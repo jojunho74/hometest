@@ -1,0 +1,25 @@
+version: 2
+updates:
+  # GitHub Actions 의존성 체크
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "jojunho74"
+    labels:
+      - "dependencies"
+
+  # npm 패키지 체크 (package.json 생기면 자동 적용)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "jojunho74"
+    labels:
+      - "dependencies"
+    ignore:
+      # 메이저 버전 업데이트는 수동으로 검토
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
