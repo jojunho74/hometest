@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 페이지</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; }
+    .btn {
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+      border: none;
+    }
+    .btn:hover  { opacity: 0.85; transform: scale(1.02); }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary   { background: #1E4D8C; color: #fff; }
+    .btn-success   { background: #16A34A; color: #fff; }
+    .btn-danger    { background: #DC2626; color: #fff; }
+    .btn-secondary { background: #E2E8F0; color: #334155; }
+
+    .badge-pending  { background: #FEF9C3; color: #854D0E; padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+    .badge-done     { background: #DCFCE7; color: #166534; padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+
+    /* 로그인 오버레이 */
+    #login-screen {
+      position: fixed; inset: 0;
+      background: #0B1D3A;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 999;
+    }
+    #login-screen.hidden { display: none; }
+
+    /* 모달 */
+    #modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    #modal-overlay.hidden { display: none; }
+
+    /* 테이블 스크롤 */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    /* 세션 타임아웃 경고 */
+    #timeout-banner {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: #DC2626; color: #fff;
+      text-align: center; padding: 10px;
+      font-size: 0.875rem; font-weight: 600;
+      z-index: 200;
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+  <!-- 세션 만료 배너 -->
+  <div id="timeout-banner">세션이 곧 만료됩니다. 계속 사용하려면 화면을 클릭하세요.</div>
+
+  <!-- ─── 로그인 화면 ─── -->
+  <div id="login-screen">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-4">
+      <h1 class="text-2xl font-bold text-center text-slate-800 mb-2">관리자 로그인</h1>
+      <p class="text-center text-slate-400 text-sm mb-6">IBT 컨설팅 관리자 페이지</p>
+      <div id="login-error" class="hidden bg-red-50 text-red-600 text-sm rounded-lg px-4 py-2 mb-4">비밀번호가 올바르지 않습니다.</div>
+      <input
+        type="password"
+        id="pw-input"
+        placeholder="비밀번호 입력"
+        class="w-full border border-slate-200 rounded-lg px-4 py-3 text-base mb-4 focus:outline-none focus:border-blue-500"
+        style="font-size:16px;"
+        onkeydown="if(event.key==='Enter') tryLogin()"
+      />
+      <button onclick="tryLogin()" class="btn btn-primary w-full py-3 text-base">로그인</button>
+    </div>
+  </div>
+
+  <!-- ─── 상세 모달 ─── -->
+  <div id="modal-overlay" class="hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+      <div class="flex items-center justify-between px-6 py-4 border-b">
+        <h2 class="font-bold text-lg text-slate-800">신청 상세</h2>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+      </div>
+      <div id="modal-body" class="px-6 py-5 space-y-4 text-sm text-slate-700"></div>
+      <div class="px-6 py-4 border-t flex justify-end gap-2">
+        <button id="modal-toggle-btn" class="btn btn-success" onclick="toggleStatusFromModal()">완료 처리</button>
+        <button onclick="closeModal()" class="btn btn-secondary">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 메인 ─── -->
+  <div id="main-app" class="hidden">
+
+    <!-- 헤더 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="font-bold text-slate-800">IBT 컨설팅</span>
+          <span class="text-slate-300">|</span>
+          <span class="text-slate-500 text-sm">관리자</span>
+        </div>
+        <button onclick="logout()" class="btn btn-secondary text-xs px-3 py-1.5">로그아웃</button>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+
+      <!-- 통계 카드 -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-xl p-5 shadow-sm">
+          <p class="text-slate-400 text-xs mb-1">총 신청</p>
+          <p id="stat-total" class="text-3xl font-bold text-slate-800">-</p>
+        </div>
+        <div class="bg-white rounded-xl p-5 shadow-sm">
+          <p class="text-slate-400 text-xs mb-1">대기중</p>
+          <p id="stat-pending" class="text-3xl font-bold text-yellow-600">-</p>
+        </div>
+        <div class="bg-white rounded-xl p-5 shadow-sm">
+          <p class="text-slate-400 text-xs mb-1">완료</p>
+          <p id="stat-done" class="text-3xl font-bold text-green-600">-</p>
+        </div>
+        <div class="bg-white rounded-xl p-5 shadow-sm">
+          <p class="text-slate-400 text-xs mb-1">오늘 신청</p>
+          <p id="stat-today" class="text-3xl font-bold text-blue-600">-</p>
+        </div>
+      </div>
+
+      <!-- 필터 & 새로고침 -->
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        <div class="flex gap-2">
+          <button onclick="setFilter('all')"     id="filter-all"     class="btn btn-primary text-xs px-3 py-1.5">전체</button>
+          <button onclick="setFilter('pending')" id="filter-pending" class="btn btn-secondary text-xs px-3 py-1.5">대기중</button>
+          <button onclick="setFilter('done')"    id="filter-done"    class="btn btn-secondary text-xs px-3 py-1.5">완료</button>
+        </div>
+        <button onclick="loadData()" class="btn btn-secondary text-xs px-3 py-1.5 ml-auto">↻ 새로고침</button>
+      </div>
+
+      <!-- 테이블 -->
+      <div class="bg-white rounded-xl shadow-sm table-wrap">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-slate-400 text-xs border-b">
+              <th class="px-4 py-3 font-semibold">이름</th>
+              <th class="px-4 py-3 font-semibold">연락처</th>
+              <th class="px-4 py-3 font-semibold hidden md:table-cell">목표</th>
+              <th class="px-4 py-3 font-semibold">상태</th>
+              <th class="px-4 py-3 font-semibold hidden md:table-cell">접수일</th>
+              <th class="px-4 py-3 font-semibold">상세</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">불러오는 중...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p id="empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">신청 내역이 없습니다.</p>
+    </main>
+  </div>
+
+  <script>
+    // ─── Supabase ───
+    const { createClient } = supabase;
+    const db = createClient(
+      'https://byzulmxcuhsrjdphmuym.supabase.co',
+      'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
+    );
+
+    // ─── 비밀번호 (해시 비교) ───
+    const PASS = 'qwer1234))';
+    let SESSION_KEY = 'ibt_admin_authed';
+    let sessionTimer, warningTimer;
+    const SESSION_DURATION = 30 * 60 * 1000; // 30분
+    const WARNING_BEFORE   =  2 * 60 * 1000; //  2분 전 경고
+
+    function tryLogin() {
+      const val = document.getElementById('pw-input').value;
+      if (val === PASS) {
+        sessionStorage.setItem(SESSION_KEY, '1');
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        startSessionTimer();
+        loadData();
+      } else {
+        document.getElementById('login-error').classList.remove('hidden');
+        document.getElementById('pw-input').value = '';
+        document.getElementById('pw-input').focus();
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem(SESSION_KEY);
+      clearTimeout(sessionTimer);
+      clearTimeout(warningTimer);
+      location.reload();
+    }
+
+    function startSessionTimer() {
+      clearTimeout(sessionTimer);
+      clearTimeout(warningTimer);
+      warningTimer = setTimeout(() => {
+        document.getElementById('timeout-banner').style.display = 'block';
+      }, SESSION_DURATION - WARNING_BEFORE);
+      sessionTimer = setTimeout(logout, SESSION_DURATION);
+    }
+
+    // 활동 시 세션 리셋
+    document.addEventListener('click', () => {
+      if (sessionStorage.getItem(SESSION_KEY)) {
+        document.getElementById('timeout-banner').style.display = 'none';
+        startSessionTimer();
+      }
+    });
+
+    // 자동 로그인 (같은 탭 내 세션 유지)
+    if (sessionStorage.getItem(SESSION_KEY)) {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('main-app').classList.remove('hidden');
+      startSessionTimer();
+    }
+
+    // ─── 데이터 ───
+    let allData = [];
+    let currentFilter = 'all';
+    let currentRow = null;
+
+    async function loadData() {
+      const { data, error } = await db
+        .from('consultations')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) { console.error(error); return; }
+      allData = data;
+      updateStats();
+      renderTable();
+    }
+
+    function updateStats() {
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById('stat-total').textContent   = allData.length;
+      document.getElementById('stat-pending').textContent = allData.filter(r => r.status === 'pending').length;
+      document.getElementById('stat-done').textContent    = allData.filter(r => r.status === 'done').length;
+      document.getElementById('stat-today').textContent   = allData.filter(r => r.created_at.slice(0, 10) === today).length;
+    }
+
+    function setFilter(f) {
+      currentFilter = f;
+      ['all', 'pending', 'done'].forEach(k => {
+        document.getElementById('filter-' + k).className =
+          k === f ? 'btn btn-primary text-xs px-3 py-1.5' : 'btn btn-secondary text-xs px-3 py-1.5';
+      });
+      renderTable();
+    }
+
+    function renderTable() {
+      const rows = currentFilter === 'all'
+        ? allData
+        : allData.filter(r => r.status === currentFilter);
+
+      const tbody = document.getElementById('table-body');
+      const empty = document.getElementById('empty-msg');
+
+      if (rows.length === 0) {
+        tbody.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      tbody.innerHTML = rows.map(r => `
+        <tr class="border-b last:border-0 hover:bg-slate-50 transition-colors">
+          <td class="px-4 py-3 font-medium text-slate-800">${esc(r.name)}</td>
+          <td class="px-4 py-3 text-slate-600">${esc(r.phone)}</td>
+          <td class="px-4 py-3 text-slate-600 hidden md:table-cell max-w-[180px] truncate">${esc(r.goal_score || '-')}</td>
+          <td class="px-4 py-3">
+            <span class="${r.status === 'done' ? 'badge-done' : 'badge-pending'}">
+              ${r.status === 'done' ? '완료' : '대기중'}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-slate-400 text-xs hidden md:table-cell">${formatDate(r.created_at)}</td>
+          <td class="px-4 py-3">
+            <button onclick="openModal('${r.id}')" class="btn btn-secondary text-xs px-3 py-1.5">보기</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ─── 모달 ───
+    function openModal(id) {
+      currentRow = allData.find(r => r.id === id);
+      if (!currentRow) return;
+      const r = currentRow;
+
+      document.getElementById('modal-body').innerHTML = `
+        <div class="grid grid-cols-2 gap-3">
+          <div><p class="text-xs text-slate-400 mb-0.5">이름</p><p class="font-semibold">${esc(r.name)}</p></div>
+          <div><p class="text-xs text-slate-400 mb-0.5">연락처</p><p class="font-semibold">${esc(r.phone)}</p></div>
+        </div>
+        <div><p class="text-xs text-slate-400 mb-0.5">접수일</p><p>${formatDate(r.created_at)}</p></div>
+        ${r.current_level ? `<div><p class="text-xs text-slate-400 mb-0.5">현재 실력</p><p class="whitespace-pre-wrap">${esc(r.current_level)}</p></div>` : ''}
+        ${r.experience    ? `<div><p class="text-xs text-slate-400 mb-0.5">응시 경험</p><p>${esc(r.experience)}</p></div>` : ''}
+        ${r.goal_score    ? `<div><p class="text-xs text-slate-400 mb-0.5">목표 점수/일정</p><p class="font-semibold text-blue-700">${esc(r.goal_score)}</p></div>` : ''}
+        ${r.message       ? `<div><p class="text-xs text-slate-400 mb-0.5">추가 메모</p><p class="whitespace-pre-wrap">${esc(r.message)}</p></div>` : ''}
+        <div><p class="text-xs text-slate-400 mb-0.5">상태</p>
+          <span class="${r.status === 'done' ? 'badge-done' : 'badge-pending'}">${r.status === 'done' ? '완료' : '대기중'}</span>
+        </div>
+      `;
+
+      const btn = document.getElementById('modal-toggle-btn');
+      btn.textContent = r.status === 'done' ? '대기중으로 되돌리기' : '완료 처리';
+      btn.className   = r.status === 'done' ? 'btn btn-secondary' : 'btn btn-success';
+
+      document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.add('hidden');
+      currentRow = null;
+    }
+
+    async function toggleStatusFromModal() {
+      if (!currentRow) return;
+      const newStatus = currentRow.status === 'done' ? 'pending' : 'done';
+      const { error } = await db
+        .from('consultations')
+        .update({ status: newStatus })
+        .eq('id', currentRow.id);
+      if (error) { alert('오류가 발생했습니다.'); return; }
+      closeModal();
+      loadData();
+    }
+
+    // ─── 유틸 ───
+    function esc(str) {
+      if (!str) return '';
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function formatDate(iso) {
+      const d = new Date(iso);
+      return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    }
+
+    // Supabase 실시간 구독 (새 신청 자동 반영)
+    if (sessionStorage.getItem(SESSION_KEY)) {
+      db.channel('consultations-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'consultations' }, () => loadData())
+        .subscribe();
+    }
+  </script>
+</body>
+</html>
