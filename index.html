@@ -97,9 +97,17 @@
     .faq-icon { transition: transform .2s; flex-shrink: 0; }
     details[open] .faq-icon { transform: rotate(180deg); }
 
-    /* ── 페이드인 ── */
-    .fade-in { opacity: 0; transform: translateY(20px); transition: opacity .5s ease, transform .5s ease; }
-    .fade-in.visible { opacity: 1; transform: none; }
+    /* ── 스크롤 애니메이션 ── */
+    .slide-up   { opacity: 0; transform: translateY(50px);  transition: opacity .65s cubic-bezier(.22,1,.36,1), transform .65s cubic-bezier(.22,1,.36,1); }
+    .slide-down { opacity: 0; transform: translateY(-50px); transition: opacity .65s cubic-bezier(.22,1,.36,1), transform .65s cubic-bezier(.22,1,.36,1); }
+    .slide-left { opacity: 0; transform: translateX(50px);  transition: opacity .65s cubic-bezier(.22,1,.36,1), transform .65s cubic-bezier(.22,1,.36,1); }
+    .slide-right{ opacity: 0; transform: translateX(-50px); transition: opacity .65s cubic-bezier(.22,1,.36,1), transform .65s cubic-bezier(.22,1,.36,1); }
+    .fade-in    { opacity: 0; transform: translateY(30px);  transition: opacity .65s cubic-bezier(.22,1,.36,1), transform .65s cubic-bezier(.22,1,.36,1); }
+    .slide-up.visible, .slide-down.visible, .slide-left.visible, .slide-right.visible, .fade-in.visible { opacity: 1; transform: none; }
+    .delay-1 { transition-delay: .1s; }
+    .delay-2 { transition-delay: .2s; }
+    .delay-3 { transition-delay: .3s; }
+    .delay-4 { transition-delay: .4s; }
 
     /* ── 카드 공통 ── */
     .card { background: #fff; border-radius: 16px; border: 1px solid var(--cream-dark); }
@@ -148,7 +156,7 @@
       <div class="flex flex-col md:flex-row md:items-center md:gap-12">
 
         <!-- 텍스트 -->
-        <div class="flex-1 fade-in">
+        <div class="flex-1 slide-right">
           <div class="inline-flex items-center gap-2 text-xs font-bold px-3.5 py-1.5 rounded-full mb-6 border" style="border-color:#FDE68A;background:#FFFBEB;color:#B45309;">
             <span>⏰</span><span>이번 달 한정 무료진단 운영 중 — 선착순 200명</span>
           </div>
@@ -191,7 +199,7 @@
         </div>
 
         <!-- 일러스트 카드 -->
-        <div class="flex-1 mt-12 md:mt-0 fade-in">
+        <div class="flex-1 mt-12 md:mt-0 slide-left">
           <div class="card p-6 shadow-lg max-w-sm mx-auto">
             <!-- 이메일 미리보기 스타일 카드 -->
             <div class="flex items-center gap-2 mb-4">
@@ -239,28 +247,28 @@
   <!-- ══════ 핵심 혜택 (무료 200명) ══════ -->
   <section class="py-14 px-4 md:py-20" id="about" style="background-image: linear-gradient(rgba(30,58,138,0.84), rgba(30,58,138,0.84)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1600&q=80&fit=crop'); background-size: cover; background-position: center; color:#fff;">
     <div class="max-w-5xl mx-auto fade-in text-center">
-      <p class="text-xs font-bold tracking-widest uppercase mb-2" style="color:#7DD3FC;">핵심 혜택</p>
-      <h2 class="font-display text-2xl font-bold text-white mb-3 md:text-4xl">최대 <span style="color:#FCD34D;">200명</span> 전액 무료 지원</h2>
-      <p class="text-base mb-10 md:text-lg max-w-xl mx-auto" style="color:#93C5FD;">
+      <p class="text-xs font-bold tracking-widest uppercase mb-2 slide-down" style="color:#7DD3FC;">핵심 혜택</p>
+      <h2 class="font-display text-2xl font-bold text-white mb-3 md:text-4xl slide-down delay-1">최대 <span style="color:#FCD34D;">200명</span> 전액 무료 지원</h2>
+      <p class="text-base mb-10 md:text-lg max-w-xl mx-auto slide-down delay-2" style="color:#93C5FD;">
         국제공인 G-TELP IBT 시험을 전송 무료로 지원해드립니다.<br/>(1인 15,000원 상당 · 학년 제한 없음 · 졸업생 포함)
       </p>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-4 max-w-4xl mx-auto">
-        <div class="rounded-2xl p-5 text-center" style="background:rgba(255,255,255,.08);">
+        <div class="rounded-2xl p-5 text-center slide-up delay-1" style="background:rgba(255,255,255,.08);">
           <div class="text-3xl mb-2">⚡</div>
           <p class="font-bold text-white text-sm mb-1">즉시 성적 확인</p>
           <p class="text-xs leading-relaxed" style="color:#93C5FD;">시험 종료 후 바로 결과 확인 가능</p>
         </div>
-        <div class="rounded-2xl p-5 text-center" style="background:rgba(255,255,255,.08);">
+        <div class="rounded-2xl p-5 text-center slide-up delay-2" style="background:rgba(255,255,255,.08);">
           <div class="text-3xl mb-2">💻</div>
           <p class="font-bold text-white text-sm mb-1">온라인 개별 응시</p>
           <p class="text-xs leading-relaxed" style="color:#93C5FD;">장소·시간 제약 없이 개인 기기로</p>
         </div>
-        <div class="rounded-2xl p-5 text-center" style="background:rgba(255,255,255,.08);">
+        <div class="rounded-2xl p-5 text-center slide-up delay-3" style="background:rgba(255,255,255,.08);">
           <div class="text-3xl mb-2">🎯</div>
           <p class="font-bold text-white text-sm mb-1">목표 점수 예측</p>
           <p class="text-xs leading-relaxed" style="color:#93C5FD;">정기시험 점수를 사전에 예측 가능</p>
         </div>
-        <div class="rounded-2xl p-5 text-center" style="background:rgba(255,255,255,.08);">
+        <div class="rounded-2xl p-5 text-center slide-up delay-4" style="background:rgba(255,255,255,.08);">
           <div class="text-3xl mb-2">🗓️</div>
           <p class="font-bold text-white text-sm mb-1">정기시험과 동일 난이도</p>
           <p class="text-xs leading-relaxed" style="color:#93C5FD;">공인시험 준비용 사전 진단 최적화</p>
@@ -274,16 +282,16 @@
 
   <!-- ══════ 실제 대학 사례 ══════ -->
   <section class="py-14 px-4 md:py-20" style="background-image: linear-gradient(rgba(255,255,255,0.90), rgba(255,255,255,0.90)), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&q=80&fit=crop'); background-size: cover; background-position: center;">
-    <div class="max-w-5xl mx-auto fade-in">
-      <p class="text-xs font-bold tracking-widest uppercase mb-2" style="color:var(--blue-mid);">2026년 실제 대학 사례</p>
-      <h2 class="font-display text-2xl font-bold mb-10 md:text-3xl" style="color:var(--ink);">이미 많은 대학이 함께하고 있습니다</h2>
+    <div class="max-w-5xl mx-auto">
+      <p class="text-xs font-bold tracking-widest uppercase mb-2 slide-up" style="color:var(--blue-mid);">2026년 실제 대학 사례</p>
+      <h2 class="font-display text-2xl font-bold mb-10 md:text-3xl slide-up delay-1" style="color:var(--ink);">이미 많은 대학이 함께하고 있습니다</h2>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div class="card p-6">
+        <div class="card p-6 slide-right">
           <div class="inline-block text-xs font-bold px-2 py-1 rounded mb-3" style="background:var(--blue);color:#fff;">매년 진행</div>
           <p class="font-bold mb-2" style="color:var(--ink);">서울시립대학교 · 한성대학교 등</p>
           <p class="text-sm leading-relaxed" style="color:var(--ink-soft);">정기시험 전 실력 진단용으로 활용. 무료 제공으로 학생 참여율이 높으며 매년 일정으로 운영되고 있습니다.</p>
         </div>
-        <div class="card p-6">
+        <div class="card p-6 slide-left">
           <div class="inline-block text-xs font-bold px-2 py-1 rounded mb-3" style="background:#0F766E;color:#fff;">졸업인증</div>
           <p class="font-bold mb-2" style="color:var(--ink);">지텔프 졸업인증 대상 대학 64개교</p>
           <p class="text-sm leading-relaxed" style="color:var(--ink-soft);">공식 졸업 요건으로 채택한 대학들이 IBT 진단을 전 학기 프로그램으로 이용 중입니다.</p>
@@ -291,15 +299,15 @@
       </div>
       <!-- 통계 -->
       <div class="grid grid-cols-3 gap-4 mt-6">
-        <div class="card p-5 text-center">
+        <div class="card p-5 text-center slide-up delay-1">
           <p class="text-3xl font-bold mb-1" style="color:var(--blue-mid);">64</p>
           <p class="text-xs" style="color:var(--ink-soft);">졸업인증 대상 대학</p>
         </div>
-        <div class="card p-5 text-center">
+        <div class="card p-5 text-center slide-up delay-2">
           <p class="text-3xl font-bold mb-1" style="color:var(--blue-mid);">200+</p>
           <p class="text-xs" style="color:var(--ink-soft);">공공기관·정부부처 채용 인정</p>
         </div>
-        <div class="card p-5 text-center">
+        <div class="card p-5 text-center slide-up delay-3">
           <p class="text-3xl font-bold mb-1" style="color:var(--blue-mid);">600+</p>
           <p class="text-xs" style="color:var(--ink-soft);">대상 기업</p>
         </div>
@@ -309,12 +317,12 @@
 
   <!-- ══════ 센터 업무 최소화 ══════ -->
   <section class="py-14 px-4 md:py-20" id="process" style="background-image: linear-gradient(rgba(244,241,235,0.91), rgba(244,241,235,0.91)), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1600&q=80&fit=crop'); background-size: cover; background-position: center;">
-    <div class="max-w-5xl mx-auto fade-in">
-      <p class="text-xs font-bold tracking-widest uppercase mb-2" style="color:var(--blue-mid);">진행 방법</p>
-      <h2 class="font-display text-2xl font-bold mb-3 md:text-3xl" style="color:var(--ink);">센터 업무 최소화 — 코드 배포만 하시면 됩니다</h2>
-      <p class="text-base mb-10" style="color:var(--ink-mid);">시험 이후 모든 진행(성적 안내, 결과 상담)은 저희가 처리합니다.</p>
+    <div class="max-w-5xl mx-auto">
+      <p class="text-xs font-bold tracking-widest uppercase mb-2 slide-down" style="color:var(--blue-mid);">진행 방법</p>
+      <h2 class="font-display text-2xl font-bold mb-3 md:text-3xl slide-down delay-1" style="color:var(--ink);">센터 업무 최소화 — 코드 배포만 하시면 됩니다</h2>
+      <p class="text-base mb-10 slide-down delay-2" style="color:var(--ink-mid);">시험 이후 모든 진행(성적 안내, 결과 상담)은 저희가 처리합니다.</p>
       <div class="grid grid-cols-1 gap-0 md:grid-cols-4">
-        <div class="flex md:flex-col items-start md:items-center gap-4 md:gap-3 p-5 md:text-center">
+        <div class="flex md:flex-col items-start md:items-center gap-4 md:gap-3 p-5 md:text-center slide-up delay-1">
           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style="background:var(--blue-mid);">1</div>
           <div>
             <p class="font-bold text-sm mb-1" style="color:var(--ink);">신청서 작성</p>
@@ -322,7 +330,7 @@
           </div>
         </div>
         <div class="hidden md:flex items-center justify-center text-gray-300 text-2xl">›</div>
-        <div class="flex md:flex-col items-start md:items-center gap-4 md:gap-3 p-5 md:text-center">
+        <div class="flex md:flex-col items-start md:items-center gap-4 md:gap-3 p-5 md:text-center slide-up delay-2">
           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style="background:var(--blue-mid);">2</div>
           <div>
             <p class="font-bold text-sm mb-1" style="color:var(--ink);">응시 코드 발급</p>
@@ -330,7 +338,7 @@
           </div>
         </div>
         <div class="hidden md:flex items-center justify-center text-gray-300 text-2xl">›</div>
-        <div class="flex md:flex-col items-start md:items-center gap-4 md:gap-3 p-5 md:text-center">
+        <div class="flex md:flex-col items-start md:items-center gap-4 md:gap-3 p-5 md:text-center slide-up delay-3">
           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style="background:var(--blue-mid);">3</div>
           <div>
             <p class="font-bold text-sm mb-1" style="color:var(--ink);">학생 배포</p>
@@ -338,7 +346,7 @@
           </div>
         </div>
         <div class="hidden md:flex items-center justify-center text-gray-300 text-2xl">›</div>
-        <div class="flex md:flex-col items-start md:items-center gap-4 md:gap-3 p-5 md:text-center">
+        <div class="flex md:flex-col items-start md:items-center gap-4 md:gap-3 p-5 md:text-center slide-up delay-4">
           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style="background:var(--blue-mid);">4</div>
           <div>
             <p class="font-bold text-sm mb-1" style="color:var(--ink);">즉시 결과 확인</p>
@@ -377,8 +385,8 @@
 
   <!-- ══════ 홍보문구 라이브러리 CTA ══════ -->
   <section class="py-14 px-4" style="background-image: linear-gradient(rgba(30,58,138,0.88), rgba(30,58,138,0.88)), url('https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1600&q=80&fit=crop'); background-size: cover; background-position: center;">
-    <div class="max-w-3xl mx-auto fade-in text-center">
-      <p class="text-xs font-bold tracking-widest uppercase mb-2" style="color:#7DD3FC;">홍보문구 라이브러리</p>
+    <div class="max-w-3xl mx-auto text-center">
+      <p class="text-xs font-bold tracking-widest uppercase mb-2 slide-down" style="color:#7DD3FC;">홍보문구 라이브러리</p>
       <h2 class="font-display text-2xl font-bold mb-3 md:text-3xl" style="color:#fff;">학생 홍보, 바로 복사해서 사용하세요</h2>
       <p class="text-sm leading-relaxed mb-6 max-w-lg mx-auto" style="color:#93C5FD;">
         취업게시판, 카카오톡, 인스타그램, 학과 이메일 등 채널별 홍보문구를 바로 복사해 쓸 수 있습니다.
@@ -403,7 +411,7 @@
 
   <!-- ══════ FAQ ══════ -->
   <section class="py-14 px-4 md:py-20" style="background:var(--cream);" id="faq">
-    <div class="max-w-2xl mx-auto fade-in">
+    <div class="max-w-2xl mx-auto slide-up">
       <p class="text-xs font-bold tracking-widest uppercase mb-2 text-center" style="color:var(--blue-mid);">자주 묻는 질문</p>
       <h2 class="font-display text-2xl font-bold text-center mb-10 md:text-3xl" style="color:var(--ink);">FAQ</h2>
       <div class="divide-y" style="border-top:1px solid var(--cream-dark);border-bottom:1px solid var(--cream-dark);">
@@ -448,7 +456,7 @@
 
   <!-- ══════ 신청 폼 ══════ -->
   <section class="py-14 px-4 md:py-20" style="background:var(--blue);" id="consultation-form">
-    <div class="max-w-lg mx-auto fade-in">
+    <div class="max-w-lg mx-auto slide-up">
       <p class="text-xs font-bold tracking-widest uppercase mb-2 text-center" style="color:#93C5FD;">무료 신청</p>
       <h2 class="font-display text-2xl font-bold text-white text-center mb-2 md:text-3xl">지금 바로 신청하세요</h2>
       <p class="text-sm text-center mb-6" style="color:#93C5FD;">제출 후 2영업일 내 연락드립니다 — 선착순 200명 마감 전에 신청하세요</p>
@@ -546,8 +554,8 @@
 
   <!-- ══════ 도입 기관 로고 ══════ -->
   <section class="py-12 px-4" style="background:var(--cream-dark);">
-    <div class="max-w-5xl mx-auto fade-in text-center">
-      <p class="text-xs font-bold tracking-widest uppercase mb-2" style="color:var(--blue-mid);">공공기관 · 기업 채용 인정</p>
+    <div class="max-w-5xl mx-auto text-center">
+      <p class="text-xs font-bold tracking-widest uppercase mb-2 slide-down" style="color:var(--blue-mid);">공공기관 · 기업 채용 인정</p>
       <h2 class="font-display text-xl font-bold mb-8 md:text-2xl" style="color:var(--ink);">국내 200개 이상 공공기관에서 공식 인정되는 시험입니다</h2>
       <img src="./partner-logos.png" alt="도입 기관 로고 목록" class="w-full max-w-4xl mx-auto rounded-2xl shadow-md" style="border:1px solid var(--cream-dark);" />
     </div>
@@ -613,8 +621,8 @@
       document.getElementById('step-indicators').style.display = 'none';
     });
 
-    const observer = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.1 });
-    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    const observer = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.08 });
+    document.querySelectorAll('.fade-in, .slide-up, .slide-down, .slide-left, .slide-right').forEach(el => observer.observe(el));
 
     const mobileCta = document.getElementById('mobile-cta');
     const hero = document.querySelector('section.bg-white');
