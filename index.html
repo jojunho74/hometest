@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IBT 컨설팅서비스 — 국제공인영어시험 전략 코칭</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              900: '#0B1D3A',
+              800: '#112952',
+              700: '#1A3A6B',
+              600: '#1E4D8C',
+              500: '#2560A8',
+              400: '#3B7AC7',
+            },
+            gold: {
+              500: '#C9992A',
+              400: '#DBA83A',
+              300: '#EFC058',
+            },
+            cream: '#F8F5EF',
+          },
+          fontFamily: {
+            display: ['"Noto Serif KR"', 'serif'],
+            sans:    ['"Noto Sans KR"', 'sans-serif'],
+          },
+          boxShadow: {
+            'navy-lg': '0 8px 32px rgba(11,29,58,0.18), 0 2px 8px rgba(11,29,58,0.10)',
+            'navy-xl': '0 20px 60px rgba(11,29,58,0.24), 0 4px 16px rgba(11,29,58,0.12)',
+            'gold':    '0 4px 20px rgba(201,153,42,0.30)',
+          },
+          screens: {
+            xs: '390px',
+          },
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Sans KR', sans-serif; -webkit-text-size-adjust: 100%; }
+    .font-display { font-family: 'Noto Serif KR', serif; }
+
+    /* ─── 버튼 상태 ─── */
+    .btn-primary {
+      background: #C9992A;
+      color: #fff;
+      /* 모바일 최소 터치 타겟 48px */
+      min-height: 52px;
+      padding: 0.875rem 1.75rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+      transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+      box-shadow: 0 4px 20px rgba(201,153,42,0.30);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-primary:hover  { background: #b8881e; transform: scale(1.025); box-shadow: 0 6px 28px rgba(201,153,42,0.40); }
+    .btn-primary:focus  { outline: none; box-shadow: 0 0 0 3px rgba(201,153,42,0.50); }
+    .btn-primary:active { transform: scale(0.96); background: #a07818; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-secondary {
+      background: transparent;
+      color: #C9992A;
+      min-height: 52px;
+      padding: 0.875rem 1.75rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      border: 2px solid #C9992A;
+      transition: background 0.18s, color 0.18s, transform 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-secondary:hover  { background: #C9992A; color: #fff; transform: scale(1.02); }
+    .btn-secondary:focus  { outline: none; box-shadow: 0 0 0 3px rgba(201,153,42,0.35); }
+    .btn-secondary:active { transform: scale(0.96); background: #C9992A; color: #fff; }
+
+    /* ─── 폼 ─── */
+    .form-step { display: none; }
+    .form-step.active { display: block; }
+
+    /* iOS 줌 방지: font-size 16px 이상 */
+    .form-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 8px;
+      font-size: 16px;          /* ← iOS 줌 방지 핵심 */
+      font-family: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      background: #fff;
+      color: #1E293B;
+      -webkit-appearance: none;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: #1E4D8C;
+      box-shadow: 0 0 0 3px rgba(30,77,140,0.14);
+    }
+
+    /* ─── 체크박스 ─── */
+    .custom-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      min-width: 22px;
+      width: 22px;
+      height: 22px;
+      border: 2px solid #3B7AC7;
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .custom-checkbox:checked { background: #1E4D8C; border-color: #1E4D8C; }
+    .custom-checkbox:checked::after {
+      content: '✓';
+      position: absolute;
+      color: #fff;
+      font-size: 13px;
+      top: 1px;
+      left: 3px;
+    }
+
+    /* 체크박스 터치 타겟: 전체 행 */
+    .check-row {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ─── FAQ ─── */
+    details summary { list-style: none; }
+    details summary::-webkit-details-marker { display: none; }
+    details summary {
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    details[open] .faq-icon { transform: rotate(180deg); }
+    .faq-icon { transition: transform 0.2s; flex-shrink: 0; }
+
+    /* ─── 스크롤 페이드인 ─── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    /* ─── 모바일 하단 고정 CTA ─── */
+    #mobile-cta {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 100;
+      background: #0B1D3A;
+      border-top: 1px solid #1A3A6B;
+      padding: 12px 16px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      display: flex;
+      gap: 10px;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+    #mobile-cta.show { transform: translateY(0); }
+    /* 데스크탑에서는 숨김 */
+    @media (min-width: 768px) { #mobile-cta { display: none !important; } }
+
+    /* 모바일 하단 CTA가 보일 때 페이지 하단 여백 */
+    body.cta-visible { padding-bottom: 80px; }
+    @media (min-width: 768px) { body.cta-visible { padding-bottom: 0; } }
+
+    /* ─── 히어로 gradient overlay ─── */
+    .hero-bg {
+      background: linear-gradient(160deg, #0B1D3A 60%, #112952 100%);
+    }
+
+    /* ─── 카드 아이콘 배경 ─── */
+    .icon-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(30,77,140,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body class="bg-white text-navy-900">
+
+  <!-- ─────────── HEADER ─────────── -->
+  <header class="sticky top-0 z-50 bg-navy-900 shadow-navy-lg">
+    <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+      <span class="font-display text-white text-base font-semibold tracking-tight">IBT 컨설팅</span>
+      <!-- 헤더 CTA는 모바일에서 숨기고 하단 바로 대체 -->
+      <a href="#consultation-form" class="hidden md:inline-flex btn-primary text-sm px-5" style="min-height:40px;padding-top:0.5rem;padding-bottom:0.5rem;">무료 상담 신청</a>
+    </div>
+  </header>
+
+  <!-- ─────────── HERO ─────────── -->
+  <section class="hero-bg text-white pt-12 pb-16 px-4 md:pt-20 md:pb-24">
+    <div class="max-w-3xl mx-auto text-center fade-in">
+
+      <!-- 긴급 배너 -->
+      <div class="inline-flex items-center gap-1.5 bg-gold-500 text-navy-900 text-xs font-bold px-3.5 py-1.5 rounded-full mb-6 md:text-sm md:px-4 md:mb-8">
+        <span>⏰</span>
+        <span>이번 달 한정 — 특별 패키지 운영 중</span>
+      </div>
+
+      <h1 class="font-display text-[1.75rem] leading-snug font-bold mb-4 xs:text-3xl md:text-5xl md:leading-tight md:mb-6">
+        영어 시험 전략을 모르겠다면<br class="hidden xs:block"/>
+        <span class="text-gold-400"> 1:1 IBT 컨설팅</span>으로<br/>
+        최단기간 목표 점수를 잡으세요
+      </h1>
+
+      <p class="text-base leading-relaxed mb-2 md:text-xl md:mb-4 md:max-w-2xl md:mx-auto" style="color:#93B8D8;">
+        대학생·졸업생을 위한 토익·아이엘츠·토플 맞춤 전략 코칭
+      </p>
+      <p class="text-base leading-relaxed mb-8 md:text-xl md:mb-10" style="color:#93B8D8;">
+        단순 강의가 아니라 <strong class="text-white">당신의 상황에 딱 맞는 로드맵</strong>을 드립니다.
+      </p>
+
+      <!-- CTA — 모바일: 전체 너비 세로 스택, 데스크탑: 가로 나란히 -->
+      <div class="flex flex-col gap-3 md:flex-row md:gap-4 md:justify-center">
+        <a href="#consultation-form" class="btn-primary text-base w-full md:w-auto md:px-10">지금 무료 상담 신청하기 →</a>
+        <a href="#about" class="btn-secondary text-base w-full md:w-auto md:px-8">서비스 자세히 보기</a>
+      </div>
+
+      <!-- 소셜 프루프 숫자 -->
+      <div class="flex justify-center gap-6 mt-8 md:mt-10 pt-6 border-t border-navy-700">
+        <div class="text-center">
+          <p class="font-display text-2xl font-bold text-gold-400">100+</p>
+          <p class="text-xs mt-0.5" style="color:#93B8D8;">수강생</p>
+        </div>
+        <div class="w-px bg-navy-700"></div>
+        <div class="text-center">
+          <p class="font-display text-2xl font-bold text-gold-400">92%</p>
+          <p class="text-xs mt-0.5" style="color:#93B8D8;">목표 점수 달성</p>
+        </div>
+        <div class="w-px bg-navy-700"></div>
+        <div class="text-center">
+          <p class="font-display text-2xl font-bold text-gold-400">2.3개월</p>
+          <p class="text-xs mt-0.5" style="color:#93B8D8;">평균 목표 달성 기간</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── 고통 공감 ─────────── -->
+  <section class="bg-cream py-14 px-4 md:py-20" id="about">
+    <div class="max-w-3xl mx-auto fade-in">
+      <p class="text-gold-500 font-bold text-xs tracking-widest uppercase mb-2 text-center md:text-sm md:mb-3">혹시 이런 상황이신가요?</p>
+      <h2 class="font-display text-2xl font-bold text-navy-900 text-center mb-8 md:text-4xl md:mb-12">
+        "공부는 하는데 점수가 안 오른다"
+      </h2>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
+        <div class="bg-white rounded-xl p-5 shadow-navy-lg border-l-4 border-navy-600 flex items-start gap-3">
+          <div class="icon-circle text-xl">📌</div>
+          <div>
+            <p class="font-bold text-navy-800 mb-1 text-sm md:text-base">전략 없이 무작정 공부했다</p>
+            <p class="text-slate-500 text-sm leading-relaxed">어떤 파트부터, 어떻게 공부해야 할지 몰라 시간만 낭비하고 있지 않으신가요?</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl p-5 shadow-navy-lg border-l-4 border-navy-600 flex items-start gap-3">
+          <div class="icon-circle text-xl">📌</div>
+          <div>
+            <p class="font-bold text-navy-800 mb-1 text-sm md:text-base">수차례 응시했는데 점수가 제자리</p>
+            <p class="text-slate-500 text-sm leading-relaxed">시험장에 여러 번 가봤지만 점수가 오르지 않아 자신감이 떨어지셨나요?</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl p-5 shadow-navy-lg border-l-4 border-navy-600 flex items-start gap-3">
+          <div class="icon-circle text-xl">⏱️</div>
+          <div>
+            <p class="font-bold text-navy-800 mb-1 text-sm md:text-base">시간이 없는데 방법을 모른다</p>
+            <p class="text-slate-500 text-sm leading-relaxed">학업·취업 준비와 병행해야 하는데, 짧은 시간에 효과 내는 방법이 필요하신가요?</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl p-5 shadow-navy-lg border-l-4 border-navy-600 flex items-start gap-3">
+          <div class="icon-circle text-xl">🙋</div>
+          <div>
+            <p class="font-bold text-navy-800 mb-1 text-sm md:text-base">"나에게 맞는 코칭"이 필요하다</p>
+            <p class="text-slate-500 text-sm leading-relaxed">유튜브·인강이 아니라 내 수준과 일정에 최적화된 1:1 가이드를 원하시나요?</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── 해결책 ─────────── -->
+  <section class="bg-white py-14 px-4 md:py-20">
+    <div class="max-w-3xl mx-auto fade-in text-center">
+      <p class="text-gold-500 font-bold text-xs tracking-widest uppercase mb-2 md:text-sm md:mb-3">IBT 컨설팅이 다른 이유</p>
+      <h2 class="font-display text-2xl font-bold text-navy-900 mb-4 md:text-4xl md:mb-6">
+        막막함을 <span class="text-navy-600">명확한 로드맵</span>으로
+      </h2>
+      <p class="text-slate-600 text-base mb-10 max-w-xl mx-auto leading-relaxed md:text-lg md:mb-14">
+        현재 실력·목표 점수·시험 일정을 분석해 오직 당신만을 위한 학습 전략을 설계합니다.
+      </p>
+      <!-- 모바일: 세로 나열, 태블릿+: 3열 -->
+      <div class="grid grid-cols-1 gap-4 text-left md:grid-cols-3 md:gap-6">
+        <div class="flex items-start gap-4 rounded-xl border border-slate-200 p-5 md:flex-col md:gap-3 md:p-6">
+          <div class="icon-circle flex-shrink-0">🎯</div>
+          <div>
+            <h3 class="font-bold text-navy-800 mb-1">목표 점수 달성 전략</h3>
+            <p class="text-slate-500 text-sm leading-relaxed">토익 900+, 아이엘츠 7.0+ 등 원하는 점수에 최적화된 섹션별 전략을 드립니다.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 rounded-xl border border-slate-200 p-5 md:flex-col md:gap-3 md:p-6">
+          <div class="icon-circle flex-shrink-0">⚡</div>
+          <div>
+            <h3 class="font-bold text-navy-800 mb-1">최단 기간 합격 루트</h3>
+            <p class="text-slate-500 text-sm leading-relaxed">시험 일정에 역산한 주차별 학습 계획으로 가장 빠른 경로를 안내합니다.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 rounded-xl border border-slate-200 p-5 md:flex-col md:gap-3 md:p-6">
+          <div class="icon-circle flex-shrink-0">📋</div>
+          <div>
+            <h3 class="font-bold text-navy-800 mb-1">1:1 맞춤 코스 로드맵</h3>
+            <p class="text-slate-500 text-sm leading-relaxed">실력 분석 → 취약 파트 진단 → 우선순위 학습 순서까지 맞춤 설계합니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── 오퍼 ─────────── -->
+  <section class="bg-navy-900 text-white py-14 px-4 md:py-20">
+    <div class="max-w-2xl mx-auto fade-in">
+      <p class="text-gold-400 font-bold text-xs tracking-widest uppercase mb-2 text-center md:text-sm md:mb-3">컨설팅 패키지</p>
+      <h2 class="font-display text-2xl font-bold text-center mb-8 md:text-4xl md:mb-10">
+        무료 상담 신청 시 드리는 것
+      </h2>
+      <div class="bg-navy-800 rounded-2xl p-5 shadow-navy-xl md:p-8">
+        <ul class="space-y-5">
+          <li class="flex items-start gap-3">
+            <span class="text-gold-400 font-bold text-lg mt-0.5 flex-shrink-0">✓</span>
+            <div>
+              <p class="font-bold text-white text-sm md:text-base">현재 실력 정밀 진단</p>
+              <p class="text-xs md:text-sm mt-0.5" style="color:#93B8D8;">취약 파트와 강점을 파악해 드립니다.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-gold-400 font-bold text-lg mt-0.5 flex-shrink-0">✓</span>
+            <div>
+              <p class="font-bold text-white text-sm md:text-base">목표 점수별 맞춤 전략</p>
+              <p class="text-xs md:text-sm mt-0.5" style="color:#93B8D8;">목표에 도달하기 위한 구체적인 로드맵을 제시합니다.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-gold-400 font-bold text-lg mt-0.5 flex-shrink-0">✓</span>
+            <div>
+              <p class="font-bold text-white text-sm md:text-base">시험 일정 역산 플랜</p>
+              <p class="text-xs md:text-sm mt-0.5" style="color:#93B8D8;">시험 날짜 기준으로 주차별 학습 계획을 드립니다.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-gold-400 font-bold text-lg mt-0.5 flex-shrink-0">✓</span>
+            <div>
+              <p class="font-bold text-white text-sm md:text-base">추천 학습 자료 리스트</p>
+              <p class="text-xs md:text-sm mt-0.5" style="color:#93B8D8;">검증된 교재·앱·유튜브 자원을 선별해 드립니다.</p>
+            </div>
+          </li>
+        </ul>
+        <div class="mt-7 pt-6 border-t border-navy-700 text-center">
+          <p class="text-gold-300 text-sm mb-1 font-semibold">⏰ 이번 달 한정 특가 운영 중</p>
+          <p class="text-white text-3xl font-display font-bold mb-1">무료 상담</p>
+          <p class="text-sm" style="color:#93B8D8;">부담 없이 신청하세요 — 맞는지 확인 후 결정하시면 됩니다</p>
+          <a href="#consultation-form" class="btn-primary w-full mt-5 text-base">지금 바로 무료 상담 신청하기</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── 보장 ─────────── -->
+  <section class="bg-cream py-12 px-4 md:py-16">
+    <div class="max-w-2xl mx-auto fade-in text-center">
+      <div class="text-5xl mb-4">🛡️</div>
+      <h2 class="font-display text-xl font-bold text-navy-900 mb-3 md:text-3xl md:mb-4">
+        부담 없이 신청하세요
+      </h2>
+      <p class="text-slate-600 leading-relaxed max-w-lg mx-auto text-sm md:text-base">
+        상담 후 저와 핏이 맞지 않는다고 느끼시면 언제든 부담 없이 말씀해 주세요.
+        억지로 진행하지 않습니다. <strong class="text-navy-800">맞는 경우에만 함께합니다.</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- ─────────── FAQ ─────────── -->
+  <section class="bg-white py-14 px-4 md:py-20">
+    <div class="max-w-2xl mx-auto fade-in">
+      <p class="text-gold-500 font-bold text-xs tracking-widest uppercase mb-2 text-center md:text-sm md:mb-3">자주 묻는 질문</p>
+      <h2 class="font-display text-2xl font-bold text-navy-900 text-center mb-8 md:text-3xl md:mb-10">FAQ</h2>
+      <div class="space-y-3">
+        <details class="bg-cream rounded-xl overflow-hidden">
+          <summary class="px-5 py-4 font-bold text-navy-800 text-sm md:text-base">
+            어떤 시험을 다루나요?
+            <span class="faq-icon text-navy-500 text-xs">▼</span>
+          </summary>
+          <p class="px-5 pb-5 text-slate-600 text-sm leading-relaxed">토익(TOEIC), 토플(TOEFL), 아이엘츠(IELTS), OPIc 등 국제공인영어시험 전반을 다룹니다. 상담 시 목표 시험을 알려주시면 해당 시험에 특화된 전략을 제공합니다.</p>
+        </details>
+        <details class="bg-cream rounded-xl overflow-hidden">
+          <summary class="px-5 py-4 font-bold text-navy-800 text-sm md:text-base">
+            영어 초보도 효과가 있나요?
+            <span class="faq-icon text-navy-500 text-xs">▼</span>
+          </summary>
+          <p class="px-5 pb-5 text-slate-600 text-sm leading-relaxed">네, 현재 실력에 상관없이 가능합니다. 초보일수록 잘못된 방향으로 시간을 낭비하기 쉬운데, 처음부터 올바른 전략을 잡아드리면 오히려 더 빠른 성장이 가능합니다.</p>
+        </details>
+        <details class="bg-cream rounded-xl overflow-hidden">
+          <summary class="px-5 py-4 font-bold text-navy-800 text-sm md:text-base">
+            상담은 어떻게 진행되나요?
+            <span class="faq-icon text-navy-500 text-xs">▼</span>
+          </summary>
+          <p class="px-5 pb-5 text-slate-600 text-sm leading-relaxed">신청서 제출 → 24시간 내 연락 → 30~40분 1:1 화상/전화 상담 순으로 진행됩니다. 상담에서 현재 상황을 파악하고 목표 달성 가능성을 함께 확인합니다.</p>
+        </details>
+        <details class="bg-cream rounded-xl overflow-hidden">
+          <summary class="px-5 py-4 font-bold text-navy-800 text-sm md:text-base">
+            바쁜 학생/직장인도 가능한가요?
+            <span class="faq-icon text-navy-500 text-xs">▼</span>
+          </summary>
+          <p class="px-5 pb-5 text-slate-600 text-sm leading-relaxed">네, 오히려 시간이 부족한 분들에게 더 도움이 됩니다. 전략 없이 많은 시간을 쏟는 것보다, 한정된 시간에 집중할 핵심만 골라드립니다.</p>
+        </details>
+        <details class="bg-cream rounded-xl overflow-hidden">
+          <summary class="px-5 py-4 font-bold text-navy-800 text-sm md:text-base">
+            비용은 얼마인가요?
+            <span class="faq-icon text-navy-500 text-xs">▼</span>
+          </summary>
+          <p class="px-5 pb-5 text-slate-600 text-sm leading-relaxed">초기 상담은 무료입니다. 컨설팅 프로그램 비용은 상담 후 개인 상황에 맞게 안내드립니다. 이번 달은 특별 할인 패키지를 운영하고 있으니 빠른 신청을 권장드립니다.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── 상담 폼 ─────────── -->
+  <section class="bg-navy-900 py-14 px-4 md:py-20" id="consultation-form">
+    <div class="max-w-lg mx-auto fade-in">
+      <p class="text-gold-400 font-bold text-xs tracking-widest uppercase mb-2 text-center md:text-sm md:mb-3">무료 상담 신청</p>
+      <h2 class="font-display text-2xl font-bold text-white text-center mb-2 md:text-3xl">
+        지금 바로 신청하세요
+      </h2>
+      <p class="text-center text-sm mb-6 md:text-base md:mb-8" style="color:#93B8D8;">
+        24시간 내 연락드립니다 — 이번 달 특가 마감 전에 신청하세요
+      </p>
+
+      <!-- 스텝 인디케이터 -->
+      <div class="flex items-center justify-center gap-0 mb-6 md:mb-8" id="step-indicators">
+        <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold step-dot" style="background:#C9992A;color:#0B1D3A;">1</div>
+        <div class="h-0.5 flex-1 max-w-[40px]" style="background:#1A3A6B;"></div>
+        <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold step-dot" style="background:#1A3A6B;color:#64748B;">2</div>
+        <div class="h-0.5 flex-1 max-w-[40px]" style="background:#1A3A6B;"></div>
+        <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold step-dot" style="background:#1A3A6B;color:#64748B;">3</div>
+      </div>
+
+      <form id="main-form" class="bg-navy-800 rounded-2xl p-5 shadow-navy-xl md:p-8">
+
+        <!-- Step 1 -->
+        <div class="form-step active" id="step-1">
+          <h3 class="font-bold text-white text-base mb-5 md:text-lg md:mb-6">기본 정보를 입력해주세요</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold mb-1.5" style="color:#93B8D8;">이름 <span style="color:#DBA83A;">*</span></label>
+              <input type="text" name="name" class="form-input" placeholder="홍길동" required autocomplete="name" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1.5" style="color:#93B8D8;">연락처 <span style="color:#DBA83A;">*</span></label>
+              <input type="tel" name="phone" class="form-input" placeholder="010-0000-0000" required autocomplete="tel" inputmode="tel" />
+            </div>
+          </div>
+          <button type="button" onclick="nextStep(1)" class="btn-primary w-full mt-5">다음 →</button>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="form-step" id="step-2">
+          <h3 class="font-bold text-white text-base mb-5 md:text-lg md:mb-6">현재 영어 실력을 알려주세요</h3>
+          <div class="space-y-5">
+            <div>
+              <label class="block text-sm font-semibold mb-1.5" style="color:#93B8D8;">준비 중인 시험과 현재 실력</label>
+              <textarea name="current_level" class="form-input" rows="3"
+                placeholder="예) 토익 준비 중, 현재 600점대입니다. 듣기가 특히 약합니다."></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-2" style="color:#93B8D8;">시험 응시 경험이 있으신가요?</label>
+              <div class="space-y-1">
+                <label class="check-row">
+                  <input type="checkbox" name="experience" value="처음" class="custom-checkbox" />
+                  <span class="text-white text-sm">처음 준비합니다</span>
+                </label>
+                <label class="check-row">
+                  <input type="checkbox" name="experience" value="수차례_응시" class="custom-checkbox" />
+                  <span class="text-white text-sm">수차례 응시했지만 점수가 정체 중입니다</span>
+                </label>
+                <label class="check-row">
+                  <input type="checkbox" name="experience" value="오래_준비중" class="custom-checkbox" />
+                  <span class="text-white text-sm">오래 준비했는데 효과가 없었습니다</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-3 mt-5">
+            <button type="button" onclick="prevStep(2)" class="btn-secondary flex-1">← 이전</button>
+            <button type="button" onclick="nextStep(2)" class="btn-primary flex-1">다음 →</button>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="form-step" id="step-3">
+          <h3 class="font-bold text-white text-base mb-5 md:text-lg md:mb-6">목표와 일정을 알려주세요</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold mb-1.5" style="color:#93B8D8;">목표 점수와 시험 일정 <span style="color:#DBA83A;">*</span></label>
+              <input type="text" name="goal_score" class="form-input"
+                placeholder="예) 토익 850점 / 3개월 안에" required />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1.5" style="color:#93B8D8;">추가로 알려주실 내용 (선택)</label>
+              <textarea name="message" class="form-input" rows="3"
+                placeholder="예) 취업 때문에 급합니다. 주말에만 공부 가능합니다."></textarea>
+            </div>
+          </div>
+          <div class="flex gap-3 mt-5">
+            <button type="button" onclick="prevStep(3)" class="btn-secondary flex-1">← 이전</button>
+            <button type="submit" class="btn-primary flex-1">신청하기 ✓</button>
+          </div>
+        </div>
+
+        <!-- 완료 -->
+        <div class="form-step text-center py-4" id="step-done">
+          <div class="text-5xl mb-4">🎉</div>
+          <h3 class="font-display text-xl font-bold text-white mb-3">신청이 완료되었습니다!</h3>
+          <p class="text-sm leading-relaxed" style="color:#93B8D8;">
+            접수 완료! 24시간 내 연락드립니다.<br/>잠시만 기다려 주세요 😊
+          </p>
+        </div>
+
+      </form>
+    </div>
+  </section>
+
+  <!-- ─────────── P.S. ─────────── -->
+  <section class="bg-cream py-10 px-4">
+    <div class="max-w-lg mx-auto fade-in text-center">
+      <p class="text-navy-700 leading-relaxed text-sm">
+        <strong>P.S.</strong> 오리진 스토리는 준비 중입니다. 완성 후 업데이트됩니다.<br/>
+        지금 신청하시면 이번 달 한정 특별 패키지를 받으실 수 있습니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- ─────────── FOOTER ─────────── -->
+  <footer class="bg-navy-900 text-center py-8 px-4">
+    <p class="text-xs md:text-sm" style="color:#4A6FA5;">© 2026 IBT 컨설팅서비스. All rights reserved.</p>
+  </footer>
+
+  <!-- ─────────── 모바일 하단 고정 CTA ─────────── -->
+  <div id="mobile-cta">
+    <a href="#consultation-form" class="btn-primary flex-1 text-sm" style="min-height:48px;">무료 상담 신청하기 →</a>
+  </div>
+
+  <script>
+    // ─── 폼 다단계 ───
+    function updateDots(step) {
+      document.querySelectorAll('.step-dot').forEach((dot, i) => {
+        if (i + 1 < step) {
+          dot.style.background = '#22C55E'; dot.style.color = '#fff';
+        } else if (i + 1 === step) {
+          dot.style.background = '#C9992A'; dot.style.color = '#0B1D3A';
+        } else {
+          dot.style.background = '#1A3A6B'; dot.style.color = '#64748B';
+        }
+      });
+    }
+
+    function showStep(step) {
+      document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById('step-' + step);
+      if (target) {
+        target.classList.add('active');
+        // 모바일: 폼 상단으로 스크롤
+        document.getElementById('consultation-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      updateDots(step);
+    }
+
+    function nextStep(from) {
+      const step = document.getElementById('step-' + from);
+      const required = step.querySelectorAll('[required]');
+      for (const field of required) {
+        if (!field.value.trim()) {
+          field.focus();
+          field.style.borderColor = '#EF4444';
+          setTimeout(() => field.style.borderColor = '', 1500);
+          return;
+        }
+      }
+      showStep(from + 1);
+    }
+
+    function prevStep(from) {
+      showStep(from - 1);
+    }
+
+    // ─── Supabase 초기화 ───
+    const { createClient } = supabase;
+    const _supabase = createClient(
+      'https://byzulmxcuhsrjdphmuym.supabase.co',
+      'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
+    );
+
+    document.getElementById('main-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const submitBtn = this.querySelector('[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = '저장 중...';
+
+      // 체크박스 값 수집
+      const checked = [...this.querySelectorAll('input[name="experience"]:checked')]
+        .map(el => el.value).join(', ');
+
+      const payload = {
+        name:          this.name.value.trim(),
+        phone:         this.phone.value.trim(),
+        current_level: this.current_level.value.trim(),
+        experience:    checked,
+        goal_score:    this.goal_score.value.trim(),
+        message:       this.message.value.trim(),
+      };
+
+      const { error } = await _supabase.from('consultations').insert([payload]);
+
+      if (error) {
+        console.error(error);
+        submitBtn.disabled = false;
+        submitBtn.textContent = '신청하기 ✓';
+        alert('저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        return;
+      }
+
+      document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+      document.getElementById('step-done').classList.add('active');
+      document.getElementById('step-indicators').style.display = 'none';
+    });
+
+    // ─── 스크롤 페이드인 ───
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.10 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // ─── 모바일 하단 CTA: 히어로 벗어나면 표시 ───
+    const mobileCta = document.getElementById('mobile-cta');
+    const heroSection = document.querySelector('section.hero-bg');
+    const formSection = document.getElementById('consultation-form');
+
+    const ctaObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        // 히어로가 화면에서 완전히 사라지면 CTA 표시
+        if (!entry.isIntersecting) {
+          mobileCta.classList.add('show');
+          document.body.classList.add('cta-visible');
+        } else {
+          mobileCta.classList.remove('show');
+          document.body.classList.remove('cta-visible');
+        }
+      });
+    }, { threshold: 0 });
+
+    if (heroSection) ctaObserver.observe(heroSection);
+
+    // 폼 섹션 도달 시 CTA 숨김
+    const formObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          mobileCta.classList.remove('show');
+          document.body.classList.remove('cta-visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    if (formSection) formObserver.observe(formSection);
+  </script>
+</body>
+</html>
