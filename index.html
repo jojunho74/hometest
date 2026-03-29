@@ -6,98 +6,94 @@
   <title>국제공인영어시험 지텔프IBT 대학컨설팅</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            blue:  { DEFAULT: '#2323FF', dark: '#1414CC', light: '#4444FF' },
-            cream: { DEFAULT: '#F4F1EB', dark: '#E8E4DA' },
-            ink:   { DEFAULT: '#111111', mid: '#444444', soft: '#888888' },
-          },
-          fontFamily: {
-            sans: ['"Noto Sans KR"', 'sans-serif'],
-            display: ['"Noto Serif KR"', 'serif'],
-          },
-        }
-      }
-    }
-  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@700&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --blue: #1E3A8A;
+      --blue-mid: #2563EB;
+      --teal: #0891B2;
+      --cream: #F4F1EB;
+      --cream-dark: #E8E4DA;
+      --ink: #111827;
+      --ink-mid: #374151;
+      --ink-soft: #6B7280;
+      --gold: #D97706;
+    }
     html { scroll-behavior: smooth; }
-    body { font-family: 'Noto Sans KR', sans-serif; background: #F4F1EB; color: #111111; -webkit-text-size-adjust: 100%; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--cream); color: var(--ink); -webkit-text-size-adjust: 100%; }
+    .font-display { font-family: 'Noto Serif KR', serif; }
 
     /* ── 버튼 ── */
-    .btn-blue {
-      background: #2323FF; color: #fff;
-      padding: 0.75rem 1.75rem; border-radius: 999px;
-      font-weight: 700; font-size: 0.9rem;
-      border: 2px solid #2323FF;
-      min-height: 48px;
+    .btn-primary {
+      background: var(--blue-mid); color: #fff;
+      padding: .875rem 2rem; border-radius: 8px;
+      font-weight: 700; font-size: .95rem; min-height: 52px;
       display: inline-flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: background .18s, transform .15s;
+      cursor: pointer; border: none;
+      transition: background .18s, transform .15s, box-shadow .18s;
+      box-shadow: 0 4px 16px rgba(37,99,235,.3);
       -webkit-tap-highlight-color: transparent;
     }
-    .btn-blue:hover  { background: #1414CC; border-color: #1414CC; transform: scale(1.02); }
-    .btn-blue:active { transform: scale(0.97); }
-    .btn-blue:focus  { outline: none; box-shadow: 0 0 0 3px rgba(35,35,255,.3); }
+    .btn-primary:hover  { background: #1d4ed8; transform: scale(1.02); }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-primary:focus  { outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,.35); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
     .btn-outline {
-      background: transparent; color: #2323FF;
-      padding: 0.75rem 1.75rem; border-radius: 999px;
-      font-weight: 700; font-size: 0.9rem;
-      border: 2px solid #2323FF;
-      min-height: 48px;
+      background: transparent; color: var(--blue-mid);
+      padding: .875rem 2rem; border-radius: 8px;
+      font-weight: 700; font-size: .95rem; min-height: 52px;
       display: inline-flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: background .18s, color .18s, transform .15s;
+      cursor: pointer; border: 2px solid var(--blue-mid);
+      transition: background .18s, color .18s, transform .15s;
       -webkit-tap-highlight-color: transparent;
     }
-    .btn-outline:hover  { background: #2323FF; color: #fff; transform: scale(1.02); }
+    .btn-outline:hover  { background: var(--blue-mid); color: #fff; transform: scale(1.02); }
     .btn-outline:active { transform: scale(0.97); }
-    .btn-outline:focus  { outline: none; box-shadow: 0 0 0 3px rgba(35,35,255,.3); }
+
+    .btn-gold {
+      background: var(--gold); color: #fff;
+      padding: .875rem 2rem; border-radius: 8px;
+      font-weight: 700; font-size: .95rem; min-height: 52px;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; border: none;
+      transition: background .18s, transform .15s;
+      box-shadow: 0 4px 16px rgba(217,119,6,.3);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-gold:hover  { background: #b45309; transform: scale(1.02); }
+    .btn-gold:active { transform: scale(0.97); }
 
     /* ── 폼 ── */
     .form-step { display: none; }
     .form-step.active { display: block; }
     .form-input {
-      width: 100%; padding: 0.875rem 1rem;
-      border: 1.5px solid #D1CBC0; border-radius: 8px;
+      width: 100%; padding: .875rem 1rem;
+      border: 1.5px solid #D1D5DB; border-radius: 8px;
       font-size: 16px; font-family: inherit;
-      background: #fff; color: #111;
+      background: #fff; color: var(--ink);
       transition: border-color .15s, box-shadow .15s;
       -webkit-appearance: none;
     }
-    .form-input:focus { outline: none; border-color: #2323FF; box-shadow: 0 0 0 3px rgba(35,35,255,.1); }
+    .form-input:focus { outline: none; border-color: var(--blue-mid); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
 
     /* ── 체크박스 ── */
     .custom-checkbox {
       appearance: none; -webkit-appearance: none;
       min-width: 22px; width: 22px; height: 22px;
-      border: 2px solid #2323FF; border-radius: 4px;
+      border: 2px solid var(--blue-mid); border-radius: 4px;
       cursor: pointer; position: relative; flex-shrink: 0;
     }
-    .custom-checkbox:checked { background: #2323FF; }
-    .custom-checkbox:checked::after {
-      content: '✓'; position: absolute; color: #fff;
-      font-size: 13px; top: 1px; left: 3px;
-    }
-    .check-row {
-      min-height: 48px; display: flex; align-items: center;
-      gap: 12px; padding: 4px 0; cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
+    .custom-checkbox:checked { background: var(--blue-mid); border-color: var(--blue-mid); }
+    .custom-checkbox:checked::after { content: '✓'; position: absolute; color: #fff; font-size: 13px; top: 1px; left: 3px; }
+    .check-row { min-height: 48px; display: flex; align-items: center; gap: 12px; padding: 4px 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
     /* ── FAQ ── */
     details summary { list-style: none; }
     details summary::-webkit-details-marker { display: none; }
-    details summary {
-      min-height: 52px; display: flex; align-items: center;
-      justify-content: space-between; gap: 12px;
-      cursor: pointer; -webkit-tap-highlight-color: transparent;
-    }
+    details summary { min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
     .faq-icon { transition: transform .2s; flex-shrink: 0; }
     details[open] .faq-icon { transform: rotate(180deg); }
 
@@ -105,12 +101,14 @@
     .fade-in { opacity: 0; transform: translateY(20px); transition: opacity .5s ease, transform .5s ease; }
     .fade-in.visible { opacity: 1; transform: none; }
 
+    /* ── 카드 공통 ── */
+    .card { background: #fff; border-radius: 16px; border: 1px solid var(--cream-dark); }
+
     /* ── 모바일 하단 CTA ── */
     #mobile-cta {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-      background: #fff; border-top: 1px solid #E8E4DA;
-      padding: 12px 16px;
-      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      background: #fff; border-top: 1px solid var(--cream-dark);
+      padding: 12px 16px; padding-bottom: max(12px, env(safe-area-inset-bottom));
       transform: translateY(100%); transition: transform .3s ease;
     }
     #mobile-cta.show { transform: translateY(0); }
@@ -118,323 +116,118 @@
     body.cta-visible { padding-bottom: 80px; }
     @media (min-width: 768px) { body.cta-visible { padding-bottom: 0; } }
 
-    /* ── 선 일러스트 SVG 색상 ── */
-    .illust-blue { color: #2323FF; }
+    /* ── 네이비 섹션 ── */
+    .dark-section { background: var(--blue); color: #fff; }
 
-    /* ── 스텝 원형 ── */
-    .step-circle {
-      width: 72px; height: 72px; border-radius: 50%;
-      border: 2px solid #2323FF;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      background: #fff;
-      position: relative;
-    }
-    .step-circle.active-step { background: #2323FF; }
-    .step-circle.active-step svg { color: #fff !important; }
-
-    /* ── 다크 섹션 ── */
-    .dark-section { background: #111111; color: #fff; }
-
-    /* ── 구분선 ── */
-    .divider { border: none; border-top: 1px solid #D1CBC0; }
+    /* ── 스텝 원 ── */
+    .step-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; flex-shrink: 0; }
   </style>
 </head>
 <body>
 
   <!-- ══════ HEADER ══════ -->
-  <header class="sticky top-0 z-50 bg-cream border-b border-cream-dark">
-    <div class="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
-      <span class="font-display text-ink font-bold text-base tracking-tight">지텔프IBT 대학컨설팅</span>
-      <nav class="hidden md:flex items-center gap-8 text-sm text-ink-mid font-medium">
-        <a href="#about" class="hover:text-blue transition-colors">서비스 소개</a>
-        <a href="#steps" class="hover:text-blue transition-colors">진행 방법</a>
-        <a href="#faq" class="hover:text-blue transition-colors">FAQ</a>
+  <header class="sticky top-0 z-50 bg-white border-b border-cream-dark shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <a href="index.html" class="font-display text-blue text-base font-bold tracking-tight" style="color:var(--blue);">지텔프IBT 대학컨설팅</a>
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium" style="color:var(--ink-mid);">
+        <a href="#about" class="hover:text-blue-600 transition-colors">서비스 소개</a>
+        <a href="#process" class="hover:text-blue-600 transition-colors">진행 방법</a>
+        <a href="library.html" class="hover:text-blue-600 transition-colors">홍보문구 라이브러리</a>
+        <a href="#faq" class="hover:text-blue-600 transition-colors">FAQ</a>
       </nav>
-      <a href="#consultation-form" class="hidden md:inline-flex btn-blue text-sm px-5" style="min-height:38px;padding-top:.5rem;padding-bottom:.5rem;">무료 진단 신청</a>
+      <div class="flex items-center gap-2">
+        <a href="library.html" class="hidden md:inline-flex btn-outline text-xs px-4" style="min-height:38px;padding-top:.4rem;padding-bottom:.4rem;">홍보문구 라이브러리</a>
+        <a href="#consultation-form" class="btn-primary text-sm px-5" style="min-height:38px;padding-top:.4rem;padding-bottom:.4rem;">무료 신청하기</a>
+      </div>
     </div>
   </header>
 
   <!-- ══════ HERO ══════ -->
-  <section class="bg-cream pt-14 pb-16 px-5 md:pt-24 md:pb-28 overflow-hidden">
+  <section class="bg-white pt-14 pb-16 px-4 md:pt-20 md:pb-24 overflow-hidden">
     <div class="max-w-6xl mx-auto">
       <div class="flex flex-col md:flex-row md:items-center md:gap-12">
 
         <!-- 텍스트 -->
         <div class="flex-1 fade-in">
-          <!-- 배너 -->
-          <div class="inline-flex items-center gap-2 border border-blue text-blue text-xs font-bold px-3 py-1 rounded-full mb-6">
-            <span>⏰</span>
-            <span>이번 달 한정 무료진단 운영 중 — 선착순 200명</span>
+          <div class="inline-flex items-center gap-2 text-xs font-bold px-3.5 py-1.5 rounded-full mb-6 border" style="border-color:#FDE68A;background:#FFFBEB;color:#B45309;">
+            <span>⏰</span><span>이번 달 한정 무료진단 운영 중 — 선착순 200명</span>
           </div>
 
-          <h1 class="font-display text-[2rem] leading-tight font-bold text-ink mb-5 md:text-5xl md:leading-snug">
-            공인영어 실력 진단<br/>
-            <span class="text-blue">취업준비 영어실력</span><br/>
-            무료 진단
+          <h1 class="font-display text-[1.85rem] leading-snug font-bold mb-5 md:text-5xl md:leading-tight" style="color:var(--ink);">
+            취업 준비 학생의<br/>
+            <span style="color:var(--blue-mid);">영어실력을 무료로</span><br/>
+            진단해드립니다
           </h1>
 
-          <p class="text-ink-mid text-base leading-relaxed mb-2 md:text-lg">
-            대학생·졸업생을 위한 지텔프IBT 무료 신청 <strong class="text-ink">(선착순 200명)</strong>
+          <p class="text-base leading-relaxed mb-2 md:text-lg" style="color:var(--ink-mid);">
+            국제공인영어시험 G-TELP IBT <strong style="color:var(--ink);">최대 200명 전액 무료 지원</strong>
           </p>
-          <p class="text-ink-mid text-base leading-relaxed mb-8 md:text-lg">
-            단순 강의가 아니라 <strong class="text-ink">당신의 상황에 딱 맞는 로드맵</strong>을 드립니다.
+          <p class="text-base leading-relaxed mb-8 md:text-lg" style="color:var(--ink-mid);">
+            대학교 취업일터·취업지원센터를 위한 맞춤 프로그램 — 코드 배포만 하시면 모든 진행은 저희가 합니다.
           </p>
 
           <div class="flex flex-col gap-3 sm:flex-row">
-            <a href="#consultation-form" class="btn-blue w-full sm:w-auto px-8">무료 진단 신청하기 →</a>
-            <a href="#about" class="btn-outline w-full sm:w-auto px-8">서비스 자세히 보기</a>
+            <a href="#consultation-form" class="btn-primary w-full sm:w-auto px-8">무료 신청하기 →</a>
+            <a href="library.html" class="btn-outline w-full sm:w-auto px-8">홍보문구 라이브러리</a>
           </div>
 
           <!-- 소셜 프루프 -->
-          <div class="flex gap-6 mt-10 pt-8 border-t border-cream-dark">
+          <div class="flex gap-6 mt-10 pt-8 border-t" style="border-color:var(--cream-dark);">
             <div>
-              <p class="text-2xl font-bold text-blue">100+</p>
-              <p class="text-xs text-ink-soft mt-0.5">수강생</p>
+              <p class="text-2xl font-bold" style="color:var(--blue-mid);">64개</p>
+              <p class="text-xs mt-0.5" style="color:var(--ink-soft);">졸업인증 대상 대학</p>
             </div>
-            <div class="w-px bg-cream-dark"></div>
+            <div class="w-px" style="background:var(--cream-dark);"></div>
             <div>
-              <p class="text-2xl font-bold text-blue">92%</p>
-              <p class="text-xs text-ink-soft mt-0.5">목표 점수 달성</p>
+              <p class="text-2xl font-bold" style="color:var(--blue-mid);">200+</p>
+              <p class="text-xs mt-0.5" style="color:var(--ink-soft);">공공기관·정부부처 채용 인정</p>
             </div>
-            <div class="w-px bg-cream-dark"></div>
+            <div class="w-px" style="background:var(--cream-dark);"></div>
             <div>
-              <p class="text-2xl font-bold text-blue">2.3개월</p>
-              <p class="text-xs text-ink-soft mt-0.5">평균 달성 기간</p>
+              <p class="text-2xl font-bold" style="color:var(--blue-mid);">600+</p>
+              <p class="text-xs mt-0.5" style="color:var(--ink-soft);">대상 기업</p>
             </div>
           </div>
         </div>
 
-        <!-- 히어로 일러스트 -->
-        <div class="flex-1 mt-12 md:mt-0 fade-in flex justify-center">
-          <svg viewBox="0 0 400 320" class="w-full max-w-sm md:max-w-md" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- 배경 원형 -->
-            <circle cx="200" cy="160" r="130" stroke="#2323FF" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.2"/>
-            <!-- 중앙 문서 -->
-            <rect x="140" y="90" width="120" height="150" rx="8" stroke="#2323FF" stroke-width="2" fill="#fff"/>
-            <line x1="160" y1="118" x2="240" y2="118" stroke="#2323FF" stroke-width="1.5"/>
-            <line x1="160" y1="134" x2="230" y2="134" stroke="#2323FF" stroke-width="1.5" opacity=".5"/>
-            <line x1="160" y1="150" x2="220" y2="150" stroke="#2323FF" stroke-width="1.5" opacity=".5"/>
-            <line x1="160" y1="166" x2="235" y2="166" stroke="#2323FF" stroke-width="1.5" opacity=".5"/>
-            <line x1="160" y1="182" x2="215" y2="182" stroke="#2323FF" stroke-width="1.5" opacity=".3"/>
-            <!-- 상단 별표/강조 -->
-            <circle cx="200" cy="104" r="10" fill="#2323FF"/>
-            <text x="200" y="109" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">✓</text>
-            <!-- 왼쪽 아이콘 카드 -->
-            <rect x="48" y="110" width="70" height="60" rx="10" stroke="#2323FF" stroke-width="1.5" fill="#fff"/>
-            <circle cx="83" cy="132" r="12" stroke="#2323FF" stroke-width="1.5" fill="none"/>
-            <line x1="63" y1="152" x2="103" y2="152" stroke="#2323FF" stroke-width="1.5" opacity=".4"/>
-            <line x1="70" y1="162" x2="96" y2="162" stroke="#2323FF" stroke-width="1.5" opacity=".4"/>
-            <!-- 오른쪽 아이콘 카드 -->
-            <rect x="282" y="110" width="70" height="60" rx="10" stroke="#2323FF" stroke-width="1.5" fill="#fff"/>
-            <polyline points="297,152 307,140 317,148 327,132 337,138 347,126" stroke="#2323FF" stroke-width="2" fill="none" stroke-linejoin="round"/>
-            <!-- 하단 연결선 -->
-            <path d="M118 140 Q130 160 140 165" stroke="#2323FF" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>
-            <path d="M282 165 Q292 160 304 140" stroke="#2323FF" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>
-            <!-- 하단 태그 -->
-            <rect x="155" y="255" width="90" height="28" rx="14" fill="#2323FF"/>
-            <text x="200" y="274" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">지텔프IBT</text>
-            <!-- 파티클 -->
-            <circle cx="80" cy="80" r="4" fill="#2323FF" opacity=".3"/>
-            <circle cx="320" cy="90" r="6" fill="#2323FF" opacity=".2"/>
-            <circle cx="60" cy="220" r="5" fill="#2323FF" opacity=".2"/>
-            <circle cx="340" cy="230" r="4" fill="#2323FF" opacity=".3"/>
-          </svg>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════ 프로세스 스텝 ══════ -->
-  <section class="bg-white py-16 px-5 md:py-20" id="steps">
-    <div class="max-w-5xl mx-auto fade-in">
-      <p class="text-blue text-xs font-bold tracking-widest uppercase mb-2 text-center">진행 방법</p>
-      <h2 class="font-display text-2xl font-bold text-ink text-center mb-12 md:text-3xl">4단계로 완성되는 맞춤 전략</h2>
-
-      <!-- 스텝 -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4">
-        <div class="flex flex-col items-center text-center">
-          <div class="step-circle active-step mb-4">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" class="text-white">
-              <rect x="7" y="5" width="18" height="22" rx="3" stroke="currentColor" stroke-width="1.8"/>
-              <line x1="11" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.5"/>
-              <line x1="11" y1="16" x2="19" y2="16" stroke="currentColor" stroke-width="1.5"/>
-              <line x1="11" y1="20" x2="17" y2="20" stroke="currentColor" stroke-width="1.5"/>
-            </svg>
-          </div>
-          <p class="text-xs font-bold text-blue mb-1">STEP 1</p>
-          <p class="text-sm font-bold text-ink">무료 상담 신청</p>
-          <p class="text-xs text-ink-soft mt-1 leading-relaxed">간단한 폼 작성으로 신청</p>
-        </div>
-        <div class="flex flex-col items-center text-center">
-          <div class="step-circle mb-4">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" class="text-blue">
-              <circle cx="16" cy="13" r="6" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M6 26c0-4 4.5-7 10-7s10 3 10 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <p class="text-xs font-bold text-blue mb-1">STEP 2</p>
-          <p class="text-sm font-bold text-ink">실력 정밀 진단</p>
-          <p class="text-xs text-ink-soft mt-1 leading-relaxed">현재 수준 파악 및 분석</p>
-        </div>
-        <div class="flex flex-col items-center text-center">
-          <div class="step-circle mb-4">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" class="text-blue">
-              <rect x="5" y="8" width="22" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/>
-              <polyline points="9,20 13,14 17,18 21,11 25,14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <p class="text-xs font-bold text-blue mb-1">STEP 3</p>
-          <p class="text-sm font-bold text-ink">맞춤 로드맵 설계</p>
-          <p class="text-xs text-ink-soft mt-1 leading-relaxed">목표·일정 역산 플랜</p>
-        </div>
-        <div class="flex flex-col items-center text-center">
-          <div class="step-circle mb-4">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" class="text-blue">
-              <circle cx="16" cy="16" r="10" stroke="currentColor" stroke-width="1.8"/>
-              <polyline points="11,16 14,19 21,12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <p class="text-xs font-bold text-blue mb-1">STEP 4</p>
-          <p class="text-sm font-bold text-ink">목표 점수 달성</p>
-          <p class="text-xs text-ink-soft mt-1 leading-relaxed">최단 기간 합격</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════ 고통 공감 ══════ -->
-  <section class="bg-cream py-16 px-5 md:py-20" id="about">
-    <div class="max-w-5xl mx-auto fade-in">
-      <p class="text-blue text-xs font-bold tracking-widest uppercase mb-2">혹시 이런 상황이신가요?</p>
-      <h2 class="font-display text-2xl font-bold text-ink mb-10 md:text-3xl">
-        "공부는 하는데 점수가 안 오른다"
-      </h2>
-      <div class="grid grid-cols-1 gap-0 md:grid-cols-2">
-        <div class="flex items-start gap-4 py-6 border-b border-cream-dark md:pr-12">
-          <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" class="text-blue">
-              <circle cx="14" cy="14" r="12" stroke="currentColor" stroke-width="1.5"/>
-              <line x1="10" y1="14" x2="18" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <line x1="14" y1="10" x2="14" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div>
-            <p class="font-bold text-ink mb-1 text-sm md:text-base">전략 없이 무작정 공부했다</p>
-            <p class="text-ink-soft text-sm leading-relaxed">어떤 파트부터, 어떻게 공부해야 할지 몰라 시간만 낭비하고 있지 않으신가요?</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 py-6 border-b border-cream-dark md:pl-12 md:border-l">
-          <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" class="text-blue">
-              <circle cx="14" cy="14" r="12" stroke="currentColor" stroke-width="1.5"/>
-              <line x1="10" y1="14" x2="18" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div>
-            <p class="font-bold text-ink mb-1 text-sm md:text-base">수차례 응시했는데 점수가 제자리</p>
-            <p class="text-ink-soft text-sm leading-relaxed">여러 번 시험을 봤지만 점수가 오르지 않아 자신감이 떨어지셨나요?</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 py-6 border-b border-cream-dark md:pr-12 md:border-b-0">
-          <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" class="text-blue">
-              <circle cx="14" cy="10" r="5" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M5 24c0-4 4-7 9-7s9 3 9 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div>
-            <p class="font-bold text-ink mb-1 text-sm md:text-base">시간이 없는데 방법을 모른다</p>
-            <p class="text-ink-soft text-sm leading-relaxed">학업·취업 준비와 병행해야 하는데 짧은 시간에 효과 내는 방법이 필요하신가요?</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 py-6 md:pl-12 md:border-l">
-          <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" class="text-blue">
-              <rect x="4" y="6" width="20" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/>
-              <polyline points="8,18 11,12 14,16 17,10 20,13" stroke="currentColor" stroke-width="1.5" fill="none"/>
-            </svg>
-          </div>
-          <div>
-            <p class="font-bold text-ink mb-1 text-sm md:text-base">"나에게 맞는 코칭"이 필요하다</p>
-            <p class="text-ink-soft text-sm leading-relaxed">유튜브·인강이 아니라 내 수준과 일정에 최적화된 1:1 가이드를 원하시나요?</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════ 다크 섹션 (해결책) ══════ -->
-  <section class="dark-section py-16 px-5 md:py-24">
-    <div class="max-w-5xl mx-auto fade-in">
-      <div class="flex flex-col md:flex-row md:items-center md:gap-16">
-        <!-- 일러스트 -->
-        <div class="flex-1 flex justify-center mb-10 md:mb-0">
-          <svg viewBox="0 0 300 260" class="w-full max-w-xs" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="40" y="40" width="220" height="160" rx="12" stroke="#2323FF" stroke-width="1.5" fill="none"/>
-            <rect x="40" y="40" width="220" height="36" rx="12" stroke="#2323FF" stroke-width="1.5" fill="#2323FF" fill-opacity=".15"/>
-            <circle cx="62" cy="58" r="6" fill="#2323FF" opacity=".6"/>
-            <circle cx="82" cy="58" r="6" fill="#2323FF" opacity=".3"/>
-            <circle cx="102" cy="58" r="6" fill="#2323FF" opacity=".15"/>
-            <line x1="60" y1="95" x2="160" y2="95" stroke="#2323FF" stroke-width="1.5"/>
-            <line x1="60" y1="112" x2="200" y2="112" stroke="#2323FF" stroke-width="1" opacity=".5"/>
-            <line x1="60" y1="128" x2="180" y2="128" stroke="#2323FF" stroke-width="1" opacity=".5"/>
-            <line x1="60" y1="144" x2="190" y2="144" stroke="#2323FF" stroke-width="1" opacity=".5"/>
-            <line x1="60" y1="160" x2="150" y2="160" stroke="#2323FF" stroke-width="1" opacity=".3"/>
-            <circle cx="220" cy="170" r="30" stroke="#2323FF" stroke-width="1.5" fill="none"/>
-            <polyline points="208,170 216,178 232,162" stroke="#2323FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <!-- 외부 장식 -->
-            <circle cx="20" cy="40" r="8" stroke="#2323FF" stroke-width="1" fill="none" opacity=".4"/>
-            <circle cx="280" cy="220" r="12" stroke="#2323FF" stroke-width="1" fill="none" opacity=".3"/>
-            <line x1="20" y1="120" x2="35" y2="120" stroke="#2323FF" stroke-width="1" opacity=".3"/>
-            <line x1="265" y1="80" x2="280" y2="80" stroke="#2323FF" stroke-width="1" opacity=".3"/>
-          </svg>
-        </div>
-        <!-- 텍스트 -->
-        <div class="flex-1">
-          <p class="text-blue text-xs font-bold tracking-widest uppercase mb-3">IBT 컨설팅이 다른 이유</p>
-          <h2 class="font-display text-2xl font-bold text-white mb-5 md:text-3xl">
-            막막함을 명확한<br/>로드맵으로 바꿔드립니다
-          </h2>
-          <p class="text-gray-400 text-sm leading-relaxed mb-8">
-            현재 실력·목표 점수·시험 일정을 분석해 오직 당신만을 위한 학습 전략을 설계합니다.
-          </p>
-          <div class="space-y-4">
-            <div class="flex items-start gap-3">
-              <div class="w-6 h-6 rounded-full bg-blue flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
-              <div>
-                <p class="font-bold text-white text-sm">목표 점수 달성 전략</p>
-                <p class="text-gray-400 text-xs mt-0.5">지텔프IBT 목표 점수에 최적화된 섹션별 전략</p>
+        <!-- 일러스트 카드 -->
+        <div class="flex-1 mt-12 md:mt-0 fade-in">
+          <div class="card p-6 shadow-lg max-w-sm mx-auto">
+            <!-- 이메일 미리보기 스타일 카드 -->
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-3 h-3 rounded-full bg-red-400"></div>
+              <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+              <div class="w-3 h-3 rounded-full bg-green-400"></div>
+              <span class="text-xs ml-2" style="color:var(--ink-soft);">취업일터 제안 이메일</span>
+            </div>
+            <div class="rounded-xl p-5" style="background:var(--blue);">
+              <div class="text-xs font-bold mb-2" style="color:#93C5FD;">🎓 대학일자리플러스센터 · 무료 지원 제안</div>
+              <p class="font-bold text-white text-base leading-snug mb-3">취업 준비 학생에게<br/><span style="color:#7DD3FC;">영어실력을 무료로 진단</span>해드립니다</p>
+              <div class="inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-full" style="background:rgba(217,119,6,.2);color:#FCD34D;">
+                🏆 최대 200명 전송 무료 · 전국 IBT 시험
               </div>
             </div>
-            <div class="flex items-start gap-3">
-              <div class="w-6 h-6 rounded-full bg-blue flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="mt-4 space-y-2">
+              <div class="flex items-center gap-3 p-3 rounded-lg" style="background:var(--cream);">
+                <span class="text-lg">✅</span>
+                <div>
+                  <p class="text-xs font-bold" style="color:var(--ink);">전송 무료 지원</p>
+                  <p class="text-xs" style="color:var(--ink-soft);">1인 15,000원 상당 · 전액 지원</p>
+                </div>
               </div>
-              <div>
-                <p class="font-bold text-white text-sm">시험 일정 역산 플랜</p>
-                <p class="text-gray-400 text-xs mt-0.5">시험 날짜 기준 주차별 학습 계획</p>
+              <div class="flex items-center gap-3 p-3 rounded-lg" style="background:var(--cream);">
+                <span class="text-lg">⚡</span>
+                <div>
+                  <p class="text-xs font-bold" style="color:var(--ink);">즉시 성적 확인</p>
+                  <p class="text-xs" style="color:var(--ink-soft);">시험 종료 후 바로 결과 확인</p>
+                </div>
               </div>
-            </div>
-            <div class="flex items-start gap-3">
-              <div class="w-6 h-6 rounded-full bg-blue flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
-              <div>
-                <p class="font-bold text-white text-sm">1:1 맞춤 코스 로드맵</p>
-                <p class="text-gray-400 text-xs mt-0.5">실력 분석 → 취약 파트 진단 → 우선순위 설계</p>
-              </div>
-            </div>
-            <div class="flex items-start gap-3">
-              <div class="w-6 h-6 rounded-full bg-blue flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
-              <div>
-                <p class="font-bold text-white text-sm">추천 학습 자료 리스트</p>
-                <p class="text-gray-400 text-xs mt-0.5">검증된 교재·앱·자료 선별 제공</p>
+              <div class="flex items-center gap-3 p-3 rounded-lg" style="background:var(--cream);">
+                <span class="text-lg">🏛️</span>
+                <div>
+                  <p class="text-xs font-bold" style="color:var(--ink);">공공기관 채용 인정</p>
+                  <p class="text-xs" style="color:var(--ink-soft);">국내 200개 이상 공공기관 공식 인정</p>
+                </div>
               </div>
             </div>
           </div>
@@ -443,329 +236,387 @@
     </div>
   </section>
 
-  <!-- ══════ 투컬럼 섹션 ══════ -->
-  <section class="bg-white py-16 px-5 md:py-20">
-    <div class="max-w-5xl mx-auto">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-0 md:divide-x divide-cream-dark">
-
-        <div class="fade-in md:pr-12 pb-10 md:pb-0">
-          <div class="w-12 h-12 flex items-center justify-center mb-5">
-            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" class="text-blue">
-              <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M12 28c0-5 3.5-8 8-8s8 3 8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              <circle cx="20" cy="16" r="5" stroke="currentColor" stroke-width="1.5"/>
-            </svg>
-          </div>
-          <h3 class="font-bold text-ink text-lg mb-3">누구를 위한 서비스인가요?</h3>
-          <p class="text-ink-soft text-sm leading-relaxed mb-4">
-            지텔프IBT 점수가 필요한 대학교 재학생 및 졸업생을 위한 서비스입니다. 취업·편입·졸업 요건 등 다양한 목적에 맞춰 맞춤 전략을 제공합니다.
-          </p>
-          <a href="#consultation-form" class="text-blue text-sm font-bold hover:underline">무료 신청하기 →</a>
-        </div>
-
-        <div class="fade-in md:pl-12 pt-10 md:pt-0 border-t md:border-t-0 border-cream-dark">
-          <div class="w-12 h-12 flex items-center justify-center mb-5">
-            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" class="text-blue">
-              <rect x="6" y="8" width="28" height="24" rx="4" stroke="currentColor" stroke-width="1.5"/>
-              <polyline points="11,24 16,16 21,21 26,13 31,17" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <h3 class="font-bold text-ink text-lg mb-3">어떤 효과를 기대할 수 있나요?</h3>
-          <p class="text-ink-soft text-sm leading-relaxed mb-4">
-            평균 2.3개월 내 목표 점수 달성, 수강생 92%가 목표를 이뤘습니다. 막연한 공부가 아니라 명확한 방향으로 최단 기간에 결과를 만들어드립니다.
-          </p>
-          <a href="#faq" class="text-blue text-sm font-bold hover:underline">자세히 알아보기 →</a>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════ 보장 ══════ -->
-  <section class="bg-cream py-14 px-5">
-    <div class="max-w-3xl mx-auto fade-in text-center">
-      <div class="inline-flex items-center justify-center w-16 h-16 border-2 border-blue rounded-full mb-5">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" class="text-blue">
-          <path d="M14 4L5 8v8c0 5 4 9 9 10 5-1 9-5 9-10V8L14 4z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
-          <polyline points="10,14 13,17 19,11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h2 class="font-display text-xl font-bold text-ink mb-3 md:text-2xl">부담 없이 신청하세요</h2>
-      <p class="text-ink-soft text-sm leading-relaxed max-w-md mx-auto">
-        상담 후 저와 핏이 맞지 않는다고 느끼시면 언제든 부담 없이 말씀해 주세요.
-        억지로 진행하지 않습니다. <strong class="text-ink">맞는 경우에만 함께합니다.</strong>
+  <!-- ══════ 핵심 혜택 (무료 200명) ══════ -->
+  <section class="dark-section py-14 px-4 md:py-20" id="about">
+    <div class="max-w-5xl mx-auto fade-in text-center">
+      <p class="text-xs font-bold tracking-widest uppercase mb-2" style="color:#7DD3FC;">핵심 혜택</p>
+      <h2 class="font-display text-2xl font-bold text-white mb-3 md:text-4xl">최대 <span style="color:#FCD34D;">200명</span> 전액 무료 지원</h2>
+      <p class="text-base mb-10 md:text-lg max-w-xl mx-auto" style="color:#93C5FD;">
+        국제공인 G-TELP IBT 시험을 전송 무료로 지원해드립니다.<br/>(1인 15,000원 상당 · 학년 제한 없음 · 졸업생 포함)
       </p>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-4 max-w-4xl mx-auto">
+        <div class="rounded-2xl p-5 text-center" style="background:rgba(255,255,255,.08);">
+          <div class="text-3xl mb-2">⚡</div>
+          <p class="font-bold text-white text-sm mb-1">즉시 성적 확인</p>
+          <p class="text-xs leading-relaxed" style="color:#93C5FD;">시험 종료 후 바로 결과 확인 가능</p>
+        </div>
+        <div class="rounded-2xl p-5 text-center" style="background:rgba(255,255,255,.08);">
+          <div class="text-3xl mb-2">💻</div>
+          <p class="font-bold text-white text-sm mb-1">온라인 개별 응시</p>
+          <p class="text-xs leading-relaxed" style="color:#93C5FD;">장소·시간 제약 없이 개인 기기로</p>
+        </div>
+        <div class="rounded-2xl p-5 text-center" style="background:rgba(255,255,255,.08);">
+          <div class="text-3xl mb-2">🎯</div>
+          <p class="font-bold text-white text-sm mb-1">목표 점수 예측</p>
+          <p class="text-xs leading-relaxed" style="color:#93C5FD;">정기시험 점수를 사전에 예측 가능</p>
+        </div>
+        <div class="rounded-2xl p-5 text-center" style="background:rgba(255,255,255,.08);">
+          <div class="text-3xl mb-2">🗓️</div>
+          <p class="font-bold text-white text-sm mb-1">정기시험과 동일 난이도</p>
+          <p class="text-xs leading-relaxed" style="color:#93C5FD;">공인시험 준비용 사전 진단 최적화</p>
+        </div>
+      </div>
+      <div class="mt-8 p-4 rounded-xl text-sm" style="background:rgba(255,255,255,.06);color:#BFD7FF;max-width:600px;margin-left:auto;margin-right:auto;">
+        ※ G-TELP IBT는 공인 성적 제출용은 아니지만, 정기시험과 거의 동일한 수준으로 추정되어 실제 공인시험 점수를 예측하는 지표로 활용하기 좋습니다. <strong style="color:#fff;">국내 200개 이상 공공기관·정부부처 채용에서 공식 인정되는 영어시험</strong>입니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ 실제 대학 사례 ══════ -->
+  <section class="bg-white py-14 px-4 md:py-20">
+    <div class="max-w-5xl mx-auto fade-in">
+      <p class="text-xs font-bold tracking-widest uppercase mb-2" style="color:var(--blue-mid);">2026년 실제 대학 사례</p>
+      <h2 class="font-display text-2xl font-bold mb-10 md:text-3xl" style="color:var(--ink);">이미 많은 대학이 함께하고 있습니다</h2>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div class="card p-6">
+          <div class="inline-block text-xs font-bold px-2 py-1 rounded mb-3" style="background:var(--blue);color:#fff;">매년 진행</div>
+          <p class="font-bold mb-2" style="color:var(--ink);">서울시립대학교 · 한성대학교 등</p>
+          <p class="text-sm leading-relaxed" style="color:var(--ink-soft);">정기시험 전 실력 진단용으로 활용. 무료 제공으로 학생 참여율이 높으며 매년 일정으로 운영되고 있습니다.</p>
+        </div>
+        <div class="card p-6">
+          <div class="inline-block text-xs font-bold px-2 py-1 rounded mb-3" style="background:#0F766E;color:#fff;">졸업인증</div>
+          <p class="font-bold mb-2" style="color:var(--ink);">지텔프 졸업인증 대상 대학 64개교</p>
+          <p class="text-sm leading-relaxed" style="color:var(--ink-soft);">공식 졸업 요건으로 채택한 대학들이 IBT 진단을 전 학기 프로그램으로 이용 중입니다.</p>
+        </div>
+      </div>
+      <!-- 통계 -->
+      <div class="grid grid-cols-3 gap-4 mt-6">
+        <div class="card p-5 text-center">
+          <p class="text-3xl font-bold mb-1" style="color:var(--blue-mid);">64</p>
+          <p class="text-xs" style="color:var(--ink-soft);">졸업인증 대상 대학</p>
+        </div>
+        <div class="card p-5 text-center">
+          <p class="text-3xl font-bold mb-1" style="color:var(--blue-mid);">200+</p>
+          <p class="text-xs" style="color:var(--ink-soft);">공공기관·정부부처 채용 인정</p>
+        </div>
+        <div class="card p-5 text-center">
+          <p class="text-3xl font-bold mb-1" style="color:var(--blue-mid);">600+</p>
+          <p class="text-xs" style="color:var(--ink-soft);">대상 기업</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ 센터 업무 최소화 ══════ -->
+  <section class="py-14 px-4 md:py-20" style="background:var(--cream);" id="process">
+    <div class="max-w-5xl mx-auto fade-in">
+      <p class="text-xs font-bold tracking-widest uppercase mb-2" style="color:var(--blue-mid);">진행 방법</p>
+      <h2 class="font-display text-2xl font-bold mb-3 md:text-3xl" style="color:var(--ink);">센터 업무 최소화 — 코드 배포만 하시면 됩니다</h2>
+      <p class="text-base mb-10" style="color:var(--ink-mid);">시험 이후 모든 진행(성적 안내, 결과 상담)은 저희가 처리합니다.</p>
+      <div class="grid grid-cols-1 gap-0 md:grid-cols-4">
+        <div class="flex md:flex-col items-start md:items-center gap-4 md:gap-3 p-5 md:text-center">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style="background:var(--blue-mid);">1</div>
+          <div>
+            <p class="font-bold text-sm mb-1" style="color:var(--ink);">신청서 작성</p>
+            <p class="text-xs leading-relaxed" style="color:var(--ink-soft);">아래 링크로 간단히 신청 (5분 이내)</p>
+          </div>
+        </div>
+        <div class="hidden md:flex items-center justify-center text-gray-300 text-2xl">›</div>
+        <div class="flex md:flex-col items-start md:items-center gap-4 md:gap-3 p-5 md:text-center">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style="background:var(--blue-mid);">2</div>
+          <div>
+            <p class="font-bold text-sm mb-1" style="color:var(--ink);">응시 코드 발급</p>
+            <p class="text-xs leading-relaxed" style="color:var(--ink-soft);">센터에 전달 드립니다</p>
+          </div>
+        </div>
+        <div class="hidden md:flex items-center justify-center text-gray-300 text-2xl">›</div>
+        <div class="flex md:flex-col items-start md:items-center gap-4 md:gap-3 p-5 md:text-center">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style="background:var(--blue-mid);">3</div>
+          <div>
+            <p class="font-bold text-sm mb-1" style="color:var(--ink);">학생 배포</p>
+            <p class="text-xs leading-relaxed" style="color:var(--ink-soft);">공지/카톡 전달만 하시면 됩니다</p>
+          </div>
+        </div>
+        <div class="hidden md:flex items-center justify-center text-gray-300 text-2xl">›</div>
+        <div class="flex md:flex-col items-start md:items-center gap-4 md:gap-3 p-5 md:text-center">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style="background:var(--blue-mid);">4</div>
+          <div>
+            <p class="font-bold text-sm mb-1" style="color:var(--ink);">즉시 결과 확인</p>
+            <p class="text-xs leading-relaxed" style="color:var(--ink-soft);">시험 후 바로 성적 확인 가능</p>
+          </div>
+        </div>
+      </div>
+      <!-- 제공 조건 -->
+      <div class="card p-6 mt-8">
+        <h3 class="font-bold text-base mb-4" style="color:var(--ink);">📋 제공 조건</h3>
+        <div class="divide-y" style="divide-color:var(--cream-dark);">
+          <div class="flex justify-between py-3 text-sm">
+            <span style="color:var(--ink-soft);">대상 인원</span>
+            <span class="font-bold" style="color:var(--ink);">최소 10명 ~ 최대 200명 (학년 제한 없음, 졸업생 포함)</span>
+          </div>
+          <div class="flex justify-between py-3 text-sm">
+            <span style="color:var(--ink-soft);">비용</span>
+            <span class="font-bold" style="color:var(--gold);">전액 무료 (1인 15,000원 상당)</span>
+          </div>
+          <div class="flex justify-between py-3 text-sm">
+            <span style="color:var(--ink-soft);">응시 방식</span>
+            <span class="font-bold" style="color:var(--ink);">개인별 온라인 응시 · 개인당 1회</span>
+          </div>
+          <div class="flex justify-between py-3 text-sm">
+            <span style="color:var(--ink-soft);">신청 기간</span>
+            <span class="font-bold" style="color:#DC2626;">시험 희망일 2주 전까지 신청 필수</span>
+          </div>
+          <div class="flex justify-between py-3 text-sm">
+            <span style="color:var(--ink-soft);">신청 마감</span>
+            <span class="font-bold" style="color:#DC2626;">2026년 4월 20일</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ 홍보문구 라이브러리 CTA ══════ -->
+  <section class="bg-white py-14 px-4">
+    <div class="max-w-3xl mx-auto fade-in text-center">
+      <p class="text-xs font-bold tracking-widest uppercase mb-2" style="color:var(--blue-mid);">홍보문구 라이브러리</p>
+      <h2 class="font-display text-2xl font-bold mb-3 md:text-3xl" style="color:var(--ink);">학생 홍보, 바로 복사해서 사용하세요</h2>
+      <p class="text-sm leading-relaxed mb-6 max-w-lg mx-auto" style="color:var(--ink-soft);">
+        취업게시판, 카카오톡, 인스타그램, 학과 이메일 등 채널별 홍보문구를 바로 복사해 쓸 수 있습니다.
+        대학명·마감일·신청링크만 입력하면 모든 문구가 자동으로 업데이트됩니다.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="library.html" class="btn-primary px-8">홍보문구 라이브러리 →</a>
+        <a href="#consultation-form" class="btn-outline px-8">신청서 먼저 작성하기</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ 마감 배너 ══════ -->
+  <section class="py-6 px-4" style="background:#FFF1F2;border-top:1.5px solid #FECDD3;border-bottom:1.5px solid #FECDD3;">
+    <div class="max-w-3xl mx-auto flex items-center gap-4">
+      <div class="text-3xl flex-shrink-0">⏰</div>
+      <div class="text-sm leading-relaxed" style="color:var(--ink-mid);">
+        신청 마감까지 얼마 남지 않았습니다. <strong style="color:#DC2626;">2026년 4월 20일</strong>까지만 신청 가능하며, 시험 희망일 <strong style="color:#DC2626;">2주 전</strong>에 신청하셔야 합니다.
+      </div>
     </div>
   </section>
 
   <!-- ══════ FAQ ══════ -->
-  <section class="bg-white py-16 px-5 md:py-20" id="faq">
+  <section class="py-14 px-4 md:py-20" style="background:var(--cream);" id="faq">
     <div class="max-w-2xl mx-auto fade-in">
-      <p class="text-blue text-xs font-bold tracking-widest uppercase mb-2 text-center">자주 묻는 질문</p>
-      <h2 class="font-display text-2xl font-bold text-ink text-center mb-10 md:text-3xl">FAQ</h2>
-      <div class="space-y-0 divide-y divide-cream-dark border-t border-cream-dark">
-        <details class="py-1">
-          <summary class="py-3 font-bold text-ink text-sm md:text-base">
-            어떤 시험을 다루나요?
-            <span class="faq-icon text-blue text-xs">▼</span>
+      <p class="text-xs font-bold tracking-widest uppercase mb-2 text-center" style="color:var(--blue-mid);">자주 묻는 질문</p>
+      <h2 class="font-display text-2xl font-bold text-center mb-10 md:text-3xl" style="color:var(--ink);">FAQ</h2>
+      <div class="divide-y" style="border-top:1px solid var(--cream-dark);border-bottom:1px solid var(--cream-dark);">
+        <details>
+          <summary class="py-3 font-bold text-sm md:text-base" style="color:var(--ink);">
+            G-TELP IBT는 어디에 인정되나요?
+            <span class="faq-icon text-xs" style="color:var(--blue-mid);">▼</span>
           </summary>
-          <p class="pb-4 text-ink-soft text-sm leading-relaxed">지텔프(G-TELP), 토익(TOEIC), 토플(TOEFL), 아이엘츠(IELTS), OPIc 등 국제공인영어시험 전반을 다룹니다.</p>
+          <p class="pb-4 text-sm leading-relaxed" style="color:var(--ink-soft);">공무원, 공공기관, 일반기업 취업 시 영어 성적으로 활용 가능한 국제공인시험입니다. 국내 200개 이상 공공기관·정부부처 채용에서 인정받고 있습니다.</p>
         </details>
-        <details class="py-1">
-          <summary class="py-3 font-bold text-ink text-sm md:text-base">
-            영어 초보도 효과가 있나요?
-            <span class="faq-icon text-blue text-xs">▼</span>
+        <details>
+          <summary class="py-3 font-bold text-sm md:text-base" style="color:var(--ink);">
+            정말 무료인가요?
+            <span class="faq-icon text-xs" style="color:var(--blue-mid);">▼</span>
           </summary>
-          <p class="pb-4 text-ink-soft text-sm leading-relaxed">네, 현재 실력에 상관없이 가능합니다. 처음부터 올바른 전략을 잡아드리면 오히려 더 빠른 성장이 가능합니다.</p>
+          <p class="pb-4 text-sm leading-relaxed" style="color:var(--ink-soft);">네! 취업일터에서 지원하는 것이라 학생분들은 완전 무료입니다. 1인 15,000원 상당의 응시료를 전액 지원해드립니다.</p>
         </details>
-        <details class="py-1">
-          <summary class="py-3 font-bold text-ink text-sm md:text-base">
-            상담은 어떻게 진행되나요?
-            <span class="faq-icon text-blue text-xs">▼</span>
+        <details>
+          <summary class="py-3 font-bold text-sm md:text-base" style="color:var(--ink);">
+            센터에서 해야 하는 일이 많나요?
+            <span class="faq-icon text-xs" style="color:var(--blue-mid);">▼</span>
           </summary>
-          <p class="pb-4 text-ink-soft text-sm leading-relaxed">신청서 제출 → 24시간 내 연락 → 30~40분 1:1 화상/전화 상담 순으로 진행됩니다.</p>
+          <p class="pb-4 text-sm leading-relaxed" style="color:var(--ink-soft);">신청서 제출 후 응시 코드를 받아 학생들에게 전달(공지/카톡)만 하시면 됩니다. 시험 이후 성적 안내와 결과 상담은 저희가 처리합니다.</p>
         </details>
-        <details class="py-1">
-          <summary class="py-3 font-bold text-ink text-sm md:text-base">
-            바쁜 학생/직장인도 가능한가요?
-            <span class="faq-icon text-blue text-xs">▼</span>
+        <details>
+          <summary class="py-3 font-bold text-sm md:text-base" style="color:var(--ink);">
+            온라인으로 보는 건가요?
+            <span class="faq-icon text-xs" style="color:var(--blue-mid);">▼</span>
           </summary>
-          <p class="pb-4 text-ink-soft text-sm leading-relaxed">네, 한정된 시간에 집중할 핵심만 골라드립니다. 오히려 시간이 부족한 분들에게 더 도움이 됩니다.</p>
+          <p class="pb-4 text-sm leading-relaxed" style="color:var(--ink-soft);">맞습니다. 개인 기기로 온라인 응시하고 결과도 바로 확인 가능합니다. 별도 시험장 예약 불필요합니다.</p>
         </details>
-        <details class="py-1">
-          <summary class="py-3 font-bold text-ink text-sm md:text-base">
-            비용은 얼마인가요?
-            <span class="faq-icon text-blue text-xs">▼</span>
+        <details>
+          <summary class="py-3 font-bold text-sm md:text-base" style="color:var(--ink);">
+            최소 인원이 있나요?
+            <span class="faq-icon text-xs" style="color:var(--blue-mid);">▼</span>
           </summary>
-          <p class="pb-4 text-ink-soft text-sm leading-relaxed">초기 상담은 무료입니다. 이번 달은 선착순 200명 한정으로 무료 진단을 운영하고 있습니다.</p>
+          <p class="pb-4 text-sm leading-relaxed" style="color:var(--ink-soft);">최소 10명부터 신청 가능합니다. 최대 200명까지 무료로 지원되며, 이번 달 선착순 마감입니다.</p>
         </details>
       </div>
     </div>
   </section>
 
-  <!-- ══════ 상담 폼 ══════ -->
-  <section class="bg-cream py-16 px-5 md:py-20" id="consultation-form">
+  <!-- ══════ 신청 폼 ══════ -->
+  <section class="py-14 px-4 md:py-20" style="background:var(--blue);" id="consultation-form">
     <div class="max-w-lg mx-auto fade-in">
-      <p class="text-blue text-xs font-bold tracking-widest uppercase mb-2 text-center">무료 상담 신청</p>
-      <h2 class="font-display text-2xl font-bold text-ink text-center mb-2 md:text-3xl">지금 바로 신청하세요</h2>
-      <p class="text-ink-soft text-sm text-center mb-8">24시간 내 연락드립니다 — 선착순 200명 마감 전에 신청하세요</p>
+      <p class="text-xs font-bold tracking-widest uppercase mb-2 text-center" style="color:#93C5FD;">무료 신청</p>
+      <h2 class="font-display text-2xl font-bold text-white text-center mb-2 md:text-3xl">지금 바로 신청하세요</h2>
+      <p class="text-sm text-center mb-6" style="color:#93C5FD;">제출 후 2영업일 내 연락드립니다 — 선착순 200명 마감 전에 신청하세요</p>
 
       <!-- 스텝 인디케이터 -->
-      <div class="flex items-center mb-8" id="step-indicators">
-        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold step-dot bg-blue text-white flex-shrink-0">1</div>
-        <div class="flex-1 h-0.5 bg-cream-dark"></div>
-        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold step-dot bg-cream-dark text-ink-soft flex-shrink-0">2</div>
-        <div class="flex-1 h-0.5 bg-cream-dark"></div>
-        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold step-dot bg-cream-dark text-ink-soft flex-shrink-0">3</div>
+      <div class="flex items-center mb-6" id="step-indicators">
+        <div class="step-dot text-white flex-shrink-0" style="background:var(--gold);">1</div>
+        <div class="flex-1 h-0.5" style="background:rgba(255,255,255,.2);"></div>
+        <div class="step-dot flex-shrink-0" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.4);">2</div>
+        <div class="flex-1 h-0.5" style="background:rgba(255,255,255,.2);"></div>
+        <div class="step-dot flex-shrink-0" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.4);">3</div>
       </div>
 
-      <form id="main-form" class="bg-white rounded-2xl p-6 shadow-sm border border-cream-dark md:p-8">
+      <form id="main-form" class="bg-white rounded-2xl p-5 shadow-xl md:p-8">
 
         <!-- Step 1 -->
         <div class="form-step active" id="step-1">
-          <h3 class="font-bold text-ink text-base mb-5">기본 정보를 입력해주세요</h3>
+          <h3 class="font-bold mb-5" style="color:var(--ink);">담당자 정보를 입력해주세요</h3>
           <div class="space-y-4">
             <div>
-              <label class="block text-xs font-bold text-ink-mid mb-1.5 uppercase tracking-wide">이름 <span class="text-blue">*</span></label>
+              <label class="block text-xs font-bold mb-1.5 uppercase tracking-wide" style="color:var(--ink-mid);">담당자명 <span style="color:var(--blue-mid);">*</span></label>
               <input type="text" name="name" class="form-input" placeholder="홍길동" required autocomplete="name"/>
             </div>
             <div>
-              <label class="block text-xs font-bold text-ink-mid mb-1.5 uppercase tracking-wide">연락처 <span class="text-blue">*</span></label>
+              <label class="block text-xs font-bold mb-1.5 uppercase tracking-wide" style="color:var(--ink-mid);">연락처 <span style="color:var(--blue-mid);">*</span></label>
               <input type="tel" name="phone" class="form-input" placeholder="010-0000-0000" required autocomplete="tel" inputmode="tel"/>
             </div>
           </div>
-          <button type="button" onclick="nextStep(1)" class="btn-blue w-full mt-5">다음 →</button>
+          <button type="button" onclick="nextStep(1)" class="btn-primary w-full mt-5">다음 →</button>
         </div>
 
         <!-- Step 2 -->
         <div class="form-step" id="step-2">
-          <h3 class="font-bold text-ink text-base mb-5">현재 영어 실력을 알려주세요</h3>
-          <div class="space-y-5">
+          <h3 class="font-bold mb-5" style="color:var(--ink);">대학 정보를 알려주세요</h3>
+          <div class="space-y-4">
             <div>
-              <label class="block text-xs font-bold text-ink-mid mb-1.5 uppercase tracking-wide">준비 중인 시험과 현재 실력</label>
-              <textarea name="current_level" class="form-input" rows="3" placeholder="예) 지텔프IBT 준비 중, 현재 50점대입니다."></textarea>
+              <label class="block text-xs font-bold mb-1.5 uppercase tracking-wide" style="color:var(--ink-mid);">대학명 <span style="color:var(--blue-mid);">*</span></label>
+              <input type="text" name="current_level" class="form-input" placeholder="예) 한성대학교" required/>
             </div>
             <div>
-              <label class="block text-xs font-bold text-ink-mid mb-2 uppercase tracking-wide">시험 응시 경험</label>
+              <label class="block text-xs font-bold mb-1.5 uppercase tracking-wide" style="color:var(--ink-mid);">예상 참여 인원</label>
               <div>
                 <label class="check-row">
-                  <input type="checkbox" name="experience" value="처음" class="custom-checkbox"/>
-                  <span class="text-ink text-sm">처음 준비합니다</span>
+                  <input type="checkbox" name="experience" value="10-50명" class="custom-checkbox"/>
+                  <span class="text-sm" style="color:var(--ink);">10~50명</span>
                 </label>
                 <label class="check-row">
-                  <input type="checkbox" name="experience" value="수차례_응시" class="custom-checkbox"/>
-                  <span class="text-ink text-sm">수차례 응시했지만 점수가 정체 중입니다</span>
+                  <input type="checkbox" name="experience" value="50-100명" class="custom-checkbox"/>
+                  <span class="text-sm" style="color:var(--ink);">50~100명</span>
                 </label>
                 <label class="check-row">
-                  <input type="checkbox" name="experience" value="오래_준비중" class="custom-checkbox"/>
-                  <span class="text-ink text-sm">오래 준비했는데 효과가 없었습니다</span>
+                  <input type="checkbox" name="experience" value="100-200명" class="custom-checkbox"/>
+                  <span class="text-sm" style="color:var(--ink);">100~200명 (최대)</span>
                 </label>
               </div>
             </div>
           </div>
           <div class="flex gap-3 mt-5">
             <button type="button" onclick="prevStep(2)" class="btn-outline flex-1">← 이전</button>
-            <button type="button" onclick="nextStep(2)" class="btn-blue flex-1">다음 →</button>
+            <button type="button" onclick="nextStep(2)" class="btn-primary flex-1">다음 →</button>
           </div>
         </div>
 
         <!-- Step 3 -->
         <div class="form-step" id="step-3">
-          <h3 class="font-bold text-ink text-base mb-5">목표와 일정을 알려주세요</h3>
+          <h3 class="font-bold mb-5" style="color:var(--ink);">시험 일정을 알려주세요</h3>
           <div class="space-y-4">
             <div>
-              <label class="block text-xs font-bold text-ink-mid mb-1.5 uppercase tracking-wide">목표 점수와 시험 일정 <span class="text-blue">*</span></label>
-              <input type="text" name="goal_score" class="form-input" placeholder="예) 지텔프IBT 65점 / 3개월 안에" required/>
+              <label class="block text-xs font-bold mb-1.5 uppercase tracking-wide" style="color:var(--ink-mid);">시험 희망 일정 <span style="color:var(--blue-mid);">*</span></label>
+              <input type="text" name="goal_score" class="form-input" placeholder="예) 2026년 5월 중순" required/>
             </div>
             <div>
-              <label class="block text-xs font-bold text-ink-mid mb-1.5 uppercase tracking-wide">추가 메모 (선택)</label>
-              <textarea name="message" class="form-input" rows="3" placeholder="예) 취업 때문에 급합니다. 주말에만 공부 가능합니다."></textarea>
+              <label class="block text-xs font-bold mb-1.5 uppercase tracking-wide" style="color:var(--ink-mid);">추가 문의 (선택)</label>
+              <textarea name="message" class="form-input" rows="3" placeholder="예) 졸업예정자도 포함 가능한지 문의드립니다."></textarea>
             </div>
           </div>
           <div class="flex gap-3 mt-5">
             <button type="button" onclick="prevStep(3)" class="btn-outline flex-1">← 이전</button>
-            <button type="submit" class="btn-blue flex-1">신청하기 ✓</button>
+            <button type="submit" class="btn-primary flex-1">신청하기 ✓</button>
           </div>
         </div>
 
         <!-- 완료 -->
         <div class="form-step text-center py-6" id="step-done">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue mb-4">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style="background:var(--blue-mid);">
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><polyline points="6,14 11,19 22,8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <h3 class="font-display text-xl font-bold text-ink mb-2">신청이 완료되었습니다!</h3>
-          <p class="text-ink-soft text-sm leading-relaxed">접수 완료! 24시간 내 연락드립니다.</p>
+          <h3 class="font-display text-xl font-bold mb-2" style="color:var(--ink);">신청이 완료되었습니다!</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--ink-soft);">접수 완료! 2영업일 내 연락드립니다.</p>
         </div>
 
       </form>
     </div>
   </section>
 
-  <!-- ══════ P.S. ══════ -->
-  <section class="bg-cream-dark py-8 px-5">
-    <div class="max-w-lg mx-auto text-center">
-      <p class="text-ink-soft text-sm leading-relaxed">
-        <strong class="text-ink">P.S.</strong> 오리진 스토리는 준비 중입니다. 완성 후 업데이트됩니다.<br/>
-        지금 신청하시면 선착순 200명 무료 진단 혜택을 받으실 수 있습니다.
-      </p>
-    </div>
-  </section>
-
   <!-- ══════ FOOTER ══════ -->
-  <footer class="bg-ink py-10 px-5">
+  <footer class="py-10 px-4" style="background:var(--ink);">
     <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <span class="font-display text-white font-bold">지텔프IBT 대학컨설팅</span>
-      <p class="text-gray-500 text-xs">© 2026 국제공인영어시험 지텔프IBT 대학컨설팅. All rights reserved.</p>
+      <div>
+        <p class="font-display text-white font-bold">지텔프IBT 대학컨설팅</p>
+        <p class="text-xs mt-1" style="color:#6B7280;">국제공인영어시험 G-TELP · 한국지텔프위원회</p>
+      </div>
+      <p class="text-xs" style="color:#4B5563;">© 2026 국제공인영어시험 지텔프IBT 대학컨설팅. All rights reserved.</p>
     </div>
   </footer>
 
-  <!-- ══════ 모바일 하단 CTA ══════ -->
+  <!-- 모바일 하단 CTA -->
   <div id="mobile-cta">
-    <a href="#consultation-form" class="btn-blue w-full text-sm">무료 진단 신청하기 →</a>
+    <a href="#consultation-form" class="btn-primary w-full text-sm">무료 신청하기 →</a>
   </div>
 
   <script>
-    // ── Supabase ──
     const { createClient } = supabase;
     const _supabase = createClient(
       'https://byzulmxcuhsrjdphmuym.supabase.co',
       'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
     );
 
-    // ── 폼 다단계 ──
     function updateDots(step) {
       document.querySelectorAll('.step-dot').forEach((dot, i) => {
-        if (i + 1 < step) {
-          dot.style.background = '#2323FF'; dot.style.color = '#fff';
-        } else if (i + 1 === step) {
-          dot.style.background = '#2323FF'; dot.style.color = '#fff';
-        } else {
-          dot.style.background = '#E8E4DA'; dot.style.color = '#888';
-        }
+        if (i + 1 <= step) { dot.style.background = '#D97706'; dot.style.color = '#fff'; }
+        else { dot.style.background = 'rgba(255,255,255,.15)'; dot.style.color = 'rgba(255,255,255,.4)'; }
       });
     }
-
     function showStep(step) {
       document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
-      const target = document.getElementById('step-' + step);
-      if (target) {
-        target.classList.add('active');
-        document.getElementById('consultation-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      const t = document.getElementById('step-' + step);
+      if (t) { t.classList.add('active'); document.getElementById('consultation-form').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
       updateDots(step);
     }
-
     function nextStep(from) {
       const step = document.getElementById('step-' + from);
-      const required = step.querySelectorAll('[required]');
-      for (const field of required) {
-        if (!field.value.trim()) {
-          field.focus();
-          field.style.borderColor = '#EF4444';
-          setTimeout(() => field.style.borderColor = '', 1500);
-          return;
-        }
+      for (const field of step.querySelectorAll('[required]')) {
+        if (!field.value.trim()) { field.focus(); field.style.borderColor = '#EF4444'; setTimeout(() => field.style.borderColor = '', 1500); return; }
       }
       showStep(from + 1);
     }
-
     function prevStep(from) { showStep(from - 1); }
 
     document.getElementById('main-form').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const submitBtn = this.querySelector('[type="submit"]');
-      submitBtn.disabled = true;
-      submitBtn.textContent = '저장 중...';
-
-      const checked = [...this.querySelectorAll('input[name="experience"]:checked')]
-        .map(el => el.value).join(', ');
-
-      const payload = {
-        name:          this.name.value.trim(),
-        phone:         this.phone.value.trim(),
-        current_level: this.current_level.value.trim(),
-        experience:    checked,
-        goal_score:    this.goal_score.value.trim(),
-        message:       this.message.value.trim(),
-      };
-
-      const { error } = await _supabase.from('consultations').insert([payload]);
-      if (error) {
-        console.error(error);
-        submitBtn.disabled = false;
-        submitBtn.textContent = '신청하기 ✓';
-        alert('오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-        return;
-      }
-
+      const btn = this.querySelector('[type="submit"]');
+      btn.disabled = true; btn.textContent = '저장 중...';
+      const checked = [...this.querySelectorAll('input[name="experience"]:checked')].map(el => el.value).join(', ');
+      const { error } = await _supabase.from('consultations').insert([{
+        name: this.name.value.trim(), phone: this.phone.value.trim(),
+        current_level: this.current_level.value.trim(), experience: checked,
+        goal_score: this.goal_score.value.trim(), message: this.message.value.trim(),
+      }]);
+      if (error) { console.error(error); btn.disabled = false; btn.textContent = '신청하기 ✓'; alert('오류가 발생했습니다.'); return; }
       document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
       document.getElementById('step-done').classList.add('active');
       document.getElementById('step-indicators').style.display = 'none';
     });
 
-    // ── 스크롤 페이드인 ──
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-    }, { threshold: 0.1 });
+    const observer = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.1 });
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-    // ── 모바일 하단 CTA ──
     const mobileCta = document.getElementById('mobile-cta');
-    const heroSection = document.querySelector('section.bg-cream');
-    const formSection = document.getElementById('consultation-form');
-
-    new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) { mobileCta.classList.add('show'); document.body.classList.add('cta-visible'); }
-        else { mobileCta.classList.remove('show'); document.body.classList.remove('cta-visible'); }
-      });
-    }, { threshold: 0 }).observe(heroSection);
-
-    new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) { mobileCta.classList.remove('show'); document.body.classList.remove('cta-visible'); }
-      });
-    }, { threshold: 0.1 }).observe(formSection);
+    const hero = document.querySelector('section.bg-white');
+    const form = document.getElementById('consultation-form');
+    new IntersectionObserver(entries => entries.forEach(e => {
+      if (!e.isIntersecting) { mobileCta.classList.add('show'); document.body.classList.add('cta-visible'); }
+      else { mobileCta.classList.remove('show'); document.body.classList.remove('cta-visible'); }
+    }), { threshold: 0 }).observe(hero);
+    new IntersectionObserver(entries => entries.forEach(e => {
+      if (e.isIntersecting) { mobileCta.classList.remove('show'); document.body.classList.remove('cta-visible'); }
+    }), { threshold: 0.1 }).observe(form);
   </script>
 </body>
 </html>
