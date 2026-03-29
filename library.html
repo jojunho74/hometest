@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>홍보문구 라이브러리 — 지텔프IBT 대학컨설팅</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue: #1E3A8A;
+      --blue-mid: #2563EB;
+      --teal: #0891B2;
+      --cream: #F4F1EB;
+      --cream-dark: #E8E4DA;
+      --ink: #111827;
+      --ink-mid: #374151;
+      --ink-soft: #6B7280;
+      --gold: #D97706;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--cream); color: var(--ink); -webkit-text-size-adjust: 100%; }
+    .font-display { font-family: 'Noto Serif KR', serif; }
+
+    .btn-primary {
+      background: var(--blue-mid); color: #fff;
+      padding: .875rem 2rem; border-radius: 8px;
+      font-weight: 700; font-size: .95rem; min-height: 52px;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; border: none;
+      transition: background .18s, transform .15s, box-shadow .18s;
+      box-shadow: 0 4px 16px rgba(37,99,235,.3);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-primary:hover  { background: #1d4ed8; transform: scale(1.02); }
+    .btn-primary:active { transform: scale(0.97); }
+
+    .btn-outline {
+      background: transparent; color: var(--blue-mid);
+      padding: .875rem 2rem; border-radius: 8px;
+      font-weight: 700; font-size: .95rem; min-height: 52px;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; border: 2px solid var(--blue-mid);
+      transition: background .18s, color .18s, transform .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-outline:hover  { background: var(--blue-mid); color: #fff; }
+
+    .form-input {
+      width: 100%; padding: .875rem 1rem;
+      border: 1.5px solid #D1D5DB; border-radius: 8px;
+      font-size: 16px; font-family: inherit;
+      background: #fff; color: var(--ink);
+      transition: border-color .15s, box-shadow .15s;
+      -webkit-appearance: none;
+    }
+    .form-input:focus { outline: none; border-color: var(--blue-mid); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+
+    .card { background: #fff; border-radius: 16px; border: 1px solid var(--cream-dark); }
+
+    /* 복사 버튼 */
+    .copy-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: .45rem 1rem; border-radius: 6px;
+      font-size: .8rem; font-weight: 700;
+      background: var(--blue-mid); color: #fff;
+      border: none; cursor: pointer;
+      transition: background .15s, transform .1s;
+    }
+    .copy-btn:hover { background: #1d4ed8; }
+    .copy-btn:active { transform: scale(0.96); }
+    .copy-btn.copied { background: #059669; }
+
+    /* 템플릿 텍스트 영역 */
+    .template-box {
+      width: 100%; padding: 1rem;
+      background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px;
+      font-size: .875rem; line-height: 1.8; color: var(--ink);
+      font-family: 'Noto Sans KR', sans-serif;
+      white-space: pre-wrap; word-break: keep-all;
+      min-height: 120px; resize: none;
+    }
+
+    /* 채널 탭 */
+    .tab-btn {
+      padding: .5rem 1rem; border-radius: 20px; font-size: .85rem; font-weight: 600;
+      border: none; cursor: pointer;
+      background: #fff; color: var(--ink-mid);
+      border: 1.5px solid var(--cream-dark);
+      transition: background .15s, color .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .tab-btn.active {
+      background: var(--blue); color: #fff; border-color: var(--blue);
+    }
+
+    /* 채널 섹션 */
+    .channel-section { display: none; }
+    .channel-section.active { display: block; }
+
+    /* 배지 */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: .25rem .65rem; border-radius: 20px;
+      font-size: .7rem; font-weight: 700; letter-spacing: .03em;
+    }
+    .badge-a { background: #DBEAFE; color: #1E40AF; }
+    .badge-b { background: #D1FAE5; color: #065F46; }
+
+    /* 입력칸 강조 */
+    .input-highlight { color: var(--blue-mid); font-weight: 700; }
+
+    /* 팁 박스 */
+    .tip-box {
+      background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px;
+      padding: 1rem 1.25rem;
+    }
+
+    .fade-in { opacity: 0; transform: translateY(20px); transition: opacity .5s ease, transform .5s ease; }
+    .fade-in.visible { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+  <!-- ══════ HEADER ══════ -->
+  <header class="sticky top-0 z-50 bg-white border-b shadow-sm" style="border-color:var(--cream-dark);">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <a href="index.html" class="font-display text-base font-bold tracking-tight" style="color:var(--blue);">지텔프IBT 대학컨설팅</a>
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium" style="color:var(--ink-mid);">
+        <a href="index.html#about" class="hover:text-blue-600 transition-colors">서비스 소개</a>
+        <a href="index.html#process" class="hover:text-blue-600 transition-colors">진행 방법</a>
+        <a href="library.html" class="hover:text-blue-600 transition-colors font-bold" style="color:var(--blue-mid);">홍보문구 라이브러리</a>
+        <a href="index.html#faq" class="hover:text-blue-600 transition-colors">FAQ</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href="index.html#consultation-form" class="btn-primary text-sm px-5" style="min-height:38px;padding-top:.4rem;padding-bottom:.4rem;">무료 신청하기</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════ PAGE HERO ══════ -->
+  <section class="bg-white pt-12 pb-10 px-4 border-b" style="border-color:var(--cream-dark);">
+    <div class="max-w-3xl mx-auto text-center fade-in">
+      <div class="inline-flex items-center gap-2 text-xs font-bold px-3.5 py-1.5 rounded-full mb-5 border" style="border-color:#C7D2FE;background:#EEF2FF;color:#4338CA;">
+        <span>📋</span><span>복붙 바로 가능 — 채널별 홍보문구</span>
+      </div>
+      <h1 class="font-display text-2xl md:text-4xl font-bold leading-snug mb-4" style="color:var(--ink);">
+        홍보문구 <span style="color:var(--blue-mid);">라이브러리</span>
+      </h1>
+      <p class="text-base md:text-lg leading-relaxed" style="color:var(--ink-mid);">
+        학교 정보를 입력하면 모든 채널 문구가 자동으로 완성됩니다.<br class="hidden md:block"/>
+        복사 버튼 한 번으로 바로 사용하세요.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════ STICKY INPUT FORM ══════ -->
+  <section class="px-4 py-8">
+    <div class="max-w-3xl mx-auto">
+      <div class="card p-6 md:p-8 fade-in">
+        <h2 class="text-base font-bold mb-5 flex items-center gap-2" style="color:var(--blue);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          학교 정보 입력 — 모든 문구에 자동 반영됩니다
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold mb-1.5" style="color:var(--ink-mid);">대학명 <span class="text-red-500">*</span></label>
+            <input id="inp-univ" type="text" class="form-input" placeholder="예: 한국대학교" oninput="updateTemplates()" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1.5" style="color:var(--ink-mid);">신청 링크 <span class="text-red-500">*</span></label>
+            <input id="inp-link" type="url" class="form-input" placeholder="예: https://forms.gle/..." oninput="updateTemplates()" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1.5" style="color:var(--ink-mid);">마감일 <span class="text-red-500">*</span></label>
+            <input id="inp-deadline" type="text" class="form-input" placeholder="예: 4월 20일(일)" oninput="updateTemplates()" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1.5" style="color:var(--ink-mid);">선착순 인원</label>
+            <input id="inp-limit" type="text" class="form-input" placeholder="예: 200명" oninput="updateTemplates()" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1.5" style="color:var(--ink-mid);">담당자명</label>
+            <input id="inp-manager" type="text" class="form-input" placeholder="예: 홍길동 선생님" oninput="updateTemplates()" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1.5" style="color:var(--ink-mid);">연락처</label>
+            <input id="inp-phone" type="text" class="form-input" placeholder="예: 02-1234-5678" oninput="updateTemplates()" />
+          </div>
+        </div>
+        <p class="text-xs mt-4" style="color:var(--ink-soft);">* 입력 즉시 아래 모든 채널 문구가 자동 업데이트됩니다. 페이지를 새로고침하면 초기화됩니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ CHANNEL TABS ══════ -->
+  <section class="px-4 pb-4 sticky top-14 z-40 bg-cream" style="background:var(--cream); padding-top:2px;">
+    <div class="max-w-3xl mx-auto">
+      <div class="card px-4 py-3">
+        <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style="scrollbar-width:none; -ms-overflow-style:none;">
+          <button class="tab-btn active" onclick="showChannel('board')">📌 취업게시판</button>
+          <button class="tab-btn" onclick="showChannel('kakao')">💬 카카오톡</button>
+          <button class="tab-btn" onclick="showChannel('sns')">📷 인스타그램</button>
+          <button class="tab-btn" onclick="showChannel('email')">✉️ 교수 전달 메일</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ TEMPLATES ══════ -->
+  <section class="px-4 py-6 pb-20">
+    <div class="max-w-3xl mx-auto space-y-6">
+
+      <!-- ── 취업게시판 ── -->
+      <div id="ch-board" class="channel-section active">
+        <div class="mb-3 flex items-center gap-2">
+          <span class="text-lg">📌</span>
+          <h3 class="font-bold text-base" style="color:var(--ink);">취업게시판 / 학교 포털 공지문</h3>
+        </div>
+        <div class="tip-box mb-5">
+          <p class="text-xs font-bold mb-1" style="color:#1E40AF;">💡 활용 팁</p>
+          <ul class="text-xs space-y-1" style="color:#1E40AF;">
+            <li>• 공지 제목에 <strong>[무료]</strong>, <strong>[선착순]</strong> 키워드를 꼭 넣으세요 — 클릭률 2~3배 차이납니다.</li>
+            <li>• 마감일 3일 전에 동일 공지를 재업로드하면 다시 상단 노출됩니다.</li>
+            <li>• A안(정보 중심)과 B안(혜택 중심) 중 학교 분위기에 맞는 것을 선택하세요.</li>
+          </ul>
+        </div>
+
+        <!-- A안 -->
+        <div class="card p-5 mb-4 fade-in">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="badge badge-a">A안</span>
+              <span class="text-sm font-semibold" style="color:var(--ink-mid);">정보형 — 제도·혜택 중심</span>
+            </div>
+            <button class="copy-btn" onclick="copyText('tpl-board-a', this)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              복사
+            </button>
+          </div>
+          <textarea id="tpl-board-a" class="template-box" readonly></textarea>
+        </div>
+
+        <!-- B안 -->
+        <div class="card p-5 fade-in">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="badge badge-b">B안</span>
+              <span class="text-sm font-semibold" style="color:var(--ink-mid);">혜택형 — 무료·선착순 강조</span>
+            </div>
+            <button class="copy-btn" onclick="copyText('tpl-board-b', this)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              복사
+            </button>
+          </div>
+          <textarea id="tpl-board-b" class="template-box" readonly></textarea>
+        </div>
+      </div>
+
+      <!-- ── 카카오톡 ── -->
+      <div id="ch-kakao" class="channel-section">
+        <div class="mb-3 flex items-center gap-2">
+          <span class="text-lg">💬</span>
+          <h3 class="font-bold text-base" style="color:var(--ink);">카카오톡 / 단톡방</h3>
+        </div>
+        <div class="tip-box mb-5">
+          <p class="text-xs font-bold mb-1" style="color:#1E40AF;">💡 활용 팁</p>
+          <ul class="text-xs space-y-1" style="color:#1E40AF;">
+            <li>• 카카오톡은 짧고 임팩트 있게 — 첫 두 줄에 핵심 정보가 와야 합니다.</li>
+            <li>• 링크는 반드시 마지막에 단독 줄로 배치하세요. 미리보기 카드가 생성됩니다.</li>
+            <li>• 이모지로 시각적 분리를 해주면 가독성이 크게 올라갑니다.</li>
+          </ul>
+        </div>
+
+        <div class="card p-5 mb-4 fade-in">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="badge badge-a">A안</span>
+              <span class="text-sm font-semibold" style="color:var(--ink-mid);">간결형 — 3줄 요약</span>
+            </div>
+            <button class="copy-btn" onclick="copyText('tpl-kakao-a', this)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              복사
+            </button>
+          </div>
+          <textarea id="tpl-kakao-a" class="template-box" readonly></textarea>
+        </div>
+
+        <div class="card p-5 fade-in">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="badge badge-b">B안</span>
+              <span class="text-sm font-semibold" style="color:var(--ink-mid);">상세형 — 혜택 전체 나열</span>
+            </div>
+            <button class="copy-btn" onclick="copyText('tpl-kakao-b', this)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              복사
+            </button>
+          </div>
+          <textarea id="tpl-kakao-b" class="template-box" readonly></textarea>
+        </div>
+      </div>
+
+      <!-- ── 인스타그램 ── -->
+      <div id="ch-sns" class="channel-section">
+        <div class="mb-3 flex items-center gap-2">
+          <span class="text-lg">📷</span>
+          <h3 class="font-bold text-base" style="color:var(--ink);">인스타그램 / 학교 SNS</h3>
+        </div>
+        <div class="tip-box mb-5">
+          <p class="text-xs font-bold mb-1" style="color:#1E40AF;">💡 활용 팁</p>
+          <ul class="text-xs space-y-1" style="color:#1E40AF;">
+            <li>• 첫 문장(더보기 전)이 가장 중요합니다 — 궁금증을 유발하는 문장으로 시작하세요.</li>
+            <li>• 해시태그는 5~10개가 최적 — 너무 많으면 스팸으로 인식됩니다.</li>
+            <li>• 링크는 바이오 링크로 연결하고 캡션에서 "링크 in bio" 안내를 추가하세요.</li>
+          </ul>
+        </div>
+
+        <div class="card p-5 fade-in">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold" style="color:var(--ink-mid);">인스타그램 캡션</span>
+            </div>
+            <button class="copy-btn" onclick="copyText('tpl-sns', this)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              복사
+            </button>
+          </div>
+          <textarea id="tpl-sns" class="template-box" readonly></textarea>
+        </div>
+      </div>
+
+      <!-- ── 교수 전달 메일 ── -->
+      <div id="ch-email" class="channel-section">
+        <div class="mb-3 flex items-center gap-2">
+          <span class="text-lg">✉️</span>
+          <h3 class="font-bold text-base" style="color:var(--ink);">교수 → 학생 전달 이메일</h3>
+        </div>
+        <div class="tip-box mb-5">
+          <p class="text-xs font-bold mb-1" style="color:#1E40AF;">💡 활용 팁</p>
+          <ul class="text-xs space-y-1" style="color:#1E40AF;">
+            <li>• 교수님이 직접 전달하는 메일은 학생 참여율이 일반 공지 대비 3~5배 높습니다.</li>
+            <li>• 수업 시작 또는 종료 직전 구두 안내와 함께 전달하면 효과가 극대화됩니다.</li>
+            <li>• 제목에 학과명/수업명을 추가하면 열람률이 올라갑니다.</li>
+          </ul>
+        </div>
+
+        <div class="card p-5 fade-in">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold" style="color:var(--ink-mid);">교수→학생 전달용 이메일 본문</span>
+            </div>
+            <button class="copy-btn" onclick="copyText('tpl-email', this)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              복사
+            </button>
+          </div>
+          <div class="mb-2">
+            <span class="text-xs font-bold" style="color:var(--ink-soft);">제목 (별도 복사)</span>
+            <div class="flex items-center gap-2 mt-1">
+              <input id="tpl-email-subject" class="form-input text-sm flex-1" readonly style="min-height:0;padding:.5rem .75rem;" />
+              <button class="copy-btn" style="white-space:nowrap;" onclick="copyInput('tpl-email-subject', this)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                복사
+              </button>
+            </div>
+          </div>
+          <textarea id="tpl-email" class="template-box" readonly style="min-height:260px;"></textarea>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════ BACK TO MAIN ══════ -->
+  <section class="px-4 py-12">
+    <div class="max-w-3xl mx-auto text-center">
+      <p class="text-sm mb-4" style="color:var(--ink-soft);">지텔프IBT 대학 컨설팅 서비스가 궁금하신가요?</p>
+      <a href="index.html" class="btn-outline inline-flex" style="min-height:48px;">
+        ← 메인 페이지로 돌아가기
+      </a>
+    </div>
+  </section>
+
+  <script>
+    // ── 기본값 ──
+    const DEFAULTS = {
+      univ: '귀 대학교',
+      link: 'https://forms.gle/신청링크',
+      deadline: '4월 20일(일)',
+      limit: '200명',
+      manager: '취업지원센터 담당자',
+      phone: '취업지원센터',
+    };
+
+    function val(id, fallback) {
+      const v = document.getElementById(id)?.value?.trim();
+      return v || fallback;
+    }
+
+    function getVars() {
+      return {
+        univ:     val('inp-univ',     DEFAULTS.univ),
+        link:     val('inp-link',     DEFAULTS.link),
+        deadline: val('inp-deadline', DEFAULTS.deadline),
+        limit:    val('inp-limit',    DEFAULTS.limit),
+        manager:  val('inp-manager',  DEFAULTS.manager),
+        phone:    val('inp-phone',    DEFAULTS.phone),
+      };
+    }
+
+    function updateTemplates() {
+      const v = getVars();
+
+      // ── 취업게시판 A안 ──
+      document.getElementById('tpl-board-a').value =
+`[공지] 지텔프IBT 무료 영어실력 진단 신청 안내 — ${v.univ}
+
+안녕하세요, ${v.univ} 취업지원센터입니다.
+
+취업 준비 중인 학생들을 위해 국제공인영어시험 지텔프IBT 무료 응시 기회를 지원합니다.
+
+■ 지원 대상
+${v.univ} 재학생 및 졸업생 (취업 준비생 우선)
+
+■ 지원 내용
+• 지텔프IBT 정기시험 응시료 전액 무료 지원
+• 공인 성적표 발급 (기업 제출 가능)
+• 취업 지원에 활용 가능한 영어 공인 성적
+
+■ 신청 인원
+선착순 ${v.limit} 한정
+
+■ 신청 마감
+${v.deadline}
+
+■ 신청 방법
+아래 링크를 통해 신청서를 제출해 주세요.
+👉 ${v.link}
+
+※ 선착순 마감이므로 조기 마감될 수 있습니다.
+※ 문의: ${v.manager} (${v.phone})`;
+
+      // ── 취업게시판 B안 ──
+      document.getElementById('tpl-board-b').value =
+`🔔 [무료신청] 지텔프IBT 영어시험, ${v.univ} 학생만 전액 지원!
+
+취업 준비하는 분들 주목! 🎯
+영어 점수 없어서 스펙 걱정되신다면 꼭 확인하세요.
+
+✅ 지텔프IBT 응시료 → 100% 무료
+✅ 공인 영어 성적표 발급 → 기업 바로 제출 가능
+✅ 선착순 ${v.limit} — 자리 빠르게 마감됩니다
+
+📅 신청 마감: ${v.deadline}
+📝 신청하기: ${v.link}
+
+취업 영어 스펙, 이번 기회에 한 번에 해결하세요.
+문의: ${v.manager} / ${v.phone}`;
+
+      // ── 카카오톡 A안 ──
+      document.getElementById('tpl-kakao-a').value =
+`📢 지텔프IBT 무료 지원 — 선착순 ${v.limit}
+
+${v.univ} 학생 대상 영어시험 응시료 전액 무료!
+마감: ${v.deadline}
+
+👉 ${v.link}`;
+
+      // ── 카카오톡 B안 ──
+      document.getElementById('tpl-kakao-b').value =
+`📢 ${v.univ} 학생 여러분께 안내드립니다
+
+💡 지텔프IBT 영어시험을 무료로 응시할 수 있는 기회입니다!
+
+✔ 응시료 전액 무료 지원
+✔ 공인 성적표 발급 (기업 제출 가능)
+✔ 선착순 ${v.limit} 한정 지원
+✔ 신청 마감: ${v.deadline}
+
+지금 바로 신청하세요 👇
+${v.link}
+
+※ 선착순 마감, 서두르세요!
+문의: ${v.phone}`;
+
+      // ── 인스타그램 ──
+      document.getElementById('tpl-sns').value =
+`취업 준비 중인데 영어 성적이 없다면? 👀
+
+${v.univ} 학생 대상 지텔프IBT 영어시험 응시료를 전액 무료로 지원합니다 🎁
+
+✅ 선착순 ${v.limit} 전액 무료
+✅ 국제공인 영어 성적표 발급
+✅ 취업·이직·졸업 인증 활용 가능
+📅 마감 ${v.deadline}
+
+신청 링크는 프로필 바이오 링크에서 확인하세요!
+(또는 댓글에 "신청" 남겨주시면 링크 보내드릴게요 👇)
+
+#지텔프 #지텔프IBT #영어공인성적 #취업준비 #취업스펙 #영어시험무료 #${v.univ.replace(/\s/g, '')} #취업지원센터 #선착순무료`;
+
+      // ── 이메일 제목 ──
+      document.getElementById('tpl-email-subject').value =
+        `[안내] ${v.univ} 학생 지텔프IBT 영어시험 무료 응시 기회 — 마감 ${v.deadline}`;
+
+      // ── 이메일 본문 ──
+      document.getElementById('tpl-email').value =
+`안녕하세요, 교수님.
+
+${v.univ} 취업지원센터에서 안내드립니다.
+
+이번에 취업 준비 중인 학생들을 위해 국제공인영어시험 지텔프IBT(G-TELP IBT) 응시료 전액 무료 지원 프로그램을 진행합니다.
+
+수업 중 또는 수업 후 학생들에게 아래 내용을 안내해 주시면 감사하겠습니다.
+
+━━━━━━━━━━━━━━━━━━━━━━━
+📌 지텔프IBT 무료 응시 지원 안내
+━━━━━━━━━━━━━━━━━━━━━━━
+
+▶ 지원 내용
+  • 지텔프IBT 정기시험 응시료 전액 무료 지원
+  • 국제공인 영어 성적표 발급 (기업/기관 제출 가능)
+
+▶ 지원 대상
+  ${v.univ} 재학생 및 졸업생
+
+▶ 모집 인원
+  선착순 ${v.limit}
+
+▶ 신청 마감
+  ${v.deadline}
+
+▶ 신청 방법
+  아래 링크를 통해 신청서 제출
+  ${v.link}
+
+※ 선착순 마감이므로 조기 마감될 수 있습니다.
+━━━━━━━━━━━━━━━━━━━━━━━
+
+바쁘신 중에도 학생들에게 전달해 주시면 큰 도움이 되겠습니다.
+문의 사항은 언제든지 연락 주세요.
+
+감사합니다.
+
+${v.manager}
+${v.univ} 취업지원센터
+연락처: ${v.phone}`;
+    }
+
+    // ── 탭 전환 ──
+    function showChannel(ch) {
+      document.querySelectorAll('.channel-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('ch-' + ch).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    // ── 복사 (textarea) ──
+    function copyText(id, btn) {
+      const el = document.getElementById(id);
+      navigator.clipboard.writeText(el.value).then(() => {
+        btn.classList.add('copied');
+        btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 복사됨';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 복사';
+        }, 2000);
+      }).catch(() => {
+        el.select();
+        document.execCommand('copy');
+      });
+    }
+
+    // ── 복사 (input) ──
+    function copyInput(id, btn) {
+      const el = document.getElementById(id);
+      navigator.clipboard.writeText(el.value).then(() => {
+        btn.classList.add('copied');
+        btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 복사됨';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 복사';
+        }, 2000);
+      });
+    }
+
+    // ── 페이드인 ──
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // ── 초기 렌더링 ──
+    updateTemplates();
+  </script>
+</body>
+</html>
