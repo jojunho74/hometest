@@ -689,7 +689,7 @@
       <p class="text-xs" style="color:#4B5563;">© 2026 지텔프IBT 대학컨설팅. All rights reserved.</p>
     </div>
     <div class="max-w-5xl mx-auto mt-4 pt-4 text-center" style="border-top:1px solid #1F2937;">
-      <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fhometest-weld.vercel.app&count_bg=%234B5563&title_bg=%23374151&icon=eye.svg&icon_color=%239CA3AF&title=방문수&edge_flat=true" alt="방문수" style="height:16px;opacity:0.6;">
+      <p class="text-xs" style="color:#4B5563;">누적 방문수 <span id="visit-counter" style="color:#6B7280;">...</span></p>
     </div>
   </footer>
 
@@ -762,6 +762,14 @@
         setTimeout(cycle, 800); }, 400); }, 400); }, 400);
       }
       setTimeout(cycle, 1200);
+    })();
+
+    // ── 방문 카운터 ──
+    (async function() {
+      await _supabase.from('page_views').insert({});
+      const { count } = await _supabase.from('page_views').select('*', { count: 'exact', head: true });
+      const el = document.getElementById('visit-counter');
+      if (el && count !== null) el.textContent = count.toLocaleString() + '회';
     })();
 
     const mobileCta = document.getElementById('mobile-cta');
