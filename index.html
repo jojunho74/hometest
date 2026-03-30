@@ -728,10 +728,11 @@
       const btn = this.querySelector('[type="submit"]');
       btn.disabled = true; btn.textContent = '저장 중...';
       const checked = [...this.querySelectorAll('input[name="experience"]:checked')].map(el => el.value).join(', ');
+      const fd = new FormData(this);
       const { error } = await _supabase.from('consultations').insert([{
-        name: this.name.value.trim(), email: this.email.value.trim(),
-        current_level: this.current_level.value.trim(), experience: checked,
-        goal_score: this.goal_score.value.trim(), message: this.message.value.trim(),
+        name: fd.get('name')?.trim(), email: fd.get('email')?.trim(),
+        current_level: fd.get('current_level')?.trim(), experience: checked,
+        goal_score: fd.get('goal_score')?.trim(), message: fd.get('message')?.trim(),
       }]);
       if (error) { console.error(error); btn.disabled = false; btn.textContent = '신청하기 ✓'; alert('오류가 발생했습니다.'); return; }
       document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
