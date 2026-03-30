@@ -91,9 +91,12 @@
         <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
       </div>
       <div id="modal-body" class="px-6 py-5 space-y-4 text-sm text-slate-700"></div>
-      <div class="px-6 py-4 border-t flex justify-end gap-2">
-        <button id="modal-toggle-btn" class="btn btn-success" onclick="toggleStatusFromModal()">완료 처리</button>
-        <button onclick="closeModal()" class="btn btn-secondary">닫기</button>
+      <div class="px-6 py-4 border-t flex justify-between items-center gap-2">
+        <button onclick="deleteFromModal()" class="btn text-sm px-4" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:8px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">🗑 삭제</button>
+        <div class="flex gap-2">
+          <button id="modal-toggle-btn" class="btn btn-success" onclick="toggleStatusFromModal()">완료 처리</button>
+          <button onclick="closeModal()" class="btn btn-secondary">닫기</button>
+        </div>
       </div>
     </div>
   </div>
@@ -156,6 +159,7 @@
               <th class="px-4 py-3 font-semibold">상태</th>
               <th class="px-4 py-3 font-semibold hidden md:table-cell">접수일</th>
               <th class="px-4 py-3 font-semibold">상세</th>
+              <th class="px-4 py-3 font-semibold">삭제</th>
             </tr>
           </thead>
           <tbody id="table-body">
@@ -292,6 +296,9 @@
           <td class="px-4 py-3">
             <button onclick="openModal('${r.id}')" class="btn btn-secondary text-xs px-3 py-1.5">보기</button>
           </td>
+          <td class="px-4 py-3">
+            <button onclick="deleteRow('${r.id}')" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">삭제</button>
+          </td>
         </tr>
       `).join('');
     }
@@ -339,6 +346,20 @@
       if (error) { alert('오류가 발생했습니다.'); return; }
       closeModal();
       loadData();
+    }
+
+    // ─── 삭제 ───
+    async function deleteRow(id) {
+      if (!confirm('이 신청 내역을 삭제하시겠습니까?\n삭제 후 복구할 수 없습니다.')) return;
+      const { error } = await db.from('consultations').delete().eq('id', id);
+      if (error) { alert('삭제 실패: ' + error.message); return; }
+      loadData();
+    }
+
+    async function deleteFromModal() {
+      if (!currentRow) return;
+      closeModal();
+      await deleteRow(currentRow.id);
     }
 
     // ─── 유틸 ───
