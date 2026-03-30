@@ -80,7 +80,7 @@
       font-size: .875rem; line-height: 1.8; color: var(--ink);
       font-family: 'Noto Sans KR', sans-serif;
       white-space: pre-wrap; word-break: keep-all;
-      min-height: 120px; resize: none;
+      min-height: 80px; resize: none; overflow: hidden;
     }
 
     /* 채널 탭 */
@@ -548,6 +548,9 @@ ${v.univ} 취업지원센터에서 안내드립니다.
 ${v.manager}
 ${v.univ} 취업지원센터
 연락처: ${v.phone}`;
+
+      // 높이 재계산
+      autoResizeAll();
     }
 
     // ── 탭 전환 ──
@@ -593,8 +596,18 @@ ${v.univ} 취업지원센터
     }, { threshold: 0.08 });
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
+    // ── 텍스트영역 자동 높이 ──
+    function autoResizeAll() {
+      document.querySelectorAll('.template-box').forEach(el => {
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
+      });
+    }
+
     // ── 초기 렌더링 ──
     updateTemplates();
+    // 폰트 로드 후 재계산
+    document.fonts.ready.then(autoResizeAll);
   </script>
 </body>
 </html>
