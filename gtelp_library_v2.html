@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G-TELP 대학 취업센터 이메일 라이브러리</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --navy: #0F1F3D;
+    --navy-mid: #1A3260;
+    --blue: #1E4FD8;
+    --blue-light: #4B7BF5;
+    --teal: #0ABFBC;
+    --teal-light: #E0F9F8;
+    --slate: #64748B;
+    --light: #F4F7FF;
+    --white: #FFFFFF;
+    --border: #E2E8F0;
+    --text: #1E293B;
+    --text-muted: #64748B;
+    --accent-gold: #F59E0B;
+    --accent-red: #EF4444;
+    --accent-green: #10B981;
+    --radius: 16px;
+    --shadow: 0 4px 24px rgba(15,31,61,0.10);
+    --shadow-lg: 0 12px 48px rgba(15,31,61,0.16);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', 'Noto Sans KR', sans-serif;
+    background: #EEF2FF;
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── 상단 헤더 ── */
+  .app-header {
+    background: var(--navy);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .app-logo {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .logo-badge {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px; font-weight: 500;
+    color: white; letter-spacing: -0.5px;
+  }
+  .logo-text { font-size: 15px; font-weight: 600; color: white; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+  .header-badge {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7);
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+  }
+
+  /* ── 탭 네비게이션 ── */
+  .tab-nav {
+    background: var(--navy-mid);
+    padding: 0 40px;
+    display: flex; gap: 0;
+    overflow-x: auto;
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    padding: 14px 20px;
+    background: none; border: none;
+    color: rgba(255,255,255,0.45);
+    font-family: 'DM Sans', 'Noto Sans KR', sans-serif;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer; white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tab-btn:hover { color: rgba(255,255,255,0.8); }
+  .tab-btn.active { color: white; border-bottom-color: var(--teal); }
+  .tab-num {
+    width: 20px; height: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    font-size: 10px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tab-btn.active .tab-num { background: var(--teal); color: var(--navy); }
+
+  /* ── 메인 레이아웃 ── */
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px;
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: contents; }
+
+  /* ── 이메일 프리뷰 래퍼 ── */
+  .email-preview-wrap {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  .email-client-bar {
+    background: #F8FAFC;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .client-dots { display: flex; gap: 6px; }
+  .client-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .client-dot:nth-child(1) { background: #FF5F57; }
+  .client-dot:nth-child(2) { background: #FEBC2E; }
+  .client-dot:nth-child(3) { background: #28C840; }
+  .client-label { font-size: 11px; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-left: auto; }
+
+  .email-meta {
+    padding: 16px 24px;
+    background: #FAFBFF;
+    border-bottom: 1px solid var(--border);
+  }
+  .meta-row { display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: var(--text-muted); line-height: 1.8; }
+  .meta-label { font-weight: 600; min-width: 40px; color: var(--slate); }
+  .meta-subject { font-size: 13px; font-weight: 600; color: var(--navy); }
+
+  /* ── 이메일 바디 ── */
+  .email-body { padding: 0; background: #F0F4FF; }
+  .email-inner { max-width: 600px; margin: 0 auto; font-family: 'Noto Sans KR', sans-serif; }
+
+  /* 이메일 헤더 배너 */
+  .em-header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, #1A4080 100%);
+    padding: 36px 40px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .em-header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(10,191,188,0.12);
+  }
+  .em-header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: 30%;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(30,79,216,0.2);
+  }
+  .em-logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; position: relative; z-index: 1; }
+  .em-logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--blue-light), var(--teal));
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    color: white; letter-spacing: -0.5px;
+    font-family: 'DM Mono', monospace;
+  }
+  .em-logo-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); letter-spacing: 0.5px; }
+
+  .em-header-tag {
+    display: inline-block;
+    background: rgba(10,191,188,0.2);
+    border: 1px solid rgba(10,191,188,0.4);
+    color: var(--teal);
+    font-size: 10px; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+    position: relative; z-index: 1;
+    text-transform: uppercase;
+  }
+
+  .em-header-title {
+    font-size: 26px; font-weight: 700;
+    color: white; line-height: 1.3;
+    position: relative; z-index: 1;
+    letter-spacing: -0.5px;
+  }
+  .em-header-title span { color: var(--teal); }
+
+  /* 무료 뱃지 강조 */
+  .em-free-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: linear-gradient(135deg, var(--accent-gold), #F97316);
+    color: white;
+    font-size: 13px; font-weight: 700;
+    padding: 8px 16px; border-radius: 30px;
+    margin-top: 18px;
+    position: relative; z-index: 1;
+    box-shadow: 0 4px 16px rgba(245,158,11,0.4);
+    letter-spacing: -0.2px;
+  }
+
+  /* 이메일 콘텐츠 영역 */
+  .em-content { padding: 32px 40px; background: white; }
+
+  .em-greeting { font-size: 14px; color: var(--text-muted); margin-bottom: 4px; }
+  .em-salute { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 20px; }
+
+  .em-intro {
+    font-size: 14px; line-height: 1.8;
+    color: var(--text);
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+  .em-intro strong { color: var(--navy); font-weight: 700; }
+
+  /* ─ 핵심 강조 카드 (무료 200명) ─ */
+  .em-hero-card {
+    background: linear-gradient(135deg, #FFF8E7, #FFFBF0);
+    border: 2px solid var(--accent-gold);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .em-hero-card::before {
+    content: '★';
+    position: absolute;
+    right: 20px; top: 16px;
+    font-size: 48px;
+    color: rgba(245,158,11,0.12);
+    line-height: 1;
+  }
+  .em-hero-label {
+    font-size: 10px; font-weight: 700;
+    color: var(--accent-gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .em-hero-num {
+    font-size: 42px; font-weight: 800;
+    color: var(--navy);
+    line-height: 1;
+    letter-spacing: -2px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .em-hero-num span { color: var(--accent-gold); }
+  .em-hero-desc { font-size: 13px; color: var(--text-muted); margin-top: 8px; line-height: 1.6; }
+  .em-hero-desc strong { color: var(--navy); }
+
+  .em-hero-cta {
+    display: inline-block;
+    margin-top: 16px;
+    background: var(--accent-gold);
+    color: white;
+    font-size: 13px; font-weight: 700;
+    padding: 10px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    letter-spacing: -0.2px;
+    transition: all 0.2s;
+  }
+  .em-hero-cta:hover { background: #D97706; transform: translateY(-1px); }
+
+  /* ─ 섹션 카드 공통 ─ */
+  .em-section-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(15,31,61,0.05);
+  }
+  .em-section-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 15px; font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--light);
+  }
+  .em-section-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .icon-blue { background: #EFF4FF; }
+  .icon-teal { background: var(--teal-light); }
+  .icon-gold { background: #FFF8E7; }
+  .icon-green { background: #ECFDF5; }
+
+  /* ─ 도입 대학 사례 ─ */
+  .em-case-list { list-style: none; }
+  .em-case-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .em-case-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .em-case-badge {
+    background: var(--navy);
+    color: white;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-family: 'DM Mono', monospace;
+  }
+  .em-case-text { color: var(--text); }
+  .em-case-text strong { color: var(--navy); }
+
+  .em-count-row {
+    display: flex; gap: 12px;
+    margin-top: 16px;
+  }
+  .em-count-chip {
+    flex: 1;
+    background: var(--light);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .em-count-num {
+    font-size: 24px; font-weight: 800;
+    color: var(--blue);
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .em-count-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  .em-case-cta {
+    display: block;
+    margin-top: 16px;
+    background: transparent;
+    border: 2px solid var(--blue);
+    color: var(--blue);
+    font-size: 13px; font-weight: 700;
+    padding: 10px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .em-case-cta:hover { background: var(--blue); color: white; }
+
+  /* ─ 센터 업무 최소화 ─ */
+  .em-steps { list-style: none; }
+  .em-step {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 10px 0;
+  }
+  .em-step-num {
+    width: 26px; height: 26px;
+    background: var(--blue);
+    color: white;
+    font-size: 11px; font-weight: 700;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .em-step-body { font-size: 13px; line-height: 1.6; color: var(--text); }
+  .em-step-body strong { color: var(--navy); font-weight: 600; }
+  .em-step-body .em-chip {
+    display: inline-block;
+    background: var(--teal-light);
+    color: #0891B2;
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px;
+    margin-left: 4px;
+  }
+
+  .em-min-cta {
+    display: block;
+    margin-top: 16px;
+    background: var(--teal);
+    color: white;
+    font-size: 13px; font-weight: 700;
+    padding: 11px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .em-min-cta:hover { background: #08A5A2; transform: translateY(-1px); }
+
+  /* ─ 즉시 성적 확인 ─ */
+  .em-instant-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .em-instant-item {
+    background: var(--light);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .em-instant-icon { font-size: 24px; margin-bottom: 8px; }
+  .em-instant-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .em-instant-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+  .em-note-box {
+    background: #F0FDF4;
+    border-left: 3px solid var(--accent-green);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #065F46;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  /* ─ 진행 절차 ─ */
+  .em-process-row {
+    display: flex; align-items: center; gap: 0;
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .em-process-step {
+    flex: 1;
+    text-align: center;
+    min-width: 80px;
+  }
+  .em-process-circle {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: white;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 8px;
+  }
+  .em-process-label { font-size: 11px; font-weight: 600; color: var(--navy); line-height: 1.4; }
+  .em-process-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .em-process-arrow {
+    font-size: 16px; color: var(--border);
+    padding: 0 4px;
+    flex-shrink: 0;
+    margin-top: -20px;
+  }
+
+  .em-conditions {
+    background: var(--light);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+  .em-cond-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 13px;
+  }
+  .em-cond-row:last-child { border-bottom: none; }
+  .em-cond-key { color: var(--text-muted); font-weight: 500; }
+  .em-cond-val { font-weight: 700; color: var(--navy); }
+  .em-cond-val.highlight { color: var(--accent-gold); }
+  .em-cond-val.deadline { color: var(--accent-red); }
+
+  /* ─ 글로벌 CTA 섹션 ─ */
+  .em-main-cta-block {
+    background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+    border-radius: 14px;
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .em-main-cta-title {
+    font-size: 18px; font-weight: 700;
+    color: white; margin-bottom: 6px;
+  }
+  .em-main-cta-sub {
+    font-size: 13px; color: rgba(255,255,255,0.6);
+    margin-bottom: 20px; line-height: 1.6;
+  }
+  .em-main-cta-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--teal), var(--blue-light));
+    color: white;
+    font-size: 15px; font-weight: 700;
+    padding: 14px 32px;
+    border-radius: 10px;
+    text-decoration: none;
+    letter-spacing: -0.3px;
+    box-shadow: 0 4px 20px rgba(10,191,188,0.3);
+    transition: all 0.2s;
+  }
+  .em-main-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(10,191,188,0.4); }
+  .em-main-cta-note { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 12px; }
+
+  /* ─ 마감 D-day 배너 ─ */
+  .em-deadline-banner {
+    background: linear-gradient(135deg, #FFF1F2, #FFF8E7);
+    border: 1.5px solid #FECDD3;
+    border-radius: 10px;
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+  }
+  .em-deadline-icon { font-size: 24px; flex-shrink: 0; }
+  .em-deadline-text { font-size: 13px; line-height: 1.5; }
+  .em-deadline-text strong { color: var(--accent-red); }
+
+  /* ─ 클로징 ─ */
+  .em-closing {
+    font-size: 13px; line-height: 1.8;
+    color: var(--text-muted);
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .em-sign { margin-top: 16px; font-size: 13px; color: var(--text); font-weight: 600; }
+  .em-sign-sub { font-size: 11px; color: var(--text-muted); font-weight: 400; display: block; margin-top: 4px; }
+
+  /* ─ 푸터 ─ */
+  .em-footer {
+    background: var(--navy);
+    padding: 20px 40px;
+    text-align: center;
+  }
+  .em-footer-logo { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 6px; letter-spacing: 0.5px; }
+  .em-footer-info { font-size: 11px; color: rgba(255,255,255,0.3); line-height: 1.6; }
+
+  /* ── 사이드 패널 ── */
+  .side-panel { display: flex; flex-direction: column; gap: 16px; }
+
+  .info-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .info-card-header {
+    padding: 14px 20px;
+    background: var(--light);
+    border-bottom: 1px solid var(--border);
+  }
+  .info-card-header h3 { font-size: 13px; font-weight: 700; color: var(--navy); }
+  .info-card-body { padding: 16px 20px; }
+
+  .info-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-key { color: var(--text-muted); font-weight: 500; }
+  .info-val { font-weight: 600; color: var(--navy); text-align: right; }
+
+  .subject-copy {
+    background: var(--light);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--navy);
+    font-weight: 500;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+  }
+  .subject-copy:hover { background: #E2E8F0; }
+  .subject-copy + .subject-copy { margin-top: 8px; }
+
+  .step-list { list-style: none; padding: 0; }
+  .step-list li {
+    font-size: 12px; color: var(--text);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before { content: '→'; position: absolute; left: 0; color: var(--teal); font-weight: 700; }
+
+  .tag-list { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+  .tag { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; font-family: 'DM Mono', monospace; }
+  .tag-blue { background: #EFF4FF; color: var(--blue); }
+  .tag-teal { background: var(--teal-light); color: #0891B2; }
+  .tag-gold { background: #FFF8E7; color: #B45309; }
+  .tag-red { background: #FFF1F2; color: var(--accent-red); }
+  .tag-green { background: #ECFDF5; color: #065F46; }
+
+  .usage-tip {
+    background: var(--navy);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.6;
+  }
+  .usage-tip strong { color: var(--teal); display: block; margin-bottom: 6px; font-size: 13px; }
+
+  /* 복사 버튼 */
+  .copy-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--blue); color: white;
+    border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 600;
+    padding: 8px 14px; border-radius: 8px;
+    transition: all 0.2s;
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .copy-btn:hover { background: #1640B8; }
+  .copy-btn.copied { background: var(--accent-green); }
+
+  /* 플로팅 CTA */
+  .floating-cta {
+    position: fixed;
+    bottom: 32px; right: 32px;
+    z-index: 999;
+    display: flex; flex-direction: column; gap: 10px;
+    align-items: flex-end;
+  }
+  .float-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: none; cursor: pointer;
+    font-family: 'DM Sans', 'Noto Sans KR', sans-serif;
+    font-size: 13px; font-weight: 700;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .float-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.25); }
+  .float-btn-primary {
+    background: linear-gradient(135deg, var(--teal), var(--blue-light));
+    color: white;
+  }
+  .float-btn-secondary {
+    background: white;
+    color: var(--navy);
+    border: 1px solid var(--border);
+  }
+
+  /* 입력 폼 */
+  .inp-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 4px; }
+  .inp-header { background: linear-gradient(135deg, var(--blue), var(--teal)); padding: 16px 28px; display: flex; align-items: center; gap: 12px; }
+  .inp-title { font-size: 14px; font-weight: 700; color: white; }
+  .inp-sub { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+  .inp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 24px 28px 16px; }
+  .inp-field { display: flex; flex-direction: column; gap: 5px; }
+  .inp-label { font-size: 11px; font-weight: 700; color: var(--slate); text-transform: uppercase; letter-spacing: 0.4px; }
+  .inp-input { border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 13px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: var(--text); transition: border 0.2s; outline: none; }
+  .inp-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(30,79,216,0.08); }
+  .inp-input::placeholder { color: #bbb; }
+  .inp-reset { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+  .inp-reset:hover { border-color: var(--accent-red); color: var(--accent-red); }
+  .inp-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent-green); font-weight: 600; opacity: 0; transition: opacity 0.3s; }
+  .inp-status.show { opacity: 1; }
+
+  /* ── 탭 숨김 ── */
+  .tab-nav { display: none; }
+
+  /* ── 반응형 ── */
+  @media (max-width: 900px) {
+    .app-header { padding: 16px 20px; }
+    .em-content { padding: 24px; }
+    .em-header { padding: 28px 24px; }
+    .em-hero-num { font-size: 34px; }
+    .em-instant-grid { grid-template-columns: 1fr; }
+    .floating-cta { bottom: 20px; right: 20px; }
+    .inp-grid { grid-template-columns: 1fr; }
+    .layout-td { display: block; width: 100% !important; }
+    .layout-gap { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ 상단 헤더 ══════════ -->
+<header class="app-header">
+  <div class="app-logo">
+    <div class="logo-badge">GT</div>
+    <div>
+      <div class="logo-text">G-TELP 대학 영업 이메일</div>
+      <div class="logo-sub">한국지텔프 · 취업센터 무료 IBT 제공 제안</div>
+    </div>
+  </div>
+  <div class="header-badge">이메일 라이브러리 · v1.0</div>
+</header>
+
+<!-- ══════════ 탭 네비게이션 ══════════ -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab(0)">
+    <span class="tab-num">1</span> 취업센터 · 메인 제안
+  </button>
+  <button class="tab-btn" onclick="switchTab(1)">
+    <span class="tab-num">2</span> 학생 홍보 문구 라이브러리
+  </button>
+</nav>
+
+<!-- ══ 2컬럼 TABLE 레이아웃 ══ -->
+<table align="center" width="1760" border="0" cellpadding="0" cellspacing="0"
+       style="width:100%; max-width:1760px; table-layout:fixed;">
+<tr valign="top">
+  <td width="80"></td><!-- 좌측 여백 -->
+
+  <!-- ── 왼쪽 컬럼: 이메일 미리보기 ── -->
+  <td class="layout-td" width="47%" valign="top" style="padding-top:40px; padding-right:20px; padding-bottom:80px;">
+
+    <!-- 컬럼 헤더 -->
+    <table border="0" cellpadding="0" cellspacing="0" width="100%"
+           style="margin-bottom:18px; padding-bottom:18px; border-bottom:2px solid #E2E8F0;">
+    <tr valign="middle">
+      <td width="40">
+        <div style="width:40px;height:40px;border-radius:50%;background:#0F1F3D;color:#fff;
+                    font-size:17px;font-weight:800;text-align:center;line-height:40px;
+                    box-shadow:0 4px 12px rgba(15,31,61,0.22);">1</div>
+      </td>
+      <td width="14"></td>
+      <td>
+        <div style="font-size:17px;font-weight:800;color:#0F1F3D;letter-spacing:-0.4px;">취업센터 제안 이메일</div>
+        <div style="font-size:12px;color:#64748B;margin-top:3px;line-height:1.5;">담당자에게 발송할 이메일 · 하단 버튼으로 전체 복사 가능</div>
+      </td>
+    </tr>
+    </table>
+
+  <div class="email-preview-wrap">
+    <div class="email-client-bar">
+      <div class="client-dots">
+        <div class="client-dot"></div>
+        <div class="client-dot"></div>
+        <div class="client-dot"></div>
+      </div>
+      <span class="client-label">받은편지함 · Template #01 · 취업센터 제안</span>
+    </div>
+    <div class="email-meta">
+      <div class="meta-row"><span class="meta-label">보낸이</span> 한국지텔프 조준호 과장 &lt;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b1dbc4dfd9def1d6c5d4ddc19fd2de9fdac3">[email&#160;protected]</a>&gt;</div>
+      <div class="meta-row"><span class="meta-label">받는이</span> [대학명] 대학일자리플러스센터 / 취업지원팀 담당자님</div>
+      <div class="meta-row meta-subject"><span class="meta-label">제목</span> [대학명] 취업센터 학생 200명 영어진단 무료 지원 — G-TELP IBT 제안드립니다</div>
+    </div>
+
+    <div class="email-body">
+      <div class="email-inner">
+
+        <!-- 헤더 -->
+        <div class="em-header">
+          <div class="em-logo-row">
+            <div class="em-logo-icon">GT</div>
+            <span class="em-logo-name">G-TELP · 한국지텔프</span>
+          </div>
+          <div class="em-header-tag">대학일자리플러스센터 · 무료 지원 제안</div>
+          <div class="em-header-title">취업 준비 학생의<br><span>영어 실력을 무료로 진단</span>해드립니다</div>
+          <div class="em-free-badge">🎁 최대 200명 전액 무료 · 정식 IBT 시험</div>
+        </div>
+
+        <!-- 콘텐츠 -->
+        <div class="em-content">
+          <div class="em-greeting">안녕하세요,</div>
+          <div class="em-salute">[대학명] 취업센터 담당자님께</div>
+          <div class="em-intro">
+            전화로 인사드렸던 국제공인영어시험 지텔프(G-TELP) 운영기관
+            <strong>㈜한국지텔프 조준호 과장</strong>입니다.<br><br>
+            학기초 바쁘신 중에 잠시 시간을 내어 읽어주시어 감사드립니다.
+            대학일자리플러스센터(취업기관, 인재개발처 등)에서 곧바로 활용하실 수 있는
+            <strong>영어 역량 진단 프로그램</strong>을 제안드립니다.
+          </div>
+
+          <!-- 1순위: 무료 200명 -->
+          <div class="em-hero-card">
+            <div class="em-hero-label">🥇 핵심 혜택 · 전액 무료 지원</div>
+            <div class="em-hero-num">최대 <span>200</span>명</div>
+            <div class="em-hero-desc">
+              국제공인 G-TELP IBT 시험을 <strong>전액 무료</strong>로 지원해드립니다.<br>
+              (정식 IBT 응시료 1회 15,000원 상당 · 학년 제한 없음 · 졸업생 포함)
+            </div>
+            <a href="https://forms.gle/obVkUL3p5QLyzxh59" class="em-hero-cta" target="_blank">
+              ✅ 지금 바로 신청하기 →
+            </a>
+          </div>
+
+          <!-- 2순위: 도입 대학 사례 -->
+          <div class="em-section-card">
+            <div class="em-section-title">
+              <div class="em-section-icon icon-blue">🏫</div>
+              2026년 실제 도입 대학 사례
+            </div>
+            <ul class="em-case-list">
+              <li class="em-case-item">
+                <span class="em-case-badge">매년 진행</span>
+                <span class="em-case-text">
+                  <strong>서울시립대학교 · 한성대학교</strong> 등 — 정기시험 전 실력 진단용으로 활용.
+                  무료 제공으로 학생 참여율이 높으며 매년 응시 중입니다.
+                </span>
+              </li>
+              <li class="em-case-item">
+                <span class="em-case-badge">졸업인증</span>
+                <span class="em-case-text">
+                  <strong>지텔프 졸업인증 도입 대학 64개교</strong> — 공식 졸업 요건으로 채택한 대학들이
+                  IBT 진단을 선행 프로그램으로 운영 중입니다.
+                </span>
+              </li>
+            </ul>
+            <div class="em-count-row">
+              <div class="em-count-chip">
+                <div class="em-count-num">64</div>
+                <div class="em-count-label">졸업인증 도입 대학</div>
+              </div>
+              <div class="em-count-chip">
+                <div class="em-count-num">200+</div>
+                <div class="em-count-label">공공기관·정부부처 채용 인정</div>
+              </div>
+              <div class="em-count-chip">
+                <div class="em-count-num">600+</div>
+                <div class="em-count-label">도입 기업</div>
+              </div>
+            </div>
+            <a href="https://forms.gle/obVkUL3p5QLyzxh59" class="em-case-cta" target="_blank">
+              📋 도입 사례 자세히 보기 →
+            </a>
+          </div>
+
+          <!-- 3순위: 센터 업무 최소화 -->
+          <div class="em-section-card">
+            <div class="em-section-title">
+              <div class="em-section-icon icon-teal">⚡</div>
+              센터 업무 최소화 — 코드 배포만 하시면 됩니다
+            </div>
+            <ul class="em-steps">
+              <li class="em-step">
+                <div class="em-step-num">1</div>
+                <div class="em-step-body">
+                  <strong>신청서 접수</strong> — 아래 링크로 간단히 신청 (5분 소요)
+                </div>
+              </li>
+              <li class="em-step">
+                <div class="em-step-num">2</div>
+                <div class="em-step-body">
+                  <strong>응시 코드 배포</strong> <span class="em-chip">센터 역할 끝</span> — 학생들에게 접속 ID를 전달해주시기만 하면 됩니다.
+                </div>
+              </li>
+              <li class="em-step">
+                <div class="em-step-num">3</div>
+                <div class="em-step-body">
+                  <strong>시험 운영 · 성적 안내</strong> — 시험 진행, 결과 안내 모두 저희가 처리합니다.
+                </div>
+              </li>
+              <li class="em-step">
+                <div class="em-step-num">4</div>
+                <div class="em-step-body">
+                  <strong>성과 지표 활용</strong> — 응시 인원을 취업 프로그램 참여 실적 지표로 보고하실 수 있습니다.
+                </div>
+              </li>
+            </ul>
+            <a href="https://forms.gle/obVkUL3p5QLyzxh59" class="em-min-cta" target="_blank">
+              🚀 신청서 작성하기 (간단 5분) →
+            </a>
+          </div>
+
+          <!-- 4순위: 즉시 성적 확인 -->
+          <div class="em-section-card">
+            <div class="em-section-title">
+              <div class="em-section-icon icon-green">📊</div>
+              응시 후 즉시 성적 확인 — 학생 만족도 높음
+            </div>
+            <div class="em-instant-grid">
+              <div class="em-instant-item">
+                <div class="em-instant-icon">⚡</div>
+                <div class="em-instant-title">즉시 성적 확인</div>
+                <div class="em-instant-desc">시험 종료 후<br>바로 결과 확인 가능</div>
+              </div>
+              <div class="em-instant-item">
+                <div class="em-instant-icon">🎯</div>
+                <div class="em-instant-title">목표 점수 설정</div>
+                <div class="em-instant-desc">정기시험 점수 예측<br>지표로 활용 가능</div>
+              </div>
+              <div class="em-instant-item">
+                <div class="em-instant-icon">💻</div>
+                <div class="em-instant-title">온라인 개별 응시</div>
+                <div class="em-instant-desc">장소·시간 자유<br>별도 시설 불필요</div>
+              </div>
+              <div class="em-instant-item">
+                <div class="em-instant-icon">🏛️</div>
+                <div class="em-instant-title">정기시험과 동일 난이도</div>
+                <div class="em-instant-desc">공인시험 준비용<br>사전 진단 최적화</div>
+              </div>
+            </div>
+            <div class="em-note-box">
+              ※ G-TELP IBT는 공인 성적 제출용은 아니지만, 정기시험과 거의 동일한 수준으로 출제되어
+              실제 공인시험 점수를 예측하는 지표로 활용하기 좋습니다.
+              <strong>국내 200개 이상 공공기관·정부부처 채용에서 공식 인정되는 영어시험</strong>입니다.
+            </div>
+          </div>
+
+          <!-- 진행 조건 -->
+          <div class="em-section-card">
+            <div class="em-section-title">
+              <div class="em-section-icon icon-gold">📋</div>
+              제공 조건 및 진행 절차
+            </div>
+            <div class="em-process-row">
+              <div class="em-process-step">
+                <div class="em-process-circle">📝</div>
+                <div class="em-process-label">신청서 접수</div>
+                <div class="em-process-sub">링크 클릭 후<br>5분 작성</div>
+              </div>
+              <div class="em-process-arrow">›</div>
+              <div class="em-process-step">
+                <div class="em-process-circle">🔑</div>
+                <div class="em-process-label">코드 발급</div>
+                <div class="em-process-sub">센터에<br>전달드림</div>
+              </div>
+              <div class="em-process-arrow">›</div>
+              <div class="em-process-step">
+                <div class="em-process-circle">📢</div>
+                <div class="em-process-label">학생 배포</div>
+                <div class="em-process-sub">공지/카톡<br>전달만</div>
+              </div>
+              <div class="em-process-arrow">›</div>
+              <div class="em-process-step">
+                <div class="em-process-circle">✅</div>
+                <div class="em-process-label">즉시 결과</div>
+                <div class="em-process-sub">시험 후<br>바로 확인</div>
+              </div>
+            </div>
+            <div class="em-conditions">
+              <div class="em-cond-row">
+                <span class="em-cond-key">대상 인원</span>
+                <span class="em-cond-val">최소 10명 ~ 최대 200명 (학년 제한 없음, 졸업생 포함)</span>
+              </div>
+              <div class="em-cond-row">
+                <span class="em-cond-key">비용</span>
+                <span class="em-cond-val highlight">전액 무료 (1인 15,000원 상당)</span>
+              </div>
+              <div class="em-cond-row">
+                <span class="em-cond-key">신청 기간</span>
+                <span class="em-cond-val deadline">시험 희망일 2주 전까지 신청 필수</span>
+              </div>
+              <div class="em-cond-row">
+                <span class="em-cond-key">응시 방식</span>
+                <span class="em-cond-val">개인별 온라인 응시 · 개인당 1회</span>
+              </div>
+              <div class="em-cond-row">
+                <span class="em-cond-key">신청 마감</span>
+                <span class="em-cond-val deadline">2026년 4월 20일</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 마감 배너 -->
+          <div class="em-deadline-banner">
+            <div class="em-deadline-icon">⏰</div>
+            <div class="em-deadline-text">
+              신청 마감까지 얼마 남지 않았습니다. <strong>2026년 4월 20일</strong>까지만 신청 가능하며,
+              시험 희망일 <strong>2주 전</strong>에 신청하셔야 합니다.
+            </div>
+          </div>
+
+          <!-- 메인 CTA -->
+          <div class="em-main-cta-block">
+            <div class="em-main-cta-title">지금 바로 신청하세요</div>
+            <div class="em-main-cta-sub">
+              관심 있으시면 간단히 신청만 해주시면 됩니다.<br>
+              이후 모든 준비는 저희가 진행합니다.
+            </div>
+            <a href="https://forms.gle/obVkUL3p5QLyzxh59" class="em-main-cta-btn" target="_blank">
+              📋 무료 신청서 작성하기 →
+            </a>
+            <div class="em-main-cta-note">신청서 제출 후 2영업일 내 연락드립니다</div>
+          </div>
+
+          <!-- 클로징 -->
+          <div class="em-closing">
+            더 자세한 내용은 첨부파일(지텔프 IBT 매뉴얼, 공공기관 활용처, 타시험 점수비교표)을 참고해 주세요.
+            궁금하신 점은 언제든지 연락 주시면 성심껏 안내해 드리겠습니다.
+            <div class="em-sign">
+              조준호 과장 드림<br>
+              <span class="em-sign-sub">㈜한국지텔프 · 02-XXX-XXXX · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="046e716a6c6b4463706168742a676b2a6f76">[email&#160;protected]</a></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 푸터 -->
+        <div class="em-footer">
+          <div class="em-footer-logo">G-TELP · ㈜한국지텔프 — 대학 무료 IBT 지원 제안</div>
+          <div class="em-footer-info">한국지텔프 | 대학 취업센터 제안 메일 | 수신거부는 회신으로 알려주세요.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  </td><!-- /왼쪽 컬럼 -->
+
+  <td class="layout-gap" width="40"></td><!-- 가운데 간격 -->
+
+  <!-- ── 오른쪽 컬럼: 학생 홍보 문구 ── -->
+  <td class="layout-td" width="47%" valign="top" style="padding-top:40px; padding-left:20px; padding-bottom:80px;">
+
+    <!-- 컬럼 헤더 -->
+    <table border="0" cellpadding="0" cellspacing="0" width="100%"
+           style="margin-bottom:18px; padding-bottom:18px; border-bottom:2px solid #E2E8F0;">
+    <tr valign="middle">
+      <td width="40">
+        <div style="width:40px;height:40px;border-radius:50%;background:#0F1F3D;color:#fff;
+                    font-size:17px;font-weight:800;text-align:center;line-height:40px;
+                    box-shadow:0 4px 12px rgba(15,31,61,0.22);">2</div>
+      </td>
+      <td width="14"></td>
+      <td>
+        <div style="font-size:17px;font-weight:800;color:#0F1F3D;letter-spacing:-0.4px;">학생 홍보 문구 라이브러리</div>
+        <div style="font-size:12px;color:#64748B;margin-top:3px;line-height:1.5;">취업게시판 · 카카오톡 · 인스타 · 학과 이메일 — 채널별 즉시 복사</div>
+      </td>
+    </tr>
+    </table>
+
+  <!-- ★ 공통 입력 폼 -->
+  <div class="inp-card">
+    <div class="inp-header">
+      <div style="width:36px;height:36px;background:rgba(255,255,255,0.18);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">✏️</div>
+      <div>
+        <div class="inp-title">공통 정보 입력 — 한 번만 입력하면 모든 문구에 자동 반영</div>
+        <div class="inp-sub">[ ] 괄호 항목 입력 시 아래 모든 채널 문구가 즉시 업데이트됩니다</div>
+      </div>
+    </div>
+    <div class="inp-grid">
+      <div class="inp-field">
+        <label class="inp-label">대학명</label>
+        <input class="inp-input" id="inp-school" placeholder="예: 한성대학교" oninput="updateAll()">
+      </div>
+      <div class="inp-field">
+        <label class="inp-label">신청 링크</label>
+        <input class="inp-input" id="inp-link" placeholder="예: https://forms.gle/..." oninput="updateAll()">
+      </div>
+      <div class="inp-field">
+        <label class="inp-label">마감일</label>
+        <input class="inp-input" id="inp-deadline" placeholder="예: 4월 20일" oninput="updateAll()">
+      </div>
+      <div class="inp-field">
+        <label class="inp-label">선착순 인원</label>
+        <input class="inp-input" id="inp-count" placeholder="예: 50" oninput="updateAll()">
+      </div>
+      <div class="inp-field">
+        <label class="inp-label">담당자명</label>
+        <input class="inp-input" id="inp-manager" placeholder="예: 홍길동" oninput="updateAll()">
+      </div>
+      <div class="inp-field">
+        <label class="inp-label">연락처</label>
+        <input class="inp-input" id="inp-contact" placeholder="예: 02-1234-5678" oninput="updateAll()">
+      </div>
+    </div>
+    <div style="padding:0 28px 20px;display:flex;align-items:center;justify-content:space-between;">
+      <span class="inp-status" id="inp-status">✅ 모든 문구가 업데이트됐습니다</span>
+      <button class="inp-reset" onclick="resetAll()">↩ 초기화</button>
+    </div>
+  </div>
+
+  <!-- 채널 1: 취업게시판 공지문 -->
+  <div style="background:white;border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:4px;">
+    <div style="background:var(--navy-mid);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;background:rgba(10,191,188,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">📋</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:white;">취업게시판 / 학교 포털 공지문</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px;">정식 공지 형태 · 제목+본문 포함</div>
+        </div>
+      </div>
+      <span style="background:rgba(10,191,188,0.15);border:1px solid rgba(10,191,188,0.3);color:var(--teal);font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;">공식 공지용</span>
+    </div>
+
+    <!-- 문구 1-A -->
+    <div style="padding:24px 28px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px;">
+          <span style="background:#EEF2FF;color:var(--blue);font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;">문구 A</span>
+          기본형 (글로컬역량 및 취업역량강화 전반 대상)
+        </div>
+        <button onclick="copyBlock('block-1a')" style="background:var(--navy);color:white;border:none;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">📋 복사하기</button>
+      </div>
+      <div id="block-1a" style="background:#F8FAFF;border:1px solid var(--border);border-radius:10px;padding:20px;font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;font-family:'Noto Sans KR',sans-serif;">【국제공인 영어시험 G-TELP IBT 무료 응시 안내】
+
+국제공인영어시험 G-TELP IBT를 무료로 응시할 수 있는 기회를 제공합니다.
+
+■ 지원 내용
+  - 응시료 전액 무료 (1인 15,000원 상당)
+  - 최대 200명 지원 / 학년 제한 없음 / 졸업생 포함
+
+■ G-TELP IBT란?
+  - 국제공인 영어능력시험 (공공기관·기업 취업 활용 가능)
+  - 온라인 응시 / 시험 후 즉시 성적 확인
+  - 공무원, 공공기관 가산점·지원자격으로 활용
+
+■ 신청 방법
+  아래 링크에서 간단히 신청해 주세요.
+  → [신청 링크 삽입]
+
+■ 신청 마감: [마감일 삽입]
+  (선착순 마감 · 조기 마감 가능)
+
+영어 스펙이 필요하신 분들께 좋은 기회가 될 것입니다.
+많은 관심과 참여 부탁드립니다.
+
+문의: [담당자명] ([연락처])</div>
+    </div>
+
+    <!-- 문구 1-B -->
+    <div style="padding:24px 28px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px;">
+          <span style="background:#FFF8E7;color:#B45309;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;">문구 B</span>
+          강조형 (선착순·마감 임박 강조)
+        </div>
+        <button onclick="copyBlock('block-1b')" style="background:var(--navy);color:white;border:none;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">📋 복사하기</button>
+      </div>
+      <div id="block-1b" style="background:#FFF8E7;border:1px solid #FDE68A;border-radius:10px;padding:20px;font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;font-family:'Noto Sans KR',sans-serif;">🎁 [마감일] 까지! G-TELP IBT 무료 응시 기회 — 선착순 마감
+
+취업 준비하는 학생이라면 놓치면 안 될 혜택입니다.
+국제공인 영어시험 G-TELP IBT를 이번 한 번만 무료로 응시할 수 있습니다.
+
+✅ 응시료 전액 무료 (15,000원 → 0원)
+✅ 온라인 응시 · 즉시 성적 확인
+✅ 공공기관·공무원·기업 취업 활용 가능
+✅ 학년 무관 · 졸업생도 신청 가능
+
+⚠️ 선착순 [00]명 마감 · 자리 없어지면 종료됩니다.
+
+📌 신청 링크: [링크 삽입]
+📌 마감: [마감일]
+
+지금 바로 신청하세요!</div>
+    </div>
+  </div>
+
+  <!-- 채널 2: 카카오톡 / 단톡방 -->
+  <div style="background:white;border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:4px;">
+    <div style="background:#3A1D96;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;background:rgba(254,229,0,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">💬</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:white;">카카오톡 / 단톡방 문구</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px;">짧고 임팩트 있는 메시지 · 링크 클릭 유도</div>
+        </div>
+      </div>
+      <span style="background:rgba(254,229,0,0.15);border:1px solid rgba(254,229,0,0.3);color:#FEE500;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;">SNS·메시지용</span>
+    </div>
+
+    <!-- 문구 2-A -->
+    <div style="padding:24px 28px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px;">
+          <span style="background:#EEF2FF;color:var(--blue);font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;">문구 A</span>
+          단문형 (단톡방 공유용)
+        </div>
+        <button onclick="copyBlock('block-2a')" style="background:var(--navy);color:white;border:none;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">📋 복사하기</button>
+      </div>
+      <div id="block-2a" style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:20px;font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;font-family:'Noto Sans KR',sans-serif;">📢 영어시험 무료 기회 공유해요!
+
+G-TELP IBT 시험을 무료로 응시할 수 있어요.
+(원래 1만5천원인데 취업센터에서 무료로 지원해드립니다)
+
+취업·공무원·공공기관 준비하시는 분들한테 도움 돼요 👍
+
+👉 신청 링크: [링크]
+⏰ 마감: [마감일] (선착순)</div>
+    </div>
+
+    <!-- 문구 2-B -->
+    <div style="padding:24px 28px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px;">
+          <span style="background:#FFF8E7;color:#B45309;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;">문구 B</span>
+          Q&A형 (궁금증 해소 선제 대응)
+        </div>
+        <button onclick="copyBlock('block-2b')" style="background:var(--navy);color:white;border:none;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">📋 복사하기</button>
+      </div>
+      <div id="block-2b" style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:20px;font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;font-family:'Noto Sans KR',sans-serif;">❓ G-TELP IBT가 뭔지 모르시는 분들을 위해!
+
+Q. 어디서 쓸 수 있나요?
+A. 공무원, 공공기관, 일반기업 취업 시 영어 스펙으로 활용 가능해요.
+
+Q. 정말 무료예요?
+A. 네! 취업센터에서 지원하는 거라 학생분들은 완전 무료예요.
+
+Q. 온라인으로 보는 거예요?
+A. 맞아요. 개인 기기로 온라인 응시하고 결과도 바로 나와요.
+
+📌 신청: [링크]  |  마감: [마감일]</div>
+    </div>
+  </div>
+
+  <!-- 채널 3: 인스타그램 / 학교 SNS -->
+  <div style="background:white;border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:4px;">
+    <div style="background:linear-gradient(135deg,#833AB4,#FD1D1D,#FCB045);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">📸</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:white;">인스타그램 / 학교 SNS 캡션</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;">해시태그 포함 · 이미지 게시물 캡션용</div>
+        </div>
+      </div>
+      <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;">SNS 게시용</span>
+    </div>
+    <div style="padding:24px 28px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px;">
+          <span style="background:#EEF2FF;color:var(--blue);font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;">문구 A</span>
+          인스타 캡션형 (해시태그 포함)
+        </div>
+        <button onclick="copyBlock('block-3a')" style="background:var(--navy);color:white;border:none;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">📋 복사하기</button>
+      </div>
+      <div id="block-3a" style="background:#F8FAFF;border:1px solid var(--border);border-radius:10px;padding:20px;font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;font-family:'Noto Sans KR',sans-serif;">🎁 취업 준비생 주목! G-TELP IBT 무료 응시 기회
+
+영어 스펙, 이렇게 준비하세요 💼
+국제공인 G-TELP IBT 시험을 [대학명] 취업센터에서 무료로 지원합니다!
+
+✔ 응시료 전액 무료
+✔ 온라인 응시 · 즉시 결과 확인
+✔ 공공기관·공무원·기업 취업 활용
+
+프로필 링크 또는 → [링크]
+마감: [마감일] ⏰ 선착순!
+
+#글로컬역량 및 취업역량강화 #영어스펙 #GTELP #IBT #무료시험
+#취업 #공무원준비 #공공기관 #[대학명]취업센터</div>
+    </div>
+  </div>
+
+  <!-- 채널 4: 이메일 (교수→학생 전달용) -->
+  <div style="background:white;border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:4px;">
+    <div style="background:#0F766E;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">✉️</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:white;">교수 → 학생 전달 이메일</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px;">수업 공지·학과 메일 활용 · 격식체</div>
+        </div>
+      </div>
+      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;">학과 메일용</span>
+    </div>
+    <div style="padding:24px 28px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:700;color:var(--navy);">교수/조교 전달용 · 격식체</div>
+        <button onclick="copyBlock('block-4a')" style="background:var(--navy);color:white;border:none;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">📋 복사하기</button>
+      </div>
+      <div id="block-4a" style="background:#F0FDFA;border:1px solid #CCFBF1;border-radius:10px;padding:20px;font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;font-family:'Noto Sans KR',sans-serif;">학생 여러분께
+
+취업센터에서 학생 여러분의 취업 역량 강화를 위해 국제공인 영어시험 G-TELP IBT 무료 응시 기회를 제공합니다.
+
+G-TELP IBT는 공공기관, 공무원, 일반기업 취업 시 영어 성적으로 활용 가능한 국제공인 시험으로, 이번 기회에 영어 실력을 진단하고 취업 준비에 활용하시기 바랍니다.
+
+◆ 지원 내용: 응시료 전액 무료 (1인 15,000원 상당)
+◆ 응시 방법: 개인 기기를 통한 온라인 응시
+◆ 대상: 학년 무관 (졸업생 포함)
+◆ 신청 마감: [마감일]
+
+신청 링크: [링크]
+
+관심 있는 학생은 마감일 전에 꼭 신청하시기 바랍니다.
+
+[대학명] 취업센터</div>
+    </div>
+  </div>
+
+  <!-- 활용 팁 -->
+  <div style="background:linear-gradient(135deg,#0F1F3D,#1A3260);border-radius:16px;padding:28px 32px;">
+    <div style="font-size:14px;font-weight:700;color:var(--teal);margin-bottom:16px;">💡 채널별 활용 팁</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
+      <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:16px;">
+        <div style="font-size:12px;font-weight:700;color:white;margin-bottom:6px;">📋 취업게시판</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.7;">학기 초 공지가 가장 효과적. 문구 B(강조형)를 마감 1주 전에 한 번 더 올리면 신청률 상승.</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:16px;">
+        <div style="font-size:12px;font-weight:700;color:white;margin-bottom:6px;">💬 카카오톡</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.7;">학과 단톡방 활용 시 문구 A(단문형)가 클릭률 높음. Q&A형은 오픈채팅방에 효과적.</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:16px;">
+        <div style="font-size:12px;font-weight:700;color:white;margin-bottom:6px;">📸 인스타그램</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.7;">카드뉴스 이미지와 함께 사용. 해시태그 10개 내외 유지. 프로필 링크에 신청 URL 삽입 권장.</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:16px;">
+        <div style="font-size:12px;font-weight:700;color:white;margin-bottom:6px;">✉️ 학과 이메일</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.7;">교수님께 전달 요청 시 가장 신뢰도 높음. 취업률에 민감한 학과 위주로 공유 요청.</div>
+      </div>
+    </div>
+  </div>
+
+  </td><!-- /오른쪽 컬럼 -->
+
+  <td width="80"></td><!-- 우측 여백 -->
+</tr>
+</table><!-- /2컬럼 TABLE -->
+
+<div style="height:40px;"></div>
+
+<!-- ══════════ 플로팅 CTA ══════════ -->
+<div class="floating-cta">
+  <a href="https://forms.gle/obVkUL3p5QLyzxh59" class="float-btn float-btn-primary" target="_blank">
+    📋 신청 링크 바로가기
+  </a>
+  <button class="float-btn float-btn-secondary" onclick="copyFullEmail()">
+    ✉️ 이메일 전체 복사
+  </button>
+</div>
+
+<script>
+  /* ── 탭 전환 ── */
+  function switchTab(idx) {
+    document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+    document.querySelectorAll('.tab-panel').forEach((p,i) => p.classList.toggle('active', i===idx));
+  }
+
+  /* ── 탭2 입력 폼: 문구 템플릿 ── */
+  const TEMPLATES = {
+    'block-1a':
+`【국제공인 영어시험 G-TELP IBT 무료 응시 안내】
+
+국제공인영어시험 G-TELP IBT를 무료로 응시할 수 있는 기회를 제공합니다.
+
+■ 지원 내용
+  - 응시료 전액 무료 (1인 15,000원 상당)
+  - 최대 200명 지원 / 학년 제한 없음 / 졸업생 포함
+
+■ G-TELP IBT란?
+  - 국제공인 영어능력시험 (공공기관·기업 취업 활용 가능)
+  - 온라인 응시 / 시험 후 즉시 성적 확인
+  - 공무원, 공공기관 가산점·지원자격으로 활용
+
+■ 신청 방법
+  아래 링크에서 간단히 신청해 주세요.
+  → {링크}
+
+■ 신청 마감: {마감일}
+  (선착순 마감 · 조기 마감 가능)
+
+영어 스펙이 필요하신 분들께 좋은 기회가 될 것입니다.
+많은 관심과 참여 부탁드립니다.
+
+문의: {담당자명} ({연락처})`,
+
+    'block-1b':
+`🎁 {마감일}까지! G-TELP IBT 무료 응시 기회 — 선착순 마감
+
+취업 준비하는 학생이라면 놓치면 안 될 혜택입니다.
+국제공인 영어시험 G-TELP IBT를 이번 한 번만 무료로 응시할 수 있습니다.
+
+✅ 응시료 전액 무료 (15,000원 → 0원)
+✅ 온라인 응시 · 즉시 성적 확인
+✅ 공공기관·공무원·기업 취업 활용 가능
+✅ 학년 무관 · 졸업생도 신청 가능
+
+⚠️ 선착순 {인원}명 마감 · 자리 없어지면 종료됩니다.
+
+📌 신청 링크: {링크}
+📌 마감: {마감일}
+
+지금 바로 신청하세요!`,
+
+    'block-2a':
+`📢 영어시험 무료 기회 공유해요!
+
+G-TELP IBT 시험을 무료로 응시할 수 있어요.
+(원래 1만5천원인데 취업센터에서 무료로 지원해드립니다)
+
+취업·공무원·공공기관 준비하시는 분들한테 도움 돼요 👍
+
+👉 신청 링크: {링크}
+⏰ 마감: {마감일} (선착순)`,
+
+    'block-2b':
+`❓ G-TELP IBT가 뭔지 모르시는 분들을 위해!
+
+Q. 어디서 쓸 수 있나요?
+A. 공무원, 공공기관, 일반기업 취업 시 영어 스펙으로 활용 가능해요.
+
+Q. 정말 무료예요?
+A. 네! 취업센터에서 지원하는 거라 학생분들은 완전 무료예요.
+
+Q. 온라인으로 보는 거예요?
+A. 맞아요. 개인 기기로 온라인 응시하고 결과도 바로 나와요.
+
+📌 신청: {링크}  |  마감: {마감일}`,
+
+    'block-3a':
+`🎁 취업 준비생 주목! G-TELP IBT 무료 응시 기회
+
+영어 스펙, 이렇게 준비하세요 💼
+국제공인 G-TELP IBT 시험을 {대학명} 취업센터에서 무료로 지원합니다!
+
+✔ 응시료 전액 무료
+✔ 온라인 응시 · 즉시 결과 확인
+✔ 공공기관·공무원·기업 취업 활용
+
+프로필 링크 또는 → {링크}
+마감: {마감일} ⏰ 선착순!
+
+#글로컬역량 및 취업역량강화 #영어스펙 #GTELP #IBT #무료시험
+#취업 #공무원준비 #공공기관 #{대학명}취업센터`,
+
+    'block-4a':
+`학생 여러분께
+
+취업센터에서 학생 여러분의 취업 역량 강화를 위해 국제공인 영어시험 G-TELP IBT 무료 응시 기회를 제공합니다.
+
+G-TELP IBT는 공공기관, 공무원, 일반기업 취업 시 영어 성적으로 활용 가능한 국제공인 시험으로, 이번 기회에 영어 실력을 진단하고 취업 준비에 활용하시기 바랍니다.
+
+◆ 지원 내용: 응시료 전액 무료 (1인 15,000원 상당)
+◆ 응시 방법: 개인 기기를 통한 온라인 응시
+◆ 대상: 학년 무관 (졸업생 포함)
+◆ 신청 마감: {마감일}
+
+신청 링크: {링크}
+
+관심 있는 학생은 마감일 전에 꼭 신청하시기 바랍니다.
+
+{대학명} 취업센터`
+  };
+
+  function getVars() {
+    return {
+      대학명:  (document.getElementById('inp-school')?.value?.trim())   || '[대학명]',
+      링크:    (document.getElementById('inp-link')?.value?.trim())     || '[신청 링크]',
+      마감일:  (document.getElementById('inp-deadline')?.value?.trim()) || '[마감일]',
+      인원:    (document.getElementById('inp-count')?.value?.trim())    || '00',
+      담당자명:(document.getElementById('inp-manager')?.value?.trim())  || '[담당자명]',
+      연락처:  (document.getElementById('inp-contact')?.value?.trim())  || '[연락처]',
+    };
+  }
+
+  function renderTemplate(tmpl, vars) {
+    return tmpl.replace(/\{([^}]+)\}/g, (_, k) => vars[k] !== undefined ? vars[k] : `[${k}]`);
+  }
+
+  function updateAll() {
+    const vars = getVars();
+    for (const [id, tmpl] of Object.entries(TEMPLATES)) {
+      const el = document.getElementById(id);
+      if (el) el.innerText = renderTemplate(tmpl, vars);
+    }
+    const st = document.getElementById('inp-status');
+    if (st) {
+      st.classList.add('show');
+      clearTimeout(st._t);
+      st._t = setTimeout(() => st.classList.remove('show'), 2000);
+    }
+  }
+
+  function resetAll() {
+    ['inp-school','inp-link','inp-deadline','inp-count','inp-manager','inp-contact']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    updateAll();
+  }
+
+  /* ── 문구 블록 복사 ── */
+  function copyBlock(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    navigator.clipboard.writeText(el.innerText).then(() => {
+      const tip = document.createElement('div');
+      tip.style.cssText = 'position:fixed;top:20px;right:20px;background:#10B981;color:white;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);';
+      tip.innerText = '✅ 문구가 클립보드에 복사됐습니다!';
+      document.body.appendChild(tip);
+      setTimeout(() => tip.remove(), 2200);
+    });
+  }
+
+  function copyText(el, text) {
+    navigator.clipboard.writeText(text || el.innerText).then(() => {
+      const orig = el.innerText;
+      if (el.tagName === 'BUTTON') {
+        el.classList.add('copied');
+        el.innerText = '✅ 복사됨!';
+        setTimeout(() => { el.classList.remove('copied'); el.innerText = orig; }, 2000);
+      } else {
+        const tip = document.createElement('div');
+        tip.style.cssText = 'position:fixed;top:20px;right:20px;background:#10B981;color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;';
+        tip.innerText = '✅ 클립보드에 복사됐습니다!';
+        document.body.appendChild(tip);
+        setTimeout(() => tip.remove(), 2000);
+      }
+    });
+  }
+
+  function copyAllSubjects() {
+    const subjects = [
+      '[대학명] 취업센터 학생 200명 영어진단 무료 지원 — G-TELP IBT 제안드립니다',
+      '[대학명] 글로컬역량 및 취업역량강화생 영어 무료진단 제공 — 지텔프 IBT 200명 무료 지원 제안',
+      '학기초 취업센터 영어진단 프로그램 무료 제공 — 한국지텔프 조준호 과장'
+    ].join('\n');
+    navigator.clipboard.writeText(subjects).then(() => {
+      const tip = document.createElement('div');
+      tip.style.cssText = 'position:fixed;top:20px;right:20px;background:#10B981;color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;';
+      tip.innerText = '✅ 제목 3개 복사됐습니다!';
+      document.body.appendChild(tip);
+      setTimeout(() => tip.remove(), 2000);
+    });
+  }
+
+  function copyFullEmail() {
+    const emailText = `제목: [대학명] 취업센터 학생 200명 영어진단 무료 지원 — G-TELP IBT 제안드립니다
+
+안녕하세요, 전화로 인사드렸던 국제공인영어시험 지텔프(G-TELP) 운영기관 ㈜한국지텔프 조준호 과장입니다.
+학기초 바쁘신 중에 잠시 시간을 내어 읽어주시어 감사드립니다.
+
+대학일자리플러스센터(취업기관, 인재개발처 등)에서 활용하실 수 있는 제안입니다.
+'국제공인영어 지텔프IBT 시험'을 최대 200명까지 무료 지원해드리고 있습니다.
+(*정식 IBT시험 응시료 1회 15,000원 수준)
+
+취업 준비 학생들의 영어 실력 진단 및 취업 프로그램에 여러 대학에서 활용 중입니다.
+※ 서울시립대, 한성대 등 매년 진행
+
+센터에서는 응시 코드만 배포해주시면 되고 시험 운영 및 성적 안내는 저희가 진행합니다.
+관심 있으시면 간단히 신청 부탁드립니다.
+
+<신청 링크> https://forms.gle/obVkUL3p5QLyzxh59
+
+─────────────────────────────
+■ 제공 조건
+• 대상: 10명 ~ 200명 / 학년 제한 없음 (졸업생 포함)
+• 비용: 전액 무료
+• 신청 마감: 2026년 4월 20일
+• 신청 기간: 시험 희망일 2주 전까지
+
+조준호 과장 드림
+㈜한국지텔프 · 02-XXX-XXXX · junho@gtelp.co.kr`;
+
+    navigator.clipboard.writeText(emailText).then(() => {
+      const tip = document.createElement('div');
+      tip.style.cssText = 'position:fixed;top:20px;right:20px;background:#10B981;color:white;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);';
+      tip.innerText = '✅ 이메일이 클립보드에 복사됐습니다!';
+      document.body.appendChild(tip);
+      setTimeout(() => tip.remove(), 2200);
+    });
+  }
+
+  /* ── 페이지 로드 시 초기 렌더링 ── */
+  document.addEventListener('DOMContentLoaded', updateAll);
+</script>
+</body>
+</html>
