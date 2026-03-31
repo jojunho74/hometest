@@ -206,19 +206,49 @@
           <table class="w-full text-sm">
             <thead>
               <tr class="text-left text-slate-400 text-xs border-b">
+                <th class="px-4 py-3 font-semibold">순서</th>
                 <th class="px-4 py-3 font-semibold">학교/부서</th>
                 <th class="px-4 py-3 font-semibold">제목</th>
                 <th class="px-4 py-3 font-semibold hidden md:table-cell">링크</th>
                 <th class="px-4 py-3 font-semibold hidden md:table-cell">등록일</th>
+                <th class="px-4 py-3 font-semibold">수정</th>
                 <th class="px-4 py-3 font-semibold">삭제</th>
               </tr>
             </thead>
             <tbody id="news-body">
-              <tr><td colspan="5" class="px-4 py-8 text-center text-slate-400">불러오는 중...</td></tr>
+              <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">불러오는 중...</td></tr>
             </tbody>
           </table>
         </div>
         <p id="news-empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">등록된 소식이 없습니다.</p>
+      </div>
+
+      <!-- 수정 모달 -->
+      <div id="news-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:200;padding:16px;">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+          <div class="flex items-center justify-between px-6 py-4 border-b">
+            <h2 class="font-bold text-lg text-slate-800">소식 수정</h2>
+            <button onclick="closeNewsModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+          </div>
+          <div class="px-6 py-5 space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">학교명 / 부서명</label>
+              <input id="edit-school" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">제목</label>
+              <input id="edit-title" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">링크 (선택)</label>
+              <input id="edit-link" type="url" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t flex justify-end gap-2">
+            <button onclick="closeNewsModal()" class="btn btn-secondary">취소</button>
+            <button onclick="saveNewsEdit()" class="btn btn-primary">저장</button>
+          </div>
+        </div>
       </div>
 
     </main>
@@ -442,26 +472,39 @@
     }
 
     // ─── 대학소식 ───
+    let newsData = [];
+    let editingId = null;
+
     async function loadNews() {
       const { data, error } = await db
         .from('university_news')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('sort_order', { ascending: true });
       if (error) { console.error(error); return; }
+      newsData = data || [];
       const tbody = document.getElementById('news-body');
       const empty = document.getElementById('news-empty-msg');
-      if (!data || data.length === 0) {
+      if (newsData.length === 0) {
         tbody.innerHTML = '';
         empty.classList.remove('hidden');
         return;
       }
       empty.classList.add('hidden');
-      tbody.innerHTML = data.map(r => `
+      tbody.innerHTML = newsData.map((r, i) => `
         <tr class="border-b last:border-0 hover:bg-slate-50">
+          <td class="px-4 py-3">
+            <div class="flex flex-col gap-1">
+              <button onclick="moveNews(${i}, -1)" ${i === 0 ? 'disabled' : ''} class="text-slate-400 hover:text-slate-700 disabled:opacity-20 text-xs leading-none">▲</button>
+              <button onclick="moveNews(${i}, 1)" ${i === newsData.length-1 ? 'disabled' : ''} class="text-slate-400 hover:text-slate-700 disabled:opacity-20 text-xs leading-none">▼</button>
+            </div>
+          </td>
           <td class="px-4 py-3 font-medium text-slate-700">${esc(r.school_name)}</td>
           <td class="px-4 py-3 text-slate-700">${esc(r.title)}</td>
           <td class="px-4 py-3 hidden md:table-cell">${r.link ? `<a href="${esc(r.link)}" target="_blank" class="text-blue-600 underline text-xs">링크</a>` : '-'}</td>
           <td class="px-4 py-3 text-slate-400 text-xs hidden md:table-cell">${formatDate(r.created_at)}</td>
+          <td class="px-4 py-3">
+            <button onclick="openNewsEdit('${r.id}')" class="btn text-xs px-3 py-1.5 btn-secondary">수정</button>
+          </td>
           <td class="px-4 py-3">
             <button onclick="deleteNews('${r.id}')" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">삭제</button>
           </td>
@@ -469,12 +512,25 @@
       `).join('');
     }
 
+    async function moveNews(idx, dir) {
+      const swapIdx = idx + dir;
+      if (swapIdx < 0 || swapIdx >= newsData.length) return;
+      const a = newsData[idx];
+      const b = newsData[swapIdx];
+      const aOrder = a.sort_order;
+      const bOrder = b.sort_order;
+      await db.from('university_news').update({ sort_order: bOrder }).eq('id', a.id);
+      await db.from('university_news').update({ sort_order: aOrder }).eq('id', b.id);
+      loadNews();
+    }
+
     async function addNews() {
       const school = document.getElementById('news-school').value.trim();
       const title  = document.getElementById('news-title').value.trim();
       const link   = document.getElementById('news-link').value.trim();
       if (!school || !title) { alert('학교명과 제목을 입력해주세요.'); return; }
-      const { error } = await db.from('university_news').insert([{ school_name: school, title, link: link || null }]);
+      const maxOrder = newsData.length > 0 ? Math.max(...newsData.map(r => r.sort_order)) + 1 : 1;
+      const { error } = await db.from('university_news').insert([{ school_name: school, title, link: link || null, sort_order: maxOrder }]);
       if (error) { alert('등록 실패: ' + error.message); return; }
       document.getElementById('news-school').value = '';
       document.getElementById('news-title').value  = '';
@@ -489,6 +545,33 @@
       if (!confirm('이 소식을 삭제하시겠습니까?')) return;
       const { error } = await db.from('university_news').delete().eq('id', id);
       if (error) { alert('삭제 실패: ' + error.message); return; }
+      loadNews();
+    }
+
+    function openNewsEdit(id) {
+      const r = newsData.find(n => String(n.id) === String(id));
+      if (!r) return;
+      editingId = id;
+      document.getElementById('edit-school').value = r.school_name;
+      document.getElementById('edit-title').value  = r.title;
+      document.getElementById('edit-link').value   = r.link || '';
+      const modal = document.getElementById('news-modal');
+      modal.style.display = 'flex';
+    }
+
+    function closeNewsModal() {
+      document.getElementById('news-modal').style.display = 'none';
+      editingId = null;
+    }
+
+    async function saveNewsEdit() {
+      const school = document.getElementById('edit-school').value.trim();
+      const title  = document.getElementById('edit-title').value.trim();
+      const link   = document.getElementById('edit-link').value.trim();
+      if (!school || !title) { alert('학교명과 제목을 입력해주세요.'); return; }
+      const { error } = await db.from('university_news').update({ school_name: school, title, link: link || null }).eq('id', editingId);
+      if (error) { alert('수정 실패: ' + error.message); return; }
+      closeNewsModal();
       loadNews();
     }
 
