@@ -771,6 +771,9 @@
       if (error) { alert('수정 실패: ' + error.message); return; }
       closeNewsModal();
       loadNews();
+      const msg = document.getElementById('news-msg');
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 2000);
     }
 
     // ─── 학교별 프로그램 ───
