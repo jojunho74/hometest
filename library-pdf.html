@@ -31,11 +31,33 @@
     #empty{display:none;text-align:center;color:#94A3B8;padding:60px 0;font-size:15px;}
     .back{font-size:13px;color:#1E4D8C;text-decoration:none;}
     .back:hover{text-decoration:underline;}
+    header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #E2E8F0;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    .hinner{max-width:1100px;margin:0 auto;padding:0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+    .hlogo{font-size:1rem;font-weight:800;color:#1E4D8C;text-decoration:none;}
+    .hnav{display:flex;align-items:center;gap:20px;font-size:0.8rem;font-weight:600;color:#475569;}
+    .hnav a{color:#475569;text-decoration:none;transition:color .15s;}
+    .hnav a:hover{color:#1E4D8C;}
+    .hbtn{padding:8px 18px;border-radius:8px;font-size:0.8rem;font-weight:700;background:#1E4D8C;color:#fff;text-decoration:none;transition:background .15s;}
+    .hbtn:hover{background:#163870;}
+    @media(max-width:640px){.hnav{display:none;}}
   </style>
 </head>
 <body>
+<header>
+  <div class="hinner">
+    <a href="index.html" class="hlogo">지텔프IBT 대학컨설팅</a>
+    <nav class="hnav">
+      <a href="index.html#about">서비스 소개</a>
+      <a href="index.html#process">진행 방법</a>
+      <a href="library.html">홍보문구 라이브러리</a>
+      <a href="library-pdf.html">채용공고 자료실</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="index.html#university-news">대학소식</a>
+    </nav>
+    <a href="index.html#consultation-form" class="hbtn">무료 신청하기</a>
+  </div>
+</header>
 <div class="wrap">
-  <a href="/" class="back">← 메인으로</a>
   <h1>채용공고 자료실</h1>
   <p class="subtitle">공공기관·공기업·연구원 채용공고 131개 — 검색 후 바로 다운로드</p>
   <input id="search" type="text" placeholder="기관명 또는 공고 제목 검색..." oninput="filterCards()"/>
