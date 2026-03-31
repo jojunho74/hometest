@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>대학생 IBT 시험 신청 — 지텔프IBT</title>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MLPBC6XMFC"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-MLPBC6XMFC');</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --blue: #1E3A8A;
+      --blue-mid: #2563EB;
+      --ink: #111827;
+      --ink-soft: #6B7280;
+      --cream: #F4F1EB;
+      --cream-dark: #E8E4DA;
+      --gold: #D97706;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F8FAFF;color:var(--ink);}
+
+    /* ── 헤더 ── */
+    header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #E2E8F0;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    .hinner{max-width:1100px;margin:0 auto;padding:0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+    .hlogo{font-size:1rem;font-weight:800;color:#1E4D8C;text-decoration:none;}
+    .hnav{display:flex;align-items:center;gap:20px;font-size:0.8rem;font-weight:600;}
+    .hnav a{color:#475569;text-decoration:none;transition:color .15s;}
+    .hnav a:hover,.hnav a.active{color:#1E4D8C;}
+    .hbtn{padding:8px 18px;border-radius:8px;font-size:0.8rem;font-weight:700;background:#1E4D8C;color:#fff;text-decoration:none;transition:background .15s;}
+    .hbtn:hover{background:#163870;}
+    .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:none;border:none;padding:4px;}
+    .hamburger span{display:block;height:2px;background:#1E293B;border-radius:2px;transition:transform .25s,opacity .25s;}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+    .mobile-menu{display:none;flex-direction:column;background:#fff;border-top:1px solid #E2E8F0;padding:12px 16px 16px;position:sticky;top:64px;z-index:49;box-shadow:0 4px 12px rgba(0,0,0,.08);}
+    .mobile-menu a{padding:12px 4px;font-size:0.9rem;font-weight:600;color:#1E293B;text-decoration:none;border-bottom:1px solid #F1F5F9;}
+    .mobile-menu a:last-child{border-bottom:none;}
+    .mobile-menu .mbtn{margin-top:12px;display:block;text-align:center;padding:12px;border-radius:8px;background:#1E4D8C;color:#fff;font-weight:700;text-decoration:none;}
+    .mobile-menu.open{display:flex;}
+    @media(max-width:640px){.hnav{display:none;}.hbtn{display:none;}.hamburger{display:flex;}}
+
+    /* ── 히어로 ── */
+    .hero{background:linear-gradient(135deg,#0B1D3A 0%,#1E3A8A 60%,#1d4ed8 100%);color:#fff;padding:60px 16px 50px;text-align:center;}
+    .hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:5px 14px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);margin-bottom:20px;letter-spacing:.04em;}
+    .hero h1{font-size:2rem;font-weight:900;line-height:1.2;margin-bottom:12px;}
+    @media(min-width:640px){.hero h1{font-size:2.6rem;}}
+    .hero-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:24px;}
+    .hero-tag{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);}
+    .hero-sub{max-width:520px;margin:0 auto 32px;font-size:1rem;line-height:1.7;color:rgba(255,255,255,.85);}
+    .hero-sub s{color:rgba(255,255,255,.5);}
+    .hero-sub strong{color:#FCD34D;font-weight:800;}
+
+    /* ── 프로세스 ── */
+    .process-section{background:#fff;padding:60px 16px;}
+    .section-label{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-mid);text-align:center;margin-bottom:8px;}
+    .section-title{font-size:1.5rem;font-weight:800;text-align:center;color:var(--ink);margin-bottom:40px;}
+    @media(min-width:640px){.section-title{font-size:1.8rem;}}
+    .steps{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:0;}
+    .step{display:flex;gap:16px;align-items:flex-start;}
+    .step-left{display:flex;flex-direction:column;align-items:center;}
+    .step-circle{width:36px;height:36px;border-radius:50%;background:var(--blue-mid);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .step-line{width:2px;flex:1;min-height:32px;background:#E2E8F0;margin:4px 0;}
+    .step-body{padding-bottom:28px;}
+    .step-body h3{font-size:0.95rem;font-weight:700;color:var(--ink);margin-bottom:4px;}
+    .step-body p{font-size:13px;color:var(--ink-soft);line-height:1.5;}
+    .step:last-child .step-line{display:none;}
+    .step:last-child .step-body{padding-bottom:0;}
+    .step-highlight .step-circle{background:var(--gold);}
+    .step-highlight .step-body h3{color:var(--gold);}
+
+    /* ── 신청 폼 ── */
+    .form-section{background:var(--blue);padding:60px 16px;}
+    .form-wrap{max-width:480px;margin:0 auto;}
+    .form-title{font-size:1.5rem;font-weight:800;color:#fff;text-align:center;margin-bottom:6px;}
+    .form-sub{font-size:13px;color:#93C5FD;text-align:center;margin-bottom:28px;}
+    .form-group{margin-bottom:14px;}
+    .form-group label{display:block;font-size:12px;font-weight:700;color:#CBD5E1;margin-bottom:6px;}
+    .form-group input{width:100%;padding:12px 14px;border-radius:8px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;}
+    .form-group input::placeholder{color:rgba(255,255,255,.4);}
+    .form-group input:focus{border-color:#93C5FD;background:rgba(255,255,255,.15);}
+    .submit-btn{width:100%;padding:14px;border-radius:10px;border:none;background:var(--gold);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;margin-top:8px;transition:background .2s,transform .15s;font-family:inherit;}
+    .submit-btn:hover{background:#b45309;transform:scale(1.02);}
+    .submit-btn:active{transform:scale(0.98);}
+    .submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+    .form-notice{font-size:11px;color:#93C5FD;text-align:center;margin-top:12px;line-height:1.6;}
+
+    /* ── 완료 ── */
+    .success-box{display:none;text-align:center;padding:32px 20px;}
+    .success-box .icon{font-size:3rem;margin-bottom:16px;}
+    .success-box h3{font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:8px;}
+    .success-box p{font-size:13px;color:#93C5FD;line-height:1.7;}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="hinner">
+    <a href="index.html" class="hlogo">지텔프IBT 대학컨설팅</a>
+    <nav class="hnav">
+      <a href="index.html#about">서비스 소개</a>
+      <a href="schedule.html">정기시험 일정</a>
+      <a href="library.html">홍보문구 라이브러리</a>
+      <a href="library-pdf.html">채용공고 자료실</a>
+      <a href="student.html" class="active">IBT 시험 신청</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <a href="#apply-form" class="hbtn">지금 신청하기</a>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="메뉴">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html#about">서비스 소개</a>
+    <a href="schedule.html">정기시험 일정</a>
+    <a href="library.html">홍보문구 라이브러리</a>
+    <a href="library-pdf.html">채용공고 자료실</a>
+    <a href="student.html">IBT 시험 신청</a>
+    <a href="#apply-form" class="mbtn">지금 신청하기</a>
+  </div>
+</header>
+
+<!-- ══ 히어로 ══ -->
+<section class="hero">
+  <div class="hero-badge">🎓 대학생 전용 무료 프로그램</div>
+  <h1>정기시험과 동일 난이도<br>즉시 결과 확인 · 완전 무료</h1>
+  <div class="hero-tags">
+    <span class="hero-tag">✅ 정기시험과 동일 난이도</span>
+    <span class="hero-tag">⚡ 즉시 결과 확인</span>
+    <span class="hero-tag">🎁 완전 무료</span>
+  </div>
+  <p class="hero-sub">
+    지텔프 정기시험 응시료 <strong><s>69,300원</s></strong><br>
+    한 번 망치면 또 <strong>69,300원</strong><br><br>
+    IBT 사전진단으로 내 점수를 먼저 확인하고<br>
+    <strong>자신 있을 때 정기시험 접수하세요.</strong>
+  </p>
+  <a href="#apply-form" style="display:inline-block;padding:14px 36px;border-radius:10px;background:var(--gold);color:#fff;font-weight:800;font-size:1rem;text-decoration:none;transition:background .2s,transform .15s;" onmouseover="this.style.background='#b45309';this.style.transform='scale(1.03)'" onmouseout="this.style.background='#D97706';this.style.transform='scale(1)'">무료로 신청하기 →</a>
+</section>
+
+<!-- ══ 프로세스 ══ -->
+<section class="process-section">
+  <p class="section-label">신청 프로세스</p>
+  <h2 class="section-title">신청부터 응시까지<br>이렇게 진행돼요</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-left"><div class="step-circle">1</div><div class="step-line"></div></div>
+      <div class="step-body"><h3>학생이 IBT 신청</h3><p>아래 신청 폼에 이름·이메일·학교 정보를 입력하고 제출합니다.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-left"><div class="step-circle">2</div><div class="step-line"></div></div>
+      <div class="step-body"><h3>G-TELP 담당자 확인</h3><p>접수된 신청을 G-TELP 담당자가 검토합니다.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-left"><div class="step-circle">3</div><div class="step-line"></div></div>
+      <div class="step-body"><h3>해당 대학 취업센터에 도입 제안</h3><p>담당자가 학생의 소속 대학 취업센터에 IBT 프로그램 도입을 제안합니다.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-left"><div class="step-circle">4</div><div class="step-line"></div></div>
+      <div class="step-body"><h3>취업센터 도입 승인</h3><p>취업센터에서 프로그램 도입을 승인합니다.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-left"><div class="step-circle">5</div><div class="step-line"></div></div>
+      <div class="step-body"><h3>코드 발급</h3><p>시험 응시에 필요한 고유 코드가 발급됩니다.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-left"><div class="step-circle">6</div><div class="step-line"></div></div>
+      <div class="step-body"><h3>취업센터 → 학생에게 코드 전달</h3><p>취업센터 담당자가 학생에게 응시 코드를 안내합니다.</p></div>
+    </div>
+    <div class="step step-highlight">
+      <div class="step-left"><div class="step-circle">7</div></div>
+      <div class="step-body"><h3>학생 시험 응시 🎉</h3><p>코드를 입력하고 IBT 시험에 응시합니다. 결과는 즉시 확인 가능!</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 신청 폼 ══ -->
+<section class="form-section" id="apply-form">
+  <div class="form-wrap">
+    <p class="section-label" style="color:#93C5FD;">무료 신청</p>
+    <h2 class="form-title">지금 바로 신청하세요</h2>
+    <p class="form-sub">제출 후 취업센터 도입 절차가 진행됩니다</p>
+
+    <div id="apply-form-inner">
+      <div class="form-group">
+        <label>이름 *</label>
+        <input type="text" id="s-name" placeholder="홍길동"/>
+      </div>
+      <div class="form-group">
+        <label>이메일 *</label>
+        <input type="email" id="s-email" placeholder="example@university.ac.kr"/>
+      </div>
+      <div class="form-group">
+        <label>연락처</label>
+        <input type="tel" id="s-phone" placeholder="010-0000-0000"/>
+      </div>
+      <div class="form-group">
+        <label>소속 대학교 *</label>
+        <input type="text" id="s-university" placeholder="예) 한성대학교"/>
+      </div>
+      <div class="form-group">
+        <label>학과 / 전공</label>
+        <input type="text" id="s-department" placeholder="예) 경영학과"/>
+      </div>
+      <button class="submit-btn" id="submit-btn" onclick="submitApplication()">무료로 신청하기 →</button>
+      <p class="form-notice">개인정보는 IBT 프로그램 운영 목적으로만 사용되며<br>제3자에게 제공되지 않습니다.</p>
+    </div>
+
+    <div class="success-box" id="success-box">
+      <div class="icon">🎉</div>
+      <h3>신청이 완료되었습니다!</h3>
+      <p>담당자가 확인 후 취업센터 도입 절차를 진행합니다.<br>절차 완료 후 안내 연락을 드립니다.<br><br>감사합니다!</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const { createClient } = supabase;
+  const _sb = createClient('https://byzulmxcuhsrjdphmuym.supabase.co', 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs');
+
+  function toggleMenu() {
+    const m = document.getElementById('mobile-menu');
+    const h = document.getElementById('hamburger');
+    m.classList.toggle('open');
+    h.classList.toggle('open');
+  }
+  document.querySelectorAll('#mobile-menu a').forEach(a => {
+    a.addEventListener('click', () => {
+      document.getElementById('mobile-menu').classList.remove('open');
+      document.getElementById('hamburger').classList.remove('open');
+    });
+  });
+
+  async function submitApplication() {
+    const name       = document.getElementById('s-name').value.trim();
+    const email      = document.getElementById('s-email').value.trim();
+    const phone      = document.getElementById('s-phone').value.trim();
+    const university = document.getElementById('s-university').value.trim();
+    const department = document.getElementById('s-department').value.trim();
+
+    if (!name)       { alert('이름을 입력해주세요.'); return; }
+    if (!email)      { alert('이메일을 입력해주세요.'); return; }
+    if (!university) { alert('소속 대학교를 입력해주세요.'); return; }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = '제출 중...';
+
+    const { error } = await _sb.from('student_applications').insert([{ name, email, phone: phone || null, university, department: department || null }]);
+
+    if (error) {
+      alert('오류가 발생했습니다: ' + error.message);
+      btn.disabled = false;
+      btn.textContent = '무료로 신청하기 →';
+      return;
+    }
+
+    document.getElementById('apply-form-inner').style.display = 'none';
+    document.getElementById('success-box').style.display = 'block';
+  }
+</script>
+</body>
+</html>

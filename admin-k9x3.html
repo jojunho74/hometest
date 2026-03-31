@@ -124,6 +124,7 @@
       <!-- 탭 -->
       <div class="flex gap-2 mb-8 border-b border-slate-200">
         <button onclick="switchTab('consult')"  id="tab-consult"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-blue-700 text-blue-700 -mb-px">신청 관리</button>
+        <button onclick="switchTab('student')"  id="tab-student"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">학생접수</button>
         <button onclick="switchTab('news')"     id="tab-news"     class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">대학소식</button>
         <button onclick="switchTab('programs')" id="tab-programs" class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">학교별 프로그램</button>
       </div>
@@ -180,6 +181,43 @@
           </table>
         </div>
         <p id="empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">신청 내역이 없습니다.</p>
+      </div>
+
+      <!-- ── 학생접수 탭 ── -->
+      <div id="section-student" class="hidden">
+        <div class="bg-white rounded-xl shadow-sm p-5 mb-6 flex flex-wrap gap-4">
+          <div class="bg-blue-50 rounded-lg px-5 py-3 text-center min-w-[100px]">
+            <p class="text-2xl font-bold text-blue-700" id="st-total">-</p>
+            <p class="text-xs text-slate-500 mt-1">전체 신청</p>
+          </div>
+          <div class="bg-amber-50 rounded-lg px-5 py-3 text-center min-w-[100px]">
+            <p class="text-2xl font-bold text-amber-600" id="st-pending">-</p>
+            <p class="text-xs text-slate-500 mt-1">대기중</p>
+          </div>
+          <div class="bg-green-50 rounded-lg px-5 py-3 text-center min-w-[100px]">
+            <p class="text-2xl font-bold text-green-600" id="st-done">-</p>
+            <p class="text-xs text-slate-500 mt-1">처리완료</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm table-wrap">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-slate-400 text-xs border-b">
+                <th class="px-4 py-3 font-semibold">이름</th>
+                <th class="px-4 py-3 font-semibold">이메일</th>
+                <th class="px-4 py-3 font-semibold hidden md:table-cell">연락처</th>
+                <th class="px-4 py-3 font-semibold">대학교</th>
+                <th class="px-4 py-3 font-semibold hidden md:table-cell">학과</th>
+                <th class="px-4 py-3 font-semibold hidden md:table-cell">신청일</th>
+                <th class="px-4 py-3 font-semibold">상태</th>
+              </tr>
+            </thead>
+            <tbody id="student-body">
+              <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">불러오는 중...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p id="student-empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">접수된 학생이 없습니다.</p>
       </div>
 
       <!-- ── 대학소식 탭 ── -->
@@ -564,7 +602,7 @@
 
     // ─── 탭 전환 ───
     function switchTab(tab) {
-      ['consult', 'news', 'programs'].forEach(t => {
+      ['consult', 'student', 'news', 'programs'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (t === tab) {
@@ -575,8 +613,51 @@
           btn.classList.add('border-transparent', 'text-slate-400');
         }
       });
+      if (tab === 'student') loadStudents();
       if (tab === 'news') loadNews();
       if (tab === 'programs') loadPrograms();
+    }
+
+    // ─── 학생접수 ───
+    async function loadStudents() {
+      const { data, error } = await db.from('student_applications').select('*').order('created_at', { ascending: false });
+      if (error) { console.error(error); return; }
+      const students = data || [];
+      const pending = students.filter(s => s.status === 'pending').length;
+      const done    = students.filter(s => s.status === 'done').length;
+      document.getElementById('st-total').textContent   = students.length;
+      document.getElementById('st-pending').textContent = pending;
+      document.getElementById('st-done').textContent    = done;
+      const tbody = document.getElementById('student-body');
+      const empty = document.getElementById('student-empty-msg');
+      if (students.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+      tbody.innerHTML = students.map(r => {
+        const date = new Date(r.created_at);
+        const dateStr = `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`;
+        const isPending = r.status === 'pending';
+        const statusBadge = isPending
+          ? `<span style="background:#FEF3C7;color:#D97706;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;">대기중</span>`
+          : `<span style="background:#D1FAE5;color:#059669;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;">완료</span>`;
+        return `<tr class="border-b last:border-0 hover:bg-slate-50">
+          <td class="px-4 py-3 font-medium text-slate-700">${esc(r.name)}</td>
+          <td class="px-4 py-3 text-slate-600 text-xs">${esc(r.email)}</td>
+          <td class="px-4 py-3 hidden md:table-cell text-slate-500 text-xs">${r.phone ? esc(r.phone) : '-'}</td>
+          <td class="px-4 py-3 font-medium text-slate-700">${esc(r.university)}</td>
+          <td class="px-4 py-3 hidden md:table-cell text-slate-500 text-xs">${r.department ? esc(r.department) : '-'}</td>
+          <td class="px-4 py-3 hidden md:table-cell text-slate-400 text-xs">${dateStr}</td>
+          <td class="px-4 py-3">
+            <button onclick="toggleStudentStatus('${r.id}','${r.status}')" class="flex items-center gap-1">${statusBadge}</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function toggleStudentStatus(id, current) {
+      const next = current === 'pending' ? 'done' : 'pending';
+      const { error } = await db.from('student_applications').update({ status: next }).eq('id', id);
+      if (error) { alert('상태 변경 실패: ' + error.message); return; }
+      loadStudents();
     }
 
     // ─── 색상 팔레트 ───
