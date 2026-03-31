@@ -775,7 +775,7 @@
     // ── 대학소식 ──
     (async function loadUniversityNews() {
       try {
-        const { data, error } = await _supabase.from('university_news').select('*').order('created_at', { ascending: false });
+        const { data, error } = await _supabase.from('university_news').select('*').order('sort_order', { ascending: true });
         const grid = document.getElementById('news-grid');
         const empty = document.getElementById('news-empty');
         if (error) { console.error('news error:', error); grid.innerHTML = ''; return; }
