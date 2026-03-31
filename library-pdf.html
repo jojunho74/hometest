@@ -33,8 +33,30 @@
   </style>
 </head>
 <body>
-<div class="wrap">
-  <a href="/" class="back">← 메인으로</a>
+  <header style="position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #E8E0D4;box-shadow:0 1px 4px rgba(0,0,0,.06);">
+    <div style="max-width:1100px;margin:0 auto;padding:0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;">
+      <a href="index.html" style="font-size:1.1rem;font-weight:800;color:#1E4D8C;text-decoration:none;">지텔프IBT 대학컨설팅</a>
+      <nav style="display:none;align-items:center;gap:20px;font-size:0.8rem;font-weight:600;" id="main-nav">
+        <a href="index.html#about" style="color:#4B5563;text-decoration:none;" onmouseover="this.style.color='#2563EB'" onmouseout="this.style.color='#4B5563'">서비스 소개</a>
+        <a href="index.html#process" style="color:#4B5563;text-decoration:none;" onmouseover="this.style.color='#2563EB'" onmouseout="this.style.color='#4B5563'">진행 방법</a>
+        <a href="library.html" style="color:#4B5563;text-decoration:none;" onmouseover="this.style.color='#2563EB'" onmouseout="this.style.color='#4B5563'">홍보문구 라이브러리</a>
+        <a href="library-pdf.html" style="color:#1E4D8C;text-decoration:none;font-weight:800;">채용공고 자료실</a>
+        <a href="index.html#faq" style="color:#4B5563;text-decoration:none;" onmouseover="this.style.color='#2563EB'" onmouseout="this.style.color='#4B5563'">FAQ</a>
+        <a href="index.html#university-news" style="color:#4B5563;text-decoration:none;" onmouseover="this.style.color='#2563EB'" onmouseout="this.style.color='#4B5563'">대학소식</a>
+        <a href="index.html#school-programs" style="color:#4B5563;text-decoration:none;" onmouseover="this.style.color='#2563EB'" onmouseout="this.style.color='#4B5563'">학교별 프로그램</a>
+      </nav>
+      <a href="index.html#consultation-form" style="background:#1E4D8C;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;" onmouseover="this.style.background='#163870'" onmouseout="this.style.background='#1E4D8C'">무료 신청하기</a>
+    </div>
+  </header>
+  <script>
+    if (window.innerWidth >= 768) document.getElementById('main-nav').style.display = 'flex';
+    window.addEventListener('resize', () => {
+      document.getElementById('main-nav').style.display = window.innerWidth >= 768 ? 'flex' : 'none';
+    });
+  </script>
+
+<div class="wrap" style="padding-top:32px;">
+  <a href="index.html" class="back">← 메인으로</a>
   <h1>채용공고 자료실</h1>
   <p class="subtitle">공공기관·공기업·연구원 채용공고 131개 — 검색 후 바로 다운로드</p>
   <input id="search" type="text" placeholder="기관명 또는 공고 제목 검색..." oninput="filterCards()"/>
