@@ -697,9 +697,9 @@
       if (!file) return null;
       const ext = file.name.split('.').pop();
       const path = `${Date.now()}.${ext}`;
-      const { error } = await db.storage.from('news-logos').upload(path, file, { upsert: true });
+      const { error } = await db.storage.from('logo').upload(path, file, { upsert: true });
       if (error) { alert('이미지 업로드 실패: ' + error.message); return null; }
-      const { data } = db.storage.from('news-logos').getPublicUrl(path);
+      const { data } = db.storage.from('logo').getPublicUrl(path);
       return data.publicUrl;
     }
 
