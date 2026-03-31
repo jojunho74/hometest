@@ -101,6 +101,7 @@ html = '''<!DOCTYPE html>
     <nav class="hnav">
       <a href="index.html#about">서비스 소개</a>
       <a href="index.html#process">진행 방법</a>
+      <a href="schedule.html">정기시험 일정</a>
       <a href="library.html">홍보문구 라이브러리</a>
       <a href="library-pdf.html">채용공고 자료실</a>
       <a href="index.html#faq">FAQ</a>
@@ -116,6 +117,7 @@ html = '''<!DOCTYPE html>
   <div class="mobile-menu" id="mobile-menu">
     <a href="index.html#about">서비스 소개</a>
     <a href="index.html#process">진행 방법</a>
+    <a href="schedule.html">정기시험 일정</a>
     <a href="library.html">홍보문구 라이브러리</a>
     <a href="library-pdf.html">채용공고 자료실</a>
     <a href="index.html#faq">FAQ</a>
