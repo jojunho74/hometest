@@ -210,6 +210,7 @@
                 <th class="px-4 py-3 font-semibold hidden md:table-cell">학과</th>
                 <th class="px-4 py-3 font-semibold hidden md:table-cell">신청일</th>
                 <th class="px-4 py-3 font-semibold">상태</th>
+                <th class="px-4 py-3 font-semibold">삭제</th>
               </tr>
             </thead>
             <tbody id="student-body">
@@ -649,8 +650,18 @@
           <td class="px-4 py-3">
             <button onclick="toggleStudentStatus('${r.id}','${r.status}')" class="flex items-center gap-1">${statusBadge}</button>
           </td>
+          <td class="px-4 py-3">
+            <button onclick="deleteStudent('${r.id}')" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">삭제</button>
+          </td>
         </tr>`;
       }).join('');
+    }
+
+    async function deleteStudent(id) {
+      if (!confirm('이 신청을 삭제하시겠습니까?')) return;
+      const { error } = await db.from('student_applications').delete().eq('id', id);
+      if (error) { alert('삭제 실패: ' + error.message); return; }
+      loadStudents();
     }
 
     async function toggleStudentStatus(id, current) {

@@ -196,10 +196,7 @@
         <label>이메일 * <span style="font-weight:400;color:#93C5FD;font-size:11px;">(이메일 형식을 지켜주세요.)</span></label>
         <input type="email" id="s-email" placeholder="example@university.ac.kr"/>
       </div>
-      <div class="form-group">
-        <label>연락처</label>
-        <input type="tel" id="s-phone" placeholder="010-0000-0000"/>
-      </div>
+
       <div class="form-group">
         <label>소속 대학교 *</label>
         <input type="text" id="s-university" placeholder="예) 한성대학교"/>
@@ -240,7 +237,7 @@
   async function submitApplication() {
     const name       = document.getElementById('s-name').value.trim();
     const email      = document.getElementById('s-email').value.trim();
-    const phone      = document.getElementById('s-phone').value.trim();
+    const phone      = null;
     const university = document.getElementById('s-university').value.trim();
     const department = document.getElementById('s-department').value.trim();
 
