@@ -8,6 +8,7 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-MLPBC6XMFC"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-MLPBC6XMFC');</script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"/>
@@ -226,6 +227,7 @@
 <script>
   const { createClient } = supabase;
   const _sb = createClient('https://byzulmxcuhsrjdphmuym.supabase.co', 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs');
+  emailjs.init('pfch4UljsmWPFOJf9');
 
   function toggleMenu() {
     const m = document.getElementById('mobile-menu');
@@ -255,7 +257,7 @@
     btn.disabled = true;
     btn.textContent = '제출 중...';
 
-    const { error } = await _sb.from('student_applications').insert([{ name, email, phone: phone || null, university, department: department || null }]);
+    const { error } = await _sb.from('student_applications').insert([{ name, email, phone: null, university, department: department || null }]);
 
     if (error) {
       alert('오류가 발생했습니다: ' + error.message);
@@ -263,6 +265,15 @@
       btn.textContent = '무료로 신청하기 →';
       return;
     }
+
+    // 이메일 알림 발송
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    emailjs.send('service_c2an9zs', 'template_tyx4s4b', {
+      name, email, university,
+      department: department || '미입력',
+      time: timeStr
+    }).catch(e => console.warn('email 발송 실패:', e));
 
     document.getElementById('apply-form-inner').style.display = 'none';
     document.getElementById('success-box').style.display = 'block';
