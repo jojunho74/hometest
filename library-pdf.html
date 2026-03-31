@@ -34,12 +34,22 @@
     header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #E2E8F0;box-shadow:0 1px 4px rgba(0,0,0,.06);}
     .hinner{max-width:1100px;margin:0 auto;padding:0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;}
     .hlogo{font-size:1rem;font-weight:800;color:#1E4D8C;text-decoration:none;}
-    .hnav{display:flex;align-items:center;gap:20px;font-size:0.8rem;font-weight:600;color:#475569;}
+    .hnav{display:flex;align-items:center;gap:20px;font-size:0.8rem;font-weight:600;}
     .hnav a{color:#475569;text-decoration:none;transition:color .15s;}
     .hnav a:hover{color:#1E4D8C;}
     .hbtn{padding:8px 18px;border-radius:8px;font-size:0.8rem;font-weight:700;background:#1E4D8C;color:#fff;text-decoration:none;transition:background .15s;}
     .hbtn:hover{background:#163870;}
-    @media(max-width:640px){.hnav{display:none;}}
+    .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:none;border:none;padding:4px;}
+    .hamburger span{display:block;height:2px;background:#1E293B;border-radius:2px;transition:transform .25s,opacity .25s;}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+    .mobile-menu{display:none;flex-direction:column;background:#fff;border-top:1px solid #E2E8F0;padding:12px 16px 16px;}
+    .mobile-menu a{padding:12px 4px;font-size:0.9rem;font-weight:600;color:#1E293B;text-decoration:none;border-bottom:1px solid #F1F5F9;}
+    .mobile-menu a:last-child{border-bottom:none;}
+    .mobile-menu .mbtn{margin-top:12px;display:block;text-align:center;padding:12px;border-radius:8px;background:#1E4D8C;color:#fff;font-weight:700;text-decoration:none;}
+    .mobile-menu.open{display:flex;}
+    @media(max-width:640px){.hnav{display:none;}.hbtn{display:none;}.hamburger{display:flex;}}
   </style>
 </head>
 <body>
@@ -54,7 +64,21 @@
       <a href="index.html#faq">FAQ</a>
       <a href="index.html#university-news">대학소식</a>
     </nav>
-    <a href="index.html#consultation-form" class="hbtn">무료 신청하기</a>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <a href="index.html#consultation-form" class="hbtn">무료 신청하기</a>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="메뉴">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html#about">서비스 소개</a>
+    <a href="index.html#process">진행 방법</a>
+    <a href="library.html">홍보문구 라이브러리</a>
+    <a href="library-pdf.html">채용공고 자료실</a>
+    <a href="index.html#faq">FAQ</a>
+    <a href="index.html#university-news">대학소식</a>
+    <a href="index.html#consultation-form" class="mbtn">무료 신청하기</a>
   </div>
 </header>
 <div class="wrap">
@@ -67,6 +91,12 @@
   <p id="empty">검색 결과가 없습니다.</p>
 </div>
 <script>
+  function toggleMenu() {
+    const m = document.getElementById('mobile-menu');
+    const h = document.getElementById('hamburger');
+    m.classList.toggle('open');
+    h.classList.toggle('open');
+  }
   let currentCat = '전체';
   function setCategory(btn, cat) {
     currentCat = cat;
