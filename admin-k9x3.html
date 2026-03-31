@@ -517,10 +517,14 @@
       if (swapIdx < 0 || swapIdx >= newsData.length) return;
       const a = newsData[idx];
       const b = newsData[swapIdx];
-      const aOrder = a.sort_order;
-      const bOrder = b.sort_order;
-      await db.from('university_news').update({ sort_order: bOrder }).eq('id', a.id);
-      await db.from('university_news').update({ sort_order: aOrder }).eq('id', b.id);
+      // 임시값으로 충돌 방지 후 순차 교환
+      const tempOrder = Date.now();
+      const r1 = await db.from('university_news').update({ sort_order: tempOrder }).eq('id', a.id);
+      if (r1.error) { alert('순서 변경 실패: ' + r1.error.message); return; }
+      const r2 = await db.from('university_news').update({ sort_order: a.sort_order }).eq('id', b.id);
+      if (r2.error) { alert('순서 변경 실패: ' + r2.error.message); return; }
+      const r3 = await db.from('university_news').update({ sort_order: b.sort_order }).eq('id', a.id);
+      if (r3.error) { alert('순서 변경 실패: ' + r3.error.message); return; }
       loadNews();
     }
 
