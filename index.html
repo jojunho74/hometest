@@ -137,7 +137,7 @@
   <header class="sticky top-0 z-50 bg-white border-b border-cream-dark shadow-sm">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <a href="index.html" class="font-display text-lg font-bold tracking-tight" style="color:var(--blue);">지텔프IBT 대학컨설팅</a>
-      <nav class="hidden md:flex items-center gap-8 font-semibold" style="color:var(--ink-mid); font-size:1rem;">
+      <nav class="hidden md:flex items-center gap-5 font-semibold" style="color:var(--ink-mid); font-size:0.8rem;">
         <a href="#about" class="hover:text-blue-600 transition-colors">서비스 소개</a>
         <a href="#process" class="hover:text-blue-600 transition-colors">진행 방법</a>
         <a href="library.html" class="hover:text-blue-600 transition-colors">홍보문구 라이브러리</a>
@@ -774,26 +774,27 @@
 
     // ── 대학소식 ──
     (async function loadUniversityNews() {
-      const { data } = await _supabase.from('university_news').select('*').order('created_at', { ascending: false });
-      const grid = document.getElementById('news-grid');
-      const empty = document.getElementById('news-empty');
-      if (!data || data.length === 0) {
-        grid.innerHTML = '';
-        empty.classList.remove('hidden');
-        return;
-      }
-      grid.innerHTML = data.map(r => {
-        const date = new Date(r.created_at);
-        const dateStr = `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}.`;
-        const cardContent = `
-          <div class="inline-block text-xs font-bold px-2 py-0.5 rounded mb-2" style="background:#EFF6FF;color:var(--blue-mid);">${r.school_name}</div>
-          <p class="font-bold text-sm leading-snug mb-4" style="color:var(--ink);">${r.title}</p>
-          <p class="text-xs mt-auto" style="color:var(--ink-soft);">${dateStr}</p>
-        `;
-        return r.link
-          ? `<a href="${r.link}" target="_blank" class="card p-5 slide-up flex flex-col hover:shadow-lg transition-shadow cursor-pointer" style="min-height:120px;text-decoration:none;">${cardContent}</a>`
-          : `<div class="card p-5 slide-up flex flex-col" style="min-height:120px;">${cardContent}</div>`;
-      }).join('');
+      try {
+        const { data, error } = await _supabase.from('university_news').select('*').order('created_at', { ascending: false });
+        const grid = document.getElementById('news-grid');
+        const empty = document.getElementById('news-empty');
+        if (error) { console.error('news error:', error); grid.innerHTML = ''; return; }
+        if (!data || data.length === 0) {
+          grid.innerHTML = '';
+          empty.classList.remove('hidden');
+          return;
+        }
+        empty.classList.add('hidden');
+        grid.innerHTML = data.map(r => {
+          const date = new Date(r.created_at);
+          const dateStr = `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}.`;
+          const inner = `<div style="display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:#EFF6FF;color:var(--blue-mid);margin-bottom:8px;">${r.school_name}</div><p style="font-weight:700;font-size:0.875rem;line-height:1.4;color:var(--ink);margin-bottom:auto;">${r.title}</p><p style="font-size:11px;color:var(--ink-soft);margin-top:12px;">${dateStr}</p>`;
+          const style = `background:#fff;border-radius:12px;border:1px solid var(--cream-dark);padding:20px;display:flex;flex-direction:column;min-height:120px;box-shadow:0 1px 4px rgba(0,0,0,.06);`;
+          return r.link
+            ? `<a href="${r.link}" target="_blank" style="${style}text-decoration:none;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,.06)'">${inner}</a>`
+            : `<div style="${style}">${inner}</div>`;
+        }).join('');
+      } catch(e) { console.error('news load failed:', e); }
     })();
 
     // ── 방문 카운터 ──
