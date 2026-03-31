@@ -32,7 +32,7 @@
       font-weight: 700; font-size: .95rem; min-height: 52px;
       display: inline-flex; align-items: center; justify-content: center;
       cursor: pointer; border: none;
-      transition: background .18s, transform .15s, box-shadow .18s;
+      transition: background .3s, color .3s, border-color .3s, transform .15s, box-shadow .3s;
       box-shadow: 0 4px 16px rgba(37,99,235,.3);
       -webkit-tap-highlight-color: transparent;
     }
@@ -47,7 +47,7 @@
       font-weight: 700; font-size: .95rem; min-height: 52px;
       display: inline-flex; align-items: center; justify-content: center;
       cursor: pointer; border: 2px solid var(--blue-mid);
-      transition: background .18s, color .18s, transform .15s;
+      transition: background .3s, color .3s, border-color .3s, transform .15s, box-shadow .3s;
       -webkit-tap-highlight-color: transparent;
     }
     .btn-outline:hover  { background: var(--blue-mid); color: #fff; transform: scale(1.02); }
@@ -182,11 +182,11 @@
           </p>
 
           <div class="flex flex-col gap-3 sm:flex-row flex-wrap">
-            <a href="#consultation-form" class="btn-primary w-full sm:w-auto px-8">무료 신청하기 →</a>
-            <a href="library.html" class="btn-outline w-full sm:w-auto px-8">홍보문구 라이브러리</a>
-            <a href="#faq" class="btn-outline w-full sm:w-auto px-8">운영 걱정 없는 이유 →</a>
-            <a href="./GTELP_IBT_대학제안서.pdf" download class="btn-outline w-full sm:w-auto px-8">자료 다운로드(PDF) ↓</a>
-            <a href="library-pdf.html" class="btn-outline w-full sm:w-auto px-8">채용공고 자료실 →</a>
+            <a href="#consultation-form" class="btn-primary w-full sm:w-auto px-8 hero-btn" data-btn-type="primary">무료 신청하기 →</a>
+            <a href="library.html" class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline">홍보문구 라이브러리</a>
+            <a href="#faq" class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline">운영 걱정 없는 이유 →</a>
+            <a href="./GTELP_IBT_대학제안서.pdf" download class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline">자료 다운로드(PDF) ↓</a>
+            <a href="library-pdf.html" class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline">채용공고 자료실 →</a>
           </div>
 
           <!-- 소셜 프루프 -->
@@ -903,6 +903,37 @@
       const { count } = await _supabase.from('page_views').select('*', { count: 'exact', head: true });
       const el = document.getElementById('visit-counter');
       if (el && count !== null) el.textContent = count.toLocaleString() + '회';
+    })();
+
+    // ── 히어로 버튼 순차 색상 애니메이션 ──
+    (function() {
+      const heroBtns = document.querySelectorAll('.hero-btn');
+      if (heroBtns.length === 0) return;
+      let cur = 0;
+      setInterval(() => {
+        heroBtns.forEach(b => {
+          if (b.dataset.btnType === 'primary') {
+            b.style.background = 'var(--blue)';
+            b.style.color = '#fff';
+            b.style.borderColor = 'var(--blue)';
+            b.style.transform = 'scale(1)';
+            b.style.boxShadow = 'none';
+          } else {
+            b.style.background = 'transparent';
+            b.style.color = 'var(--blue)';
+            b.style.borderColor = 'var(--blue)';
+            b.style.transform = 'scale(1)';
+            b.style.boxShadow = 'none';
+          }
+        });
+        const active = heroBtns[cur];
+        active.style.background = 'var(--gold)';
+        active.style.color = '#fff';
+        active.style.borderColor = 'var(--gold)';
+        active.style.transform = 'scale(1.04)';
+        active.style.boxShadow = '0 4px 16px rgba(212,160,23,0.45)';
+        cur = (cur + 1) % heroBtns.length;
+      }, 1800);
     })();
 
     const mobileCta = document.getElementById('mobile-cta');
