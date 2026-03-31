@@ -199,6 +199,11 @@
             </div>
           </div>
           <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">로고 이미지 (선택)</label>
+            <input id="news-logo" type="file" accept="image/*" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+            <p id="news-logo-preview-wrap" class="hidden mt-2"><img id="news-logo-preview" src="" class="h-12 object-contain rounded border border-slate-200 p-1"/></p>
+          </div>
+          <div class="mb-4">
             <label class="block text-xs font-semibold text-slate-500 mb-2">카드 배경색</label>
             <input type="hidden" id="news-color" value="#FFFFFF"/>
             <div id="news-color-swatches" class="flex flex-wrap gap-2"></div>
@@ -298,6 +303,11 @@
             <div>
               <label class="block text-xs font-semibold text-slate-500 mb-1">링크 (선택)</label>
               <input id="edit-link" type="url" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">로고 이미지 변경 (선택)</label>
+              <input id="edit-logo" type="file" accept="image/*" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+              <p id="edit-logo-preview-wrap" class="mt-2"><img id="edit-logo-preview" src="" class="h-12 object-contain rounded border border-slate-200 p-1"/></p>
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-500 mb-2">카드 배경색</label>
@@ -618,6 +628,22 @@
       if (error) { console.error(error); return; }
       newsData = data || [];
       renderSwatches('news-color-swatches', 'news-color', '#FFFFFF');
+      // 로고 미리보기
+      document.getElementById('news-logo').onchange = function() {
+        const f = this.files[0];
+        if (!f) return;
+        const wrap = document.getElementById('news-logo-preview-wrap');
+        const img  = document.getElementById('news-logo-preview');
+        img.src = URL.createObjectURL(f);
+        wrap.classList.remove('hidden');
+      };
+      document.getElementById('edit-logo').onchange = function() {
+        const f = this.files[0];
+        if (!f) return;
+        const img = document.getElementById('edit-logo-preview');
+        img.src = URL.createObjectURL(f);
+        img.parentElement.classList.remove('hidden');
+      };
       const tbody = document.getElementById('news-body');
       const empty = document.getElementById('news-empty-msg');
       if (newsData.length === 0) {
@@ -666,19 +692,34 @@
       loadNews();
     }
 
+    async function uploadNewsLogo(fileInput) {
+      const file = fileInput.files[0];
+      if (!file) return null;
+      const ext = file.name.split('.').pop();
+      const path = `${Date.now()}.${ext}`;
+      const { error } = await db.storage.from('news-logos').upload(path, file, { upsert: true });
+      if (error) { alert('이미지 업로드 실패: ' + error.message); return null; }
+      const { data } = db.storage.from('news-logos').getPublicUrl(path);
+      return data.publicUrl;
+    }
+
     async function addNews() {
       const school = document.getElementById('news-school').value.trim();
       const title  = document.getElementById('news-title').value.trim();
       const link   = document.getElementById('news-link').value.trim();
       const color  = document.getElementById('news-color').value || '#FFFFFF';
       if (!school || !title) { alert('학교명과 제목을 입력해주세요.'); return; }
+      const logoInput = document.getElementById('news-logo');
+      const logo_url = await uploadNewsLogo(logoInput);
       const maxOrder = newsData.length > 0 ? Math.max(...newsData.map(r => r.sort_order)) + 1 : 1;
-      const { error } = await db.from('university_news').insert([{ school_name: school, title, link: link || null, sort_order: maxOrder, bg_color: color }]);
+      const { error } = await db.from('university_news').insert([{ school_name: school, title, link: link || null, sort_order: maxOrder, bg_color: color, logo_url }]);
       if (error) { alert('등록 실패: ' + error.message); return; }
       document.getElementById('news-school').value = '';
       document.getElementById('news-title').value  = '';
       document.getElementById('news-link').value   = '';
       document.getElementById('news-color').value  = '#FFFFFF';
+      logoInput.value = '';
+      document.getElementById('news-logo-preview-wrap').classList.add('hidden');
       const msg = document.getElementById('news-msg');
       msg.classList.remove('hidden');
       setTimeout(() => msg.classList.add('hidden'), 2000);
@@ -701,6 +742,10 @@
       document.getElementById('edit-link').value   = r.link || '';
       document.getElementById('edit-color').value  = r.bg_color || '#FFFFFF';
       renderSwatches('edit-color-swatches', 'edit-color', r.bg_color || '#FFFFFF');
+      const preview = document.getElementById('edit-logo-preview');
+      if (r.logo_url) { preview.src = r.logo_url; preview.parentElement.classList.remove('hidden'); }
+      else { preview.src = ''; preview.parentElement.classList.add('hidden'); }
+      document.getElementById('edit-logo').value = '';
       const modal = document.getElementById('news-modal');
       modal.style.display = 'flex';
     }
@@ -716,7 +761,13 @@
       const link   = document.getElementById('edit-link').value.trim();
       const color  = document.getElementById('edit-color').value || '#FFFFFF';
       if (!school || !title) { alert('학교명과 제목을 입력해주세요.'); return; }
-      const { error } = await db.from('university_news').update({ school_name: school, title, link: link || null, bg_color: color }).eq('id', editingId);
+      const logoInput = document.getElementById('edit-logo');
+      let logo_url = newsData.find(n => String(n.id) === String(editingId))?.logo_url || null;
+      if (logoInput.files[0]) {
+        const uploaded = await uploadNewsLogo(logoInput);
+        if (uploaded) logo_url = uploaded;
+      }
+      const { error } = await db.from('university_news').update({ school_name: school, title, link: link || null, bg_color: color, logo_url }).eq('id', editingId);
       if (error) { alert('수정 실패: ' + error.message); return; }
       closeNewsModal();
       loadNews();
