@@ -116,6 +116,24 @@
     .card { background: #fff; border-radius: 16px; border: 1px solid var(--cream-dark); }
 
     /* ── 모바일 하단 CTA ── */
+    /* ── 우측 플로팅 버튼 ── */
+    .float-btns {
+      position: fixed; right: 16px; top: 50%; transform: translateY(-50%);
+      z-index: 99; display: flex; flex-direction: column; gap: 10px;
+    }
+    .float-btn {
+      writing-mode: vertical-rl; text-orientation: mixed;
+      padding: 16px 10px; border-radius: 10px;
+      font-size: 13px; font-weight: 800; line-height: 1.3;
+      color: #fff; text-decoration: none; text-align: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,.18);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .float-btn:hover { transform: scale(1.06); box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+    .float-btn-univ { background: var(--blue-mid); }
+    .float-btn-student { background: var(--gold); }
+    @media (max-width: 640px) { .float-btns { right: 8px; } .float-btn { font-size: 11px; padding: 12px 8px; } }
+
     #mobile-cta {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
       background: #fff; border-top: 1px solid var(--cream-dark);
@@ -155,7 +173,7 @@
         <a href="#about" class="hover:text-blue-600 transition-colors">서비스 소개</a>
         <a href="#process" class="hover:text-blue-600 transition-colors">진행 방법</a>
         <a href="schedule.html" class="hover:text-blue-600 transition-colors">정기시험 일정</a>
-        <a href="student.html" class="hover:text-blue-600 transition-colors">IBT 시험 신청</a>
+        <a href="student.html" class="hover:text-blue-600 transition-colors">IBT 학생 신청</a>
         <a href="library.html" class="hover:text-blue-600 transition-colors">홍보문구 라이브러리</a>
         <a href="library-pdf.html" class="hover:text-blue-600 transition-colors">채용공고 자료실</a>
 
@@ -164,6 +182,7 @@
         <a href="#school-programs" class="hover:text-blue-600 transition-colors">학교별 프로그램</a>
       </nav>
       <div class="flex items-center gap-2">
+        <a href="student.html" class="hidden md:inline-flex btn-outline text-sm px-4" style="min-height:40px;padding-top:.45rem;padding-bottom:.45rem;color:var(--gold);border-color:var(--gold);" onmouseover="this.style.background='var(--gold)';this.style.color='#fff';" onmouseout="this.style.background='transparent';this.style.color='var(--gold)';">학생 IBT 신청</a>
         <a href="#consultation-form" class="hidden md:inline-flex btn-primary text-sm px-5" style="min-height:40px;padding-top:.45rem;padding-bottom:.45rem;">무료 신청하기</a>
         <a href="admin-k9x3.html" title="관리자" class="flex items-center justify-center rounded-lg transition-colors" style="width:36px;height:36px;background:var(--cream-dark);color:var(--ink-soft);" onmouseover="this.style.background='var(--cream)';this.style.color='var(--blue)';" onmouseout="this.style.background='var(--cream-dark)';this.style.color='var(--ink-soft)';">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -178,7 +197,7 @@
     <a href="#about">서비스 소개</a>
     <a href="#process">진행 방법</a>
     <a href="schedule.html">정기시험 일정</a>
-    <a href="student.html">IBT 시험 신청</a>
+    <a href="student.html">IBT 학생 신청</a>
     <a href="library.html">홍보문구 라이브러리</a>
     <a href="library-pdf.html">채용공고 자료실</a>
     <a href="#faq">FAQ</a>
@@ -763,6 +782,12 @@
       <p class="text-xs" style="color:#4B5563;">누적 방문수 <span id="visit-counter" style="color:#6B7280;">...</span></p>
     </div>
   </footer>
+
+  <!-- 우측 플로팅 버튼 -->
+  <div class="float-btns">
+    <a href="#consultation-form" class="float-btn float-btn-univ">대학교<br>IBT<br>신청접수</a>
+    <a href="student.html" class="float-btn float-btn-student">학생<br>IBT<br>신청접수</a>
+  </div>
 
   <!-- 모바일 하단 CTA -->
   <div id="mobile-cta">
