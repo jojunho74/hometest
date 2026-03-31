@@ -197,6 +197,11 @@
               <input id="news-link" type="url" placeholder="https://..." class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
             </div>
           </div>
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-500 mb-2">카드 배경색</label>
+            <input type="hidden" id="news-color" value="#FFFFFF"/>
+            <div id="news-color-swatches" class="flex flex-wrap gap-2"></div>
+          </div>
           <button onclick="addNews()" class="btn btn-primary">+ 등록하기</button>
           <p id="news-msg" class="hidden text-sm text-green-600 mt-2 font-semibold">✓ 등록되었습니다.</p>
         </div>
@@ -242,6 +247,11 @@
             <div>
               <label class="block text-xs font-semibold text-slate-500 mb-1">링크 (선택)</label>
               <input id="edit-link" type="url" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-2">카드 배경색</label>
+              <input type="hidden" id="edit-color" value="#FFFFFF"/>
+              <div id="edit-color-swatches" class="flex flex-wrap gap-2"></div>
             </div>
           </div>
           <div class="px-6 py-4 border-t flex justify-end gap-2">
@@ -471,6 +481,46 @@
       if (tab === 'news') loadNews();
     }
 
+    // ─── 색상 팔레트 ───
+    const NEWS_COLORS = [
+      { hex: '#FFFFFF', label: '흰색',   dark: false },
+      { hex: '#EFF6FF', label: '연파랑', dark: false },
+      { hex: '#E0F2FE', label: '하늘',   dark: false },
+      { hex: '#F0FDF4', label: '연초록', dark: false },
+      { hex: '#FEFCE8', label: '연노랑', dark: false },
+      { hex: '#FFF7ED', label: '연주황', dark: false },
+      { hex: '#FAF5FF', label: '연보라', dark: false },
+      { hex: '#FFF1F2', label: '연분홍', dark: false },
+      { hex: '#1E3A5F', label: '네이비', dark: true  },
+      { hex: '#1E4D8C', label: '파랑',   dark: true  },
+      { hex: '#166534', label: '초록',   dark: true  },
+      { hex: '#7C3AED', label: '보라',   dark: true  },
+    ];
+
+    function renderSwatches(containerId, inputId, selectedHex) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = NEWS_COLORS.map(c => `
+        <button type="button" onclick="selectColor('${inputId}','${containerId}','${c.hex}')"
+          title="${c.label}"
+          style="width:28px;height:28px;border-radius:50%;background:${c.hex};border:3px solid ${selectedHex===c.hex?'#1E4D8C':'#CBD5E1'};transition:border-color .15s;flex-shrink:0;"
+          onmouseover="this.style.borderColor='#1E4D8C'"
+          onmouseout="this.style.borderColor='${selectedHex===c.hex?'#1E4D8C':'#CBD5E1'}'">
+        </button>
+      `).join('');
+    }
+
+    function selectColor(inputId, containerId, hex) {
+      document.getElementById(inputId).value = hex;
+      renderSwatches(containerId, inputId, hex);
+    }
+
+    function isDark(hex) {
+      const r = parseInt(hex.slice(1,3),16);
+      const g = parseInt(hex.slice(3,5),16);
+      const b = parseInt(hex.slice(5,7),16);
+      return (r*0.299 + g*0.587 + b*0.114) < 128;
+    }
+
     // ─── 대학소식 ───
     let newsData = [];
     let editingId = null;
@@ -482,6 +532,7 @@
         .order('sort_order', { ascending: true });
       if (error) { console.error(error); return; }
       newsData = data || [];
+      renderSwatches('news-color-swatches', 'news-color', '#FFFFFF');
       const tbody = document.getElementById('news-body');
       const empty = document.getElementById('news-empty-msg');
       if (newsData.length === 0) {
@@ -490,7 +541,9 @@
         return;
       }
       empty.classList.add('hidden');
-      tbody.innerHTML = newsData.map((r, i) => `
+      tbody.innerHTML = newsData.map((r, i) => {
+        const bg = r.bg_color || '#FFFFFF';
+        return `
         <tr class="border-b last:border-0 hover:bg-slate-50">
           <td class="px-4 py-3">
             <div class="flex flex-col gap-1">
@@ -501,15 +554,15 @@
           <td class="px-4 py-3 font-medium text-slate-700">${esc(r.school_name)}</td>
           <td class="px-4 py-3 text-slate-700">${esc(r.title)}</td>
           <td class="px-4 py-3 hidden md:table-cell">${r.link ? `<a href="${esc(r.link)}" target="_blank" class="text-blue-600 underline text-xs">링크</a>` : '-'}</td>
-          <td class="px-4 py-3 text-slate-400 text-xs hidden md:table-cell">${formatDate(r.created_at)}</td>
+          <td class="px-4 py-3 hidden md:table-cell"><span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:${bg};border:1px solid #CBD5E1;"></span></td>
           <td class="px-4 py-3">
             <button onclick="openNewsEdit('${r.id}')" class="btn text-xs px-3 py-1.5 btn-secondary">수정</button>
           </td>
           <td class="px-4 py-3">
             <button onclick="deleteNews('${r.id}')" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">삭제</button>
           </td>
-        </tr>
-      `).join('');
+        </tr>`;
+      }).join('');
     }
 
     async function moveNews(idx, dir) {
@@ -532,13 +585,15 @@
       const school = document.getElementById('news-school').value.trim();
       const title  = document.getElementById('news-title').value.trim();
       const link   = document.getElementById('news-link').value.trim();
+      const color  = document.getElementById('news-color').value || '#FFFFFF';
       if (!school || !title) { alert('학교명과 제목을 입력해주세요.'); return; }
       const maxOrder = newsData.length > 0 ? Math.max(...newsData.map(r => r.sort_order)) + 1 : 1;
-      const { error } = await db.from('university_news').insert([{ school_name: school, title, link: link || null, sort_order: maxOrder }]);
+      const { error } = await db.from('university_news').insert([{ school_name: school, title, link: link || null, sort_order: maxOrder, bg_color: color }]);
       if (error) { alert('등록 실패: ' + error.message); return; }
       document.getElementById('news-school').value = '';
       document.getElementById('news-title').value  = '';
       document.getElementById('news-link').value   = '';
+      document.getElementById('news-color').value  = '#FFFFFF';
       const msg = document.getElementById('news-msg');
       msg.classList.remove('hidden');
       setTimeout(() => msg.classList.add('hidden'), 2000);
@@ -559,6 +614,8 @@
       document.getElementById('edit-school').value = r.school_name;
       document.getElementById('edit-title').value  = r.title;
       document.getElementById('edit-link').value   = r.link || '';
+      document.getElementById('edit-color').value  = r.bg_color || '#FFFFFF';
+      renderSwatches('edit-color-swatches', 'edit-color', r.bg_color || '#FFFFFF');
       const modal = document.getElementById('news-modal');
       modal.style.display = 'flex';
     }
@@ -572,8 +629,9 @@
       const school = document.getElementById('edit-school').value.trim();
       const title  = document.getElementById('edit-title').value.trim();
       const link   = document.getElementById('edit-link').value.trim();
+      const color  = document.getElementById('edit-color').value || '#FFFFFF';
       if (!school || !title) { alert('학교명과 제목을 입력해주세요.'); return; }
-      const { error } = await db.from('university_news').update({ school_name: school, title, link: link || null }).eq('id', editingId);
+      const { error } = await db.from('university_news').update({ school_name: school, title, link: link || null, bg_color: color }).eq('id', editingId);
       if (error) { alert('수정 실패: ' + error.message); return; }
       closeNewsModal();
       loadNews();
