@@ -184,6 +184,8 @@
     .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .nav-link { padding: 6px 12px; border-radius: 8px; color: var(--ink-mid); text-decoration: none; transition: background .18s, color .18s; }
+    .nav-link:hover { background: #EFF6FF; color: var(--blue); }
     .mobile-menu { display: none; flex-direction: column; background: #fff; border-top: 1px solid #E2E8F0; padding: 12px 16px 16px; position: sticky; top: 64px; z-index: 49; box-shadow: 0 4px 12px rgba(0,0,0,.08); }
     .mobile-menu a { padding: 12px 4px; font-size: 0.9rem; font-weight: 600; color: var(--ink); text-decoration: none; border-bottom: 1px solid #E2E8F0; }
     .mobile-menu a:last-child { border-bottom: none; }
@@ -250,15 +252,14 @@
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <a href="index.html" class="font-display text-xl font-bold tracking-tight" style="background:linear-gradient(135deg,#1E3A8A,#0891B2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">지텔프IBT 대학컨설팅</a>
       <nav class="hidden md:flex items-center gap-5 font-semibold" style="color:var(--ink-mid); font-size:0.8rem;">
-        <a href="#about" class="hover:text-blue-600 transition-colors">서비스 소개</a>
-        <a href="schedule.html" class="hover:text-blue-600 transition-colors">정기시험 일정</a>
-        <a href="student.html" class="hover:text-blue-600 transition-colors">IBT 학생 신청</a>
-        <a href="library-pdf.html" class="hover:text-blue-600 transition-colors">채용공고 자료실</a>
-
-        <a href="#faq" class="hover:text-blue-600 transition-colors">FAQ</a>
-        <a href="#university-news" class="hover:text-blue-600 transition-colors">대학소식</a>
-        <a href="#school-programs" class="hover:text-blue-600 transition-colors">학교별 프로그램</a>
-        <a href="#job-postings" class="hover:text-blue-600 transition-colors">채용공고</a>
+        <a href="#about" class="nav-link">서비스 소개</a>
+        <a href="schedule.html" class="nav-link">정기시험 일정</a>
+        <a href="student.html" class="nav-link">IBT 학생 신청</a>
+        <a href="library-pdf.html" class="nav-link">채용공고 자료실</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+        <a href="#university-news" class="nav-link">대학소식</a>
+        <a href="#school-programs" class="nav-link">학교별 프로그램</a>
+        <a href="#job-postings" class="nav-link">채용공고</a>
       </nav>
       <div class="flex items-center gap-2">
         <a href="student.html" class="hidden md:inline-flex btn-outline text-sm px-4" style="min-height:40px;padding-top:.45rem;padding-bottom:.45rem;color:var(--gold);border-color:var(--gold);" onmouseover="this.style.background='linear-gradient(135deg,#D97706,#F59E0B)';this.style.color='#fff';this.style.borderColor='transparent';" onmouseout="this.style.background='transparent';this.style.color='var(--gold)';this.style.borderColor='var(--gold)';">학생 IBT 신청</a>
