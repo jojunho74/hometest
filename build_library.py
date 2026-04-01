@@ -100,7 +100,7 @@ html = '''<!DOCTYPE html>
     <a href="index.html" class="hlogo">지텔프IBT 대학컨설팅</a>
     <nav class="hnav">
       <a href="index.html#about">서비스 소개</a>
-      <a href="index.html#process">진행 방법</a>
+      
       <a href="schedule.html">정기시험 일정</a>
       <a href="student.html">IBT 학생 신청</a>
       <a href="library-pdf.html">채용공고 자료실</a>
@@ -117,7 +117,7 @@ html = '''<!DOCTYPE html>
   </div>
   <div class="mobile-menu" id="mobile-menu">
     <a href="index.html#about">서비스 소개</a>
-    <a href="index.html#process">진행 방법</a>
+    
     <a href="schedule.html">정기시험 일정</a>
     <a href="student.html">IBT 학생 신청</a>
     <a href="library-pdf.html">채용공고 자료실</a>
