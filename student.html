@@ -269,11 +269,17 @@
     // 이메일 알림 발송
     const now = new Date();
     const timeStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    emailjs.send('service_c2an9zs', 'template_tyx4s4b', {
-      name, email, university,
-      department: department || '미입력',
-      time: timeStr
-    }).catch(e => console.warn('email 발송 실패:', e));
+    try {
+      const res = await emailjs.send('service_c2an9zs', 'template_tyx4s4b', {
+        name, email, university,
+        department: department || '미입력',
+        time: timeStr,
+        message: `대학교: ${university}\n학과: ${department || '미입력'}\n이메일: ${email}\n신청일시: ${timeStr}`
+      });
+      console.log('이메일 발송 성공:', res.status, res.text);
+    } catch(e) {
+      console.error('이메일 발송 실패 상세:', JSON.stringify(e));
+    }
 
     document.getElementById('apply-form-inner').style.display = 'none';
     document.getElementById('success-box').style.display = 'block';
