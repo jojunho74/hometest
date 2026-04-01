@@ -537,7 +537,7 @@
       'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
     );
     emailjs.init('pfch4UljsmWPFOJf9');
-    const REPLY_TEMPLATE = 'REPLY_TEMPLATE_ID'; // ← EmailJS 답장 템플릿 ID로 교체
+    const REPLY_TEMPLATE = 'template_tyx4s4b';
 
     // ─── 비밀번호 (해시 비교) ───
     const PASS = 'qwer1234))';
@@ -1289,9 +1289,10 @@
       try {
         const res = await emailjs.send('service_c2an9zs', REPLY_TEMPLATE, {
           to_email: toEmail,
-          to_name: toName,
+          name: toName,
           subject: subject,
-          reply_message: message
+          message: message,
+          time: new Date().toLocaleString('ko-KR')
         });
         console.log('답장 발송 성공:', res.status);
         result.textContent = '✓ 발송 완료!';
