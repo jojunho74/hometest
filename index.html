@@ -1034,11 +1034,11 @@
     const mobileCta = document.getElementById('mobile-cta');
     const hero = document.querySelector('section.bg-white');
     const form = document.getElementById('consultation-form');
-    new IntersectionObserver(entries => entries.forEach(e => {
+    if (hero) new IntersectionObserver(entries => entries.forEach(e => {
       if (!e.isIntersecting) { mobileCta.classList.add('show'); document.body.classList.add('cta-visible'); }
       else { mobileCta.classList.remove('show'); document.body.classList.remove('cta-visible'); }
     }), { threshold: 0 }).observe(hero);
-    new IntersectionObserver(entries => entries.forEach(e => {
+    if (form) new IntersectionObserver(entries => entries.forEach(e => {
       if (e.isIntersecting) { mobileCta.classList.remove('show'); document.body.classList.remove('cta-visible'); }
     }), { threshold: 0.1 }).observe(form);
   </script>
