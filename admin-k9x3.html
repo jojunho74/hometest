@@ -6,6 +6,7 @@
   <title>관리자 페이지</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     body { font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; }
     .btn {
@@ -173,6 +174,7 @@
                 <th class="px-4 py-3 font-semibold">상태</th>
                 <th class="px-4 py-3 font-semibold hidden md:table-cell">접수일</th>
                 <th class="px-4 py-3 font-semibold">상세</th>
+                <th class="px-4 py-3 font-semibold">답장</th>
                 <th class="px-4 py-3 font-semibold">삭제</th>
               </tr>
             </thead>
@@ -211,6 +213,7 @@
                 <th class="px-4 py-3 font-semibold hidden md:table-cell">학과</th>
                 <th class="px-4 py-3 font-semibold hidden md:table-cell">신청일</th>
                 <th class="px-4 py-3 font-semibold">상태</th>
+                <th class="px-4 py-3 font-semibold">답장</th>
                 <th class="px-4 py-3 font-semibold">삭제</th>
               </tr>
             </thead>
@@ -417,6 +420,41 @@
         </div>
       </div>
 
+      <!-- ── 답장 모달 ── -->
+      <div id="reply-modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:300;padding:16px;">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+          <div class="flex items-center justify-between px-6 py-4 border-b">
+            <h2 class="font-bold text-lg text-slate-800">✉️ 답장 보내기</h2>
+            <button onclick="closeReplyModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+          </div>
+          <div class="px-6 py-5 space-y-4">
+            <div class="flex gap-3">
+              <div class="flex-1">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">받는 사람 이름</label>
+                <input id="reply-name" type="text" readonly class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-slate-50 text-slate-500"/>
+              </div>
+              <div class="flex-1">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">받는 사람 이메일</label>
+                <input id="reply-to-email" type="email" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">제목</label>
+              <input id="reply-subject" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">메시지</label>
+              <textarea id="reply-message" rows="7" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 resize-none" placeholder="메시지를 입력하세요..."></textarea>
+            </div>
+            <p id="reply-result" class="hidden text-sm font-semibold mt-1"></p>
+          </div>
+          <div class="px-6 py-4 border-t flex justify-end gap-2">
+            <button onclick="closeReplyModal()" class="btn btn-secondary">취소</button>
+            <button id="reply-send-btn" onclick="sendReply()" class="btn btn-primary">📨 발송하기</button>
+          </div>
+        </div>
+      </div>
+
       <!-- 수정 모달 -->
       <div id="news-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:200;padding:16px;">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
@@ -498,6 +536,8 @@
       'https://byzulmxcuhsrjdphmuym.supabase.co',
       'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
     );
+    emailjs.init('pfch4UljsmWPFOJf9');
+    const REPLY_TEMPLATE = 'REPLY_TEMPLATE_ID'; // ← EmailJS 답장 템플릿 ID로 교체
 
     // ─── 비밀번호 (해시 비교) ───
     const PASS = 'qwer1234))';
@@ -614,6 +654,9 @@
           <td class="px-4 py-3 text-slate-400 text-xs hidden md:table-cell">${formatDate(r.created_at)}</td>
           <td class="px-4 py-3">
             <button onclick="openModal('${r.id}')" class="btn btn-secondary text-xs px-3 py-1.5">보기</button>
+          </td>
+          <td class="px-4 py-3">
+            <button onclick="openReplyModal('${esc(r.name)}','${esc(r.email || '')}','신청 확인 안내')" class="btn text-xs px-3 py-1.5" style="color:#0891B2;border:1px solid #BAE6FD;background:#F0F9FF;border-radius:6px;" onmouseover="this.style.background='#E0F2FE'" onmouseout="this.style.background='#F0F9FF'">✉️ 답장</button>
           </td>
           <td class="px-4 py-3">
             <button onclick="deleteRow('${r.id}')" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">삭제</button>
@@ -741,6 +784,9 @@
           <td class="px-4 py-3 hidden md:table-cell text-slate-400 text-xs">${dateStr}</td>
           <td class="px-4 py-3">
             <button onclick="toggleStudentStatus('${r.id}','${r.status}')" class="flex items-center gap-1">${statusBadge}</button>
+          </td>
+          <td class="px-4 py-3">
+            <button onclick="openReplyModal('${esc(r.name)}','${esc(r.email)}','IBT 학생 신청 확인 안내')" class="btn text-xs px-3 py-1.5" style="color:#0891B2;border:1px solid #BAE6FD;background:#F0F9FF;border-radius:6px;" onmouseover="this.style.background='#E0F2FE'" onmouseout="this.style.background='#F0F9FF'">✉️ 답장</button>
           </td>
           <td class="px-4 py-3">
             <button onclick="deleteStudent('${r.id}')" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">삭제</button>
@@ -1207,6 +1253,59 @@
       const msg = document.getElementById('job-msg');
       msg.classList.remove('hidden');
       setTimeout(() => msg.classList.add('hidden'), 2000);
+    }
+
+    // ─── 답장 기능 ───
+    function openReplyModal(name, email, defaultSubject) {
+      document.getElementById('reply-name').value    = name;
+      document.getElementById('reply-to-email').value = email;
+      document.getElementById('reply-subject').value  = defaultSubject || '안녕하세요, 지텔프IBT 대학컨설팅입니다.';
+      document.getElementById('reply-message').value  = `${name} 님, 안녕하세요.\n지텔프IBT 대학컨설팅입니다.\n\n`;
+      document.getElementById('reply-result').classList.add('hidden');
+      document.getElementById('reply-send-btn').disabled = false;
+      document.getElementById('reply-send-btn').textContent = '📨 발송하기';
+      document.getElementById('reply-modal').style.display = 'flex';
+    }
+
+    function closeReplyModal() {
+      document.getElementById('reply-modal').style.display = 'none';
+    }
+
+    async function sendReply() {
+      const toEmail  = document.getElementById('reply-to-email').value.trim();
+      const toName   = document.getElementById('reply-name').value.trim();
+      const subject  = document.getElementById('reply-subject').value.trim();
+      const message  = document.getElementById('reply-message').value.trim();
+      const result   = document.getElementById('reply-result');
+      const btn      = document.getElementById('reply-send-btn');
+
+      if (!toEmail) { alert('받는 사람 이메일을 입력해주세요.'); return; }
+      if (!message) { alert('메시지를 입력해주세요.'); return; }
+
+      btn.disabled = true;
+      btn.textContent = '발송 중...';
+      result.classList.add('hidden');
+
+      try {
+        const res = await emailjs.send('service_c2an9zs', REPLY_TEMPLATE, {
+          to_email: toEmail,
+          to_name: toName,
+          subject: subject,
+          reply_message: message
+        });
+        console.log('답장 발송 성공:', res.status);
+        result.textContent = '✓ 발송 완료!';
+        result.style.color = '#059669';
+        result.classList.remove('hidden');
+        setTimeout(() => closeReplyModal(), 1500);
+      } catch(e) {
+        console.error('답장 발송 실패:', JSON.stringify(e));
+        result.textContent = '✗ 발송 실패: ' + (e.text || JSON.stringify(e));
+        result.style.color = '#EF4444';
+        result.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = '📨 발송하기';
+      }
     }
 
     // Supabase 실시간 구독 (새 신청 자동 반영)
