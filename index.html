@@ -257,7 +257,7 @@
         <a href="library-pdf.html" class="nav-link">채용공고 자료실</a>
         <a href="#faq" class="nav-link">FAQ</a>
         <a href="#university-news" class="nav-link">대학소식</a>
-        <a href="#school-programs" class="nav-link">학교별 프로그램</a>
+        <a href="#school-programs" class="nav-link">대학활동</a>
         <a href="#job-postings" class="nav-link">채용공고</a>
       </nav>
       <div class="flex items-center gap-2">
@@ -279,7 +279,7 @@
     <a href="library-pdf.html">채용공고 자료실</a>
     <a href="#faq">FAQ</a>
     <a href="#university-news">대학소식</a>
-    <a href="#school-programs">학교별 프로그램</a>
+    <a href="#school-programs">대학활동</a>
     <a href="#job-postings">채용공고</a>
     <a href="#consultation-form" class="m-cta">무료 신청하기</a>
   </div>
@@ -665,11 +665,11 @@
 
   <div class="section-divider"></div>
 
-  <!-- ══════ 학교별 프로그램 ══════ -->
+  <!-- ══════ 대학활동 ══════ -->
   <section class="py-20 px-4 md:py-28" style="background:#F0FDFA;" id="school-programs">
     <div class="max-w-5xl mx-auto">
       <div class="text-center mb-10">
-        <span class="section-badge slide-up" style="background:#CCFBF1;color:#0F766E;">학교별 프로그램</span>
+        <span class="section-badge slide-up" style="background:#CCFBF1;color:#0F766E;">대학활동</span>
         <h2 class="font-display text-2xl font-bold md:text-3xl slide-up" style="color:var(--ink);">학교별 운영 프로그램</h2>
       </div>
       <div id="prog-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1074,7 +1074,7 @@
       } catch(e) { console.error('news load failed:', e); }
     })();
 
-    // ── 학교별 프로그램 ──
+    // ── 대학활동 ──
     (async function loadSchoolPrograms() {
       try {
         const { data, error } = await _supabase.from('school_programs').select('*').order('sort_order', { ascending: true });

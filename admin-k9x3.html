@@ -127,7 +127,7 @@
         <button onclick="switchTab('consult')"  id="tab-consult"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-blue-700 text-blue-700 -mb-px">신청 관리</button>
         <button onclick="switchTab('student')"  id="tab-student"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">학생접수</button>
         <button onclick="switchTab('news')"     id="tab-news"     class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">대학소식</button>
-        <button onclick="switchTab('programs')" id="tab-programs" class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">학교별 프로그램</button>
+        <button onclick="switchTab('programs')" id="tab-programs" class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">대학활동</button>
         <button onclick="switchTab('jobs')"     id="tab-jobs"     class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">채용공고</button>
       </div>
 
@@ -280,7 +280,7 @@
         <p id="news-empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">등록된 소식이 없습니다.</p>
       </div>
 
-      <!-- ── 학교별 프로그램 탭 ── -->
+      <!-- ── 대학활동 탭 ── -->
       <div id="section-programs" class="hidden">
         <!-- 등록 폼 -->
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
@@ -1009,7 +1009,7 @@
       setTimeout(() => msg.classList.add('hidden'), 2000);
     }
 
-    // ─── 학교별 프로그램 ───
+    // ─── 대학활동 ───
     let progData = [];
     let editingProgId = null;
 
