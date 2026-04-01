@@ -127,6 +127,7 @@
         <button onclick="switchTab('student')"  id="tab-student"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">학생접수</button>
         <button onclick="switchTab('news')"     id="tab-news"     class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">대학소식</button>
         <button onclick="switchTab('programs')" id="tab-programs" class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">학교별 프로그램</button>
+        <button onclick="switchTab('jobs')"     id="tab-jobs"     class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">채용공고</button>
       </div>
 
       <!-- ── 신청 관리 탭 ── -->
@@ -324,6 +325,96 @@
           </table>
         </div>
         <p id="prog-empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">등록된 프로그램이 없습니다.</p>
+      </div>
+
+      <!-- ── 채용공고 탭 ── -->
+      <div id="section-jobs" class="hidden">
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 class="font-bold text-slate-700 mb-4">새 채용공고 등록</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">기관명 *</label>
+              <input id="job-school" type="text" placeholder="예) 한국수자원공사" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">제목 *</label>
+              <input id="job-title" type="text" placeholder="채용공고 제목을 입력하세요" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">링크 (선택)</label>
+              <input id="job-link" type="url" placeholder="https://..." class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">로고 이미지 (선택)</label>
+            <input id="job-logo" type="file" accept="image/*" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+            <p id="job-logo-preview-wrap" class="hidden mt-2"><img id="job-logo-preview" src="" class="h-12 object-contain rounded border border-slate-200 p-1"/></p>
+          </div>
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-500 mb-2">카드 배경색</label>
+            <input type="hidden" id="job-color" value="#FFFFFF"/>
+            <div id="job-color-swatches" class="flex flex-wrap gap-2"></div>
+          </div>
+          <button onclick="addJob()" class="btn btn-primary">+ 등록하기</button>
+          <p id="job-msg" class="hidden text-sm text-green-600 mt-2 font-semibold">✓ 등록되었습니다.</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm table-wrap">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-slate-400 text-xs border-b">
+                <th class="px-4 py-3 font-semibold">순서</th>
+                <th class="px-4 py-3 font-semibold">기관명</th>
+                <th class="px-4 py-3 font-semibold">제목</th>
+                <th class="px-4 py-3 font-semibold hidden md:table-cell">링크</th>
+                <th class="px-4 py-3 font-semibold hidden md:table-cell">등록일</th>
+                <th class="px-4 py-3 font-semibold">수정</th>
+                <th class="px-4 py-3 font-semibold">삭제</th>
+              </tr>
+            </thead>
+            <tbody id="job-body">
+              <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">불러오는 중...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p id="job-empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">등록된 채용공고가 없습니다.</p>
+      </div>
+
+      <!-- 채용공고 수정 모달 -->
+      <div id="job-modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:200;padding:16px;">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+          <div class="flex items-center justify-between px-6 py-4 border-b">
+            <h2 class="font-bold text-lg text-slate-800">채용공고 수정</h2>
+            <button onclick="closeJobModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+          </div>
+          <div class="px-6 py-5 space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">기관명</label>
+              <input id="edit-job-school" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">제목</label>
+              <input id="edit-job-title" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">링크 (선택)</label>
+              <input id="edit-job-link" type="url" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">로고 이미지 변경 (선택)</label>
+              <input id="edit-job-logo" type="file" accept="image/*" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+              <p id="edit-job-logo-preview-wrap" class="mt-2"><img id="edit-job-logo-preview" src="" class="h-12 object-contain rounded border border-slate-200 p-1"/></p>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-2">카드 배경색</label>
+              <input type="hidden" id="edit-job-color" value="#FFFFFF"/>
+              <div id="edit-job-color-swatches" class="flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t flex justify-end gap-2">
+            <button onclick="closeJobModal()" class="btn btn-secondary">취소</button>
+            <button onclick="saveJobEdit()" class="btn btn-primary">저장</button>
+          </div>
+        </div>
       </div>
 
       <!-- 수정 모달 -->
@@ -603,7 +694,7 @@
 
     // ─── 탭 전환 ───
     function switchTab(tab) {
-      ['consult', 'student', 'news', 'programs'].forEach(t => {
+      ['consult', 'student', 'news', 'programs', 'jobs'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (t === tab) {
@@ -617,6 +708,7 @@
       if (tab === 'student') loadStudents();
       if (tab === 'news') loadNews();
       if (tab === 'programs') loadPrograms();
+      if (tab === 'jobs') loadJobs();
     }
 
     // ─── 학생접수 ───
@@ -969,6 +1061,152 @@
       if (error) { alert('수정 실패: ' + error.message); return; }
       closeProgModal();
       loadPrograms();
+    }
+
+    // ─── 채용공고 ───
+    let jobData = [];
+    let editingJobId = null;
+
+    async function loadJobs() {
+      const { data, error } = await db.from('job_postings').select('*').order('sort_order', { ascending: true });
+      if (error) { console.error(error); return; }
+      jobData = data || [];
+      renderSwatches('job-color-swatches', 'job-color', '#FFFFFF');
+      document.getElementById('job-logo').onchange = function() {
+        const f = this.files[0];
+        if (!f) return;
+        const img = document.getElementById('job-logo-preview');
+        img.src = URL.createObjectURL(f);
+        document.getElementById('job-logo-preview-wrap').classList.remove('hidden');
+      };
+      document.getElementById('edit-job-logo').onchange = function() {
+        const f = this.files[0];
+        if (!f) return;
+        const img = document.getElementById('edit-job-logo-preview');
+        img.src = URL.createObjectURL(f);
+        img.parentElement.classList.remove('hidden');
+      };
+      const tbody = document.getElementById('job-body');
+      const empty = document.getElementById('job-empty-msg');
+      if (jobData.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+      tbody.innerHTML = jobData.map((r, i) => {
+        const bg = r.bg_color || '#FFFFFF';
+        const date = new Date(r.created_at);
+        const dateStr = `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`;
+        return `
+        <tr class="border-b last:border-0 hover:bg-slate-50">
+          <td class="px-4 py-3">
+            <div class="flex flex-col gap-1">
+              <button onclick="moveJob(${i}, -1)" ${i === 0 ? 'disabled' : ''} class="text-slate-400 hover:text-slate-700 disabled:opacity-20 text-xs leading-none">▲</button>
+              <button onclick="moveJob(${i}, 1)" ${i === jobData.length-1 ? 'disabled' : ''} class="text-slate-400 hover:text-slate-700 disabled:opacity-20 text-xs leading-none">▼</button>
+            </div>
+          </td>
+          <td class="px-4 py-3 font-medium text-slate-700">${esc(r.school_name)}</td>
+          <td class="px-4 py-3 text-slate-700">${esc(r.title)}</td>
+          <td class="px-4 py-3 hidden md:table-cell">${r.link ? `<a href="${esc(r.link)}" target="_blank" class="text-blue-600 underline text-xs">링크</a>` : '-'}</td>
+          <td class="px-4 py-3 hidden md:table-cell text-xs text-slate-400">${dateStr}</td>
+          <td class="px-4 py-3"><button onclick="openJobEdit('${r.id}')" class="btn text-xs px-3 py-1.5 btn-secondary">수정</button></td>
+          <td class="px-4 py-3"><button onclick="deleteJob('${r.id}')" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">삭제</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function moveJob(idx, dir) {
+      const swapIdx = idx + dir;
+      if (swapIdx < 0 || swapIdx >= jobData.length) return;
+      const a = jobData[idx], b = jobData[swapIdx];
+      const tempOrder = Date.now();
+      const r1 = await db.from('job_postings').update({ sort_order: tempOrder }).eq('id', a.id);
+      if (r1.error) { alert('순서 변경 실패: ' + r1.error.message); return; }
+      const r2 = await db.from('job_postings').update({ sort_order: a.sort_order }).eq('id', b.id);
+      if (r2.error) { alert('순서 변경 실패: ' + r2.error.message); return; }
+      const r3 = await db.from('job_postings').update({ sort_order: b.sort_order }).eq('id', a.id);
+      if (r3.error) { alert('순서 변경 실패: ' + r3.error.message); return; }
+      loadJobs();
+    }
+
+    async function uploadJobLogo(fileInput) {
+      const file = fileInput.files[0];
+      if (!file) return null;
+      const ext = file.name.split('.').pop();
+      const path = `${Date.now()}.${ext}`;
+      const { error } = await db.storage.from('logo').upload(path, file, { upsert: true });
+      if (error) { alert('이미지 업로드 실패: ' + error.message); return null; }
+      const { data } = db.storage.from('logo').getPublicUrl(path);
+      return data.publicUrl;
+    }
+
+    async function addJob() {
+      const school = document.getElementById('job-school').value.trim();
+      const title  = document.getElementById('job-title').value.trim();
+      const link   = document.getElementById('job-link').value.trim();
+      const color  = document.getElementById('job-color').value || '#FFFFFF';
+      if (!school || !title) { alert('기관명과 제목을 입력해주세요.'); return; }
+      const logoInput = document.getElementById('job-logo');
+      const logo_url = await uploadJobLogo(logoInput);
+      const maxOrder = jobData.length > 0 ? Math.max(...jobData.map(r => r.sort_order)) + 1 : 1;
+      const { error } = await db.from('job_postings').insert([{ school_name: school, title, link: link || null, sort_order: maxOrder, bg_color: color, logo_url }]);
+      if (error) { alert('등록 실패: ' + error.message); return; }
+      document.getElementById('job-school').value = '';
+      document.getElementById('job-title').value  = '';
+      document.getElementById('job-link').value   = '';
+      document.getElementById('job-color').value  = '#FFFFFF';
+      logoInput.value = '';
+      document.getElementById('job-logo-preview-wrap').classList.add('hidden');
+      const msg = document.getElementById('job-msg');
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 2000);
+      loadJobs();
+    }
+
+    async function deleteJob(id) {
+      if (!confirm('이 채용공고를 삭제하시겠습니까?')) return;
+      const { error } = await db.from('job_postings').delete().eq('id', id);
+      if (error) { alert('삭제 실패: ' + error.message); return; }
+      loadJobs();
+    }
+
+    function openJobEdit(id) {
+      const r = jobData.find(n => String(n.id) === String(id));
+      if (!r) return;
+      editingJobId = id;
+      document.getElementById('edit-job-school').value = r.school_name;
+      document.getElementById('edit-job-title').value  = r.title;
+      document.getElementById('edit-job-link').value   = r.link || '';
+      document.getElementById('edit-job-color').value  = r.bg_color || '#FFFFFF';
+      renderSwatches('edit-job-color-swatches', 'edit-job-color', r.bg_color || '#FFFFFF');
+      const preview = document.getElementById('edit-job-logo-preview');
+      if (r.logo_url) { preview.src = r.logo_url; preview.parentElement.classList.remove('hidden'); }
+      else { preview.src = ''; preview.parentElement.classList.add('hidden'); }
+      document.getElementById('edit-job-logo').value = '';
+      document.getElementById('job-modal').style.display = 'flex';
+    }
+
+    function closeJobModal() {
+      document.getElementById('job-modal').style.display = 'none';
+      editingJobId = null;
+    }
+
+    async function saveJobEdit() {
+      const school = document.getElementById('edit-job-school').value.trim();
+      const title  = document.getElementById('edit-job-title').value.trim();
+      const link   = document.getElementById('edit-job-link').value.trim();
+      const color  = document.getElementById('edit-job-color').value || '#FFFFFF';
+      if (!school || !title) { alert('기관명과 제목을 입력해주세요.'); return; }
+      const logoInput = document.getElementById('edit-job-logo');
+      let logo_url = jobData.find(n => String(n.id) === String(editingJobId))?.logo_url || null;
+      if (logoInput.files[0]) {
+        const uploaded = await uploadJobLogo(logoInput);
+        if (uploaded) logo_url = uploaded;
+      }
+      const { error } = await db.from('job_postings').update({ school_name: school, title, link: link || null, bg_color: color, logo_url }).eq('id', editingJobId);
+      if (error) { alert('수정 실패: ' + error.message); return; }
+      closeJobModal();
+      loadJobs();
+      const msg = document.getElementById('job-msg');
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 2000);
     }
 
     // Supabase 실시간 구독 (새 신청 자동 반영)
