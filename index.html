@@ -818,12 +818,14 @@
     <a href="#consultation-form" class="btn-primary w-full text-sm">무료 신청하기 →</a>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
     const { createClient } = supabase;
     const _supabase = createClient(
       'https://byzulmxcuhsrjdphmuym.supabase.co',
       'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
     );
+    emailjs.init('pfch4UljsmWPFOJf9');
 
     function updateDots(step) {
       document.querySelectorAll('.step-dot').forEach((dot, i) => {
@@ -858,6 +860,22 @@
         goal_score: fd.get('goal_score')?.trim(), message: fd.get('message')?.trim(),
       }]);
       if (error) { console.error(error); btn.disabled = false; btn.textContent = '신청하기 ✓'; alert('오류가 발생했습니다.'); return; }
+
+      // 이메일 알림 발송
+      const now = new Date();
+      const timeStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      try {
+        const res = await emailjs.send('service_c2an9zs', 'template_tyx4s4b', {
+          name: fd.get('name')?.trim(),
+          email: fd.get('email')?.trim(),
+          time: timeStr,
+          message: `목표점수: ${fd.get('goal_score')?.trim() || '미입력'}\n현재수준: ${fd.get('current_level')?.trim() || '미입력'}\n경험: ${[...document.querySelectorAll('input[name="experience"]:checked')].map(el=>el.value).join(', ') || '미입력'}\n문의내용: ${fd.get('message')?.trim() || '미입력'}`
+        });
+        console.log('이메일 발송 성공:', res.status, res.text);
+      } catch(e) {
+        console.error('이메일 발송 실패 상세:', JSON.stringify(e));
+      }
+
       document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
       document.getElementById('step-done').classList.add('active');
       document.getElementById('step-indicators').style.display = 'none';
