@@ -25,7 +25,7 @@
       --gold: #D97706;
       --accent: #1E4D8C;
     }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-padding-top: 72px; }
     body { font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; background: #FFFFFF; color: var(--ink); -webkit-text-size-adjust: 100%; }
     .font-display { font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; }
 
@@ -287,54 +287,52 @@
   </div>
 
   <!-- ══════ HERO ══════ -->
-  <section class="pt-20 pb-24 px-4 md:pt-28 md:pb-32 overflow-hidden" style="background:#FFFFFF;">
-    <!-- 상단 그라디언트 스트립 -->
-    <div style="position:absolute;top:67px;left:0;right:0;height:320px;background:linear-gradient(180deg,#F0F9FF 0%,rgba(240,249,255,0) 100%);pointer-events:none;z-index:0;"></div>
+  <section class="pt-20 pb-24 px-4 md:pt-28 md:pb-32 overflow-hidden" style="background:linear-gradient(160deg,#060D1F 0%,#0D1F4A 50%,#1A2F6B 100%);">
     <div class="max-w-4xl mx-auto text-center" style="position:relative;z-index:1;">
 
         <!-- 텍스트 -->
         <div class="slide-up">
-          <div class="inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full mb-8 border" style="border-color:#FDE68A;background:#FFFBEB;color:#B45309;">
+          <div class="inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full mb-8 border" style="border-color:rgba(252,211,77,.4);background:rgba(252,211,77,.1);color:#FCD34D;">
             <span>⏰</span><span>이번 달 한정 무료진단 운영 중 — 선착순 200명</span>
           </div>
 
-          <h1 class="font-display leading-tight font-bold mb-6" style="font-size:clamp(2rem,5vw,3.5rem);color:var(--ink);">
+          <h1 class="font-display leading-tight font-bold mb-6" style="font-size:clamp(2rem,5vw,3.5rem);color:#fff;">
             취업 준비 학생의<br/>
-            <span class="gradient-text">영어실력을 무료로</span><br/>
+            <span style="background:linear-gradient(135deg,#60A5FA,#38BDF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">영어실력을 무료로</span><br/>
             진단해드립니다
           </h1>
 
-          <p class="text-base leading-relaxed mb-2 md:text-lg" style="color:var(--ink-mid);">
-            국제공인영어시험 G-TELP IBT <strong style="color:var(--ink);">최대 200명 전액 무료 지원</strong>
+          <p class="text-base leading-relaxed mb-2 md:text-lg" style="color:rgba(255,255,255,.75);">
+            국제공인영어시험 G-TELP IBT <strong style="color:#fff;">최대 200명 전액 무료 지원</strong>
           </p>
-          <p class="text-base leading-relaxed mb-10 md:text-lg" style="color:var(--ink-mid);">
+          <p class="text-base leading-relaxed mb-10 md:text-lg" style="color:rgba(255,255,255,.75);">
             대학교 취업지원센터를 위한 맞춤 프로그램 — 코드 배포만 하시면 모든 진행은 저희가 합니다.
           </p>
 
           <div class="flex flex-col gap-3 sm:flex-row flex-wrap justify-center">
             <a href="#consultation-form" class="btn-primary w-full sm:w-auto px-8 hero-btn" data-btn-type="primary">무료 신청하기 →</a>
-            <a href="package.html" class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline">대학IBT패키지 →</a>
-            <a href="library.html" class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline">홍보문구 라이브러리</a>
-            <a href="#faq" class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline">운영 걱정 없는 이유 →</a>
-            <a href="./GTELP_IBT_대학제안서.pdf" download class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline">자료 다운로드(PDF) ↓</a>
-            <a href="library-pdf.html" class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline">채용공고 자료실 →</a>
+            <a href="package.html" class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline" style="border-color:rgba(255,255,255,.4);color:#fff;">대학IBT패키지 →</a>
+            <a href="library.html" class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline" style="border-color:rgba(255,255,255,.4);color:#fff;">홍보문구 라이브러리</a>
+            <a href="#faq" class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline" style="border-color:rgba(255,255,255,.4);color:#fff;">운영 걱정 없는 이유 →</a>
+            <a href="./GTELP_IBT_대학제안서.pdf" download class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline" style="border-color:rgba(255,255,255,.4);color:#fff;">자료 다운로드(PDF) ↓</a>
+            <a href="library-pdf.html" class="btn-outline w-full sm:w-auto px-8 hero-btn" data-btn-type="outline" style="border-color:rgba(255,255,255,.4);color:#fff;">채용공고 자료실 →</a>
           </div>
 
           <!-- 소셜 프루프 -->
-          <div class="flex justify-center gap-8 mt-12 pt-10 border-t" style="border-color:#E2E8F0;">
+          <div class="flex justify-center gap-8 mt-12 pt-10 border-t" style="border-color:rgba(255,255,255,.15);">
             <div>
-              <p class="text-3xl font-bold" style="color:var(--blue-mid);">64개</p>
-              <p class="text-xs mt-1" style="color:var(--ink-soft);">졸업인증 대상 대학</p>
+              <p class="text-3xl font-bold" style="color:#60A5FA;">64개</p>
+              <p class="text-xs mt-1" style="color:rgba(255,255,255,.6);">졸업인증 대상 대학</p>
             </div>
-            <div class="w-px" style="background:#E2E8F0;"></div>
+            <div class="w-px" style="background:rgba(255,255,255,.15);"></div>
             <div>
-              <p class="text-3xl font-bold" style="color:var(--blue-mid);">200+</p>
-              <p class="text-xs mt-1" style="color:var(--ink-soft);">공공기관·정부부처 채용 인정</p>
+              <p class="text-3xl font-bold" style="color:#60A5FA;">200+</p>
+              <p class="text-xs mt-1" style="color:rgba(255,255,255,.6);">공공기관·정부부처 채용 인정</p>
             </div>
-            <div class="w-px" style="background:#E2E8F0;"></div>
+            <div class="w-px" style="background:rgba(255,255,255,.15);"></div>
             <div>
-              <p class="text-3xl font-bold" style="color:var(--blue-mid);">600+</p>
-              <p class="text-xs mt-1" style="color:var(--ink-soft);">대상 기업</p>
+              <p class="text-3xl font-bold" style="color:#60A5FA;">600+</p>
+              <p class="text-xs mt-1" style="color:rgba(255,255,255,.6);">대상 기업</p>
             </div>
           </div>
 
