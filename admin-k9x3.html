@@ -300,6 +300,11 @@
             </div>
           </div>
           <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">이미지 (선택)</label>
+            <input id="prog-logo" type="file" accept="image/*" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+            <p id="prog-logo-preview-wrap" class="hidden mt-2"><img id="prog-logo-preview" src="" class="h-20 object-contain rounded border border-slate-200 p-1"/></p>
+          </div>
+          <div class="mb-4">
             <label class="block text-xs font-semibold text-slate-500 mb-2">카드 배경색</label>
             <input type="hidden" id="prog-color" value="#FFFFFF"/>
             <div id="prog-color-swatches" class="flex flex-wrap gap-2"></div>
@@ -512,6 +517,12 @@
             <div>
               <label class="block text-xs font-semibold text-slate-500 mb-1">링크 (선택)</label>
               <input id="edit-prog-link" type="url" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">이미지 교체 (선택)</label>
+              <input id="edit-prog-logo" type="file" accept="image/*" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+              <p id="edit-prog-logo-preview-wrap" class="hidden mt-2"><img id="edit-prog-logo-preview" src="" class="h-20 object-contain rounded border border-slate-200 p-1"/></p>
+              <p id="edit-prog-logo-current" class="hidden mt-2 text-xs text-slate-400">현재 이미지: <img id="edit-prog-logo-current-img" src="" class="inline h-10 object-contain rounded border border-slate-200 p-1 ml-1"/></p>
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-500 mb-2">카드 배경색</label>
@@ -1018,6 +1029,13 @@
       if (error) { console.error(error); return; }
       progData = data || [];
       renderSwatches('prog-color-swatches', 'prog-color', '#FFFFFF');
+      document.getElementById('prog-logo').onchange = function() {
+        const f = this.files[0];
+        if (!f) return;
+        const img = document.getElementById('prog-logo-preview');
+        img.src = URL.createObjectURL(f);
+        document.getElementById('prog-logo-preview-wrap').classList.remove('hidden');
+      };
       const tbody = document.getElementById('prog-body');
       const empty = document.getElementById('prog-empty-msg');
       if (progData.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
@@ -1054,19 +1072,34 @@
       loadPrograms();
     }
 
+    async function uploadProgLogo(fileInput) {
+      const file = fileInput.files[0];
+      if (!file) return null;
+      const ext = file.name.split('.').pop();
+      const path = `prog_${Date.now()}.${ext}`;
+      const { error } = await db.storage.from('logo').upload(path, file, { upsert: true });
+      if (error) { alert('이미지 업로드 실패: ' + error.message); return null; }
+      const { data } = db.storage.from('logo').getPublicUrl(path);
+      return data.publicUrl;
+    }
+
     async function addProgram() {
       const school = document.getElementById('prog-school').value.trim();
       const title  = document.getElementById('prog-title').value.trim();
       const link   = document.getElementById('prog-link').value.trim();
       const color  = document.getElementById('prog-color').value || '#FFFFFF';
       if (!school || !title) { alert('학교명과 제목을 입력해주세요.'); return; }
+      const logoInput = document.getElementById('prog-logo');
+      const logo_url = await uploadProgLogo(logoInput);
       const maxOrder = progData.length > 0 ? Math.max(...progData.map(r => r.sort_order)) + 1 : 1;
-      const { error } = await db.from('school_programs').insert([{ school_name: school, title, link: link || null, sort_order: maxOrder, bg_color: color }]);
+      const { error } = await db.from('school_programs').insert([{ school_name: school, title, link: link || null, sort_order: maxOrder, bg_color: color, logo_url }]);
       if (error) { alert('등록 실패: ' + error.message); return; }
       document.getElementById('prog-school').value = '';
       document.getElementById('prog-title').value  = '';
       document.getElementById('prog-link').value   = '';
       document.getElementById('prog-color').value  = '#FFFFFF';
+      document.getElementById('prog-logo').value   = '';
+      document.getElementById('prog-logo-preview-wrap').classList.add('hidden');
       const msg = document.getElementById('prog-msg');
       msg.classList.remove('hidden');
       setTimeout(() => msg.classList.add('hidden'), 2000);
@@ -1089,6 +1122,18 @@
       document.getElementById('edit-prog-link').value   = r.link || '';
       document.getElementById('edit-prog-color').value  = r.bg_color || '#FFFFFF';
       renderSwatches('edit-prog-color-swatches', 'edit-prog-color', r.bg_color || '#FFFFFF');
+      document.getElementById('edit-prog-logo').value = '';
+      document.getElementById('edit-prog-logo-preview-wrap').classList.add('hidden');
+      document.getElementById('edit-prog-logo').onchange = function() {
+        const f = this.files[0]; if (!f) return;
+        document.getElementById('edit-prog-logo-preview').src = URL.createObjectURL(f);
+        document.getElementById('edit-prog-logo-preview-wrap').classList.remove('hidden');
+      };
+      const curWrap = document.getElementById('edit-prog-logo-current');
+      if (r.logo_url) {
+        document.getElementById('edit-prog-logo-current-img').src = r.logo_url;
+        curWrap.classList.remove('hidden');
+      } else { curWrap.classList.add('hidden'); }
       document.getElementById('prog-modal').style.display = 'flex';
     }
 
@@ -1103,7 +1148,11 @@
       const link   = document.getElementById('edit-prog-link').value.trim();
       const color  = document.getElementById('edit-prog-color').value || '#FFFFFF';
       if (!school || !title) { alert('학교명과 제목을 입력해주세요.'); return; }
-      const { error } = await db.from('school_programs').update({ school_name: school, title, link: link || null, bg_color: color }).eq('id', editingProgId);
+      const logoInput = document.getElementById('edit-prog-logo');
+      const newLogoUrl = await uploadProgLogo(logoInput);
+      const existing = progData.find(p => String(p.id) === String(editingProgId));
+      const logo_url = newLogoUrl !== null ? newLogoUrl : (existing ? existing.logo_url : null);
+      const { error } = await db.from('school_programs').update({ school_name: school, title, link: link || null, bg_color: color, logo_url }).eq('id', editingProgId);
       if (error) { alert('수정 실패: ' + error.message); return; }
       closeProgModal();
       loadPrograms();
