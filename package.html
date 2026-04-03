@@ -131,10 +131,30 @@
       G-TELP IBT를 완전 무료로 연계해드립니다.
     </p>
     <div class="flex flex-wrap justify-center gap-3 mb-8 fade-in">
-      <span class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm" style="background:rgba(255,255,255,.15);color:#93C5FD;border:1.5px solid rgba(147,197,253,.4);">📝 영어평가</span>
-      <span class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm" style="background:rgba(255,255,255,.15);color:#86EFAC;border:1.5px solid rgba(134,239,172,.4);">🧠 인적성</span>
-      <span class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm" style="background:rgba(255,255,255,.15);color:#FCD34D;border:1.5px solid rgba(252,211,77,.4);">🤖 AI감독</span>
+      <span id="ppkg-banner-0" class="inline-flex items-center px-6 py-2.5 rounded-full font-bold text-sm text-white" style="background:#1E3A8A;box-shadow:0 4px 16px rgba(30,58,138,.5);transition:all .5s;">영어평가</span>
+      <span id="ppkg-banner-1" class="inline-flex items-center px-6 py-2.5 rounded-full font-bold text-sm text-white" style="background:#334155;box-shadow:0 2px 8px rgba(30,41,59,.3);transition:all .5s;">인적성</span>
+      <span id="ppkg-banner-2" class="inline-flex items-center px-6 py-2.5 rounded-full font-bold text-sm text-white" style="background:#334155;box-shadow:0 2px 8px rgba(30,41,59,.3);transition:all .5s;">AI감독</span>
     </div>
+    <script>
+      (function(){
+        var banners = [
+          {el: document.getElementById('ppkg-banner-0'), on:'#1E3A8A', onShadow:'rgba(30,58,138,.6)', off:'#334155', offShadow:'rgba(30,41,59,.3)'},
+          {el: document.getElementById('ppkg-banner-1'), on:'#065F46', onShadow:'rgba(6,95,70,.6)',   off:'#334155', offShadow:'rgba(30,41,59,.3)'},
+          {el: document.getElementById('ppkg-banner-2'), on:'#78350F', onShadow:'rgba(120,53,15,.6)', off:'#334155', offShadow:'rgba(30,41,59,.3)'}
+        ];
+        var cur = 0;
+        function tick() {
+          banners.forEach(function(b, i) {
+            b.el.style.background = i === cur ? b.on : b.off;
+            b.el.style.boxShadow = i === cur ? '0 4px 20px ' + b.onShadow : '0 2px 8px ' + b.offShadow;
+            b.el.style.transform = i === cur ? 'scale(1.06)' : 'scale(1)';
+          });
+          cur = (cur + 1) % banners.length;
+        }
+        tick();
+        setInterval(tick, 1000);
+      })();
+    </script>
     <div class="flex flex-wrap gap-3 justify-center fade-in">
       <a href="index.html#consultation-form" class="btn-primary px-8 py-3">무료로 신청하기 →</a>
       <a href="#packages" class="btn-outline px-8 py-3" style="border-color:rgba(255,255,255,.4);color:#fff;">패키지 비교하기</a>
