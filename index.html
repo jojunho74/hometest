@@ -853,6 +853,22 @@
 
   <div class="section-divider"></div>
 
+  <!-- ══════ 유튜브 쇼츠 ══════ -->
+  <section class="py-20 px-4 md:py-28" style="background:#F8FAFF;" id="shorts">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-10">
+        <span class="section-badge" style="background:#FEE2E2;color:#DC2626;">▶ 유튜브 쇼츠</span>
+        <h2 class="font-display text-2xl font-bold md:text-3xl mt-3" style="color:var(--ink);">G-TELP IBT 영상 모음</h2>
+      </div>
+      <div id="shorts-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <p class="text-center text-sm col-span-4" style="color:var(--ink-soft);">불러오는 중...</p>
+      </div>
+      <p id="shorts-empty" class="hidden text-center text-sm mt-6" style="color:var(--ink-soft);">등록된 영상이 없습니다.</p>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
   <!-- ══════ FAQ ══════ -->
   <section class="py-20 px-4 md:py-28" style="background:#FFFFFF;" id="faq">
     <div class="max-w-2xl mx-auto slide-up">
@@ -1130,6 +1146,29 @@
 
     // ── 대학활동 ──
     // ── 기업소식 슬라이더 ──
+    // ── 유튜브 쇼츠 ──
+    (async function loadShorts() {
+      try {
+        const { data, error } = await _supabase.from('youtube_shorts').select('*').order('sort_order', { ascending: true });
+        const grid  = document.getElementById('shorts-grid');
+        const empty = document.getElementById('shorts-empty');
+        if (error || !data || data.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); return; }
+        empty.classList.add('hidden');
+        grid.innerHTML = data.map(r => {
+          // YouTube URL에서 영상 ID 추출 (shorts/xxx 또는 watch?v=xxx 또는 youtu.be/xxx)
+          let vid = '';
+          const m = r.link.match(/(?:shorts\/|watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+          if (m) vid = m[1];
+          return `<div style="border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1);background:#000;">
+            ${vid
+              ? `<div style="position:relative;padding-bottom:177.78%;height:0;"><iframe src="https://www.youtube-nocookie.com/embed/${vid}" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe></div>`
+              : `<div style="padding:20px;color:#fff;font-size:0.8rem;">${r.title}</div>`}
+            ${r.title ? `<p style="padding:10px 12px;font-size:0.8rem;font-weight:700;color:#fff;background:#111;">${r.title}</p>` : ''}
+          </div>`;
+        }).join('');
+      } catch(e) { console.error(e); }
+    })();
+
     (async function loadCompanyNews() {
       try {
         const { data, error } = await _supabase.from('company_news').select('*').order('sort_order', { ascending: true });
