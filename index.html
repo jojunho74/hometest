@@ -151,6 +151,26 @@
     }
     @media (max-width: 640px) { .float-btns { right: 8px; bottom: 80px; } .float-btn { font-size: 12px; padding: 10px 14px; } }
 
+    /* ── 모바일 카드 그리드 최적화 ── */
+    @media (max-width: 767px) {
+      #news-grid a, #news-grid div[style],
+      #prog-grid a, #prog-grid div[style],
+      #job-grid a, #job-grid div[style] {
+        padding: 12px !important;
+        min-height: 100px !important;
+      }
+      #news-grid img, #prog-grid img, #job-grid img {
+        height: 40px !important;
+        margin-bottom: 6px !important;
+      }
+      #news-grid p, #prog-grid p, #job-grid p {
+        font-size: 0.78rem !important;
+      }
+      #news-grid span, #prog-grid span, #job-grid span {
+        font-size: 10px !important;
+      }
+    }
+
     /* ── 카드 아래 학생 신청 버튼 ── */
     .student-cta-btn {
       display: block; margin: 14px auto 0; max-width: 320px;
@@ -816,7 +836,7 @@
         <span class="section-badge slide-up">대학소식</span>
         <h2 class="font-display text-2xl font-bold md:text-3xl slide-up" style="color:var(--ink);">We 대학일자리플러스센터</h2>
       </div>
-      <div id="news-grid" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div id="news-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <p class="text-center text-sm col-span-4" style="color:var(--ink-soft);">불러오는 중...</p>
       </div>
       <p id="news-empty" class="hidden text-center text-sm mt-6" style="color:var(--ink-soft);">등록된 소식이 없습니다.</p>
@@ -832,7 +852,7 @@
         <span class="section-badge slide-up" style="background:#CCFBF1;color:#0F766E;">대학활동</span>
         <h2 class="font-display text-2xl font-bold md:text-3xl slide-up" style="color:var(--ink);">학교별 New & 소식</h2>
       </div>
-      <div id="prog-grid" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div id="prog-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <p class="text-center text-sm col-span-4" style="color:var(--ink-soft);">불러오는 중...</p>
       </div>
       <p id="prog-empty" class="hidden text-center text-sm mt-6" style="color:var(--ink-soft);">등록된 프로그램이 없습니다.</p>
@@ -848,8 +868,8 @@
         <span class="section-badge slide-up" style="background:#FEF3C7;color:#92400E;">채용공고</span>
         <h2 class="font-display text-2xl font-bold md:text-3xl slide-up" style="color:var(--ink);">채용공고</h2>
       </div>
-      <div id="job-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <p class="text-center text-sm col-span-3" style="color:var(--ink-soft);">불러오는 중...</p>
+      <div id="job-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <p class="text-center text-sm col-span-4" style="color:var(--ink-soft);">불러오는 중...</p>
       </div>
       <p id="job-empty" class="hidden text-center text-sm mt-6" style="color:var(--ink-soft);">등록된 채용공고가 없습니다.</p>
     </div>
