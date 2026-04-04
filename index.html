@@ -402,53 +402,6 @@
           })();
         </script>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <a id="pkg-a" href="package.html" class="pkg-card block rounded-xl p-5 text-left transition-all hover:-translate-y-1" style="background:#fff;border:1.5px solid #BFDBFE;box-shadow:0 2px 8px rgba(30,77,140,.08);text-decoration:none;">
-          <p class="text-xl mb-2">🧪</p>
-          <p class="font-bold text-sm mb-1" style="color:#1E4D8C;">패키지 A — 역량측정</p>
-          <p class="text-xs" style="color:#475569;">AI역량평가 운영 중? 영어 진단까지 한 번에 완성하세요.</p>
-          <p class="text-xs font-semibold mt-2" style="color:#1E4D8C;">자세히 보기 →</p>
-        </a>
-        <a id="pkg-b" href="package.html" class="pkg-card block rounded-xl p-5 text-left transition-all hover:-translate-y-1" style="background:#fff;border:1.5px solid #BBF7D0;box-shadow:0 2px 8px rgba(5,150,105,.08);text-decoration:none;">
-          <p class="text-xl mb-2">📋</p>
-          <p class="font-bold text-sm mb-1" style="color:#059669;">패키지 B — 점프업</p>
-          <p class="text-xs" style="color:#475569;">점프업 운영 중? 보고서에 바로 쓸 수 있는 데이터 무료 제공.</p>
-          <p class="text-xs font-semibold mt-2" style="color:#059669;">자세히 보기 →</p>
-        </a>
-        <a id="pkg-c" href="package.html" class="pkg-card block rounded-xl p-5 text-left transition-all hover:-translate-y-1" style="background:#fff;border:1.5px solid #FDE68A;box-shadow:0 2px 8px rgba(217,119,6,.08);text-decoration:none;">
-          <p class="text-xl mb-2">🏢</p>
-          <p class="font-bold text-sm mb-1" style="color:#D97706;">패키지 C — 공기업</p>
-          <p class="text-xs" style="color:#475569;">공기업 패키지 운영 중? 영어 파트를 IBT로 무료 완성하세요.</p>
-          <p class="text-xs font-semibold mt-2" style="color:#D97706;">자세히 보기 →</p>
-        </a>
-      </div>
-      <script>
-        (function(){
-          var cards = [
-            {el: document.getElementById('pkg-a'), bg:'#EFF6FF', border:'#1E4D8C', shadow:'rgba(30,77,140,.25)'},
-            {el: document.getElementById('pkg-b'), bg:'#F0FDF4', border:'#059669', shadow:'rgba(5,150,105,.25)'},
-            {el: document.getElementById('pkg-c'), bg:'#FFFBEB', border:'#D97706', shadow:'rgba(217,119,6,.25)'}
-          ];
-          var defaults = [
-            {bg:'#fff', border:'#BFDBFE', shadow:'rgba(30,77,140,.08)'},
-            {bg:'#fff', border:'#BBF7D0', shadow:'rgba(5,150,105,.08)'},
-            {bg:'#fff', border:'#FDE68A', shadow:'rgba(217,119,6,.08)'}
-          ];
-          var cur = 0;
-          function highlight(i) {
-            cards.forEach(function(c, idx) {
-              c.el.style.background = idx === i ? cards[idx].bg : defaults[idx].bg;
-              c.el.style.borderColor = idx === i ? cards[idx].border : defaults[idx].border;
-              c.el.style.boxShadow = idx === i ? '0 6px 24px ' + cards[idx].shadow : '0 2px 8px ' + defaults[idx].shadow;
-              c.el.style.transform = idx === i ? 'translateY(-4px)' : '';
-            });
-          }
-          setInterval(function() {
-            highlight(cur);
-            cur = (cur + 1) % cards.length;
-          }, 1200);
-        })();
-      </script>
     </div>
   </section>
 
