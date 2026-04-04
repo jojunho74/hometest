@@ -1721,8 +1721,8 @@
     async function loadStats() {
       const { data: views, error } = await db
         .from('page_views')
-        .select('page, created_at')
-        .order('created_at', { ascending: false });
+        .select('page, visited_at')
+        .order('visited_at', { ascending: false });
 
       if (error) { console.error(error); return; }
       const rows = views || [];
@@ -1734,9 +1734,9 @@
 
       // 요약 카드
       document.getElementById('stats-total-views').textContent     = rows.length;
-      document.getElementById('stats-month-views').textContent     = rows.filter(r => r.created_at.slice(0, 7) === thisMonth).length;
-      document.getElementById('stats-today-views').textContent     = rows.filter(r => r.created_at.slice(0, 10) === today).length;
-      document.getElementById('stats-yesterday-views').textContent = rows.filter(r => r.created_at.slice(0, 10) === yesterday).length;
+      document.getElementById('stats-month-views').textContent     = rows.filter(r => r.visited_at.slice(0, 7) === thisMonth).length;
+      document.getElementById('stats-today-views').textContent     = rows.filter(r => r.visited_at.slice(0, 10) === today).length;
+      document.getElementById('stats-yesterday-views').textContent = rows.filter(r => r.visited_at.slice(0, 10) === yesterday).length;
       document.getElementById('stats-month-label').textContent     = (now.getMonth() + 1) + '월';
 
       // 기존 차트 파기
@@ -1749,7 +1749,7 @@
         const d = new Date(now - i * 864e5);
         const key = d.toISOString().slice(0, 10);
         dailyLabels.push((d.getMonth() + 1) + '/' + d.getDate());
-        dailyCounts.push(rows.filter(r => r.created_at.slice(0, 10) === key).length);
+        dailyCounts.push(rows.filter(r => r.visited_at.slice(0, 10) === key).length);
       }
 
       statsCharts.daily = new Chart(document.getElementById('chart-daily'), {
@@ -1802,7 +1802,7 @@
       // 요일별 분포
       const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
       const weekdayCounts = Array(7).fill(0);
-      rows.forEach(r => { weekdayCounts[new Date(r.created_at).getDay()]++; });
+      rows.forEach(r => { weekdayCounts[new Date(r.visited_at).getDay()]++; });
 
       statsCharts.weekday = new Chart(document.getElementById('chart-weekday'), {
         type: 'bar',
