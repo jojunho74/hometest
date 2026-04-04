@@ -56,9 +56,9 @@
     .section-badge { display: inline-block; padding: 4px 14px; border-radius: 50px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
 
     /* ── 패키지 탭 ── */
-    .pkg-tab { padding: 12px 24px; border-radius: 12px; font-size: 0.9rem; font-weight: 700; cursor: pointer; border: 2px solid #E2E8F0; background: #fff; color: var(--ink-mid); transition: all .2s; white-space: nowrap; }
-    .pkg-tab.active { background: linear-gradient(135deg, #1E4D8C, #0891B2); color: #fff; border-color: transparent; box-shadow: 0 4px 16px rgba(30,77,140,.3); }
-    .pkg-tab:hover:not(.active) { border-color: #1E4D8C; color: #1E4D8C; }
+    .pkg-tab { padding: 14px 28px; border-radius: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; background: #334155; color: #fff; transition: all .2s; white-space: nowrap; box-shadow: 0 2px 8px rgba(30,41,59,.3); }
+    .pkg-tab.active { background: #1E3A8A; color: #fff; box-shadow: 0 4px 20px rgba(30,58,138,.5); transform: scale(1.06); }
+    .pkg-tab:hover:not(.active) { background: #475569; }
 
     .pkg-panel { display: none; }
     .pkg-panel.active { display: block; }
@@ -181,9 +181,9 @@
 
     <!-- 탭 버튼 -->
     <div class="flex flex-wrap justify-center gap-3 mb-10 fade-in">
-      <button class="pkg-tab active" onclick="switchPkg('a', this)">🧪 역량측정 운영 중</button>
-      <button class="pkg-tab" onclick="switchPkg('b', this)">📋 점프업 운영 중</button>
-      <button class="pkg-tab" onclick="switchPkg('c', this)">🏢 공기업 패키지 운영 중</button>
+      <button class="pkg-tab active" onclick="switchPkg('a', this)">역량측정 운영 중</button>
+      <button class="pkg-tab" onclick="switchPkg('b', this)">점프업 운영 중</button>
+      <button class="pkg-tab" onclick="switchPkg('c', this)">공기업 패키지 운영 중</button>
     </div>
 
     <!-- ── 패키지 A ── -->
