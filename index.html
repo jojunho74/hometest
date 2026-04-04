@@ -331,7 +331,7 @@
               function showLines(){
                 lines.forEach(function(id){ var el=document.getElementById(id); el.style.opacity='0'; el.style.transform='translateY(16px)'; });
                 lines.forEach(function(id,i){
-                  setTimeout(function(){ var el=document.getElementById(id); el.style.opacity='1'; el.style.transform='translateY(0)'; }, 100+i*400);
+                  setTimeout(function(){ var el=document.getElementById(id); el.style.opacity='1'; el.style.transform='translateY(0)'; }, 400+i*400);
                 });
               }
               showLines();
