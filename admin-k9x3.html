@@ -6,6 +6,7 @@
   <title>관리자 페이지</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     body { font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; }
@@ -123,7 +124,7 @@
     <main class="max-w-6xl mx-auto px-4 py-8">
 
       <!-- 탭 -->
-      <div class="flex gap-2 mb-8 border-b border-slate-200">
+      <div class="flex flex-wrap gap-2 mb-8 border-b border-slate-200">
         <button onclick="switchTab('consult')"  id="tab-consult"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-blue-700 text-blue-700 -mb-px">신청 관리</button>
         <button onclick="switchTab('student')"  id="tab-student"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">학생접수</button>
         <button onclick="switchTab('news')"     id="tab-news"     class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">대학소식</button>
@@ -131,6 +132,7 @@
         <button onclick="switchTab('jobs')"     id="tab-jobs"     class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">채용공고</button>
         <button onclick="switchTab('cnews')"   id="tab-cnews"   class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">기업소식</button>
         <button onclick="switchTab('shorts')"  id="tab-shorts"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">유튜브쇼츠</button>
+        <button onclick="switchTab('stats')"   id="tab-stats"   class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">통계</button>
       </div>
 
       <!-- ── 신청 관리 탭 ── -->
@@ -656,6 +658,69 @@
         <p id="sh-empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">등록된 쇼츠가 없습니다.</p>
       </div>
 
+      <!-- ── 통계 탭 ── -->
+      <div id="section-stats" class="hidden">
+
+        <!-- 요약 카드 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-xl p-5 shadow-sm">
+            <p class="text-xs text-slate-400 mb-1">전체 신청 합계</p>
+            <p id="stats-total-all" class="text-3xl font-bold text-slate-800">-</p>
+            <p class="text-xs text-slate-400 mt-1">상담 + 학생</p>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm">
+            <p class="text-xs text-slate-400 mb-1">이번달 신청</p>
+            <p id="stats-this-month" class="text-3xl font-bold text-blue-600">-</p>
+            <p id="stats-month-label" class="text-xs text-slate-400 mt-1">-월</p>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm">
+            <p class="text-xs text-slate-400 mb-1">오늘 신청</p>
+            <p id="stats-today-all" class="text-3xl font-bold text-emerald-600">-</p>
+            <p class="text-xs text-slate-400 mt-1">합산</p>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm">
+            <p class="text-xs text-slate-400 mb-1">상담 처리 완료율</p>
+            <p id="stats-done-rate" class="text-3xl font-bold text-purple-600">-</p>
+            <p class="text-xs text-slate-400 mt-1">완료/전체</p>
+          </div>
+        </div>
+
+        <!-- 월별 추이 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 class="font-bold text-slate-700 mb-4">월별 신청 추이 <span class="text-xs font-normal text-slate-400">(최근 6개월)</span></h3>
+          <canvas id="chart-monthly" height="90"></canvas>
+        </div>
+
+        <!-- 유형별 + 요일별 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="font-bold text-slate-700 mb-4">신청 유형별</h3>
+            <canvas id="chart-type" height="180"></canvas>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="font-bold text-slate-700 mb-4">요일별 신청 분포</h3>
+            <canvas id="chart-weekday" height="180"></canvas>
+          </div>
+        </div>
+
+        <!-- 상담 처리 현황 -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <h3 class="font-bold text-slate-700 mb-4">상담 처리 현황</h3>
+          <div class="flex gap-8 mb-4">
+            <div class="flex items-center gap-2">
+              <span class="inline-block w-3 h-3 rounded-full bg-yellow-400"></span>
+              <span class="text-sm text-slate-600">대기중 <strong id="stats-pending-count" class="text-slate-800">-</strong>건</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="inline-block w-3 h-3 rounded-full bg-emerald-500"></span>
+              <span class="text-sm text-slate-600">완료 <strong id="stats-done-count" class="text-slate-800">-</strong>건</span>
+            </div>
+          </div>
+          <canvas id="chart-status" height="60"></canvas>
+        </div>
+
+      </div>
+
     </main>
   </div>
 
@@ -867,7 +932,7 @@
 
     // ─── 탭 전환 ───
     function switchTab(tab) {
-      ['consult', 'student', 'news', 'programs', 'jobs', 'cnews', 'shorts'].forEach(t => {
+      ['consult', 'student', 'news', 'programs', 'jobs', 'cnews', 'shorts', 'stats'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (t === tab) {
@@ -884,6 +949,7 @@
       if (tab === 'jobs') loadJobs();
       if (tab === 'cnews') loadCNews();
       if (tab === 'shorts') loadShorts();
+      if (tab === 'stats')  requestAnimationFrame(() => loadStats());
     }
 
     // ─── 학생접수 ───
@@ -1663,6 +1729,130 @@
         btn.disabled = false;
         btn.textContent = '📨 발송하기';
       }
+    }
+
+    // ─── 통계 ───
+    let statsCharts = {};
+
+    async function loadStats() {
+      const [consultRes, studentRes] = await Promise.all([
+        db.from('consultations').select('id, status, created_at'),
+        db.from('student_applications').select('id, status, created_at')
+      ]);
+
+      const consults = consultRes.data || [];
+      const students = studentRes.data || [];
+      const allRows  = [
+        ...consults.map(r => ({ ...r, type: '상담' })),
+        ...students.map(r => ({ ...r, type: '학생' }))
+      ];
+
+      const today     = new Date().toISOString().slice(0, 10);
+      const thisMonth = new Date().toISOString().slice(0, 7);
+
+      // 요약 카드
+      document.getElementById('stats-total-all').textContent   = allRows.length;
+      document.getElementById('stats-this-month').textContent  = allRows.filter(r => r.created_at.slice(0, 7) === thisMonth).length;
+      document.getElementById('stats-today-all').textContent   = allRows.filter(r => r.created_at.slice(0, 10) === today).length;
+      document.getElementById('stats-month-label').textContent = (new Date().getMonth() + 1) + '월';
+
+      const totalConsults = consults.length;
+      const doneConsults  = consults.filter(r => r.status === 'done').length;
+      const pendingConsults = totalConsults - doneConsults;
+      const doneRate = totalConsults > 0 ? Math.round(doneConsults / totalConsults * 100) : 0;
+      document.getElementById('stats-done-rate').textContent    = doneRate + '%';
+      document.getElementById('stats-pending-count').textContent = pendingConsults;
+      document.getElementById('stats-done-count').textContent    = doneConsults;
+
+      // 기존 차트 파기
+      Object.values(statsCharts).forEach(c => c.destroy());
+      statsCharts = {};
+
+      // 월별 추이 (최근 6개월)
+      const monthLabels = [], consultMonthly = [], studentMonthly = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(1);
+        d.setMonth(d.getMonth() - i);
+        const key = d.toISOString().slice(0, 7);
+        monthLabels.push((d.getMonth() + 1) + '월');
+        consultMonthly.push(consults.filter(r => r.created_at.slice(0, 7) === key).length);
+        studentMonthly.push(students.filter(r => r.created_at.slice(0, 7) === key).length);
+      }
+
+      statsCharts.monthly = new Chart(document.getElementById('chart-monthly'), {
+        type: 'bar',
+        data: {
+          labels: monthLabels,
+          datasets: [
+            { label: '상담신청', data: consultMonthly, backgroundColor: '#3B82F6', borderRadius: 6 },
+            { label: '학생신청', data: studentMonthly, backgroundColor: '#10B981', borderRadius: 6 }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'top' } },
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }
+        }
+      });
+
+      // 유형별 도넛
+      statsCharts.type = new Chart(document.getElementById('chart-type'), {
+        type: 'doughnut',
+        data: {
+          labels: ['상담신청', '학생신청'],
+          datasets: [{
+            data: [consults.length, students.length],
+            backgroundColor: ['#3B82F6', '#10B981'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+
+      // 요일별 분포
+      const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+      const weekdayCounts = Array(7).fill(0);
+      allRows.forEach(r => { weekdayCounts[new Date(r.created_at).getDay()]++; });
+
+      statsCharts.weekday = new Chart(document.getElementById('chart-weekday'), {
+        type: 'bar',
+        data: {
+          labels: weekdays,
+          datasets: [{
+            label: '신청 수',
+            data: weekdayCounts,
+            backgroundColor: weekdayCounts.map((_, i) => (i === 0 || i === 6) ? '#F87171' : '#6366F1'),
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }
+        }
+      });
+
+      // 처리 현황 수평 바
+      statsCharts.status = new Chart(document.getElementById('chart-status'), {
+        type: 'bar',
+        data: {
+          labels: ['상담신청'],
+          datasets: [
+            { label: '대기중', data: [pendingConsults], backgroundColor: '#FBBF24', borderRadius: 4 },
+            { label: '완료',   data: [doneConsults],    backgroundColor: '#10B981', borderRadius: 4 }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          plugins: { legend: { position: 'bottom' } },
+          scales: { x: { beginAtZero: true, stacked: true, ticks: { precision: 0 } }, y: { stacked: true } }
+        }
+      });
     }
 
     // Supabase 실시간 구독 (새 신청 자동 반영)
