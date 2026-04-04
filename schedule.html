@@ -12,7 +12,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet"/>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F8FAFF;color:#1E293B;}
+    body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F8FAFF;color:#1E293B;position:relative;}
+    body::before{content:'';position:fixed;inset:0;background-image:url('3zp576E3rSmr33EdZHpLu.png');background-size:cover;background-position:center;opacity:0.8;z-index:-1;}
+    body::after{content:'';position:fixed;inset:0;background:rgba(248,250,255,0.25);z-index:-1;}
     header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #E2E8F0;box-shadow:0 1px 4px rgba(0,0,0,.06);}
     .hinner{max-width:1100px;margin:0 auto;padding:0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;}
     .hlogo{font-size:1rem;font-weight:800;color:#1E4D8C;text-decoration:none;}
