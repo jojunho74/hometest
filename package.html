@@ -464,5 +464,22 @@
   }), { threshold: 0.08 });
   document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 </script>
+
+  <!-- 방문 트래킹 -->
+  <script>
+    (function() {
+      var page = window.location.pathname.split('/').pop() || 'index.html';
+      fetch('/rest/v1/page_views', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': '',
+          'Authorization': 'Bearer ',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ page: page, referrer: document.referrer || null })
+      }).catch(function(){});
+    })();
+  </script>
 </body>
 </html>

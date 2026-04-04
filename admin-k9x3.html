@@ -664,59 +664,43 @@
         <!-- 요약 카드 -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div class="bg-white rounded-xl p-5 shadow-sm">
-            <p class="text-xs text-slate-400 mb-1">전체 신청 합계</p>
-            <p id="stats-total-all" class="text-3xl font-bold text-slate-800">-</p>
-            <p class="text-xs text-slate-400 mt-1">상담 + 학생</p>
+            <p class="text-xs text-slate-400 mb-1">전체 방문수</p>
+            <p id="stats-total-views" class="text-3xl font-bold text-slate-800">-</p>
+            <p class="text-xs text-slate-400 mt-1">누적</p>
           </div>
           <div class="bg-white rounded-xl p-5 shadow-sm">
-            <p class="text-xs text-slate-400 mb-1">이번달 신청</p>
-            <p id="stats-this-month" class="text-3xl font-bold text-blue-600">-</p>
+            <p class="text-xs text-slate-400 mb-1">이번달 방문</p>
+            <p id="stats-month-views" class="text-3xl font-bold text-blue-600">-</p>
             <p id="stats-month-label" class="text-xs text-slate-400 mt-1">-월</p>
           </div>
           <div class="bg-white rounded-xl p-5 shadow-sm">
-            <p class="text-xs text-slate-400 mb-1">오늘 신청</p>
-            <p id="stats-today-all" class="text-3xl font-bold text-emerald-600">-</p>
-            <p class="text-xs text-slate-400 mt-1">합산</p>
+            <p class="text-xs text-slate-400 mb-1">오늘 방문</p>
+            <p id="stats-today-views" class="text-3xl font-bold text-emerald-600">-</p>
+            <p class="text-xs text-slate-400 mt-1">오늘</p>
           </div>
           <div class="bg-white rounded-xl p-5 shadow-sm">
-            <p class="text-xs text-slate-400 mb-1">상담 처리 완료율</p>
-            <p id="stats-done-rate" class="text-3xl font-bold text-purple-600">-</p>
-            <p class="text-xs text-slate-400 mt-1">완료/전체</p>
+            <p class="text-xs text-slate-400 mb-1">어제 방문</p>
+            <p id="stats-yesterday-views" class="text-3xl font-bold text-purple-600">-</p>
+            <p class="text-xs text-slate-400 mt-1">어제</p>
           </div>
         </div>
 
-        <!-- 월별 추이 -->
+        <!-- 일별 추이 -->
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h3 class="font-bold text-slate-700 mb-4">월별 신청 추이 <span class="text-xs font-normal text-slate-400">(최근 6개월)</span></h3>
-          <canvas id="chart-monthly" height="90"></canvas>
+          <h3 class="font-bold text-slate-700 mb-4">일별 방문 추이 <span class="text-xs font-normal text-slate-400">(최근 14일)</span></h3>
+          <canvas id="chart-daily" height="90"></canvas>
         </div>
 
-        <!-- 유형별 + 요일별 -->
+        <!-- 페이지별 + 요일별 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div class="bg-white rounded-xl shadow-sm p-6">
-            <h3 class="font-bold text-slate-700 mb-4">신청 유형별</h3>
-            <canvas id="chart-type" height="180"></canvas>
+            <h3 class="font-bold text-slate-700 mb-4">페이지별 방문수</h3>
+            <canvas id="chart-pages" height="200"></canvas>
           </div>
           <div class="bg-white rounded-xl shadow-sm p-6">
-            <h3 class="font-bold text-slate-700 mb-4">요일별 신청 분포</h3>
-            <canvas id="chart-weekday" height="180"></canvas>
+            <h3 class="font-bold text-slate-700 mb-4">요일별 방문 분포</h3>
+            <canvas id="chart-weekday" height="200"></canvas>
           </div>
-        </div>
-
-        <!-- 상담 처리 현황 -->
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <h3 class="font-bold text-slate-700 mb-4">상담 처리 현황</h3>
-          <div class="flex gap-8 mb-4">
-            <div class="flex items-center gap-2">
-              <span class="inline-block w-3 h-3 rounded-full bg-yellow-400"></span>
-              <span class="text-sm text-slate-600">대기중 <strong id="stats-pending-count" class="text-slate-800">-</strong>건</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="inline-block w-3 h-3 rounded-full bg-emerald-500"></span>
-              <span class="text-sm text-slate-600">완료 <strong id="stats-done-count" class="text-slate-800">-</strong>건</span>
-            </div>
-          </div>
-          <canvas id="chart-status" height="60"></canvas>
         </div>
 
       </div>
@@ -1731,126 +1715,110 @@
       }
     }
 
-    // ─── 통계 ───
+    // ─── 방문 통계 ───
     let statsCharts = {};
 
     async function loadStats() {
-      const [consultRes, studentRes] = await Promise.all([
-        db.from('consultations').select('id, status, created_at'),
-        db.from('student_applications').select('id, status, created_at')
-      ]);
+      const { data: views, error } = await db
+        .from('page_views')
+        .select('page, created_at')
+        .order('created_at', { ascending: false });
 
-      const consults = consultRes.data || [];
-      const students = studentRes.data || [];
-      const allRows  = [
-        ...consults.map(r => ({ ...r, type: '상담' })),
-        ...students.map(r => ({ ...r, type: '학생' }))
-      ];
+      if (error) { console.error(error); return; }
+      const rows = views || [];
 
-      const today     = new Date().toISOString().slice(0, 10);
-      const thisMonth = new Date().toISOString().slice(0, 7);
+      const now       = new Date();
+      const today     = now.toISOString().slice(0, 10);
+      const thisMonth = now.toISOString().slice(0, 7);
+      const yesterday = new Date(now - 864e5).toISOString().slice(0, 10);
 
       // 요약 카드
-      document.getElementById('stats-total-all').textContent   = allRows.length;
-      document.getElementById('stats-this-month').textContent  = allRows.filter(r => r.created_at.slice(0, 7) === thisMonth).length;
-      document.getElementById('stats-today-all').textContent   = allRows.filter(r => r.created_at.slice(0, 10) === today).length;
-      document.getElementById('stats-month-label').textContent = (new Date().getMonth() + 1) + '월';
-
-      const totalConsults = consults.length;
-      const doneConsults  = consults.filter(r => r.status === 'done').length;
-      const pendingConsults = totalConsults - doneConsults;
-      const doneRate = totalConsults > 0 ? Math.round(doneConsults / totalConsults * 100) : 0;
-      document.getElementById('stats-done-rate').textContent    = doneRate + '%';
-      document.getElementById('stats-pending-count').textContent = pendingConsults;
-      document.getElementById('stats-done-count').textContent    = doneConsults;
+      document.getElementById('stats-total-views').textContent     = rows.length;
+      document.getElementById('stats-month-views').textContent     = rows.filter(r => r.created_at.slice(0, 7) === thisMonth).length;
+      document.getElementById('stats-today-views').textContent     = rows.filter(r => r.created_at.slice(0, 10) === today).length;
+      document.getElementById('stats-yesterday-views').textContent = rows.filter(r => r.created_at.slice(0, 10) === yesterday).length;
+      document.getElementById('stats-month-label').textContent     = (now.getMonth() + 1) + '월';
 
       // 기존 차트 파기
       Object.values(statsCharts).forEach(c => c.destroy());
       statsCharts = {};
 
-      // 월별 추이 (최근 6개월)
-      const monthLabels = [], consultMonthly = [], studentMonthly = [];
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(1);
-        d.setMonth(d.getMonth() - i);
-        const key = d.toISOString().slice(0, 7);
-        monthLabels.push((d.getMonth() + 1) + '월');
-        consultMonthly.push(consults.filter(r => r.created_at.slice(0, 7) === key).length);
-        studentMonthly.push(students.filter(r => r.created_at.slice(0, 7) === key).length);
+      // 일별 추이 (최근 14일)
+      const dailyLabels = [], dailyCounts = [];
+      for (let i = 13; i >= 0; i--) {
+        const d = new Date(now - i * 864e5);
+        const key = d.toISOString().slice(0, 10);
+        dailyLabels.push((d.getMonth() + 1) + '/' + d.getDate());
+        dailyCounts.push(rows.filter(r => r.created_at.slice(0, 10) === key).length);
       }
 
-      statsCharts.monthly = new Chart(document.getElementById('chart-monthly'), {
-        type: 'bar',
+      statsCharts.daily = new Chart(document.getElementById('chart-daily'), {
+        type: 'line',
         data: {
-          labels: monthLabels,
-          datasets: [
-            { label: '상담신청', data: consultMonthly, backgroundColor: '#3B82F6', borderRadius: 6 },
-            { label: '학생신청', data: studentMonthly, backgroundColor: '#10B981', borderRadius: 6 }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { position: 'top' } },
-          scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }
-        }
-      });
-
-      // 유형별 도넛
-      statsCharts.type = new Chart(document.getElementById('chart-type'), {
-        type: 'doughnut',
-        data: {
-          labels: ['상담신청', '학생신청'],
+          labels: dailyLabels,
           datasets: [{
-            data: [consults.length, students.length],
-            backgroundColor: ['#3B82F6', '#10B981'],
-            borderWidth: 0
+            label: '방문수',
+            data: dailyCounts,
+            borderColor: '#3B82F6',
+            backgroundColor: 'rgba(59,130,246,0.1)',
+            borderWidth: 2,
+            pointRadius: 3,
+            fill: true,
+            tension: 0.3
           }]
         },
         options: {
           responsive: true,
-          plugins: { legend: { position: 'bottom' } }
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+      });
+
+      // 페이지별 방문수
+      const pageMap = {};
+      rows.forEach(r => { pageMap[r.page] = (pageMap[r.page] || 0) + 1; });
+      const pageLabels = Object.keys(pageMap).sort((a, b) => pageMap[b] - pageMap[a]);
+      const pageCounts = pageLabels.map(p => pageMap[p]);
+
+      statsCharts.pages = new Chart(document.getElementById('chart-pages'), {
+        type: 'bar',
+        data: {
+          labels: pageLabels,
+          datasets: [{
+            label: '방문수',
+            data: pageCounts,
+            backgroundColor: '#6366F1',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
         }
       });
 
       // 요일별 분포
       const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
       const weekdayCounts = Array(7).fill(0);
-      allRows.forEach(r => { weekdayCounts[new Date(r.created_at).getDay()]++; });
+      rows.forEach(r => { weekdayCounts[new Date(r.created_at).getDay()]++; });
 
       statsCharts.weekday = new Chart(document.getElementById('chart-weekday'), {
         type: 'bar',
         data: {
           labels: weekdays,
           datasets: [{
-            label: '신청 수',
+            label: '방문수',
             data: weekdayCounts,
-            backgroundColor: weekdayCounts.map((_, i) => (i === 0 || i === 6) ? '#F87171' : '#6366F1'),
+            backgroundColor: weekdayCounts.map((_, i) => (i === 0 || i === 6) ? '#F87171' : '#3B82F6'),
             borderRadius: 6
           }]
         },
         options: {
           responsive: true,
           plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }
-        }
-      });
-
-      // 처리 현황 수평 바
-      statsCharts.status = new Chart(document.getElementById('chart-status'), {
-        type: 'bar',
-        data: {
-          labels: ['상담신청'],
-          datasets: [
-            { label: '대기중', data: [pendingConsults], backgroundColor: '#FBBF24', borderRadius: 4 },
-            { label: '완료',   data: [doneConsults],    backgroundColor: '#10B981', borderRadius: 4 }
-          ]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          plugins: { legend: { position: 'bottom' } },
-          scales: { x: { beginAtZero: true, stacked: true, ticks: { precision: 0 } }, y: { stacked: true } }
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
         }
       });
     }
