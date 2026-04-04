@@ -453,12 +453,28 @@
     });
   });
 
+  const PKG_IDS = ['a', 'b', 'c'];
+  let pkgAutoTimer = null;
+  let pkgCur = 0;
+
   function switchPkg(id, btn) {
     document.querySelectorAll('.pkg-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.pkg-tab').forEach(b => b.classList.remove('active'));
     document.getElementById('pkg-' + id).classList.add('active');
     btn.classList.add('active');
+    pkgCur = PKG_IDS.indexOf(id);
+    // 수동 클릭 시 자동 순환 재시작
+    clearInterval(pkgAutoTimer);
+    pkgAutoTimer = setInterval(pkgAutoNext, 2000);
   }
+
+  function pkgAutoNext() {
+    pkgCur = (pkgCur + 1) % PKG_IDS.length;
+    const tabs = document.querySelectorAll('.pkg-tab');
+    switchPkg(PKG_IDS[pkgCur], tabs[pkgCur]);
+  }
+
+  pkgAutoTimer = setInterval(pkgAutoNext, 2000);
 
   // 페이드인 애니메이션
   const observer = new IntersectionObserver(entries => entries.forEach(e => {
