@@ -945,16 +945,9 @@
   <!-- 카카오 SDK -->
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
   <script>
-    window.addEventListener('load', function() {
-      if (window.Kakao && !Kakao.isInitialized()) {
-        Kakao.init('233759a22146d1c339ba19cfb1c257dc');
-      }
-    });
     function shareKakao() {
-      if (!window.Kakao || !Kakao.isInitialized()) {
-        alert('카카오 SDK가 아직 로딩 중입니다. 잠시 후 다시 눌러주세요.');
-        return;
-      }
+      if (!window.Kakao) { alert('카카오 SDK 로딩 실패. 페이지를 새로고침해주세요.'); return; }
+      if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
       Kakao.Share.sendDefault({
         objectType: 'feed',
         content: {
