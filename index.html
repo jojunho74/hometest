@@ -321,10 +321,23 @@
           </div>
 
           <h1 class="font-display leading-tight font-bold mb-6" style="font-size:clamp(2rem,5vw,3.5rem);color:#fff;">
-            취업 준비 학생의<br/>
-            <span style="background:linear-gradient(135deg,#60A5FA,#38BDF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">영어실력을 무료로</span><br/>
-            진단해드립니다
+            <span class="hero-line" id="hero-line-1" style="display:block;opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s;">취업 준비 학생의</span>
+            <span class="hero-line" id="hero-line-2" style="display:block;opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s;background:linear-gradient(135deg,#60A5FA,#38BDF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">영어실력을 무료로</span>
+            <span class="hero-line" id="hero-line-3" style="display:block;opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s;">진단해드립니다</span>
           </h1>
+          <script>
+            (function(){
+              var lines = ['hero-line-1','hero-line-2','hero-line-3'];
+              function showLines(){
+                lines.forEach(function(id){ var el=document.getElementById(id); el.style.opacity='0'; el.style.transform='translateY(16px)'; });
+                lines.forEach(function(id,i){
+                  setTimeout(function(){ var el=document.getElementById(id); el.style.opacity='1'; el.style.transform='translateY(0)'; }, i*400);
+                });
+              }
+              showLines();
+              setInterval(showLines, 3000);
+            })();
+          </script>
 
           <p class="text-base leading-relaxed mb-2 md:text-lg" style="color:rgba(255,255,255,.75);">
             국제공인영어시험 G-TELP IBT <strong style="color:#fff;">최대 200명 전액 무료 지원</strong>
