@@ -1719,37 +1719,78 @@
     let statsCharts = {};
 
     async function loadStats() {
+      // KST(UTC+9) 기준 날짜 계산
+      const now       = new Date();
+      const kstNow    = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+      const today     = kstNow.toISOString().slice(0, 10);
+      const yesterday = new Date(kstNow.getTime() - 864e5).toISOString().slice(0, 10);
+      const thisMonth = kstNow.toISOString().slice(0, 7);
+      const nextMonth = (() => {
+        const d = new Date(kstNow);
+        d.setMonth(d.getMonth() + 1);
+        return d.toISOString().slice(0, 7);
+      })();
+
+      // 전체 방문수 (count only — 1000행 제한 우회)
+      const { count: totalCount } = await db
+        .from('page_views')
+        .select('*', { count: 'exact', head: true });
+
+      // 이번달 방문수
+      const { count: monthCount } = await db
+        .from('page_views')
+        .select('*', { count: 'exact', head: true })
+        .gte('visited_at', thisMonth + '-01T00:00:00+09:00')
+        .lt('visited_at', nextMonth + '-01T00:00:00+09:00');
+
+      // 오늘 방문수
+      const { count: todayCount } = await db
+        .from('page_views')
+        .select('*', { count: 'exact', head: true })
+        .gte('visited_at', today + 'T00:00:00+09:00')
+        .lt('visited_at', today + 'T23:59:59+09:00');
+
+      // 어제 방문수
+      const { count: yesterdayCount } = await db
+        .from('page_views')
+        .select('*', { count: 'exact', head: true })
+        .gte('visited_at', yesterday + 'T00:00:00+09:00')
+        .lt('visited_at', yesterday + 'T23:59:59+09:00');
+
+      // 차트용 데이터 (최근 14일, 충분한 행)
+      const since14 = new Date(kstNow.getTime() - 13 * 864e5).toISOString().slice(0, 10);
       const { data: views, error } = await db
         .from('page_views')
         .select('page, visited_at')
-        .order('visited_at', { ascending: false });
+        .gte('visited_at', since14 + 'T00:00:00+09:00')
+        .order('visited_at', { ascending: false })
+        .limit(5000);
 
       if (error) { console.error(error); return; }
       const rows = views || [];
 
-      const now       = new Date();
-      const today     = now.toISOString().slice(0, 10);
-      const thisMonth = now.toISOString().slice(0, 7);
-      const yesterday = new Date(now - 864e5).toISOString().slice(0, 10);
-
       // 요약 카드
-      document.getElementById('stats-total-views').textContent     = rows.length;
-      document.getElementById('stats-month-views').textContent     = rows.filter(r => r.visited_at.slice(0, 7) === thisMonth).length;
-      document.getElementById('stats-today-views').textContent     = rows.filter(r => r.visited_at.slice(0, 10) === today).length;
-      document.getElementById('stats-yesterday-views').textContent = rows.filter(r => r.visited_at.slice(0, 10) === yesterday).length;
-      document.getElementById('stats-month-label').textContent     = (now.getMonth() + 1) + '월';
+      document.getElementById('stats-total-views').textContent     = (totalCount ?? 0).toLocaleString();
+      document.getElementById('stats-month-views').textContent     = (monthCount ?? 0).toLocaleString();
+      document.getElementById('stats-today-views').textContent     = (todayCount ?? 0).toLocaleString();
+      document.getElementById('stats-yesterday-views').textContent = (yesterdayCount ?? 0).toLocaleString();
+      document.getElementById('stats-month-label').textContent     = (kstNow.getMonth() + 1) + '월';
 
       // 기존 차트 파기
       Object.values(statsCharts).forEach(c => c.destroy());
       statsCharts = {};
 
-      // 일별 추이 (최근 14일)
+      // 일별 추이 (최근 14일) — KST 기준
       const dailyLabels = [], dailyCounts = [];
       for (let i = 13; i >= 0; i--) {
-        const d = new Date(now - i * 864e5);
+        const d = new Date(kstNow.getTime() - i * 864e5);
         const key = d.toISOString().slice(0, 10);
         dailyLabels.push((d.getMonth() + 1) + '/' + d.getDate());
-        dailyCounts.push(rows.filter(r => r.visited_at.slice(0, 10) === key).length);
+        // visited_at을 KST로 변환해서 날짜 비교
+        dailyCounts.push(rows.filter(r => {
+          const kst = new Date(new Date(r.visited_at).getTime() + 9 * 60 * 60 * 1000);
+          return kst.toISOString().slice(0, 10) === key;
+        }).length);
       }
 
       statsCharts.daily = new Chart(document.getElementById('chart-daily'), {
