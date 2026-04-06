@@ -249,12 +249,14 @@
     .process-number {
       width: 44px; height: 44px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #1E4D8C, #0891B2);
       color: #fff; font-weight: 800; font-size: 18px;
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 16px;
-      box-shadow: 0 4px 12px rgba(30,77,140,.3);
     }
+    .process-card:nth-child(1) .process-number { background: linear-gradient(135deg,#1E4D8C,#2563EB); box-shadow: 0 4px 12px rgba(30,77,140,.35); }
+    .process-card:nth-child(2) .process-number { background: linear-gradient(135deg,#0891B2,#06B6D4); box-shadow: 0 4px 12px rgba(8,145,178,.35); }
+    .process-card:nth-child(3) .process-number { background: linear-gradient(135deg,#D97706,#F59E0B); box-shadow: 0 4px 12px rgba(217,119,6,.35); }
+    .process-card:nth-child(4) .process-number { background: linear-gradient(135deg,#059669,#10B981); box-shadow: 0 4px 12px rgba(5,150,105,.35); }
 
     /* ── 구분선 ── */
     .section-divider {
