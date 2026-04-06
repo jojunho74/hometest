@@ -198,18 +198,18 @@
   <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
   <script>
     function shareKakao() {
-      if (!window.Kakao) { alert('카카오 SDK 로딩 실패. 페이지를 새로고침해주세요.'); return; }
-      if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
-      Kakao.Share.sendDefault({
-        objectType: 'feed',
-        content: {
-          title: '지텔프IBT 대학컨설팅 — 취업 영어실력 무료 진단',
-          description: '국제공인 G-TELP IBT 시험 최대 200명 전액 무료 지원. 대학교 취업지원센터 맞춤 프로그램.',
-          imageUrl: 'https://hometest-weld.vercel.app/Gemini_Generated_Image_cz810vcz810vcz81.png',
-          link: { mobileWebUrl: 'https://hometest-weld.vercel.app', webUrl: 'https://hometest-weld.vercel.app' }
-        },
-        buttons: [{ title: '자세히 보기', link: { mobileWebUrl: 'https://hometest-weld.vercel.app', webUrl: 'https://hometest-weld.vercel.app' } }]
-      });
+      var url = 'https://hometest-weld.vercel.app';
+      var title = '지텔프IBT 대학컨설팅 — 취업 영어실력 무료 진단';
+      var desc  = '국제공인 G-TELP IBT 시험 최대 200명 전액 무료 지원. 대학교 취업지원센터 맞춤 프로그램.';
+      if (window.Kakao) {
+        try {
+          if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
+          Kakao.Share.sendDefault({ objectType: 'feed', content: { title: title, description: desc, imageUrl: 'https://hometest-weld.vercel.app/Gemini_Generated_Image_cz810vcz810vcz81.png', link: { mobileWebUrl: url, webUrl: url } }, buttons: [{ title: '자세히 보기', link: { mobileWebUrl: url, webUrl: url } }] });
+          return;
+        } catch(e) { console.warn('Kakao SDK error:', e); }
+      }
+      if (navigator.share) { navigator.share({ title: title, text: desc, url: url }).catch(function(){}); return; }
+      navigator.clipboard.writeText(url).then(function() { alert('링크가 복사되었습니다.\n카카오톡에 붙여넣기 해주세요.'); }).catch(function() { alert('공유 URL: ' + url); });
     }
     function copyForInsta(btn) {
       navigator.clipboard.writeText('https://hometest-weld.vercel.app').then(function() {
