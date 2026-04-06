@@ -297,12 +297,12 @@
   <script>
     (function() {
       var page = window.location.pathname.split('/').pop() || 'index.html';
-      fetch('/rest/v1/page_views', {
+      fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/page_views', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'apikey': '',
-          'Authorization': 'Bearer ',
+          'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs',
+          'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs',
           'Prefer': 'return=minimal'
         },
         body: JSON.stringify({ page: page, referrer: document.referrer || null })
