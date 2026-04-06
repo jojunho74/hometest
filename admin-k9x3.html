@@ -1096,9 +1096,8 @@
       if (swapIdx < 0 || swapIdx >= newsData.length) return;
       const newOrder = [...newsData];
       [newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx], newOrder[idx]];
-      const base = Date.now();
       for (let i = 0; i < newOrder.length; i++) {
-        const { error } = await db.from('university_news').update({ sort_order: base + i }).eq('id', newOrder[i].id);
+        const { error } = await db.from('university_news').update({ sort_order: -(i + 1) }).eq('id', newOrder[i].id);
         if (error) { alert('순서 변경 실패: ' + error.message); loadNews(); return; }
       }
       for (let i = 0; i < newOrder.length; i++) {
@@ -1225,9 +1224,8 @@
       if (swapIdx < 0 || swapIdx >= shortsData.length) return;
       const newOrder = [...shortsData];
       [newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx], newOrder[idx]];
-      const base = Date.now();
       for (let i = 0; i < newOrder.length; i++) {
-        const { error } = await db.from('youtube_shorts').update({ sort_order: base + i }).eq('id', newOrder[i].id);
+        const { error } = await db.from('youtube_shorts').update({ sort_order: -(i + 1) }).eq('id', newOrder[i].id);
         if (error) { alert('순서 변경 실패: ' + error.message); loadShorts(); return; }
       }
       for (let i = 0; i < newOrder.length; i++) {
@@ -1297,9 +1295,8 @@
       if (swapIdx < 0 || swapIdx >= cnewsData.length) return;
       const newOrder = [...cnewsData];
       [newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx], newOrder[idx]];
-      const base = Date.now();
       for (let i = 0; i < newOrder.length; i++) {
-        const { error } = await db.from('company_news').update({ sort_order: base + i }).eq('id', newOrder[i].id);
+        const { error } = await db.from('company_news').update({ sort_order: -(i + 1) }).eq('id', newOrder[i].id);
         if (error) { alert('순서 변경 실패: ' + error.message); loadCNews(); return; }
       }
       for (let i = 0; i < newOrder.length; i++) {
@@ -1432,9 +1429,8 @@
       if (swapIdx < 0 || swapIdx >= progData.length) return;
       const newOrder = [...progData];
       [newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx], newOrder[idx]];
-      const base = Date.now();
       for (let i = 0; i < newOrder.length; i++) {
-        const { error } = await db.from('school_programs').update({ sort_order: base + i }).eq('id', newOrder[i].id);
+        const { error } = await db.from('school_programs').update({ sort_order: -(i + 1) }).eq('id', newOrder[i].id);
         if (error) { alert('순서 변경 실패: ' + error.message); loadPrograms(); return; }
       }
       for (let i = 0; i < newOrder.length; i++) {
@@ -1586,10 +1582,8 @@
       const tmp = newOrder[idx];
       newOrder[idx] = newOrder[swapIdx];
       newOrder[swapIdx] = tmp;
-      // 큰 offset 기반으로 먼저 써서 충돌 회피 후 정리
-      const base = Date.now();
       for (let i = 0; i < newOrder.length; i++) {
-        const { error } = await db.from('job_postings').update({ sort_order: base + i }).eq('id', newOrder[i].id);
+        const { error } = await db.from('job_postings').update({ sort_order: -(i + 1) }).eq('id', newOrder[i].id);
         if (error) { alert('순서 변경 실패: ' + error.message); loadJobs(); return; }
       }
       for (let i = 0; i < newOrder.length; i++) {
