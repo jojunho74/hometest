@@ -1094,16 +1094,16 @@
     async function moveNews(idx, dir) {
       const swapIdx = idx + dir;
       if (swapIdx < 0 || swapIdx >= newsData.length) return;
-      const a = newsData[idx];
-      const b = newsData[swapIdx];
-      // 임시값으로 충돌 방지 후 순차 교환
-      const tempOrder = Date.now();
-      const r1 = await db.from('university_news').update({ sort_order: tempOrder }).eq('id', a.id);
-      if (r1.error) { alert('순서 변경 실패: ' + r1.error.message); return; }
-      const r2 = await db.from('university_news').update({ sort_order: a.sort_order }).eq('id', b.id);
-      if (r2.error) { alert('순서 변경 실패: ' + r2.error.message); return; }
-      const r3 = await db.from('university_news').update({ sort_order: b.sort_order }).eq('id', a.id);
-      if (r3.error) { alert('순서 변경 실패: ' + r3.error.message); return; }
+      const newOrder = [...newsData];
+      [newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx], newOrder[idx]];
+      const base = Date.now();
+      for (let i = 0; i < newOrder.length; i++) {
+        const { error } = await db.from('university_news').update({ sort_order: base + i }).eq('id', newOrder[i].id);
+        if (error) { alert('순서 변경 실패: ' + error.message); loadNews(); return; }
+      }
+      for (let i = 0; i < newOrder.length; i++) {
+        await db.from('university_news').update({ sort_order: i + 1 }).eq('id', newOrder[i].id);
+      }
       loadNews();
     }
 
@@ -1223,11 +1223,16 @@
     async function moveShort(idx, dir) {
       const swapIdx = idx + dir;
       if (swapIdx < 0 || swapIdx >= shortsData.length) return;
-      const a = shortsData[idx], b = shortsData[swapIdx];
-      const temp = Date.now();
-      await db.from('youtube_shorts').update({ sort_order: temp }).eq('id', a.id);
-      await db.from('youtube_shorts').update({ sort_order: a.sort_order }).eq('id', b.id);
-      await db.from('youtube_shorts').update({ sort_order: b.sort_order }).eq('id', a.id);
+      const newOrder = [...shortsData];
+      [newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx], newOrder[idx]];
+      const base = Date.now();
+      for (let i = 0; i < newOrder.length; i++) {
+        const { error } = await db.from('youtube_shorts').update({ sort_order: base + i }).eq('id', newOrder[i].id);
+        if (error) { alert('순서 변경 실패: ' + error.message); loadShorts(); return; }
+      }
+      for (let i = 0; i < newOrder.length; i++) {
+        await db.from('youtube_shorts').update({ sort_order: i + 1 }).eq('id', newOrder[i].id);
+      }
       loadShorts();
     }
 
@@ -1290,11 +1295,16 @@
     async function moveCNews(idx, dir) {
       const swapIdx = idx + dir;
       if (swapIdx < 0 || swapIdx >= cnewsData.length) return;
-      const a = cnewsData[idx], b = cnewsData[swapIdx];
-      const temp = Date.now();
-      await db.from('company_news').update({ sort_order: temp }).eq('id', a.id);
-      await db.from('company_news').update({ sort_order: a.sort_order }).eq('id', b.id);
-      await db.from('company_news').update({ sort_order: b.sort_order }).eq('id', a.id);
+      const newOrder = [...cnewsData];
+      [newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx], newOrder[idx]];
+      const base = Date.now();
+      for (let i = 0; i < newOrder.length; i++) {
+        const { error } = await db.from('company_news').update({ sort_order: base + i }).eq('id', newOrder[i].id);
+        if (error) { alert('순서 변경 실패: ' + error.message); loadCNews(); return; }
+      }
+      for (let i = 0; i < newOrder.length; i++) {
+        await db.from('company_news').update({ sort_order: i + 1 }).eq('id', newOrder[i].id);
+      }
       loadCNews();
     }
 
@@ -1420,12 +1430,16 @@
     async function moveProgram(idx, dir) {
       const swapIdx = idx + dir;
       if (swapIdx < 0 || swapIdx >= progData.length) return;
-      const a = progData[idx], b = progData[swapIdx];
-      const temp = Date.now();
-      const r1 = await db.from('school_programs').update({ sort_order: temp }).eq('id', a.id);
-      if (r1.error) { alert('순서 변경 실패: ' + r1.error.message); return; }
-      await db.from('school_programs').update({ sort_order: a.sort_order }).eq('id', b.id);
-      await db.from('school_programs').update({ sort_order: b.sort_order }).eq('id', a.id);
+      const newOrder = [...progData];
+      [newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx], newOrder[idx]];
+      const base = Date.now();
+      for (let i = 0; i < newOrder.length; i++) {
+        const { error } = await db.from('school_programs').update({ sort_order: base + i }).eq('id', newOrder[i].id);
+        if (error) { alert('순서 변경 실패: ' + error.message); loadPrograms(); return; }
+      }
+      for (let i = 0; i < newOrder.length; i++) {
+        await db.from('school_programs').update({ sort_order: i + 1 }).eq('id', newOrder[i].id);
+      }
       loadPrograms();
     }
 
@@ -1567,14 +1581,21 @@
     async function moveJob(idx, dir) {
       const swapIdx = idx + dir;
       if (swapIdx < 0 || swapIdx >= jobData.length) return;
-      const a = jobData[idx], b = jobData[swapIdx];
-      const tempOrder = Date.now();
-      const r1 = await db.from('job_postings').update({ sort_order: tempOrder }).eq('id', a.id);
-      if (r1.error) { alert('순서 변경 실패: ' + r1.error.message); return; }
-      const r2 = await db.from('job_postings').update({ sort_order: a.sort_order }).eq('id', b.id);
-      if (r2.error) { alert('순서 변경 실패: ' + r2.error.message); return; }
-      const r3 = await db.from('job_postings').update({ sort_order: b.sort_order }).eq('id', a.id);
-      if (r3.error) { alert('순서 변경 실패: ' + r3.error.message); return; }
+      // 배열에서 먼저 순서 변경 후 인덱스 기반으로 일괄 업데이트 (unique constraint 충돌 방지)
+      const newOrder = [...jobData];
+      const tmp = newOrder[idx];
+      newOrder[idx] = newOrder[swapIdx];
+      newOrder[swapIdx] = tmp;
+      // 큰 offset 기반으로 먼저 써서 충돌 회피 후 정리
+      const base = Date.now();
+      for (let i = 0; i < newOrder.length; i++) {
+        const { error } = await db.from('job_postings').update({ sort_order: base + i }).eq('id', newOrder[i].id);
+        if (error) { alert('순서 변경 실패: ' + error.message); loadJobs(); return; }
+      }
+      for (let i = 0; i < newOrder.length; i++) {
+        const { error } = await db.from('job_postings').update({ sort_order: i + 1 }).eq('id', newOrder[i].id);
+        if (error) { alert('순서 변경 실패: ' + error.message); loadJobs(); return; }
+      }
       loadJobs();
     }
 
