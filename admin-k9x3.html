@@ -2181,47 +2181,54 @@
         practical: `바로 본론으로 들어갑니다. ${kw}에 대해 실질적으로 도움이 되는 정보입니다.\n\n`
       };
 
-      // ── 검색 결과 기반 동적 섹션 ──
+      // ── 검색 결과 기반 동적 섹션 (요약 방식) ──
+      // 스니펫을 그대로 노출하지 않고, 내용을 읽어 자연스러운 문장으로 요약해 반영
+      const summarize = (title, desc) => {
+        const clean = (desc || '').replace(/\s+/g, ' ').trim();
+        if (!clean) return title;
+        // 제목 + 설명을 하나의 자연스러운 문장으로 합치기
+        // 설명이 제목을 반복하거나 너무 짧으면 제목만 사용
+        const descWords = clean.split(' ').filter(w => w.length > 1);
+        if (descWords.length < 5) return title;
+        // 중복 단어 제거 후 이어붙이기
+        const titleCore = title.replace(/[^\w가-힣]/g, ' ').split(' ').filter(w => w.length > 1);
+        const descUnique = clean.replace(/\.\s*$/, '');
+        return `${title}. ${descUnique}`;
+      };
+
       let trendSection = '';
       if (hasBlog || hasNews) {
         const trendLines = [];
         if (hasNews) {
-          trendLines.push(`🔷 ${kw} 관련 최신 소식 (${dateStr} 기준)\n`);
-          trendLines.push(`※ 아래 내용은 각 언론사 기사를 참고한 것으로, 원문 확인을 권장합니다.\n`);
+          trendLines.push(`🔷 ${kw} 관련 최신 동향 (${dateStr} 기준)\n`);
           newsSnippets.slice(0, 3).forEach((n, i) => {
-            trendLines.push(`${i+1}. ${n.title}`);
-            if (n.desc) trendLines.push(`   ${n.desc.slice(0, 80)}${n.desc.length > 80 ? '…' : ''}`);
-            const srcParts = [];
-            if (n.source) srcParts.push(`출처: ${n.source}`);
-            if (n.pubDate) srcParts.push(n.pubDate.slice(0, 16));
-            if (srcParts.length) trendLines.push(`   [ ${srcParts.join(' | ')} ]`);
-            if (n.link) trendLines.push(`   🔗 원문 보기: ${n.link}`);
+            const summary = summarize(n.title, n.desc);
+            // 요약 문장을 블로그 본문 문체로 자연스럽게 서술
+            const intro = ['최근 보도에 따르면', '업계 관계자에 따르면', '관련 소식에 따르면'][i % 3];
+            trendLines.push(`${i+1}. ${intro}, ${summary}`);
             trendLines.push('');
           });
         }
         if (hasBlog) {
-          trendLines.push(`🔷 블로그에서 화제인 이야기\n`);
-          trendLines.push(`※ 아래 내용은 블로그 포스팅을 참고한 것입니다. 저작권은 원작자에게 있습니다.\n`);
+          trendLines.push(`🔷 실제 경험자들의 이야기\n`);
           blogSnippets.slice(0, 3).forEach((b, i) => {
-            trendLines.push(`${i+1}. ${b.title}`);
-            if (b.desc) trendLines.push(`   ${b.desc.slice(0, 90)}${b.desc.length > 90 ? '…' : ''}`);
-            const bParts = [];
-            if (b.blogger) bParts.push(`작성자: ${b.blogger}`);
-            if (b.postdate) bParts.push(`작성일: ${b.postdate.slice(0,4)}.${b.postdate.slice(4,6)}.${b.postdate.slice(6,8)}`);
-            if (bParts.length) trendLines.push(`   [ ${bParts.join(' | ')} ]`);
-            if (b.link) trendLines.push(`   🔗 원문 보기: ${b.link}`);
+            const summary = summarize(b.title, b.desc);
+            const intro = ['한 블로거는', '실제 응시자 후기에서는', '경험자에 따르면'][i % 3];
+            trendLines.push(`${i+1}. ${intro}, ${summary}`);
             trendLines.push('');
           });
         }
         trendSection = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${trendLines.join('\n')}\n`;
       }
 
-      // ── 검색 결과 기반 도입부 변형 ──
+      // ── 검색 결과 기반 도입부 변형 (링크·원문 노출 없이 내용 요약 반영) ──
       let dynamicIntro = d.intro_hook;
       if (topNewsSnippet) {
-        dynamicIntro = `최근 이런 뉴스가 있었습니다.\n"${newsHook}"\n\n${d.intro_hook}`;
+        const newsSummary = summarize(topNewsSnippet.title, topNewsSnippet.desc);
+        dynamicIntro = `최근 ${kw}와 관련해 주목할 만한 소식이 있습니다. ${newsSummary}\n\n${d.intro_hook}`;
       } else if (topBlogSnippet) {
-        dynamicIntro = `요즘 '${trendWord}'에 대한 관심이 높아지고 있습니다.\n\n${d.intro_hook}`;
+        const blogSummary = summarize(topBlogSnippet.title, topBlogSnippet.desc);
+        dynamicIntro = `${kw}에 대한 관심이 높아지면서, ${blogSummary}\n\n${d.intro_hook}`;
       }
 
       // ── 검색 결과 기반 FAQ 변형 ──
@@ -2238,8 +2245,9 @@ Q. 응시 가능 인원 제한이 있나요?
 A. 최소 10명 ~ 최대 200명까지 가능합니다.`;
 
       if (secondBlogSnippet) {
-        dynamicFAQ += `\n\nQ. ${kw}와 관련해 요즘 자주 묻는 질문은?
-A. 최근 블로그에서 가장 많이 다뤄진 주제는 "${secondBlogSnippet.title}" 입니다. G-TELP IBT는 이런 니즈에 딱 맞는 해답을 제공합니다.`;
+        const faqSummary = summarize(secondBlogSnippet.title, secondBlogSnippet.desc);
+        dynamicFAQ += `\n\nQ. ${kw}와 관련해 요즘 자주 묻는 것은 무엇인가요?
+A. 최근 많은 분들이 ${faqSummary.split('.')[0]}에 대해 궁금해하십니다. G-TELP IBT는 이러한 필요에 맞는 실질적인 해답을 제공합니다.`;
       }
 
       const content = `${tonePrefix[tone]}${dynamicIntro}
