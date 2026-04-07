@@ -753,7 +753,11 @@
               </select>
             </div>
           </div>
-          <button onclick="generateBlog()" class="btn btn-primary w-full md:w-auto px-8">🤖 원고 생성</button>
+          <button onclick="generateBlog()" id="btn-generate" class="btn btn-primary w-full md:w-auto px-8">🤖 원고 생성</button>
+          <div id="blog-search-status" class="hidden mt-3 text-sm text-slate-500 flex items-center gap-2">
+            <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+            <span id="blog-search-msg">네이버에서 최신 정보 검색 중...</span>
+          </div>
         </div>
 
         <!-- 생성된 원고 편집 -->
@@ -2026,42 +2030,86 @@
 
     // ─── 블로그 원고 생성 ───
 
-    function generateBlog() {
-      const audience  = document.getElementById('blog-audience').value;
-      const keyword   = document.getElementById('blog-keyword').value.trim() || 'G-TELP IBT';
-      const subtopic  = document.getElementById('blog-subtopic').value.trim();
-      const tone      = document.getElementById('blog-tone').value;
+    async function generateBlog() {
+      const audience   = document.getElementById('blog-audience').value;
+      const keyword    = document.getElementById('blog-keyword').value.trim() || 'G-TELP IBT';
+      const subtopic   = document.getElementById('blog-subtopic').value.trim();
+      const tone       = document.getElementById('blog-tone').value;
       const titleStyle = document.getElementById('blog-title-style').value;
 
-      const today = new Date();
+      const today   = new Date();
       const dateStr = `${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일`;
-      const year = today.getFullYear();
+      const year    = today.getFullYear();
 
-      const result = buildBlogPost({ audience, keyword, subtopic, tone, titleStyle, dateStr, year });
-      document.getElementById('blog-title-out').value = result.title;
+      // UI 로딩 상태
+      const btn = document.getElementById('btn-generate');
+      const statusEl = document.getElementById('blog-search-status');
+      const msgEl    = document.getElementById('blog-search-msg');
+      btn.disabled = true; btn.textContent = '검색 중...';
+      statusEl.classList.remove('hidden');
+
+      // 네이버 검색 (블로그 + 뉴스 병렬)
+      let blogItems = [], newsItems = [];
+      const searchQ = `${keyword} ${subtopic || 'G-TELP IBT'}`;
+      try {
+        msgEl.textContent = `"${searchQ}" 블로그·뉴스 검색 중...`;
+        const [blogRes, newsRes] = await Promise.all([
+          fetch(`/api/naver-search?query=${encodeURIComponent(searchQ)}&type=blog`).then(r => r.json()).catch(() => ({})),
+          fetch(`/api/naver-search?query=${encodeURIComponent(searchQ + ' 취업')}&type=news`).then(r => r.json()).catch(() => ({}))
+        ]);
+        blogItems = (blogRes.items || []).slice(0, 4);
+        newsItems = (newsRes.items || []).slice(0, 3);
+        msgEl.textContent = `검색 완료 — 블로그 ${blogItems.length}건, 뉴스 ${newsItems.length}건 반영 중...`;
+      } catch(e) {
+        msgEl.textContent = '검색 실패 — 기본 템플릿으로 생성합니다.';
+      }
+
+      const result = buildBlogPost({ audience, keyword, subtopic, tone, titleStyle, dateStr, year, blogItems, newsItems });
+      document.getElementById('blog-title-out').value   = result.title;
       document.getElementById('blog-content-out').value = result.content;
       document.getElementById('blog-editor-wrap').classList.remove('hidden');
+
+      btn.disabled = false; btn.textContent = '🤖 원고 생성';
+      statusEl.classList.add('hidden');
       document.getElementById('blog-editor-wrap').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function buildBlogPost({ audience, keyword, subtopic, tone, titleStyle, dateStr, year }) {
+    function buildBlogPost({ audience, keyword, subtopic, tone, titleStyle, dateStr, year, blogItems = [], newsItems = [] }) {
       const kw = keyword;
       const sub = subtopic ? ` ${subtopic}` : '';
 
-      // ── 제목 생성 ──
+      // ── 검색 결과에서 텍스트 추출 헬퍼 ──
+      const stripHtml = s => (s || '').replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'");
+      const blogSnippets = blogItems.map(it => ({ title: stripHtml(it.title), desc: stripHtml(it.description) }));
+      const newsSnippets = newsItems.map(it => ({ title: stripHtml(it.title), desc: stripHtml(it.description) }));
+
+      // ── 검색 결과 기반 동적 트렌드 섹션 ──
+      const hasBlog = blogSnippets.length > 0;
+      const hasNews = newsSnippets.length > 0;
+
+      // 검색 결과 중 가장 정보량 많은 2개 snippet 선택
+      const topBlogSnippet = hasBlog ? blogSnippets[0] : null;
+      const secondBlogSnippet = hasBlog && blogSnippets.length > 1 ? blogSnippets[1] : null;
+      const topNewsSnippet = hasNews ? newsSnippets[0] : null;
+
+      // 다양한 제목 변형을 위해 검색 결과의 키워드 반영
+      const trendWord = topBlogSnippet ? topBlogSnippet.title.split(' ').slice(0,3).join(' ') : kw;
+      const newsHook  = topNewsSnippet ? topNewsSnippet.title : `${kw} 관련 최신 동향`;
+
+      // ── 제목 생성 (검색 결과 반영해 날짜·트렌드 포함) ──
       const titles = {
         university: {
-          question: `취업지원센터에서 무료로 영어실력 진단이 가능하다고요? G-TELP IBT 도입 방법`,
-          number:   `대학 취업지원센터 담당자가 알아야 할 G-TELP IBT 5가지 핵심 사항`,
+          question: `취업지원센터에서 무료로 영어실력 진단이 가능하다고요? G-TELP IBT 도입 방법 [${dateStr}]`,
+          number:   `대학 취업지원센터 담당자가 알아야 할 G-TELP IBT 5가지 핵심 사항 — ${kw}`,
           benefit:  `코드 배포만 하면 끝! 취업지원센터 업무 최소화하는 G-TELP IBT 활용법`
         },
         student: {
           question: `취업 준비 중인데 영어 성적이 없다고요? G-TELP IBT로 무료 진단 받는 법`,
           number:   `졸업 전 꼭 알아야 할 G-TELP IBT 활용법 5가지 — ${kw} 완벽 정리`,
-          benefit:  `공공기관·대기업 취업에 유리한 영어 성적, G-TELP IBT로 무료로 받는 방법`
+          benefit:  `공공기관·대기업 취업에 유리한 영어 성적, G-TELP IBT로 무료로 받는 방법 [${year}년판]`
         },
         examinee: {
-          question: `G-TELP 32점, 65점, 75점… 목표 점수별 공략법이 다르다고요?`,
+          question: `G-TELP 32점, 65점, 75점… 목표 점수별 공략법이 다르다고요? ${kw} 정리`,
           number:   `G-TELP IBT 고득점을 위한 파트별 핵심 전략 5가지 — ${kw} 총정리`,
           benefit:  `G-TELP IBT 단기간에 목표 점수 달성하는 실전 학습법 — ${kw}${sub}`
         }
@@ -2127,12 +2175,61 @@
 
       // ── 톤별 인트로 접두어 ──
       const tonePrefix = {
-        info:      `[ ${dateStr} 기준 정보 ]\n\n`,
+        info:      `[ ${dateStr} 기준 최신 정보 ]\n\n`,
         story:     `안녕하세요! 오늘은 ${d.target_users}을(를) 위한 꼭 필요한 정보를 가져왔습니다.\n\n`,
         practical: `바로 본론으로 들어갑니다. ${kw}에 대해 실질적으로 도움이 되는 정보입니다.\n\n`
       };
 
-      const content = `${tonePrefix[tone]}${d.intro_hook}
+      // ── 검색 결과 기반 동적 섹션 ──
+      let trendSection = '';
+      if (hasBlog || hasNews) {
+        const trendLines = [];
+        if (hasNews) {
+          trendLines.push(`🔷 ${kw} 관련 최신 소식 (${dateStr})\n`);
+          newsSnippets.slice(0, 3).forEach((n, i) => {
+            trendLines.push(`${i+1}. ${n.title}`);
+            if (n.desc) trendLines.push(`   → ${n.desc.slice(0, 80)}${n.desc.length > 80 ? '…' : ''}`);
+          });
+          trendLines.push('');
+        }
+        if (hasBlog) {
+          trendLines.push(`🔷 블로그에서 화제인 이야기\n`);
+          blogSnippets.slice(0, 3).forEach((b, i) => {
+            trendLines.push(`${i+1}. ${b.title}`);
+            if (b.desc) trendLines.push(`   → ${b.desc.slice(0, 90)}${b.desc.length > 90 ? '…' : ''}`);
+          });
+          trendLines.push('');
+        }
+        trendSection = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${trendLines.join('\n')}\n`;
+      }
+
+      // ── 검색 결과 기반 도입부 변형 ──
+      let dynamicIntro = d.intro_hook;
+      if (topNewsSnippet) {
+        dynamicIntro = `최근 이런 뉴스가 있었습니다.\n"${newsHook}"\n\n${d.intro_hook}`;
+      } else if (topBlogSnippet) {
+        dynamicIntro = `요즘 '${trendWord}'에 대한 관심이 높아지고 있습니다.\n\n${d.intro_hook}`;
+      }
+
+      // ── 검색 결과 기반 FAQ 변형 ──
+      let dynamicFAQ = `Q. 정말 무료인가요?
+A. 네, 대학교 취업지원센터를 통해 신청하면 응시료가 전혀 없습니다.
+
+Q. 성적표는 언제 받나요?
+A. IBT 특성상 시험 직후 즉시 확인 가능합니다.
+
+Q. 어떤 기관에서 인정하나요?
+A. 공공기관, 정부부처, 일반 기업 및 대학원 입학 등 다양한 목적으로 활용됩니다.
+
+Q. 응시 가능 인원 제한이 있나요?
+A. 최소 10명 ~ 최대 200명까지 가능합니다.`;
+
+      if (secondBlogSnippet) {
+        dynamicFAQ += `\n\nQ. ${kw}와 관련해 요즘 자주 묻는 질문은?
+A. 최근 블로그에서 가장 많이 다뤄진 주제는 "${secondBlogSnippet.title}" 입니다. G-TELP IBT는 이런 니즈에 딱 맞는 해답을 제공합니다.`;
+      }
+
+      const content = `${tonePrefix[tone]}${dynamicIntro}
 
 ${d.pain}
 
@@ -2158,19 +2255,9 @@ ${d.process}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🔷 자주 묻는 질문 (FAQ)
+${trendSection}🔷 자주 묻는 질문 (FAQ)
 
-Q. 정말 무료인가요?
-A. 네, 대학교 취업지원센터를 통해 신청하면 응시료가 전혀 없습니다.
-
-Q. 성적표는 언제 받나요?
-A. IBT 특성상 시험 직후 즉시 확인 가능합니다.
-
-Q. 어떤 기관에서 인정하나요?
-A. 공공기관, 정부부처, 일반 기업 및 대학원 입학 등 다양한 목적으로 활용됩니다.
-
-Q. 응시 가능 인원 제한이 있나요?
-A. 최소 10명 ~ 최대 200명까지 가능합니다.
+${dynamicFAQ}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
