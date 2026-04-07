@@ -2196,6 +2196,18 @@
         return `${title}. ${descUnique}`;
       };
 
+      // 뉴스 아이템 → 위트 있고 길게 쓰는 헬퍼
+      const wittyNewsIntros = [
+        `자, 잠깐요. 오늘 아침 커피 한 잔 마시다가 눈에 확 들어온 뉴스가 있어요.`,
+        `솔직히 말할게요. 이 소식 접하고 저 혼자 "오…!" 했습니다.`,
+        `요즘 세상 돌아가는 거 보면 참 빠르죠. 이런 소식도 있더라고요.`
+      ];
+      const wittyNewsComments = [
+        [`왜 이게 중요하냐고요? 단순히 '뉴스니까 봐야지' 수준이 아닙니다.`, `이게 ${kw}와 연결되는 지점이 있거든요. 생각보다 가까운 이야기예요.`, `별거 아닌 것처럼 보여도, 실제로 취업·졸업인증 준비하는 분들한테는 꽤 중요한 시그널입니다.`],
+        [`처음 봤을 때 '이게 나랑 무슨 상관?' 싶으셨을 수도 있어요.`, `근데 한 번만 더 생각해보면, 결국 ${kw}를 준비하는 분들한테 직접적으로 닿는 이야기입니다.`, `요즘 트렌드가 이쪽으로 움직이고 있다는 신호이기도 하고요.`],
+        [`이런 소식이 나온다는 건, 시장이 바뀌고 있다는 뜻이기도 해요.`, `미리 알고 있는 것과 모르는 것의 차이가 생각보다 크거든요.`, `이 흐름을 파악한 분들이 결국 한 발 앞서가는 거 아닐까요?`]
+      ];
+
       let trendSection = '';
       if (hasBlog || hasNews) {
         const trendLines = [];
@@ -2203,9 +2215,16 @@
           trendLines.push(`🔷 ${kw} 관련 최신 동향 (${dateStr} 기준)\n`);
           newsSnippets.slice(0, 3).forEach((n, i) => {
             const summary = summarize(n.title, n.desc);
-            // 요약 문장을 블로그 본문 문체로 자연스럽게 서술
-            const intro = ['최근 보도에 따르면', '업계 관계자에 따르면', '관련 소식에 따르면'][i % 3];
-            trendLines.push(`${i+1}. ${intro}, ${summary}`);
+            const intro   = wittyNewsIntros[i % wittyNewsIntros.length];
+            const comments = wittyNewsComments[i % wittyNewsComments.length];
+            // 뉴스 아이템을 위트 있는 여러 문장으로 풀어쓰기
+            trendLines.push(`📌 ${intro}`);
+            trendLines.push('');
+            trendLines.push(`${summary}`);
+            trendLines.push('');
+            trendLines.push(comments[0]);
+            trendLines.push(comments[1]);
+            trendLines.push(comments[2]);
             trendLines.push('');
           });
         }
@@ -2213,8 +2232,14 @@
           trendLines.push(`🔷 실제 경험자들의 이야기\n`);
           blogSnippets.slice(0, 3).forEach((b, i) => {
             const summary = summarize(b.title, b.desc);
-            const intro = ['한 블로거는', '실제 응시자 후기에서는', '경험자에 따르면'][i % 3];
-            trendLines.push(`${i+1}. ${intro}, ${summary}`);
+            const reactions = [
+              `읽으면서 "맞아, 나도 그랬는데" 하실 분들 분명 있을 거예요.`,
+              `이런 후기 하나하나가 사실 엄청난 공부 자료가 되거든요.`,
+              `경험자의 말은 어떤 교재보다 솔직하죠. 귀 기울여볼 만합니다.`
+            ];
+            trendLines.push(`💬 ${reactions[i % reactions.length]}`);
+            trendLines.push('');
+            trendLines.push(summary);
             trendLines.push('');
           });
         }
