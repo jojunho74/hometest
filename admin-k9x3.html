@@ -2080,8 +2080,8 @@
 
       // ── 검색 결과에서 텍스트 추출 헬퍼 ──
       const stripHtml = s => (s || '').replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'");
-      const blogSnippets = blogItems.map(it => ({ title: stripHtml(it.title), desc: stripHtml(it.description) }));
-      const newsSnippets = newsItems.map(it => ({ title: stripHtml(it.title), desc: stripHtml(it.description) }));
+      const blogSnippets = blogItems.map(it => ({ title: stripHtml(it.title), desc: stripHtml(it.description), link: it.link || it.bloggerlink || '' }));
+      const newsSnippets = newsItems.map(it => ({ title: stripHtml(it.title), desc: stripHtml(it.description), link: it.originallink || it.link || '' }));
 
       // ── 검색 결과 기반 동적 트렌드 섹션 ──
       const hasBlog = blogSnippets.length > 0;
@@ -2189,6 +2189,7 @@
           newsSnippets.slice(0, 3).forEach((n, i) => {
             trendLines.push(`${i+1}. ${n.title}`);
             if (n.desc) trendLines.push(`   → ${n.desc.slice(0, 80)}${n.desc.length > 80 ? '…' : ''}`);
+            if (n.link) trendLines.push(`   🔗 ${n.link}`);
           });
           trendLines.push('');
         }
@@ -2197,6 +2198,7 @@
           blogSnippets.slice(0, 3).forEach((b, i) => {
             trendLines.push(`${i+1}. ${b.title}`);
             if (b.desc) trendLines.push(`   → ${b.desc.slice(0, 90)}${b.desc.length > 90 ? '…' : ''}`);
+            if (b.link) trendLines.push(`   🔗 ${b.link}`);
           });
           trendLines.push('');
         }
