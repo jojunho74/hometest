@@ -2080,8 +2080,9 @@
 
       // ── 검색 결과에서 텍스트 추출 헬퍼 ──
       const stripHtml = s => (s || '').replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'");
-      const blogSnippets = blogItems.map(it => ({ title: stripHtml(it.title), desc: stripHtml(it.description), link: it.link || it.bloggerlink || '' }));
-      const newsSnippets = newsItems.map(it => ({ title: stripHtml(it.title), desc: stripHtml(it.description), link: it.originallink || it.link || '' }));
+      const getDomain = url => { try { return new URL(url).hostname.replace('www.',''); } catch { return ''; } };
+      const blogSnippets = blogItems.map(it => ({ title: stripHtml(it.title), desc: stripHtml(it.description), link: it.link || it.bloggerlink || '', blogger: stripHtml(it.bloggername || ''), postdate: it.postdate || '' }));
+      const newsSnippets = newsItems.map(it => ({ title: stripHtml(it.title), desc: stripHtml(it.description), link: it.originallink || it.link || '', source: getDomain(it.originallink || it.link || ''), pubDate: it.pubDate || '' }));
 
       // ── 검색 결과 기반 동적 트렌드 섹션 ──
       const hasBlog = blogSnippets.length > 0;
@@ -2185,22 +2186,32 @@
       if (hasBlog || hasNews) {
         const trendLines = [];
         if (hasNews) {
-          trendLines.push(`🔷 ${kw} 관련 최신 소식 (${dateStr})\n`);
+          trendLines.push(`🔷 ${kw} 관련 최신 소식 (${dateStr} 기준)\n`);
+          trendLines.push(`※ 아래 내용은 각 언론사 기사를 참고한 것으로, 원문 확인을 권장합니다.\n`);
           newsSnippets.slice(0, 3).forEach((n, i) => {
             trendLines.push(`${i+1}. ${n.title}`);
-            if (n.desc) trendLines.push(`   → ${n.desc.slice(0, 80)}${n.desc.length > 80 ? '…' : ''}`);
-            if (n.link) trendLines.push(`   🔗 ${n.link}`);
+            if (n.desc) trendLines.push(`   ${n.desc.slice(0, 80)}${n.desc.length > 80 ? '…' : ''}`);
+            const srcParts = [];
+            if (n.source) srcParts.push(`출처: ${n.source}`);
+            if (n.pubDate) srcParts.push(n.pubDate.slice(0, 16));
+            if (srcParts.length) trendLines.push(`   [ ${srcParts.join(' | ')} ]`);
+            if (n.link) trendLines.push(`   🔗 원문 보기: ${n.link}`);
+            trendLines.push('');
           });
-          trendLines.push('');
         }
         if (hasBlog) {
           trendLines.push(`🔷 블로그에서 화제인 이야기\n`);
+          trendLines.push(`※ 아래 내용은 블로그 포스팅을 참고한 것입니다. 저작권은 원작자에게 있습니다.\n`);
           blogSnippets.slice(0, 3).forEach((b, i) => {
             trendLines.push(`${i+1}. ${b.title}`);
-            if (b.desc) trendLines.push(`   → ${b.desc.slice(0, 90)}${b.desc.length > 90 ? '…' : ''}`);
-            if (b.link) trendLines.push(`   🔗 ${b.link}`);
+            if (b.desc) trendLines.push(`   ${b.desc.slice(0, 90)}${b.desc.length > 90 ? '…' : ''}`);
+            const bParts = [];
+            if (b.blogger) bParts.push(`작성자: ${b.blogger}`);
+            if (b.postdate) bParts.push(`작성일: ${b.postdate.slice(0,4)}.${b.postdate.slice(4,6)}.${b.postdate.slice(6,8)}`);
+            if (bParts.length) trendLines.push(`   [ ${bParts.join(' | ')} ]`);
+            if (b.link) trendLines.push(`   🔗 원문 보기: ${b.link}`);
+            trendLines.push('');
           });
-          trendLines.push('');
         }
         trendSection = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${trendLines.join('\n')}\n`;
       }
