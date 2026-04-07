@@ -133,6 +133,7 @@
         <button onclick="switchTab('cnews')"   id="tab-cnews"   class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">기업소식</button>
         <button onclick="switchTab('shorts')"  id="tab-shorts"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">유튜브쇼츠</button>
         <button onclick="switchTab('stats')"   id="tab-stats"   class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">통계</button>
+        <button onclick="switchTab('blog')"    id="tab-blog"    class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">블로그 원고</button>
       </div>
 
       <!-- ── 신청 관리 탭 ── -->
@@ -710,6 +711,87 @@
 
       </div>
 
+      <!-- ── 블로그 원고 탭 ── -->
+      <div id="section-blog" class="hidden">
+
+        <!-- 원고 생성 폼 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 class="font-bold text-slate-700 mb-5 text-base">✍️ AI 블로그 원고 생성</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">대상 독자</label>
+              <select id="blog-audience" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                <option value="university">🏫 대학관계자 / 교수</option>
+                <option value="student">🎓 대학생 / 졸업생</option>
+                <option value="examinee">📝 G-TELP 수험자</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">주제 키워드</label>
+              <input id="blog-keyword" type="text" placeholder="예: 취업 영어, 졸업인증, 점수 향상" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">글 톤</label>
+              <select id="blog-tone" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                <option value="info">📊 정보성 (데이터 중심)</option>
+                <option value="story">💬 공감형 (스토리텔링)</option>
+                <option value="practical">🛠️ 실용적 (방법 안내)</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">세부 주제 (선택)</label>
+              <input id="blog-subtopic" type="text" placeholder="예: 대학원 진학, 공공기관 채용, 32점 달성" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">제목 스타일</label>
+              <select id="blog-title-style" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                <option value="question">❓ 질문형 (궁금증 유발)</option>
+                <option value="number">🔢 숫자형 (5가지 방법)</option>
+                <option value="benefit">✅ 혜택형 (무료로 가능한)</option>
+              </select>
+            </div>
+          </div>
+          <button onclick="generateBlog()" class="btn btn-primary w-full md:w-auto px-8">🤖 원고 생성</button>
+        </div>
+
+        <!-- 생성된 원고 편집 -->
+        <div id="blog-editor-wrap" class="hidden bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-700 text-base">📄 생성된 원고</h3>
+            <div class="flex gap-2">
+              <button onclick="copyBlog()" class="btn btn-secondary text-xs px-3 py-1.5">📋 전체 복사</button>
+              <button onclick="openNaverBlog()" class="btn text-xs px-3 py-1.5" style="background:#03C75A;color:#fff;border-radius:6px;border:none;cursor:pointer;">N 네이버 블로그 열기</button>
+              <button onclick="saveBlogDraft()" class="btn btn-primary text-xs px-3 py-1.5">💾 초안 저장</button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="block text-xs font-semibold text-slate-500 mb-1.5">제목</label>
+            <input id="blog-title-out" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold focus:outline-none focus:border-blue-500"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1.5">본문 <span class="font-normal text-slate-400">(직접 수정 가능)</span></label>
+            <textarea id="blog-content-out" rows="28" class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm leading-relaxed focus:outline-none focus:border-blue-500" style="font-family:inherit;resize:vertical;"></textarea>
+          </div>
+          <div class="mt-3 p-3 rounded-lg text-xs text-slate-500" style="background:#F8FAFC;">
+            💡 복사 후 네이버 블로그 글쓰기 페이지에 붙여넣기하세요. 해시태그는 본문 하단에 포함되어 있습니다.
+          </div>
+        </div>
+
+        <!-- 저장된 초안 목록 -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-700 text-base">📁 저장된 초안</h3>
+            <span id="blog-draft-count" class="text-xs text-slate-400"></span>
+          </div>
+          <div id="blog-draft-list">
+            <p class="text-sm text-slate-400 text-center py-8">저장된 초안이 없습니다.</p>
+          </div>
+        </div>
+
+      </div>
+
     </main>
   </div>
 
@@ -921,7 +1003,7 @@
 
     // ─── 탭 전환 ───
     function switchTab(tab) {
-      ['consult', 'student', 'news', 'programs', 'jobs', 'cnews', 'shorts', 'stats'].forEach(t => {
+      ['consult', 'student', 'news', 'programs', 'jobs', 'cnews', 'shorts', 'stats', 'blog'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (t === tab) {
@@ -939,6 +1021,7 @@
       if (tab === 'cnews') loadCNews();
       if (tab === 'shorts') loadShorts();
       if (tab === 'stats')  requestAnimationFrame(() => loadStats());
+      if (tab === 'blog')   loadBlogDrafts();
     }
 
     // ─── 학생접수 ───
@@ -1939,6 +2022,250 @@
           }
         }
       });
+    }
+
+    // ─── 블로그 원고 생성 ───
+
+    function generateBlog() {
+      const audience  = document.getElementById('blog-audience').value;
+      const keyword   = document.getElementById('blog-keyword').value.trim() || 'G-TELP IBT';
+      const subtopic  = document.getElementById('blog-subtopic').value.trim();
+      const tone      = document.getElementById('blog-tone').value;
+      const titleStyle = document.getElementById('blog-title-style').value;
+
+      const today = new Date();
+      const dateStr = `${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일`;
+      const year = today.getFullYear();
+
+      const result = buildBlogPost({ audience, keyword, subtopic, tone, titleStyle, dateStr, year });
+      document.getElementById('blog-title-out').value = result.title;
+      document.getElementById('blog-content-out').value = result.content;
+      document.getElementById('blog-editor-wrap').classList.remove('hidden');
+      document.getElementById('blog-editor-wrap').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function buildBlogPost({ audience, keyword, subtopic, tone, titleStyle, dateStr, year }) {
+      const kw = keyword;
+      const sub = subtopic ? ` ${subtopic}` : '';
+
+      // ── 제목 생성 ──
+      const titles = {
+        university: {
+          question: `취업지원센터에서 무료로 영어실력 진단이 가능하다고요? G-TELP IBT 도입 방법`,
+          number:   `대학 취업지원센터 담당자가 알아야 할 G-TELP IBT 5가지 핵심 사항`,
+          benefit:  `코드 배포만 하면 끝! 취업지원센터 업무 최소화하는 G-TELP IBT 활용법`
+        },
+        student: {
+          question: `취업 준비 중인데 영어 성적이 없다고요? G-TELP IBT로 무료 진단 받는 법`,
+          number:   `졸업 전 꼭 알아야 할 G-TELP IBT 활용법 5가지 — ${kw} 완벽 정리`,
+          benefit:  `공공기관·대기업 취업에 유리한 영어 성적, G-TELP IBT로 무료로 받는 방법`
+        },
+        examinee: {
+          question: `G-TELP 32점, 65점, 75점… 목표 점수별 공략법이 다르다고요?`,
+          number:   `G-TELP IBT 고득점을 위한 파트별 핵심 전략 5가지 — ${kw} 총정리`,
+          benefit:  `G-TELP IBT 단기간에 목표 점수 달성하는 실전 학습법 — ${kw}${sub}`
+        }
+      };
+      const title = titles[audience][titleStyle];
+
+      // ── 대상별 공통 데이터 ──
+      const audienceData = {
+        university: {
+          intro_hook: `취업지원센터를 운영하다 보면 늘 이런 고민이 생깁니다.\n"학생들 영어 실력이 어느 수준인지 파악하고 싶은데, 비용도 시간도 없다."`,
+          pain: `시험 응시료 부담, 복잡한 행정 절차, 학생 독려의 어려움…\n이 모든 문제를 한 번에 해결하는 방법이 있습니다.`,
+          solution: `G-TELP IBT는 대학교 취업지원센터를 위한 **전액 무료** 영어 진단 프로그램입니다.\n담당자는 신청서 작성 후 **응시 코드만 배포**하면 됩니다. 시험 후 성적 안내와 결과 상담은 G-TELP 운영팀이 전담합니다.`,
+          features: [
+            '✅ 전액 무료 — 학교 예산 소요 없음',
+            '✅ 최대 200명 동시 응시 가능',
+            '✅ 온라인 IBT 방식 — 장소·시간 제약 없음',
+            '✅ 국제공인 성적표 즉시 발급',
+            '✅ 졸업인증·취업지원 연계 활용 가능',
+            '✅ 공공기관 200+ 채용 인정 시험'
+          ],
+          process: `📋 신청 절차\n1단계 · 신청서 작성 (5분 이내)\n2단계 · G-TELP 담당자가 응시 코드 발급\n3단계 · 학생들에게 코드 배포 (공지/카톡)\n4단계 · 시험 후 즉시 성적 확인 가능`,
+          target_users: '취업지원센터 담당자, 대학 교수, 학과 사무실',
+          cta: `지금 바로 무료 신청하기 → https://hometest-weld.vercel.app\n문의: 카카오톡 채널 @지텔프IBT대학컨설팅`,
+          hashtags: '#지텔프IBT #대학취업지원센터 #영어진단 #무료영어시험 #취업영어 #GTELP #공공기관채용 #졸업인증 #대학컨설팅 #취업준비'
+        },
+        student: {
+          intro_hook: `취업 준비하면서 가장 막막한 것 중 하나가 바로 '영어 성적'이지 않나요?\n토익은 비싸고, 준비 기간도 오래 걸리고…`,
+          pain: `영어 성적 없이는 서류 통과조차 힘든 현실.\n하지만 시간과 돈이 부족한 취준생에게 영어 시험 준비는 쉽지 않습니다.`,
+          solution: `G-TELP IBT는 대학교 취업지원센터를 통해 **완전 무료**로 응시할 수 있는 국제공인 영어시험입니다.\n우리 학교 취업지원센터에서 신청하면, 별도 비용 없이 공인 영어 성적표를 받을 수 있습니다.`,
+          features: [
+            '✅ 완전 무료 응시 (취업지원센터 통해 신청)',
+            '✅ 공공기관 200+ / 기업 600+ 인정 시험',
+            '✅ 온라인 응시 — 집에서 편하게',
+            '✅ 시험 후 즉시 성적 확인',
+            '✅ 졸업인증 활용 가능 대학 증가 중',
+            '✅ 대학원 입시 · 편입 활용도 높음'
+          ],
+          process: `📋 신청 방법\n1단계 · 학교 취업지원센터에 G-TELP IBT 문의\n2단계 · 응시 코드 수령\n3단계 · 온라인으로 IBT 응시\n4단계 · 즉시 성적표 수령 → 취업 서류에 활용`,
+          target_users: '대학생, 졸업생, 취업준비생',
+          cta: `학교 취업지원센터에 G-TELP IBT 도입을 요청해보세요!\n자세히 보기 → https://hometest-weld.vercel.app/student.html`,
+          hashtags: '#지텔프IBT #취업영어성적 #무료영어시험 #GTELP #취업준비 #대학생 #졸업생 #공공기관취업 #영어점수 #취준생'
+        },
+        examinee: {
+          intro_hook: `G-TELP 시험을 준비하고 있다면 한 번쯤 이런 생각을 해봤을 겁니다.\n"도대체 파트별로 어떻게 공부해야 효율적인 걸까?"`,
+          pain: `문법, 청취, 독해 — 파트마다 접근법이 다른데\n무작정 문제집만 풀다 보면 시간은 가도 점수는 제자리입니다.`,
+          solution: `G-TELP IBT는 인터넷 기반 시험으로, 기존 Paper 시험보다 접근성이 뛰어나고\n결과도 즉시 확인할 수 있어 단기 목표 달성에 매우 유리합니다.`,
+          features: [
+            '✅ 파트1 문법: 기출 패턴 집중 → 20문항 15분 내 처리',
+            '✅ 파트2 청취: 문제 먼저 확인 후 → 핵심 키워드 캐치',
+            '✅ 파트3 독해: 스키밍·스캐닝 전략 → 지문 전체 읽지 않기',
+            '✅ IBT 환경 적응: 화면 UI 미리 파악',
+            '✅ 목표 점수별 집중 파트 다름 (32점/65점/75점)',
+            '✅ 대학교 취업지원센터 통해 무료 응시 가능'
+          ],
+          process: `📋 G-TELP IBT 응시 방법\n1단계 · 학교 취업지원센터에서 무료 신청\n2단계 · 응시 코드 수령 후 온라인 응시\n3단계 · 즉시 성적 확인\n4단계 · 성적표로 취업·졸업인증 활용`,
+          target_users: 'G-TELP 수험자, 취업준비생, 공무원 준비생',
+          cta: `G-TELP IBT 무료 응시 신청 → https://hometest-weld.vercel.app/student.html\n추가 문의: 카카오톡 채널 @지텔프IBT대학컨설팅`,
+          hashtags: '#지텔프 #GTELP #지텔프IBT #지텔프공부법 #지텔프점수 #취업영어 #영어시험 #지텔프32점 #지텔프65점 #공인영어'
+        }
+      };
+
+      const d = audienceData[audience];
+
+      // ── 톤별 인트로 접두어 ──
+      const tonePrefix = {
+        info:      `[ ${dateStr} 기준 정보 ]\n\n`,
+        story:     `안녕하세요! 오늘은 ${d.target_users}을(를) 위한 꼭 필요한 정보를 가져왔습니다.\n\n`,
+        practical: `바로 본론으로 들어갑니다. ${kw}에 대해 실질적으로 도움이 되는 정보입니다.\n\n`
+      };
+
+      const content = `${tonePrefix[tone]}${d.intro_hook}
+
+${d.pain}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔷 G-TELP IBT란?
+
+${d.solution}
+
+G-TELP(General Tests of English Language Proficiency)는 미국 SDSU(샌디에이고주립대학교)가 개발한 국제공인 영어능력시험입니다.
+현재 ${year}년 기준 공공기관 200개 이상, 기업 600개 이상에서 채용 인정 시험으로 활용되고 있으며
+전국 64개 대학교에서 졸업인증 시험으로 채택하고 있습니다.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔷 핵심 특징
+
+${d.features.join('\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${d.process}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔷 자주 묻는 질문 (FAQ)
+
+Q. 정말 무료인가요?
+A. 네, 대학교 취업지원센터를 통해 신청하면 응시료가 전혀 없습니다.
+
+Q. 성적표는 언제 받나요?
+A. IBT 특성상 시험 직후 즉시 확인 가능합니다.
+
+Q. 어떤 기관에서 인정하나요?
+A. 공공기관, 정부부처, 일반 기업 및 대학원 입학 등 다양한 목적으로 활용됩니다.
+
+Q. 응시 가능 인원 제한이 있나요?
+A. 최소 10명 ~ 최대 200명까지 가능합니다.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔷 신청 / 문의
+
+${d.cta}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${d.hashtags}`;
+
+      return { title, content };
+    }
+
+    function copyBlog() {
+      const title = document.getElementById('blog-title-out').value;
+      const content = document.getElementById('blog-content-out').value;
+      navigator.clipboard.writeText(`${title}\n\n${content}`).then(() => {
+        alert('원고가 복사되었습니다!\n네이버 블로그 글쓰기에 붙여넣기 하세요.');
+      });
+    }
+
+    function openNaverBlog() {
+      window.open('https://blog.naver.com/PostWriteForm.naver', '_blank');
+    }
+
+    async function saveBlogDraft() {
+      const title   = document.getElementById('blog-title-out').value.trim();
+      const content = document.getElementById('blog-content-out').value.trim();
+      const audience = document.getElementById('blog-audience').value;
+      const keyword  = document.getElementById('blog-keyword').value.trim();
+      if (!title) { alert('제목을 입력해주세요.'); return; }
+
+      const { error } = await db.from('blog_posts').insert([{
+        title, content, target_audience: audience, topic: keyword, status: 'draft'
+      }]);
+      if (error) { alert('저장 실패: ' + error.message); return; }
+      alert('초안이 저장되었습니다!');
+      loadBlogDrafts();
+    }
+
+    async function loadBlogDrafts() {
+      const { data, error } = await db.from('blog_posts').select('*').order('created_at', { ascending: false });
+      const list = document.getElementById('blog-draft-list');
+      const count = document.getElementById('blog-draft-count');
+      if (error || !data || data.length === 0) {
+        list.innerHTML = '<p class="text-sm text-slate-400 text-center py-8">저장된 초안이 없습니다.</p>';
+        count.textContent = '';
+        return;
+      }
+      count.textContent = `총 ${data.length}건`;
+      const audienceLabel = { university: '대학관계자', student: '대학생/졸업생', examinee: 'G-TELP 수험자' };
+      const statusLabel   = { draft: '초안', published: '발행됨' };
+      list.innerHTML = `<div class="divide-y divide-slate-100">` + data.map(r => {
+        const d = new Date(r.created_at);
+        const dateStr = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+        return `<div class="py-4 flex items-start gap-4">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1 flex-wrap">
+              <span class="text-xs px-2 py-0.5 rounded-full font-semibold" style="background:#EFF6FF;color:#1D4ED8;">${audienceLabel[r.target_audience] || r.target_audience}</span>
+              <span class="text-xs px-2 py-0.5 rounded-full font-semibold" style="background:${r.status==='published'?'#D1FAE5':'#FEF3C7'};color:${r.status==='published'?'#065F46':'#92400E'};">${statusLabel[r.status]||r.status}</span>
+              <span class="text-xs text-slate-400">${dateStr}</span>
+            </div>
+            <p class="font-semibold text-slate-700 text-sm truncate">${r.title}</p>
+            ${r.topic ? `<p class="text-xs text-slate-400 mt-0.5">키워드: ${r.topic}</p>` : ''}
+          </div>
+          <div class="flex gap-2 shrink-0">
+            <button onclick="loadDraftToEditor('${r.id}')" class="btn btn-secondary text-xs px-3 py-1.5">편집</button>
+            <button onclick="markPublished('${r.id}')" class="text-xs px-3 py-1.5 rounded-lg border font-semibold" style="border-color:#A7F3D0;background:#ECFDF5;color:#065F46;cursor:pointer;">발행완료</button>
+            <button onclick="deleteDraft('${r.id}')" class="text-xs px-3 py-1.5 rounded-lg" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;cursor:pointer;">삭제</button>
+          </div>
+        </div>`;
+      }).join('') + '</div>';
+    }
+
+    let _blogDrafts = [];
+    async function loadDraftToEditor(id) {
+      const { data } = await db.from('blog_posts').select('*').eq('id', id).single();
+      if (!data) return;
+      document.getElementById('blog-title-out').value = data.title;
+      document.getElementById('blog-content-out').value = data.content;
+      document.getElementById('blog-editor-wrap').classList.remove('hidden');
+      document.getElementById('blog-editor-wrap').scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('blog-editor-wrap').dataset.editId = id;
+    }
+
+    async function markPublished(id) {
+      await db.from('blog_posts').update({ status: 'published' }).eq('id', id);
+      loadBlogDrafts();
+    }
+
+    async function deleteDraft(id) {
+      if (!confirm('초안을 삭제하시겠습니까?')) return;
+      await db.from('blog_posts').delete().eq('id', id);
+      loadBlogDrafts();
     }
 
     // Supabase 실시간 구독 (새 신청 자동 반영)
