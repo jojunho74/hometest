@@ -124,19 +124,16 @@
     <main class="max-w-6xl mx-auto px-4 py-8">
 
       <!-- 탭 -->
-      <div class="mb-8 border-b border-slate-200" style="overflow-x:auto;white-space:nowrap;">
-        <div style="display:inline-flex;gap:0;">
-          <button onclick="switchTab('consult')"  id="tab-consult"  class="px-4 py-2.5 text-sm font-semibold border-b-2 border-blue-700 text-blue-700 -mb-px" style="white-space:nowrap;">신청 관리</button>
-          <button onclick="switchTab('student')"  id="tab-student"  class="px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600" style="white-space:nowrap;">학생접수</button>
-          <button onclick="switchTab('news')"     id="tab-news"     class="px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600" style="white-space:nowrap;">대학소식</button>
-          <button onclick="switchTab('programs')" id="tab-programs" class="px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600" style="white-space:nowrap;">대학활동</button>
-          <button onclick="switchTab('jobs')"     id="tab-jobs"     class="px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600" style="white-space:nowrap;">채용공고</button>
-          <button onclick="switchTab('cnews')"    id="tab-cnews"    class="px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600" style="white-space:nowrap;">기업소식</button>
-          <button onclick="switchTab('shorts')"   id="tab-shorts"   class="px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600" style="white-space:nowrap;">유튜브쇼츠</button>
-          <button onclick="switchTab('stats')"    id="tab-stats"    class="px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600" style="white-space:nowrap;">통계</button>
-          <button onclick="switchTab('blog')"     id="tab-blog"     class="px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600" style="white-space:nowrap;">블로그 원고</button>
-          <button onclick="switchTab('aihelper')" id="tab-aihelper" class="px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600" style="white-space:nowrap;">🤖 AI 도우미</button>
-        </div>
+      <div class="flex flex-wrap gap-2 mb-8 border-b border-slate-200">
+        <button onclick="switchTab('consult')"  id="tab-consult"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-blue-700 text-blue-700 -mb-px">신청 관리</button>
+        <button onclick="switchTab('student')"  id="tab-student"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">학생접수</button>
+        <button onclick="switchTab('news')"     id="tab-news"     class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">대학소식</button>
+        <button onclick="switchTab('programs')" id="tab-programs" class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">대학활동</button>
+        <button onclick="switchTab('jobs')"     id="tab-jobs"     class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">채용공고</button>
+        <button onclick="switchTab('cnews')"   id="tab-cnews"   class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">기업소식</button>
+        <button onclick="switchTab('shorts')"  id="tab-shorts"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">유튜브쇼츠</button>
+        <button onclick="switchTab('stats')"   id="tab-stats"   class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">통계</button>
+        <button onclick="switchTab('blog')"    id="tab-blog"    class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">블로그 원고</button>
       </div>
 
       <!-- ── 신청 관리 탭 ── -->
@@ -799,169 +796,7 @@
 
       </div>
 
-      <!-- ── AI 학습도우미 탭 ── -->
-      <div id="section-aihelper" class="hidden">
-
-        <!-- 상단 안내 카드 -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <a href="지텔프에듀_AI학습도우미.html" target="_blank"
-             class="bg-gradient-to-br from-blue-700 to-blue-500 rounded-xl p-5 text-white shadow-sm flex flex-col gap-2 hover:opacity-90 transition-opacity">
-            <span class="text-2xl">📈</span>
-            <p class="font-bold">AI 학습도우미 열기</p>
-            <p class="text-xs opacity-80">새 탭에서 학생용 AI 도우미를 확인합니다</p>
-          </a>
-          <div class="bg-white rounded-xl p-5 shadow-sm">
-            <p class="text-xs text-slate-400 mb-1">등록된 합격수기</p>
-            <p id="ai-story-count" class="text-3xl font-bold text-slate-800">-</p>
-            <p class="text-xs text-slate-400 mt-1">AI 학습 지식베이스</p>
-          </div>
-          <div class="bg-amber-50 rounded-xl p-5 shadow-sm border border-amber-100">
-            <p class="text-xs font-semibold text-amber-700 mb-2">📋 Supabase 테이블 설정</p>
-            <p class="text-xs text-slate-600 leading-relaxed">아래 SQL을 Supabase SQL Editor에서 실행하세요:</p>
-            <button onclick="document.getElementById('sql-modal').style.display='flex'" class="mt-2 btn btn-secondary text-xs px-3 py-1">SQL 보기</button>
-          </div>
-        </div>
-
-        <!-- 합격수기 등록 폼 -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h3 class="font-bold text-slate-700 mb-4">합격수기 등록</h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">학습자 프로필 *</label>
-              <input id="story-profile" type="text" placeholder="예) 직장인 / 대학생 / 유학생" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">목표(달성) 점수 *</label>
-              <input id="story-score" type="text" placeholder="예) 65점 / 74점" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">준비 기간 *</label>
-              <input id="story-period" type="text" placeholder="예) 2주 / 1개월" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
-            </div>
-          </div>
-          <div class="mb-3">
-            <label class="block text-xs font-semibold text-slate-500 mb-1">제목 (선택)</label>
-            <input id="story-title" type="text" placeholder="예) 직장인이 2주만에 65점 달성한 비결" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
-          </div>
-          <div class="mb-4">
-            <label class="block text-xs font-semibold text-slate-500 mb-1">합격수기 내용 *</label>
-            <textarea id="story-content" rows="6" placeholder="합격수기 원문을 붙여넣으세요..." class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" style="resize:vertical;"></textarea>
-          </div>
-          <button onclick="addSuccessStory()" class="btn btn-primary">+ 등록하기</button>
-          <p id="story-msg" class="hidden text-sm text-green-600 mt-2 font-semibold">✓ 등록되었습니다.</p>
-        </div>
-
-        <!-- 합격수기 목록 -->
-        <div class="bg-white rounded-xl shadow-sm table-wrap">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="text-left text-slate-400 text-xs border-b">
-                <th class="px-4 py-3 font-semibold">프로필</th>
-                <th class="px-4 py-3 font-semibold">목표점수</th>
-                <th class="px-4 py-3 font-semibold hidden md:table-cell">준비기간</th>
-                <th class="px-4 py-3 font-semibold hidden md:table-cell">제목</th>
-                <th class="px-4 py-3 font-semibold hidden md:table-cell">내용 미리보기</th>
-                <th class="px-4 py-3 font-semibold hidden md:table-cell">등록일</th>
-                <th class="px-4 py-3 font-semibold">수정</th>
-                <th class="px-4 py-3 font-semibold">삭제</th>
-              </tr>
-            </thead>
-            <tbody id="story-body">
-              <tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">불러오는 중...</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p id="story-empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">등록된 합격수기가 없습니다.</p>
-
-        <!-- 채팅 테스트 -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mt-6">
-          <h3 class="font-bold text-slate-700 mb-4">🧪 AI 채팅 테스트</h3>
-          <div class="flex gap-2 mb-4">
-            <input id="ai-test-key" type="password" placeholder="Anthropic API 키 (sk-ant-...)" class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
-            <button onclick="initTestChat()" class="btn btn-primary text-sm px-4">연결</button>
-          </div>
-          <p id="ai-test-status" class="text-xs text-slate-400 mb-4">API 키를 입력하고 연결하면 DB의 합격수기를 기반으로 AI를 테스트할 수 있습니다.</p>
-          <div id="ai-test-chat" class="hidden">
-            <div id="ai-test-messages" class="border border-slate-100 rounded-xl p-4 mb-3 space-y-3" style="min-height:200px;max-height:400px;overflow-y:auto;background:#f8fafc;"></div>
-            <div class="flex gap-2">
-              <input id="ai-test-input" type="text" placeholder="질문을 입력하세요..." class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" onkeydown="if(event.key==='Enter')sendTestMsg()"/>
-              <button onclick="sendTestMsg()" class="btn btn-primary text-sm px-4">전송</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- 합격수기 수정 모달 -->
-      <div id="story-modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:200;padding:16px;">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
-          <div class="flex items-center justify-between px-6 py-4 border-b">
-            <h2 class="font-bold text-lg text-slate-800">합격수기 수정</h2>
-            <button onclick="closeStoryModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
-          </div>
-          <div class="px-6 py-5 space-y-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">학습자 프로필</label>
-              <input id="edit-story-profile" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">목표점수</label>
-                <input id="edit-story-score" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">준비기간</label>
-                <input id="edit-story-period" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">제목</label>
-              <input id="edit-story-title" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">합격수기 내용</label>
-              <textarea id="edit-story-content" rows="8" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" style="resize:vertical;"></textarea>
-            </div>
-          </div>
-          <div class="px-6 py-4 border-t flex justify-end gap-2">
-            <button onclick="closeStoryModal()" class="btn btn-secondary">취소</button>
-            <button onclick="saveStoryEdit()" class="btn btn-primary">저장</button>
-          </div>
-        </div>
-      </div>
-
     </main>
-  </div>
-
-  <!-- SQL 안내 모달 (body 최상위에 위치해야 hidden 영향 없음) -->
-  <div id="sql-modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px;">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl">
-      <div class="flex items-center justify-between px-6 py-4 border-b">
-        <h2 class="font-bold text-lg text-slate-800">Supabase 테이블 생성 SQL</h2>
-        <button onclick="document.getElementById('sql-modal').style.display='none'" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
-      </div>
-      <div class="px-6 py-5">
-        <p class="text-sm text-slate-500 mb-3">Supabase → SQL Editor에서 아래 SQL을 실행하세요:</p>
-        <pre class="bg-slate-800 text-green-300 rounded-xl p-4 text-xs overflow-x-auto leading-relaxed">CREATE TABLE success_stories (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  title TEXT,
-  author_profile TEXT NOT NULL,
-  target_score TEXT NOT NULL,
-  prep_period TEXT NOT NULL,
-  content TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-ALTER TABLE success_stories ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Anyone can read" ON success_stories
-  FOR SELECT USING (true);
-
-CREATE POLICY "Service role only insert" ON success_stories
-  FOR INSERT WITH CHECK (true);</pre>
-        <button onclick="copySQL()" class="mt-3 btn btn-secondary text-sm">📋 복사</button>
-      </div>
-    </div>
   </div>
 
   <script>
@@ -1172,7 +1007,7 @@ CREATE POLICY "Service role only insert" ON success_stories
 
     // ─── 탭 전환 ───
     function switchTab(tab) {
-      ['consult', 'student', 'news', 'programs', 'jobs', 'cnews', 'shorts', 'stats', 'blog', 'aihelper'].forEach(t => {
+      ['consult', 'student', 'news', 'programs', 'jobs', 'cnews', 'shorts', 'stats', 'blog'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (t === tab) {
@@ -1190,8 +1025,7 @@ CREATE POLICY "Service role only insert" ON success_stories
       if (tab === 'cnews') loadCNews();
       if (tab === 'shorts') loadShorts();
       if (tab === 'stats')  requestAnimationFrame(() => loadStats());
-      if (tab === 'blog')      loadBlogDrafts();
-      if (tab === 'aihelper')  loadSuccessStories();
+      if (tab === 'blog')   loadBlogDrafts();
     }
 
     // ─── 학생접수 ───
@@ -2532,229 +2366,6 @@ ${d.hashtags}`;
       if (!confirm('초안을 삭제하시겠습니까?')) return;
       await db.from('blog_posts').delete().eq('id', id);
       loadBlogDrafts();
-    }
-
-    // ─── AI 학습도우미: 합격수기 관리 ───
-    let editingStoryId = null;
-
-    async function loadSuccessStories() {
-      const tbody = document.getElementById('story-body');
-      const emptyMsg = document.getElementById('story-empty-msg');
-      const countEl = document.getElementById('ai-story-count');
-      tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">불러오는 중...</td></tr>';
-
-      const { data, error } = await db.from('success_stories').select('*').order('created_at', { ascending: false });
-      if (error) {
-        tbody.innerHTML = `<tr><td colspan="8" class="px-4 py-8 text-center text-red-400">오류: ${error.message}<br><span class="text-xs text-slate-400">Supabase에 success_stories 테이블이 없으면 위 SQL 안내를 실행하세요.</span></td></tr>`;
-        if (countEl) countEl.textContent = '오류';
-        return;
-      }
-      if (countEl) countEl.textContent = data.length;
-      if (!data || data.length === 0) {
-        tbody.innerHTML = '';
-        emptyMsg.classList.remove('hidden');
-        return;
-      }
-      emptyMsg.classList.add('hidden');
-      tbody.innerHTML = data.map((r, i) => {
-        const d = new Date(r.created_at);
-        const dateStr = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
-        const preview = (r.content || '').slice(0, 60).replace(/\n/g, ' ') + (r.content && r.content.length > 60 ? '…' : '');
-        return `<tr class="border-b hover:bg-slate-50">
-          <td class="px-4 py-3">${escHtml(r.author_profile || '')}</td>
-          <td class="px-4 py-3 font-semibold text-blue-700">${escHtml(r.target_score || '')}</td>
-          <td class="px-4 py-3 hidden md:table-cell text-slate-500">${escHtml(r.prep_period || '')}</td>
-          <td class="px-4 py-3 hidden md:table-cell text-slate-600">${escHtml(r.title || '-')}</td>
-          <td class="px-4 py-3 hidden md:table-cell text-slate-400 text-xs max-w-xs truncate">${escHtml(preview)}</td>
-          <td class="px-4 py-3 hidden md:table-cell text-slate-400 text-xs">${dateStr}</td>
-          <td class="px-4 py-3"><button onclick="openStoryModal('${r.id}')" class="btn btn-secondary text-xs px-3 py-1">수정</button></td>
-          <td class="px-4 py-3"><button onclick="deleteStory('${r.id}')" class="text-xs px-3 py-1 rounded-lg" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;cursor:pointer;">삭제</button></td>
-        </tr>`;
-      }).join('');
-    }
-
-    async function addSuccessStory() {
-      const profile = document.getElementById('story-profile').value.trim();
-      const score   = document.getElementById('story-score').value.trim();
-      const period  = document.getElementById('story-period').value.trim();
-      const title   = document.getElementById('story-title').value.trim();
-      const content = document.getElementById('story-content').value.trim();
-      if (!profile || !score || !period || !content) { alert('프로필, 목표점수, 준비기간, 내용은 필수입니다.'); return; }
-
-      const { error } = await db.from('success_stories').insert([{ title, author_profile: profile, target_score: score, prep_period: period, content }]);
-      if (error) { alert('등록 실패: ' + error.message); return; }
-      document.getElementById('story-profile').value = '';
-      document.getElementById('story-score').value   = '';
-      document.getElementById('story-period').value  = '';
-      document.getElementById('story-title').value   = '';
-      document.getElementById('story-content').value = '';
-      const msg = document.getElementById('story-msg');
-      msg.classList.remove('hidden');
-      setTimeout(() => msg.classList.add('hidden'), 2500);
-      loadSuccessStories();
-    }
-
-    let _storyCache = {};
-    async function openStoryModal(id) {
-      const { data, error } = await db.from('success_stories').select('*').eq('id', id).single();
-      if (error || !data) { alert('불러오기 실패'); return; }
-      editingStoryId = id;
-      _storyCache = data;
-      document.getElementById('edit-story-profile').value = data.author_profile || '';
-      document.getElementById('edit-story-score').value   = data.target_score || '';
-      document.getElementById('edit-story-period').value  = data.prep_period || '';
-      document.getElementById('edit-story-title').value   = data.title || '';
-      document.getElementById('edit-story-content').value = data.content || '';
-      document.getElementById('story-modal').style.display = 'flex';
-    }
-
-    function closeStoryModal() {
-      document.getElementById('story-modal').style.display = 'none';
-      editingStoryId = null;
-    }
-
-    async function saveStoryEdit() {
-      if (!editingStoryId) return;
-      const profile = document.getElementById('edit-story-profile').value.trim();
-      const score   = document.getElementById('edit-story-score').value.trim();
-      const period  = document.getElementById('edit-story-period').value.trim();
-      const title   = document.getElementById('edit-story-title').value.trim();
-      const content = document.getElementById('edit-story-content').value.trim();
-      if (!profile || !score || !period || !content) { alert('필수 항목을 입력하세요.'); return; }
-
-      const { error } = await db.from('success_stories').update({ author_profile: profile, target_score: score, prep_period: period, title, content }).eq('id', editingStoryId);
-      if (error) { alert('저장 실패: ' + error.message); return; }
-      closeStoryModal();
-      loadSuccessStories();
-    }
-
-    async function deleteStory(id) {
-      if (!confirm('이 합격수기를 삭제하시겠습니까?')) return;
-      const { error } = await db.from('success_stories').delete().eq('id', id);
-      if (error) { alert('삭제 실패: ' + error.message); return; }
-      loadSuccessStories();
-    }
-
-    function copySQL() {
-      const sql = `CREATE TABLE success_stories (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  title TEXT,
-  author_profile TEXT NOT NULL,
-  target_score TEXT NOT NULL,
-  prep_period TEXT NOT NULL,
-  content TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-ALTER TABLE success_stories ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Anyone can read" ON success_stories
-  FOR SELECT USING (true);
-
-CREATE POLICY "Service role only insert" ON success_stories
-  FOR INSERT WITH CHECK (true);`;
-      navigator.clipboard.writeText(sql).then(() => alert('SQL이 복사되었습니다!'));
-    }
-
-    // ─── AI 학습도우미: 채팅 테스트 ───
-    let testApiKey = '';
-    let testHistory = [];
-    const TEST_SYSTEM_BASE = `당신은 지텔프에듀(G-TELP Edu)의 AI 학습 전략 코치입니다.
-아래 【합격수기 데이터】는 실제 수강생들이 직접 작성한 합격 후기 원문입니다.
-이 데이터를 분석하여 사용자의 질문에 답변하세요.
-
-답변 원칙:
-1. 원문에 실제로 등장하는 경험과 방법만 근거로 사용
-2. 출처 맥락(몇 명이 언급했는지 등)을 함께 제시
-3. 목표 점수·준비 기간·현재 수준에 맞게 맞춤형으로 답변
-4. 단계별 플랜은 번호를 붙여 명확하게
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-【합격수기 데이터】
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`;
-
-    async function initTestChat() {
-      const key = document.getElementById('ai-test-key').value.trim();
-      if (!key.startsWith('sk-ant-')) { alert('올바른 Anthropic API 키를 입력하세요 (sk-ant-로 시작).'); return; }
-      testApiKey = key;
-      testHistory = [];
-
-      // DB에서 합격수기 가져오기
-      const { data, error } = await db.from('success_stories').select('*').order('created_at', { ascending: false });
-      let storiesText = '';
-      if (!error && data && data.length > 0) {
-        storiesText = data.map((r, i) => `[수기 ${i+1}] 프로필: ${r.author_profile} | 목표: ${r.target_score} | 준비기간: ${r.prep_period}\n${r.content}`).join('\n\n---\n\n');
-      } else {
-        storiesText = '(등록된 합격수기가 없습니다. 합격수기를 먼저 등록해주세요.)';
-      }
-      window._testSystemPrompt = TEST_SYSTEM_BASE + storiesText;
-
-      document.getElementById('ai-test-status').textContent = `✅ 연결됨 | 합격수기 ${data ? data.length : 0}건 로드됨`;
-      document.getElementById('ai-test-chat').classList.remove('hidden');
-      document.getElementById('ai-test-messages').innerHTML = '<div class="text-xs text-slate-400 text-center">AI 채팅 테스트를 시작하세요.</div>';
-    }
-
-    function appendTestMsg(role, text) {
-      const box = document.getElementById('ai-test-messages');
-      const isUser = role === 'user';
-      const div = document.createElement('div');
-      div.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
-      div.innerHTML = `<div class="max-w-xs md:max-w-sm rounded-xl px-3 py-2 text-sm leading-relaxed ${isUser ? 'bg-blue-600 text-white' : 'bg-white border border-slate-100 text-slate-700'}" style="white-space:pre-wrap;">${escHtml(text)}</div>`;
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
-    }
-
-    async function sendTestMsg() {
-      if (!testApiKey) { alert('먼저 연결하세요.'); return; }
-      const input = document.getElementById('ai-test-input');
-      const q = input.value.trim();
-      if (!q) return;
-      input.value = '';
-      appendTestMsg('user', q);
-      testHistory.push({ role: 'user', content: q });
-
-      // 로딩
-      const loadId = 'tl_' + Date.now();
-      const box = document.getElementById('ai-test-messages');
-      const ld = document.createElement('div');
-      ld.id = loadId;
-      ld.className = 'flex justify-start';
-      ld.innerHTML = '<div class="bg-white border border-slate-100 rounded-xl px-3 py-2 text-slate-400 text-xs">생각 중...</div>';
-      box.appendChild(ld);
-      box.scrollTop = box.scrollHeight;
-
-      try {
-        const resp = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': testApiKey,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true'
-          },
-          body: JSON.stringify({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 1024,
-            system: window._testSystemPrompt || TEST_SYSTEM_BASE,
-            messages: testHistory
-          })
-        });
-        const result = await resp.json();
-        document.getElementById(loadId)?.remove();
-        if (!resp.ok) throw new Error(result?.error?.message || `HTTP ${resp.status}`);
-        const reply = result.content?.[0]?.text || '응답을 받지 못했습니다.';
-        appendTestMsg('assistant', reply);
-        testHistory.push({ role: 'assistant', content: reply });
-      } catch(e) {
-        document.getElementById(loadId)?.remove();
-        appendTestMsg('assistant', '❌ 오류: ' + e.message);
-        testHistory.pop();
-      }
-    }
-
-    function escHtml(s) {
-      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
     // Supabase 실시간 구독 (새 신청 자동 반영)
