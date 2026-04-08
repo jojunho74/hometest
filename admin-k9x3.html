@@ -709,6 +709,30 @@
           <canvas id="chart-weekday-pages" height="100"></canvas>
         </div>
 
+        <!-- 페이지별 상세 수치 테이블 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-700">페이지별 접속 현황</h3>
+            <span class="text-xs text-slate-400">전체 누적 기준</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-xs text-slate-400 border-b">
+                  <th class="pb-2 font-semibold">페이지</th>
+                  <th class="pb-2 font-semibold text-right">전체</th>
+                  <th class="pb-2 font-semibold text-right">이번달</th>
+                  <th class="pb-2 font-semibold text-right">오늘</th>
+                  <th class="pb-2 font-semibold pl-4">비율</th>
+                </tr>
+              </thead>
+              <tbody id="page-stats-body">
+                <tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
 
       <!-- ── 블로그 원고 탭 ── -->
@@ -2026,6 +2050,56 @@
           }
         }
       });
+
+      // ── 페이지별 상세 수치 테이블 ──
+      // 오늘 / 이번달 per-page 카운트는 rows(14일치)에서 계산
+      const pageStatToday   = {};
+      const pageStatMonth   = {};
+      const kstMonth = kstNow.toISOString().slice(0, 7); // "YYYY-MM"
+      rows.forEach(r => {
+        if (!r.page) return;
+        const kst = new Date(new Date(r.visited_at).getTime() + 9 * 60 * 60 * 1000);
+        const dayKey = kst.toISOString().slice(0, 10);
+        const monKey = kst.toISOString().slice(0, 7);
+        if (dayKey === today) pageStatToday[r.page] = (pageStatToday[r.page] || 0) + 1;
+        if (monKey === kstMonth) pageStatMonth[r.page] = (pageStatMonth[r.page] || 0) + 1;
+      });
+
+      const totalAll = Object.values(pageMap).reduce((a, b) => a + b, 0) || 1;
+      const sortedPages = Object.keys(pageMap).sort((a, b) => pageMap[b] - pageMap[a]);
+      const pageColors8 = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4','#F97316','#EC4899'];
+
+      const tbody = document.getElementById('page-stats-body');
+      if (sortedPages.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">데이터가 없습니다.</td></tr>';
+      } else {
+        tbody.innerHTML = sortedPages.map((p, i) => {
+          const total  = pageMap[p] || 0;
+          const month  = pageStatMonth[p] || 0;
+          const todayCnt = pageStatToday[p] || 0;
+          const pct    = Math.round((total / totalAll) * 100);
+          const color  = pageColors8[i % pageColors8.length];
+          return `<tr class="border-b border-slate-50 hover:bg-slate-50">
+            <td class="py-2.5 pr-4">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${color};"></span>
+                <span class="font-medium text-slate-700">${p}</span>
+              </div>
+            </td>
+            <td class="py-2.5 text-right font-bold text-slate-800">${total.toLocaleString()}</td>
+            <td class="py-2.5 text-right text-blue-600 font-semibold">${month.toLocaleString()}</td>
+            <td class="py-2.5 text-right text-emerald-600 font-semibold">${todayCnt.toLocaleString()}</td>
+            <td class="py-2.5 pl-4">
+              <div class="flex items-center gap-2">
+                <div class="flex-1 bg-slate-100 rounded-full h-2" style="min-width:80px;">
+                  <div class="h-2 rounded-full" style="width:${pct}%;background:${color};"></div>
+                </div>
+                <span class="text-xs text-slate-400 w-8 text-right">${pct}%</span>
+              </div>
+            </td>
+          </tr>`;
+        }).join('');
+      }
     }
 
     // ─── 블로그 원고 생성 ───
