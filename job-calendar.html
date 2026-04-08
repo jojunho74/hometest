@@ -209,8 +209,14 @@
 
   // ── 채용달력 스크롤 리스트 ──
   const CAL_PER = 10;
-  let calData = [], calPage = 0, calTimer = null;
-  const ROW_H = 38; // 한 행 높이(px)
+  let calData = [], calPage = 0, calTimer = null, calFirstRender = true;
+
+  function typeClass(t) {
+    if (t === '시작') return 'type-시작';
+    if (t === '마감') return 'type-마감';
+    if (t === '인적성') return 'type-인적성';
+    return 'type-기타';
+  }
 
   function renderCalPage() {
     if (!calData.length) return;
@@ -220,35 +226,38 @@
     const slice = calData.slice(start, start + CAL_PER);
 
     // 레이블
-    const d0 = slice[0].event_date, d1 = slice[slice.length-1].event_date;
-    document.getElementById('cal-range-label').textContent = d0 === d1 ? d0 : `${d0} ~ ${d1}`;
-    document.getElementById('cal-page-label').textContent = `${calPage+1}/${pages}`;
-    document.getElementById('cal-total').textContent = `총 ${total}건`;
-
-    // 진행바
+    const d0 = slice[0].event_date || '', d1 = slice[slice.length-1].event_date || '';
+    document.getElementById('cal-range-label').textContent = d0 === d1 ? d0 : d0 + ' ~ ' + d1;
+    document.getElementById('cal-page-label').textContent = (calPage+1) + '/' + pages;
+    document.getElementById('cal-total').textContent = '총 ' + total + '건';
     document.getElementById('cal-progress-bar').style.width = ((calPage+1)/pages*100) + '%';
 
-    // 행 렌더
-    const inner = document.getElementById('cal-scroll-inner');
-    inner.style.transition = 'none';
-    inner.style.transform = `translateY(${ROW_H * CAL_PER}px)`;
-
-    inner.innerHTML = slice.map(e => {
-      const tc = `type-${e.event_type}` in {'type-시작':1,'type-마감':1,'type-인적성':1} ? `type-${e.event_type}` : 'type-기타';
-      return `<div class="cal-row">
-        <span class="cal-row-date">${e.event_date||''}</span>
-        <span class="cal-row-type ${tc}">${e.event_type||''}</span>
-        <span class="cal-row-co" title="${e.company||''}">${e.company||''}</span>
-      </div>`;
+    const html = slice.map(function(e) {
+      return '<div class="cal-row">' +
+        '<span class="cal-row-date">' + (e.event_date||'') + '</span>' +
+        '<span class="cal-row-type ' + typeClass(e.event_type) + '">' + (e.event_type||'') + '</span>' +
+        '<span class="cal-row-co" title="' + (e.company||'') + '">' + (e.company||'') + '</span>' +
+      '</div>';
     }).join('');
 
-    // 슬라이드 인 (위에서 아래로 밀려오는 효과)
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        inner.style.transition = 'transform .6s cubic-bezier(.4,0,.2,1)';
-        inner.style.transform = 'translateY(0)';
-      });
-    });
+    const inner = document.getElementById('cal-scroll-inner');
+
+    if (calFirstRender) {
+      // 첫 로드는 애니메이션 없이 바로 표시
+      inner.style.transition = 'none';
+      inner.style.opacity = '1';
+      inner.style.transform = 'translateY(0)';
+      inner.innerHTML = html;
+      calFirstRender = false;
+    } else {
+      // 이후는 페이드 전환
+      inner.style.transition = 'opacity .3s ease';
+      inner.style.opacity = '0';
+      setTimeout(function() {
+        inner.innerHTML = html;
+        inner.style.opacity = '1';
+      }, 300);
+    }
   }
 
   function calNext() {
@@ -258,16 +267,23 @@
   }
 
   (async function loadCalendar() {
-    const { data, error } = await _sb.from('job_calendar').select('*').order('event_date', { ascending: true });
-    if (error) { console.error(error); return; }
-    calData = data || [];
-    if (!calData.length) {
-      document.getElementById('cal-scroll-inner').innerHTML = '<div style="text-align:center;padding:40px;color:#94A3B8;font-size:13px;">등록된 데이터가 없습니다.</div>';
-      return;
+    try {
+      const { data, error } = await _sb.from('job_calendar').select('*').order('event_date', { ascending: true });
+      const inner = document.getElementById('cal-scroll-inner');
+      if (error) {
+        inner.innerHTML = '<div style="text-align:center;padding:30px;color:#EF4444;font-size:12px;">오류: ' + error.message + '</div>';
+        return;
+      }
+      calData = data || [];
+      if (!calData.length) {
+        inner.innerHTML = '<div style="text-align:center;padding:40px;color:#94A3B8;font-size:13px;">등록된 데이터가 없습니다.</div>';
+        return;
+      }
+      renderCalPage();
+      calTimer = setInterval(calNext, 5000);
+    } catch(e) {
+      document.getElementById('cal-scroll-inner').innerHTML = '<div style="text-align:center;padding:30px;color:#EF4444;font-size:12px;">' + e.message + '</div>';
     }
-    renderCalPage();
-    // 5초마다 다음 10개로 이동
-    calTimer = setInterval(calNext, 5000);
   })();
 </script>
 </body>
