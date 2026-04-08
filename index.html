@@ -353,14 +353,15 @@
             대학교 취업지원센터를 위한 맞춤 프로그램 — 코드 배포만 하시면 모든 진행은 저희가 합니다.
           </p>
 
-          <div style="display:grid;grid-template-columns:repeat(3,auto);gap:10px;justify-content:center;">
-            <a href="student.html"       style="display:inline-flex;align-items:center;justify-content:center;padding:11px 22px;border-radius:50px;font-size:.9rem;font-weight:700;white-space:nowrap;text-decoration:none;background:#0891B2;color:#fff;border:2px solid #0891B2;transition:opacity .15s;">학생용 →</a>
-            <a href="package.html"       style="display:inline-flex;align-items:center;justify-content:center;padding:11px 22px;border-radius:50px;font-size:.9rem;font-weight:700;white-space:nowrap;text-decoration:none;background:transparent;color:#fff;border:2px solid rgba(255,255,255,.55);transition:opacity .15s;">대학 및 관계자용 →</a>
-            <a href="library-pdf.html"   style="display:inline-flex;align-items:center;justify-content:center;padding:11px 22px;border-radius:50px;font-size:.9rem;font-weight:700;white-space:nowrap;text-decoration:none;background:transparent;color:#fff;border:2px solid rgba(255,255,255,.55);transition:opacity .15s;">채용공고 자료실 →</a>
+          <div class="hero-btns" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
+            <a href="student.html"     style="display:inline-flex;align-items:center;justify-content:center;padding:11px 22px;border-radius:50px;font-size:.9rem;font-weight:700;white-space:nowrap;text-decoration:none;background:#0891B2;color:#fff;border:2px solid #0891B2;transition:opacity .15s;">학생용 →</a>
+            <a href="package.html"     style="display:inline-flex;align-items:center;justify-content:center;padding:11px 22px;border-radius:50px;font-size:.9rem;font-weight:700;white-space:nowrap;text-decoration:none;background:transparent;color:#fff;border:2px solid rgba(255,255,255,.55);transition:opacity .15s;">대학 및 관계자용 →</a>
+            <a href="library-pdf.html" style="display:inline-flex;align-items:center;justify-content:center;padding:11px 22px;border-radius:50px;font-size:.9rem;font-weight:700;white-space:nowrap;text-decoration:none;background:transparent;color:#fff;border:2px solid rgba(255,255,255,.55);transition:opacity .15s;">채용공고 자료실 →</a>
           </div>
           <style>
             @media(max-width:640px){
-              div[style*="grid-template-columns:repeat(4"]{grid-template-columns:repeat(2,auto)!important;}
+              .hero-btns { flex-direction:column; align-items:center; }
+              .hero-btns a { width:220px; }
             }
           </style>
 
