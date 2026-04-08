@@ -29,7 +29,7 @@
 
     /* ── 헤더 ── */
     .nav-link { padding: 5px 9px; border-radius: 8px; color: var(--ink-mid); text-decoration: none; transition: background .18s, color .18s; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
-    .nav-link:hover { background: #1E4D8C; color: #fff; }
+    .nav-link:hover,.nav-link.active { background: #1E4D8C; color: #fff; }
     .mobile-menu { display: none; flex-direction: column; background: #fff; border-top: 1px solid #E2E8F0; padding: 12px 16px 16px; position: sticky; top: 64px; z-index: 49; box-shadow: 0 4px 12px rgba(0,0,0,.08); }
     .mobile-menu a { padding: 12px 4px; font-size: 0.9rem; font-weight: 600; color: var(--ink); text-decoration: none; border-bottom: 1px solid #E2E8F0; }
     .mobile-menu a:last-child { border-bottom: none; }
@@ -90,7 +90,7 @@
     <a href="index.html" class="font-display text-xl font-bold tracking-tight" style="background:linear-gradient(135deg,#1E3A8A,#0891B2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">지텔프IBT 대학컨설팅</a>
     <nav class="hidden md:flex items-center gap-1 font-semibold">
       <a href="index.html#about" class="nav-link">서비스 소개</a>
-      <a href="package.html" class="nav-link">패키지</a>
+      <a href="package.html" class="nav-link active">패키지</a>
       <a href="schedule.html" class="nav-link">정기시험 일정</a>
       <a href="library-pdf.html" class="nav-link">채용공고 자료실</a>
       <a href="index.html#faq" class="nav-link">FAQ</a>
