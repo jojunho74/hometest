@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>G-TELP 타시험 점수 대비표 — 지텔프IBT 대학컨설팅</title>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MLPBC6XMFC"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-MLPBC6XMFC');</script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F8FAFF;color:#1E293B;}
+
+    /* 헤더 */
+    header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #E2E8F0;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    .hinner{max-width:1100px;margin:0 auto;padding:0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+    .hlogo{font-size:1rem;font-weight:800;color:#1E4D8C;text-decoration:none;}
+    .hnav{display:flex;align-items:center;gap:4px;font-size:0.8rem;font-weight:600;}
+    .hnav a{color:#475569;text-decoration:none;transition:background .18s,color .18s;padding:5px 9px;border-radius:8px;font-size:0.78rem;}
+    .hnav a:hover,.hnav a.active{background:#1E4D8C;color:#fff;}
+    .hbtn{padding:8px 18px;border-radius:8px;font-size:0.8rem;font-weight:700;background:#1E4D8C;color:#fff;text-decoration:none;transition:background .15s;}
+    .hbtn:hover{background:#163870;}
+    .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:#1E4D8C;border:none;padding:6px;border-radius:8px;}
+    .hamburger span{display:block;height:2px;background:#fff;border-radius:2px;transition:transform .25s,opacity .25s;}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+    .mobile-menu{display:none;flex-direction:column;background:#fff;border-top:1px solid #E2E8F0;padding:12px 16px 16px;}
+    .mobile-menu a{padding:12px 4px;font-size:0.9rem;font-weight:600;color:#1E293B;text-decoration:none;border-bottom:1px solid #F1F5F9;}
+    .mobile-menu a:last-child{border-bottom:none;}
+    .mobile-menu .mbtn{margin-top:12px;display:block;text-align:center;padding:12px;border-radius:8px;background:#1E4D8C;color:#fff;font-weight:700;text-decoration:none;}
+    .mobile-menu.open{display:flex;}
+    @media(max-width:640px){.hnav{display:none;}.hbtn{display:none;}.hamburger{display:flex;}}
+
+    /* 히어로 */
+    .hero{background:linear-gradient(135deg,#0B1D3A 0%,#1E3A8A 60%,#1d4ed8 100%);color:#fff;padding:48px 16px 40px;text-align:center;}
+    .hero h1{font-size:1.8rem;font-weight:900;color:#fff;margin-bottom:8px;}
+    @media(min-width:640px){.hero h1{font-size:2.2rem;}}
+    .hero p{color:rgba(255,255,255,.75);font-size:14px;}
+
+    /* 본문 */
+    .wrap{max-width:900px;margin:0 auto;padding:40px 16px 60px;}
+
+    /* 검색/하이라이트 */
+    .search-bar{display:flex;gap:10px;margin-bottom:24px;align-items:center;flex-wrap:wrap;}
+    #scoreInput{flex:1;min-width:160px;padding:10px 16px;border:1.5px solid #CBD5E1;border-radius:10px;font-size:14px;outline:none;font-family:inherit;}
+    #scoreInput:focus{border-color:#1E4D8C;}
+    .search-bar label{font-size:13px;font-weight:600;color:#475569;white-space:nowrap;}
+    .search-bar select{padding:10px 12px;border:1.5px solid #CBD5E1;border-radius:10px;font-size:13px;outline:none;background:#fff;cursor:pointer;font-family:inherit;}
+    .search-bar select:focus{border-color:#1E4D8C;}
+
+    /* 결과 카드 */
+    .result-card{display:none;background:linear-gradient(135deg,#1E4D8C,#0891B2);color:#fff;border-radius:14px;padding:20px 24px;margin-bottom:24px;}
+    .result-card.show{display:block;}
+    .result-card h3{font-size:13px;font-weight:700;opacity:.8;margin-bottom:10px;}
+    .result-row{display:flex;flex-wrap:wrap;gap:16px;}
+    .result-item{background:rgba(255,255,255,.15);border-radius:8px;padding:10px 18px;text-align:center;}
+    .result-item .label{font-size:11px;opacity:.8;margin-bottom:4px;}
+    .result-item .val{font-size:1.3rem;font-weight:900;}
+
+    /* 테이블 */
+    .table-wrap{overflow-x:auto;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);}
+    table{width:100%;border-collapse:collapse;background:#fff;font-size:13px;}
+    thead th{background:#1E4D8C;color:#fff;font-weight:700;padding:10px 12px;text-align:center;white-space:nowrap;}
+    thead th.group{background:#0B1D3A;font-size:12px;}
+    tbody tr:nth-child(even){background:#F8FAFF;}
+    tbody tr:hover{background:#EFF6FF;}
+    tbody tr.highlight{background:#FEF3C7 !important;outline:2px solid #D97706;}
+    td{padding:8px 12px;text-align:center;border-bottom:1px solid #E2E8F0;color:#1E293B;}
+    td.gtelp{font-weight:800;color:#1E4D8C;font-size:14px;}
+    td.empty{color:#CBD5E1;}
+    .note{font-size:11px;color:#94A3B8;margin-top:12px;text-align:right;}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="hinner">
+    <a href="index.html" class="hlogo">지텔프IBT 대학컨설팅</a>
+    <nav class="hnav">
+      <a href="index.html#about">서비스 소개</a>
+      <a href="package.html">패키지</a>
+      <a href="schedule.html">정기시험 일정</a>
+      <a href="student.html">IBT 학생 신청</a>
+      <a href="library-pdf.html">채용공고 자료실</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="gtelp점수비교.html" class="active">점수 대비표</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <a href="index.html#consultation-form" class="hbtn">무료 신청하기</a>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="메뉴">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html#about">서비스 소개</a>
+    <a href="package.html">패키지</a>
+    <a href="schedule.html">정기시험 일정</a>
+    <a href="student.html">IBT 학생 신청</a>
+    <a href="library-pdf.html">채용공고 자료실</a>
+    <a href="index.html#faq">FAQ</a>
+    <a href="gtelp점수비교.html">점수 대비표</a>
+    <a href="index.html#consultation-form" class="mbtn">무료 신청하기</a>
+  </div>
+</header>
+
+<div class="hero">
+  <h1>G-TELP 타시험 점수 대비표</h1>
+  <p>G-TELP Level 1 · Level 2 기준 TOEIC · TOEFL(IBT) 환산 점수</p>
+</div>
+
+<div class="wrap">
+
+  <!-- 점수 검색 -->
+  <div class="search-bar">
+    <label>내 점수 찾기</label>
+    <select id="examType">
+      <option value="gtelp">G-TELP</option>
+      <option value="toeic1">TOEIC (Level 1 기준)</option>
+      <option value="toefl1">TOEFL IBT (Level 1 기준)</option>
+      <option value="toeic2">TOEIC (Level 2 기준)</option>
+      <option value="toefl2">TOEFL IBT (Level 2 기준)</option>
+    </select>
+    <input id="scoreInput" type="number" placeholder="점수 입력..." min="50" max="99" oninput="findScore()"/>
+  </div>
+
+  <div class="result-card" id="resultCard">
+    <h3 id="resultTitle">검색 결과</h3>
+    <div class="result-row" id="resultRow"></div>
+  </div>
+
+  <!-- 대비표 -->
+  <div class="table-wrap">
+    <table id="scoreTable">
+      <thead>
+        <tr>
+          <th rowspan="2" class="group">G-TELP</th>
+          <th colspan="2" class="group">Level 1 대비</th>
+          <th colspan="2" class="group">Level 2 대비</th>
+        </tr>
+        <tr>
+          <th>TOEIC</th>
+          <th>TOEFL (IBT)</th>
+          <th>TOEIC</th>
+          <th>TOEFL (IBT)</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+  <p class="note">※ 토플 CBT 변환 점수는 YBM 시사닷컴을 참고하였음</p>
+</div>
+
+<script>
+function toggleMenu(){
+  const m=document.getElementById('mobile-menu'),h=document.getElementById('hamburger');
+  m.classList.toggle('open');h.classList.toggle('open');
+}
+
+const DATA = [
+  [99,'없음','114-115',969,'111-112'],
+  [98,'없음','',962,110],
+  [97,'없음','',954,109],
+  [96,'없음',113,947,''],
+  [95,'없음','',940,'106-108'],
+  [94,'없음','',932,''],
+  [93,'없음','111-112',925,''],
+  [92,'없음','',918,105],
+  [91,989,'',910,''],
+  [90,984,'',903,''],
+  [89,980,110,896,'103-104'],
+  [88,976,'',889,'101-102'],
+  [87,972,109,881,''],
+  [86,967,'',874,100],
+  [85,963,'',867,''],
+  [84,959,'',859,'98-99'],
+  [83,954,'106-108',852,''],
+  [82,950,'',845,'96-97'],
+  [81,946,'',837,''],
+  [80,941,'',830,'94-95'],
+  [79,937,'',823,''],
+  [78,933,105,815,'92-93'],
+  [77,928,'',808,''],
+  [76,924,'',801,'90-91'],
+  [75,920,'',793,'88-89'],
+  [74,916,'103-104',786,''],
+  [73,911,'',779,''],
+  [72,907,'',771,'86-87'],
+  [71,903,'101-102',764,'84-85'],
+  [70,898,'',757,83],
+  [69,894,'',749,''],
+  [68,890,'',742,'81-82'],
+  [67,885,100,735,'79-80'],
+  [66,881,'',720,'77-78'],
+  [65,877,'',713,76],
+  [64,873,'',706,''],
+  [63,868,'98-99',698,''],
+  [62,864,'',691,'74-75'],
+  [61,860,'',684,'72-73'],
+  [60,855,'96-97',676,''],
+  [59,851,'',669,71],
+  [58,847,'',662,''],
+  [57,842,'',654,'69-70'],
+  [56,838,'94-95',647,68],
+  [55,834,'',640,'66-67'],
+  [54,830,'',632,''],
+  [53,825,'92-93',625,65],
+  [52,821,'',618,64],
+  [51,817,'',610,''],
+  [50,812,'',603,''],
+];
+
+// 테이블 렌더링
+function renderTable(highlightGtelp) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = DATA.map(([g,t1,f1,t2,f2]) => {
+    const hl = highlightGtelp === g ? ' class="highlight"' : '';
+    const c1 = (t1===''||t1==='없음') ? `<td class="${t1==='없음'?'empty':''}">${t1||'—'}</td>` : `<td>${t1}</td>`;
+    return `<tr${hl}>
+      <td class="gtelp">${g}</td>
+      ${c1}
+      <td>${f1||'—'}</td>
+      <td>${t2||'—'}</td>
+      <td>${f2||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+renderTable(null);
+
+// 점수 찾기
+function findScore() {
+  const val = parseInt(document.getElementById('scoreInput').value);
+  const type = document.getElementById('examType').value;
+  const card = document.getElementById('resultCard');
+  const row = document.getElementById('resultRow');
+  const title = document.getElementById('resultTitle');
+
+  if (!val) { card.classList.remove('show'); renderTable(null); return; }
+
+  let found = null;
+
+  if (type === 'gtelp') {
+    found = DATA.find(d => d[0] === val);
+    if (found) {
+      const [g,t1,f1,t2,f2] = found;
+      title.textContent = `G-TELP ${g}점 환산 결과`;
+      row.innerHTML = `
+        <div class="result-item"><div class="label">TOEIC (Lv.1)</div><div class="val">${t1||'—'}</div></div>
+        <div class="result-item"><div class="label">TOEFL IBT (Lv.1)</div><div class="val">${f1||'—'}</div></div>
+        <div class="result-item"><div class="label">TOEIC (Lv.2)</div><div class="val">${t2||'—'}</div></div>
+        <div class="result-item"><div class="label">TOEFL IBT (Lv.2)</div><div class="val">${f2||'—'}</div></div>`;
+      renderTable(g);
+    }
+  } else if (type === 'toeic1') {
+    found = DATA.slice().reverse().find(d => typeof d[1]==='number' && d[1] <= val);
+    if (!found) found = DATA.find(d => typeof d[1]==='number' && d[1] <= val);
+    if (found) {
+      title.textContent = `TOEIC ${val}점 → G-TELP Level 1`;
+      row.innerHTML = `<div class="result-item"><div class="label">G-TELP 환산</div><div class="val">${found[0]}점 수준</div></div>`;
+      renderTable(found[0]);
+    }
+  } else if (type === 'toeic2') {
+    found = DATA.slice().reverse().find(d => typeof d[3]==='number' && d[3] <= val);
+    if (found) {
+      title.textContent = `TOEIC ${val}점 → G-TELP Level 2`;
+      row.innerHTML = `<div class="result-item"><div class="label">G-TELP 환산</div><div class="val">${found[0]}점 수준</div></div>`;
+      renderTable(found[0]);
+    }
+  } else {
+    // TOEFL — range matching
+    const idx = type === 'toefl1' ? 2 : 4;
+    found = DATA.find(d => {
+      const v = String(d[idx]);
+      if (!v || v === '') return false;
+      const parts = v.split('-').map(Number);
+      if (parts.length === 2) return val >= parts[0] && val <= parts[1];
+      return val === parts[0];
+    });
+    if (found) {
+      const lv = type === 'toefl1' ? 'Level 1' : 'Level 2';
+      title.textContent = `TOEFL IBT ${val}점 → G-TELP ${lv}`;
+      row.innerHTML = `<div class="result-item"><div class="label">G-TELP 환산</div><div class="val">${found[0]}점 수준</div></div>`;
+      renderTable(found[0]);
+    }
+  }
+
+  if (!found) {
+    card.classList.remove('show');
+    renderTable(null);
+  } else {
+    card.classList.add('show');
+    document.getElementById('scoreTable').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+}
+
+// notrack
+(function(){
+  if(localStorage.getItem('gtelp_notrack')==='1') return;
+  var page=window.location.pathname.split('/').pop()||'gtelp점수비교.html';
+  fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/page_views',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs','Authorization':'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'},
+    body:JSON.stringify({page:page})
+  });
+})();
+</script>
+</body>
+</html>
