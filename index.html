@@ -1392,7 +1392,9 @@
 
     // ── 방문 카운터 ──
     (async function() {
-      await _supabase.from('page_views').insert({ page: 'index.html' });
+      if (localStorage.getItem('gtelp_notrack') !== '1') {
+        await _supabase.from('page_views').insert({ page: 'index.html' });
+      }
       const { count } = await _supabase.from('page_views').select('*', { count: 'exact', head: true });
       const el = document.getElementById('visit-counter');
       if (el && count !== null) el.textContent = count.toLocaleString() + '회';

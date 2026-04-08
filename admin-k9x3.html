@@ -115,6 +115,7 @@
           <span class="text-slate-500 text-sm">관리자</span>
         </div>
         <div class="flex items-center gap-2">
+          <button onclick="toggleNoTrack()" id="notrack-btn" class="btn text-xs px-3 py-1.5">🙈 내 방문 제외 OFF</button>
           <a href="index.html" class="btn btn-secondary text-xs px-3 py-1.5">← 메인으로</a>
           <button onclick="logout()" class="btn btn-secondary text-xs px-3 py-1.5">로그아웃</button>
         </div>
@@ -906,6 +907,33 @@
     let sessionTimer, warningTimer;
     const SESSION_DURATION = 30 * 60 * 1000; // 30분
     const WARNING_BEFORE   =  2 * 60 * 1000; //  2분 전 경고
+
+    const NOTRACK_KEY = 'gtelp_notrack';
+
+    function updateNoTrackBtn() {
+      const btn = document.getElementById('notrack-btn');
+      if (!btn) return;
+      const on = localStorage.getItem(NOTRACK_KEY) === '1';
+      btn.textContent = on ? '👁 내 방문 제외 ON' : '🙈 내 방문 제외 OFF';
+      btn.className   = on
+        ? 'btn text-xs px-3 py-1.5 border border-emerald-500 text-emerald-600 bg-emerald-50 rounded-lg font-semibold cursor-pointer'
+        : 'btn btn-secondary text-xs px-3 py-1.5';
+    }
+
+    function toggleNoTrack() {
+      const on = localStorage.getItem(NOTRACK_KEY) === '1';
+      if (on) {
+        localStorage.removeItem(NOTRACK_KEY);
+        alert('내 방문 제외 OFF\n이제부터 이 브라우저의 방문도 통계에 포함됩니다.');
+      } else {
+        localStorage.setItem(NOTRACK_KEY, '1');
+        alert('내 방문 제외 ON ✅\n이제부터 이 브라우저의 방문은 통계에 포함되지 않습니다.');
+      }
+      updateNoTrackBtn();
+    }
+
+    // 페이지 로드 시 버튼 상태 초기화
+    updateNoTrackBtn();
 
     function tryLogin() {
       const val = document.getElementById('pw-input').value;

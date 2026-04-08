@@ -484,6 +484,7 @@
   <!-- 방문 트래킹 -->
   <script>
     (function() {
+      if (localStorage.getItem('gtelp_notrack') === '1') return;
       var page = window.location.pathname.split('/').pop() || 'index.html';
       fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/page_views', {
         method: 'POST',
