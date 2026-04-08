@@ -682,7 +682,18 @@
           </div>
           <!-- 탭2: 네이버블로그 유입 분석 -->
           <div id="ins-panel-2" class="hidden">
-            <div id="insights2-cards"></div>
+            <div class="flex items-center gap-3 mb-4">
+              <button onclick="generateInsights2(_statsRows)" id="btn-insights2"
+                class="btn btn-primary px-5 py-2 text-sm flex items-center gap-2">
+                🤖 AI 분석 실행
+              </button>
+              <span class="text-xs text-slate-400">최근 14일 방문 데이터 기반 · Claude AI 분석</span>
+            </div>
+            <div id="insights2-cards">
+              <div class="rounded-xl p-5 text-center text-slate-400 text-sm" style="background:#F8FAFF;border:1px solid #E2E8F0;">
+                위 버튼을 눌러 AI 분석을 시작하세요
+              </div>
+            </div>
           </div>
         </div>
 
@@ -2203,7 +2214,6 @@
 
       // ── 인사이트 분석 ──
       generateInsights({ rows, dailyCounts, dailyLabels, pageMap, totalCount, todayCount, yesterdayCount, monthCount, kstNow });
-      generateInsights2(rows);
 
       // ── 페이지별 상세 수치 테이블 ──
       // 오늘 / 이번달 per-page 카운트는 rows(14일치)에서 계산
