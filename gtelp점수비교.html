@@ -210,19 +210,40 @@ const DATA = [
   [50,812,'',603,''],
 ];
 
+// 각 컬럼의 rowspan 계산 (연속된 빈 칸 또는 동일 값은 위 셀에 합침)
+function calcSpans(colIdx) {
+  const spans = new Array(DATA.length).fill(1);
+  let activeIdx = -1, activeVal = null;
+  for (let i = 0; i < DATA.length; i++) {
+    const val = String(DATA[i][colIdx]);
+    if (activeVal !== null && (val === '' || val === activeVal)) {
+      spans[activeIdx]++;
+      spans[i] = 0;
+    } else {
+      activeIdx = i;
+      activeVal = val;
+      spans[i] = 1;
+    }
+  }
+  return spans;
+}
+
 // 테이블 렌더링
 function renderTable(highlightGtelp) {
+  const sp = [null, calcSpans(1), calcSpans(2), calcSpans(3), calcSpans(4)];
   const tbody = document.getElementById('tableBody');
-  tbody.innerHTML = DATA.map(([g,t1,f1,t2,f2]) => {
+  tbody.innerHTML = DATA.map(([g,t1,f1,t2,f2], i) => {
     const hl = highlightGtelp === g ? ' class="highlight"' : '';
-    const c1 = (t1===''||t1==='없음') ? `<td class="${t1==='없음'?'empty':''}">${t1||'—'}</td>` : `<td>${t1}</td>`;
-    return `<tr${hl}>
-      <td class="gtelp">${g}</td>
-      ${c1}
-      <td>${f1||'—'}</td>
-      <td>${t2||'—'}</td>
-      <td>${f2||'—'}</td>
-    </tr>`;
+    const vals = ['', t1, f1, t2, f2];
+    let cells = `<td class="gtelp">${g}</td>`;
+    for (let c = 1; c <= 4; c++) {
+      if (sp[c][i] === 0) continue; // 합쳐진 셀 — 렌더 생략
+      const rs = sp[c][i] > 1 ? ` rowspan="${sp[c][i]}"` : '';
+      const v = String(vals[c]);
+      const cls = (v === '없음') ? ' class="empty"' : '';
+      cells += `<td${rs}${cls}>${v === '' ? '' : v}</td>`;
+    }
+    return `<tr${hl}>${cells}</tr>`;
   }).join('');
 }
 
