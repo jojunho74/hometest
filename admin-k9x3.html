@@ -2761,18 +2761,79 @@ ${internalSummary}
         msgEl.textContent = '검색 실패 — 기본 템플릿으로 생성합니다.';
       }
 
-      const result = buildBlogPost({ audience, keyword, subtopic, tone, titleStyle, dateStr, year, blogItems, newsItems });
-      document.getElementById('blog-title-out').value   = result.title;
-      document.getElementById('blog-content-out').value = result.content;
-      document.getElementById('blog-editor-wrap').classList.remove('hidden');
+      // ── 네이버 검색 결과 정리 ──
+      const stripHtml = s => (s||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'");
+      const blogSnippets = blogItems.map(it => `- ${stripHtml(it.title)}: ${stripHtml(it.description)}`).join('\n');
+      const newsSnippets = newsItems.map(it => `- ${stripHtml(it.title)}: ${stripHtml(it.description)}`).join('\n');
+
+      const audienceLabel = { university:'대학 취업지원센터 담당자', student:'대학생·취업준비생', examinee:'G-TELP 수험생' }[audience] || audience;
+      const toneLabel     = { friendly:'친근하고 쉽게', professional:'전문적이고 신뢰감 있게', urgent:'긴박감 있고 행동 촉구하게' }[tone] || tone;
+      const titleLabel    = { question:'질문형 (예: "~하셨나요?")', number:'숫자형 (예: "5가지 방법")', benefit:'혜택형 (예: "~하는 법")' }[titleStyle] || titleStyle;
+
+      const aiPrompt = `당신은 네이버 블로그 전문 작가입니다. 아래 조건으로 G-TELP IBT 관련 블로그 원고를 작성해주세요.
+
+【작성 조건】
+- 대상 독자: ${audienceLabel}
+- 핵심 키워드: ${keyword}${subtopic ? ' / ' + subtopic : ''}
+- 문체·톤: ${toneLabel}
+- 제목 스타일: ${titleLabel}
+- 작성일: ${dateStr}
+
+【참고할 최신 블로그 트렌드】
+${blogSnippets || '(검색 결과 없음)'}
+
+【참고할 최신 뉴스】
+${newsSnippets || '(검색 결과 없음)'}
+
+【G-TELP IBT 핵심 정보】
+- G-TELP IBT = 온라인 영어 진단시험, 대학생 무료 응시 가능
+- 정기시험과 동일 난이도, 즉시 결과 확인
+- 대학 취업지원센터 도입 시 전액 무료, 담당자 업무 최소화
+- 공공기관·공기업 취업 시 G-TELP 성적 활용 가능
+- 지텔프 Level 2 기준: TOEIC 600~900점대 환산 가능
+
+【출력 형식】
+반드시 아래 형식으로만 출력하세요:
+
+TITLE: (제목 1개)
+
+CONTENT:
+(본문 — 네이버 블로그에 바로 올릴 수 있는 형식)
+(소제목은 ▶ 기호 사용)
+(본문 1,200~1,500자)
+(마지막에 해시태그 10개 포함: #G-TELP #지텔프 등)`;
+
+      msgEl.textContent = 'AI가 원고를 작성 중입니다...';
+      btn.textContent = 'AI 작성 중...';
+
+      try {
+        const aiRes = await fetch('/api/ai-insights', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ prompt: aiPrompt })
+        });
+        const aiData = await aiRes.json();
+        const text = aiData?.content?.[0]?.text || '';
+
+        // TITLE / CONTENT 파싱
+        const titleMatch   = text.match(/TITLE:\s*(.+)/);
+        const contentMatch = text.match(/CONTENT:\s*([\s\S]+)/);
+        const title   = titleMatch   ? titleMatch[1].trim()   : keyword + ' 블로그 원고';
+        const content = contentMatch ? contentMatch[1].trim() : text;
+
+        document.getElementById('blog-title-out').value   = title;
+        document.getElementById('blog-content-out').value = content;
+        document.getElementById('blog-editor-wrap').classList.remove('hidden');
+      } catch(e) {
+        alert('AI 원고 생성 오류: ' + e.message);
+      }
 
       btn.disabled = false; btn.textContent = '🤖 원고 생성';
       statusEl.classList.add('hidden');
       document.getElementById('blog-editor-wrap').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function buildBlogPost({ audience, keyword, subtopic, tone, titleStyle, dateStr, year, blogItems = [], newsItems = [] }) {
-      const kw = keyword;
+    function _unused() { const kw = '';
       const sub = subtopic ? ` ${subtopic}` : '';
 
       // ── 검색 결과에서 텍스트 추출 헬퍼 ──
