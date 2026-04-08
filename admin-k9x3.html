@@ -736,6 +736,37 @@
           </div>
         </div>
 
+        <!-- 채용공고 자료실 다운로드 TOP 10 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <h3 class="font-bold text-slate-700">📥 채용공고 자료실 다운로드 TOP 10</h3>
+            <div class="flex gap-1" id="dl-period-btns">
+              <button onclick="renderDownloadTable('daily')"   id="dl-btn-daily"   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">일일</button>
+              <button onclick="renderDownloadTable('weekly')"  id="dl-btn-weekly"  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">주간</button>
+              <button onclick="renderDownloadTable('monthly')" id="dl-btn-monthly" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">월간</button>
+              <button onclick="renderDownloadTable('all')"     id="dl-btn-all"     class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">전체</button>
+            </div>
+          </div>
+          <p id="dl-period-label" class="text-xs text-slate-400 mb-3">이번달 기준</p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-xs text-slate-400 border-b">
+                  <th class="pb-2 font-semibold w-8">순위</th>
+                  <th class="pb-2 font-semibold">기관명</th>
+                  <th class="pb-2 font-semibold hidden md:table-cell">공고명</th>
+                  <th class="pb-2 font-semibold hidden md:table-cell">분류</th>
+                  <th class="pb-2 font-semibold text-right">다운로드</th>
+                </tr>
+              </thead>
+              <tbody id="download-stats-body">
+                <tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-xs text-slate-300 mt-3">* 다운로드 버튼 클릭 시 집계됩니다. 이전 다운로드는 집계에 포함되지 않습니다.</p>
+        </div>
+
         <!-- 페이지별 상세 수치 테이블 -->
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div class="flex items-center justify-between mb-4">
@@ -2085,6 +2116,9 @@
       // ── 유입 경로 테이블 (기본: 월간) ──
       renderReferrerTable('monthly');
 
+      // ── 다운로드 TOP 10 (기본: 월간) ──
+      renderDownloadTable('monthly');
+
       // ── 페이지별 상세 수치 테이블 ──
       // 오늘 / 이번달 per-page 카운트는 rows(14일치)에서 계산
       const pageStatToday   = {};
@@ -2134,6 +2168,73 @@
           </tr>`;
         }).join('');
       }
+    }
+
+    // ─── 다운로드 TOP 10 테이블 ───
+    let _dlPeriod = 'monthly';
+
+    async function renderDownloadTable(period) {
+      _dlPeriod = period;
+      const now    = new Date();
+      const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+      const today  = kstNow.toISOString().slice(0, 10);
+      const kstMonth = kstNow.toISOString().slice(0, 7);
+      const since7 = new Date(kstNow.getTime() - 6 * 864e5).toISOString().slice(0, 10);
+
+      // 버튼 스타일
+      ['daily','weekly','monthly','all'].forEach(p => {
+        const btn = document.getElementById(`dl-btn-${p}`);
+        if (!btn) return;
+        btn.className = p === period
+          ? 'px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50'
+          : 'px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white';
+      });
+
+      const labelEl = document.getElementById('dl-period-label');
+      const tbody   = document.getElementById('download-stats-body');
+      tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>';
+
+      // 기간별 쿼리 조건
+      let query = db.from('download_logs').select('institution, title, category, downloaded_at');
+      if (period === 'daily')   { query = query.gte('downloaded_at', today + 'T00:00:00+09:00').lt('downloaded_at', today + 'T23:59:59+09:00'); if (labelEl) labelEl.textContent = `오늘 (${today}) 기준`; }
+      else if (period === 'weekly')  { query = query.gte('downloaded_at', since7 + 'T00:00:00+09:00'); if (labelEl) labelEl.textContent = `최근 7일 (${since7} ~ ${today}) 기준`; }
+      else if (period === 'monthly') { query = query.gte('downloaded_at', kstMonth + '-01T00:00:00+09:00').lt('downloaded_at', kstMonth.replace(/-\d+$/, m => { const [y,mo]=kstMonth.split('-'); const d=new Date(+y, +mo, 1); return `-${String(d.getMonth()+1).padStart(2,'0')}`; }) + '-01T00:00:00+09:00'); if (labelEl) labelEl.textContent = `이번달 (${kstMonth}) 기준`; }
+      else { if (labelEl) labelEl.textContent = '전체 누적 기준'; }
+
+      const { data, error } = await query.limit(3000);
+      if (error) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-red-400 text-xs">오류: ${error.message}<br><span class="text-slate-400">Supabase에 download_logs 테이블이 없으면 아래 SQL을 실행하세요.</span></td></tr>`;
+        return;
+      }
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">해당 기간 다운로드 데이터가 없습니다.</td></tr>';
+        return;
+      }
+
+      // 집계
+      const dlMap = {};
+      data.forEach(r => {
+        const key = `${r.institution}||${r.title}||${r.category}`;
+        dlMap[key] = (dlMap[key] || 0) + 1;
+      });
+      const sorted = Object.entries(dlMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
+      const rankColors = ['#F59E0B','#94A3B8','#B45309','#6366F1','#3B82F6','#10B981','#EF4444','#8B5CF6','#06B6D4','#F97316'];
+      const rankEmojis = ['🥇','🥈','🥉'];
+
+      tbody.innerHTML = sorted.map(([key, cnt], i) => {
+        const [institution, title, category] = key.split('||');
+        const rankLabel = i < 3 ? rankEmojis[i] : `${i+1}위`;
+        const color = rankColors[i] || '#94A3B8';
+        return `<tr class="border-b border-slate-50 hover:bg-slate-50">
+          <td class="py-2.5 pr-2 text-center font-bold text-sm" style="color:${color};">${rankLabel}</td>
+          <td class="py-2.5 pr-3 font-medium text-slate-700">${institution || '-'}</td>
+          <td class="py-2.5 pr-3 text-slate-500 hidden md:table-cell text-xs">${title || '-'}</td>
+          <td class="py-2.5 pr-3 hidden md:table-cell">
+            <span class="text-xs px-2 py-0.5 rounded-full font-semibold" style="background:#EFF6FF;color:#1D4ED8;">${category || '-'}</span>
+          </td>
+          <td class="py-2.5 text-right font-bold text-slate-800">${cnt.toLocaleString()}</td>
+        </tr>`;
+      }).join('');
     }
 
     // ─── 유입 경로 테이블 렌더링 (period: 'daily' | 'weekly' | 'monthly') ───

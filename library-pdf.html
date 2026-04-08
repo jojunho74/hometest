@@ -168,6 +168,35 @@
     })();
   </script>
 
+  <!-- 다운로드 추적 -->
+  <script>
+    (function() {
+      function trackDownload(institution, title, category) {
+        fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/download_logs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs',
+            'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ institution: institution, title: title, category: category })
+        }).catch(function(){});
+      }
+
+      document.querySelectorAll('.dl-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var card = btn.closest('[data-institution]');
+          if (!card) return;
+          var institution = card.getAttribute('data-institution') || '';
+          var title       = card.getAttribute('data-title') || '';
+          var category    = card.getAttribute('data-category') || '';
+          trackDownload(institution, title, category);
+        });
+      });
+    })();
+  </script>
+
   <!-- 우측 플로팅 버튼 -->
   <style>
     .float-btns{position:fixed;right:16px;bottom:100px;z-index:99;display:flex;flex-direction:column;gap:10px;}
