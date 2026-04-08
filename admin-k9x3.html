@@ -662,6 +662,15 @@
       <!-- ── 통계 탭 ── -->
       <div id="section-stats" class="hidden">
 
+        <!-- AI 인사이트 -->
+        <div id="insights-wrap" class="mb-6 hidden">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-base font-bold text-slate-700">🔍 데이터 인사이트</span>
+            <span class="text-xs text-slate-400">통계 기반 자동 분석</span>
+          </div>
+          <div id="insights-cards" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+        </div>
+
         <!-- 요약 카드 -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div class="bg-white rounded-xl p-5 shadow-sm">
@@ -2119,6 +2128,9 @@
       // ── 다운로드 TOP 10 (기본: 전체) ──
       renderDownloadTable('all');
 
+      // ── 인사이트 분석 ──
+      generateInsights({ rows, dailyCounts, dailyLabels, pageMap, totalCount, todayCount, yesterdayCount, monthCount, kstNow });
+
       // ── 페이지별 상세 수치 테이블 ──
       // 오늘 / 이번달 per-page 카운트는 rows(14일치)에서 계산
       const pageStatToday   = {};
@@ -2168,6 +2180,134 @@
           </tr>`;
         }).join('');
       }
+    }
+
+    // ─── 인사이트 분석 ───
+    function generateInsights({ rows, dailyCounts, dailyLabels, pageMap, totalCount, todayCount, yesterdayCount, monthCount, kstNow }) {
+      const wrap  = document.getElementById('insights-wrap');
+      const cards = document.getElementById('insights-cards');
+      const insights = [];
+
+      // ── 1. 트래픽 트렌드 (최근 7일 vs 이전 7일) ──
+      const last7  = dailyCounts.slice(-7).reduce((a,b) => a+b, 0);
+      const prev7  = dailyCounts.slice(-14,-7).reduce((a,b) => a+b, 0);
+      const trendPct = prev7 > 0 ? Math.round(((last7 - prev7) / prev7) * 100) : null;
+      if (trendPct !== null) {
+        const up = trendPct >= 0;
+        insights.push({
+          icon: up ? '📈' : '📉',
+          color: up ? '#10B981' : '#EF4444',
+          bg: up ? '#F0FDF4' : '#FFF5F5',
+          title: `트래픽 ${up ? '증가' : '감소'} ${Math.abs(trendPct)}%`,
+          body: `최근 7일 방문 ${last7.toLocaleString()}건 vs 이전 7일 ${prev7.toLocaleString()}건. ${up ? '방문자가 늘고 있어요! 콘텐츠 발행이나 SNS 홍보를 계속 유지하세요.' : '방문이 줄고 있어요. 새 콘텐츠 발행이나 SNS 공유로 유입을 늘려보세요.'}`
+        });
+      }
+
+      // ── 2. 오늘 vs 어제 ──
+      if (yesterdayCount > 0) {
+        const diff = todayCount - yesterdayCount;
+        const diffPct = Math.round((diff / yesterdayCount) * 100);
+        const up = diff >= 0;
+        insights.push({
+          icon: up ? '✅' : '⚠️',
+          color: up ? '#3B82F6' : '#F59E0B',
+          bg: up ? '#EFF6FF' : '#FFFBEB',
+          title: `오늘 방문 ${up ? '어제보다 많아요' : '어제보다 적어요'}`,
+          body: `오늘 ${todayCount}명 방문 (어제 ${yesterdayCount}명, ${up ? '+' : ''}${diffPct}%). ${up ? '좋은 흐름이에요!' : '아직 하루가 끝나지 않았어요. 오후 유입을 기대해보세요.'}`
+        });
+      } else if (todayCount > 0) {
+        insights.push({
+          icon: '✅', color: '#3B82F6', bg: '#EFF6FF',
+          title: `오늘 ${todayCount}명 방문`,
+          body: '오늘 방문 데이터가 쌓이고 있어요.'
+        });
+      }
+
+      // ── 3. 인기 페이지 ──
+      const topPages = Object.entries(pageMap).sort((a,b) => b[1]-a[1]).slice(0,3);
+      if (topPages.length > 0) {
+        const [topPage, topCnt] = topPages[0];
+        const totalAll = Object.values(pageMap).reduce((a,b)=>a+b,0) || 1;
+        const topPct = Math.round((topCnt / totalAll) * 100);
+        const pageLabels = { 'index.html':'메인', 'student.html':'학생신청', 'schedule.html':'시험일정', 'library.html':'홍보자료', 'library-pdf.html':'채용공고', 'package.html':'패키지' };
+        const label = pageLabels[topPage] || topPage;
+        const second = topPages[1] ? `다음으로 ${pageLabels[topPages[1][0]] || topPages[1][0]} (${topPages[1][1]}건)이 많아요.` : '';
+        insights.push({
+          icon: '🏆', color: '#8B5CF6', bg: '#F5F3FF',
+          title: `인기 페이지: ${label}`,
+          body: `전체 방문의 ${topPct}%가 ${label} 페이지에 집중됩니다. ${second}`
+        });
+      }
+
+      // ── 4. 최고 방문 요일 ──
+      const weekdays = ['일','월','화','수','목','금','토'];
+      const wdCounts = Array(7).fill(0);
+      rows.forEach(r => {
+        const kst = new Date(new Date(r.visited_at).getTime() + 9*60*60*1000);
+        wdCounts[kst.getDay()]++;
+      });
+      const maxWd = wdCounts.indexOf(Math.max(...wdCounts));
+      const minWd = wdCounts.indexOf(Math.min(...wdCounts));
+      if (wdCounts[maxWd] > 0) {
+        insights.push({
+          icon: '📅', color: '#06B6D4', bg: '#ECFEFF',
+          title: `${weekdays[maxWd]}요일이 가장 바빠요`,
+          body: `최근 14일 기준 ${weekdays[maxWd]}요일 방문이 ${wdCounts[maxWd]}건으로 가장 많습니다. 중요한 공지나 SNS 게시물은 ${weekdays[maxWd]}요일에 맞춰 올리면 효과적이에요. 반면 ${weekdays[minWd]}요일(${wdCounts[minWd]}건)은 한산한 편입니다.`
+        });
+      }
+
+      // ── 5. 유입 경로 인사이트 ──
+      const refMap = {};
+      rows.forEach(r => {
+        let src = '직접';
+        if (r.referrer) {
+          try {
+            const host = new URL(r.referrer).hostname.replace(/^www\./,'');
+            if (host.includes('google'))     src = 'Google';
+            else if (host.includes('naver')) src = 'Naver';
+            else if (host.includes('kakao')) src = '카카오';
+            else if (host.includes('instagram')) src = '인스타';
+            else if (host.includes('facebook'))  src = '페이스북';
+            else src = host;
+          } catch { src = '외부'; }
+        }
+        refMap[src] = (refMap[src] || 0) + 1;
+      });
+      const topRef = Object.entries(refMap).sort((a,b)=>b[1]-a[1])[0];
+      const directCnt = refMap['직접'] || 0;
+      const directPct = rows.length > 0 ? Math.round((directCnt / rows.length) * 100) : 0;
+      if (topRef) {
+        const isOrganicGood = (refMap['Google'] || 0) + (refMap['Naver'] || 0) > rows.length * 0.2;
+        insights.push({
+          icon: '🔍', color: '#F97316', bg: '#FFF7ED',
+          title: `주요 유입: ${topRef[0]} (${Math.round(topRef[1]/rows.length*100)}%)`,
+          body: `직접 접속이 ${directPct}%입니다. ${isOrganicGood ? '검색 유입이 20% 이상으로 SEO가 잘 되고 있어요!' : '검색 유입이 적어요. 블로그 원고를 꾸준히 올려 SEO를 강화해보세요.'} ${directPct > 60 ? '직접 접속 비중이 높다는 건 단골 방문자가 많다는 뜻이에요.' : ''}`
+        });
+      }
+
+      // ── 6. 이번달 페이스 ──
+      const dayOfMonth = kstNow.getDate();
+      const daysInMonth = new Date(kstNow.getFullYear(), kstNow.getMonth()+1, 0).getDate();
+      const pace = dayOfMonth > 0 ? Math.round((monthCount / dayOfMonth) * daysInMonth) : 0;
+      if (monthCount > 0) {
+        insights.push({
+          icon: '📊', color: '#1E4D8C', bg: '#EFF6FF',
+          title: `이번달 예상 방문: ${pace.toLocaleString()}명`,
+          body: `이번달 ${dayOfMonth}일까지 ${monthCount.toLocaleString()}명 방문. 현재 페이스라면 월말까지 약 ${pace.toLocaleString()}명이 방문할 것으로 예상돼요. ${pace > (monthCount / dayOfMonth * 30) ? '' : ''}`
+        });
+      }
+
+      // ── 렌더링 ──
+      if (insights.length === 0) { wrap.classList.add('hidden'); return; }
+      wrap.classList.remove('hidden');
+      cards.innerHTML = insights.map(ins => `
+        <div class="rounded-xl p-4 flex gap-3 items-start" style="background:${ins.bg};border:1px solid ${ins.color}22;">
+          <span class="text-2xl flex-shrink-0">${ins.icon}</span>
+          <div>
+            <p class="font-bold text-sm mb-1" style="color:${ins.color};">${ins.title}</p>
+            <p class="text-xs text-slate-600 leading-relaxed">${ins.body}</p>
+          </div>
+        </div>`).join('');
     }
 
     // ─── 다운로드 TOP 10 테이블 ───
