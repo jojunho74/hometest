@@ -2460,7 +2460,7 @@
       const internalSummary  = Object.entries(internalMap).sort((a,b)=>b[1]-a[1]).slice(0,7).map(([k,v])=>`${k} (${v}건)`).join(', ') || '없음';
       const pageSummary   = Object.entries(pageMap2).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${pageLabels[k]||k}: ${v}건`).join(', ');
 
-      const prompt = `당신은 웹사이트 마케팅 전략가입니다. 아래는 G-TELP IBT 대학컨설팅 홈페이지의 최근 14일 방문 통계입니다.
+      const aiPrompt = `당신은 웹사이트 마케팅 전략가입니다. 아래는 G-TELP IBT 대학컨설팅 홈페이지의 최근 14일 방문 통계입니다.
 
 【사이트 소개】
 - G-TELP IBT 무료 영어진단 서비스를 대학 취업지원센터에 제공하는 컨설팅 사이트
@@ -2498,7 +2498,7 @@ ${internalSummary}
       try {
         let apiKey = localStorage.getItem('anthropic_api_key');
         if (!apiKey) {
-          apiKey = prompt('Anthropic API 키를 입력하세요 (한 번만 입력하면 저장됩니다):');
+          apiKey = window.prompt('Anthropic API 키를 입력하세요 (한 번만 입력하면 저장됩니다):');
           if (!apiKey) { container.innerHTML = '<div class="text-xs text-slate-400 p-4">API 키가 없어 분석을 실행할 수 없습니다.</div>'; return; }
           localStorage.setItem('anthropic_api_key', apiKey.trim());
         }
@@ -2513,7 +2513,7 @@ ${internalSummary}
           body: JSON.stringify({
             model: 'claude-haiku-4-5-20251001',
             max_tokens: 1024,
-            messages: [{ role: 'user', content: prompt }]
+            messages: [{ role: 'user', content: aiPrompt }]
           })
         });
         const data = await res.json();
