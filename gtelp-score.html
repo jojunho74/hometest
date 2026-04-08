@@ -83,7 +83,7 @@
       <a href="student.html">IBT 학생 신청</a>
       <a href="library-pdf.html">채용공고 자료실</a>
       <a href="index.html#faq">FAQ</a>
-      <a href="gtelp점수비교.html" class="active">점수대비표</a>
+      <a href="gtelp-score.html" class="active">점수대비표</a>
       <a href="index.html#university-news">대학소식</a>
       <a href="index.html#school-programs">대학활동</a>
       <a href="index.html#job-postings">채용공고</a>
@@ -102,7 +102,7 @@
     <a href="student.html">IBT 학생 신청</a>
     <a href="library-pdf.html">채용공고 자료실</a>
     <a href="index.html#faq">FAQ</a>
-    <a href="gtelp점수비교.html">점수대비표</a>
+    <a href="gtelp-score.html">점수대비표</a>
     <a href="index.html#university-news">대학소식</a>
     <a href="index.html#school-programs">대학활동</a>
     <a href="index.html#job-postings">채용공고</a>
@@ -325,7 +325,7 @@ function findScore() {
 // notrack
 (function(){
   if(localStorage.getItem('gtelp_notrack')==='1') return;
-  var page=window.location.pathname.split('/').pop()||'gtelp점수비교.html';
+  var page=window.location.pathname.split('/').pop()||'gtelp-score.html';
   fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/page_views',{
     method:'POST',
     headers:{'Content-Type':'application/json','apikey':'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs','Authorization':'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'},
