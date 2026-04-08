@@ -743,11 +743,11 @@
             <div class="flex gap-1" id="dl-period-btns">
               <button onclick="renderDownloadTable('daily')"   id="dl-btn-daily"   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">일일</button>
               <button onclick="renderDownloadTable('weekly')"  id="dl-btn-weekly"  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">주간</button>
-              <button onclick="renderDownloadTable('monthly')" id="dl-btn-monthly" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">월간</button>
-              <button onclick="renderDownloadTable('all')"     id="dl-btn-all"     class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">전체</button>
+              <button onclick="renderDownloadTable('monthly')" id="dl-btn-monthly" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">월간</button>
+              <button onclick="renderDownloadTable('all')"     id="dl-btn-all"     class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">전체</button>
             </div>
           </div>
-          <p id="dl-period-label" class="text-xs text-slate-400 mb-3">이번달 기준</p>
+          <p id="dl-period-label" class="text-xs text-slate-400 mb-3">전체 누적 기준</p>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
@@ -2116,8 +2116,8 @@
       // ── 유입 경로 테이블 (기본: 월간) ──
       renderReferrerTable('monthly');
 
-      // ── 다운로드 TOP 10 (기본: 월간) ──
-      renderDownloadTable('monthly');
+      // ── 다운로드 TOP 10 (기본: 전체) ──
+      renderDownloadTable('all');
 
       // ── 페이지별 상세 수치 테이블 ──
       // 오늘 / 이번달 per-page 카운트는 rows(14일치)에서 계산
