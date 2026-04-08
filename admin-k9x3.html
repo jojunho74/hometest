@@ -709,6 +709,28 @@
           <canvas id="chart-weekday-pages" height="100"></canvas>
         </div>
 
+        <!-- 유입 경로 테이블 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-700">유입 경로 (어디서 접속했는지)</h3>
+            <span class="text-xs text-slate-400">최근 14일 기준</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-xs text-slate-400 border-b">
+                  <th class="pb-2 font-semibold">유입 경로</th>
+                  <th class="pb-2 font-semibold text-right">방문수</th>
+                  <th class="pb-2 font-semibold pl-4">비율</th>
+                </tr>
+              </thead>
+              <tbody id="referrer-stats-body">
+                <tr><td colspan="3" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- 페이지별 상세 수치 테이블 -->
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div class="flex items-center justify-between mb-4">
@@ -1892,7 +1914,7 @@
       const since14 = new Date(kstNow.getTime() - 13 * 864e5).toISOString().slice(0, 10);
       const { data: views, error } = await db
         .from('page_views')
-        .select('page, visited_at')
+        .select('page, visited_at, referrer')
         .gte('visited_at', since14 + 'T00:00:00+09:00')
         .order('visited_at', { ascending: false })
         .limit(5000);
@@ -2050,6 +2072,57 @@
           }
         }
       });
+
+      // ── 유입 경로 테이블 ──
+      const refMap = {};
+      rows.forEach(r => {
+        let src = '직접 접속 (주소창/북마크)';
+        if (r.referrer) {
+          try {
+            const u = new URL(r.referrer);
+            const host = u.hostname.replace(/^www\./, '');
+            // 잘 알려진 소스 라벨링
+            if (host.includes('google'))       src = '🔍 Google 검색';
+            else if (host.includes('naver'))   src = '🔍 Naver 검색';
+            else if (host.includes('daum'))    src = '🔍 Daum 검색';
+            else if (host.includes('kakao'))   src = '💬 카카오톡';
+            else if (host.includes('t.co') || host.includes('twitter') || host.includes('x.com')) src = '🐦 X(트위터)';
+            else if (host.includes('instagram')) src = '📸 인스타그램';
+            else if (host.includes('facebook'))  src = '📘 페이스북';
+            else if (host.includes('youtube'))   src = '▶️ 유튜브';
+            else if (host.includes('blog.naver')) src = '📝 네이버 블로그';
+            else if (host.includes('vercel.app') || host === location.hostname) src = '🔗 내부 링크';
+            else src = `🌐 ${host}`;
+          } catch { src = '🌐 기타 외부'; }
+        }
+        refMap[src] = (refMap[src] || 0) + 1;
+      });
+
+      const refTotal = Object.values(refMap).reduce((a, b) => a + b, 0) || 1;
+      const sortedRefs = Object.entries(refMap).sort((a, b) => b[1] - a[1]);
+      const refColors = ['#6366F1','#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4','#F97316'];
+
+      const refTbody = document.getElementById('referrer-stats-body');
+      if (sortedRefs.length === 0) {
+        refTbody.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-slate-400 text-xs">데이터가 없습니다.</td></tr>';
+      } else {
+        refTbody.innerHTML = sortedRefs.map(([src, cnt], i) => {
+          const pct = Math.round((cnt / refTotal) * 100);
+          const color = refColors[i % refColors.length];
+          return `<tr class="border-b border-slate-50 hover:bg-slate-50">
+            <td class="py-2.5 pr-4 font-medium text-slate-700">${src}</td>
+            <td class="py-2.5 text-right font-bold text-slate-800">${cnt.toLocaleString()}</td>
+            <td class="py-2.5 pl-4">
+              <div class="flex items-center gap-2">
+                <div class="flex-1 bg-slate-100 rounded-full h-2" style="min-width:80px;">
+                  <div class="h-2 rounded-full" style="width:${pct}%;background:${color};"></div>
+                </div>
+                <span class="text-xs text-slate-400 w-8 text-right">${pct}%</span>
+              </div>
+            </td>
+          </tr>`;
+        }).join('');
+      }
 
       // ── 페이지별 상세 수치 테이블 ──
       // 오늘 / 이번달 per-page 카운트는 rows(14일치)에서 계산
