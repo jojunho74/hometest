@@ -7,77 +7,61 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F8FAFF;color:#1E293B;}
+    body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F8FAFF;color:#1E293B;min-height:100vh;}
+
+    /* 헤더 */
     header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #E2E8F0;box-shadow:0 1px 4px rgba(0,0,0,.06);}
     .hinner{max-width:1200px;margin:0 auto;padding:0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;}
-    .hlogo{font-size:1rem;font-weight:800;color:#1E4D8C;text-decoration:none;white-space:nowrap;flex-shrink:0;}
-    .hnav{display:flex;align-items:center;gap:4px;font-size:0.8rem;font-weight:600;}
-    .hnav a{color:#475569;text-decoration:none;transition:background .18s,color .18s;padding:5px 9px;border-radius:8px;font-size:0.78rem;}
+    .hlogo{font-size:1rem;font-weight:800;color:#1E4D8C;text-decoration:none;white-space:nowrap;}
+    .hnav{display:flex;align-items:center;gap:4px;}
+    .hnav a{color:#475569;text-decoration:none;padding:5px 9px;border-radius:8px;font-size:0.78rem;font-weight:600;}
     .hnav a:hover,.hnav a.active{background:#1E4D8C;color:#fff;}
-    .hbtn{padding:8px 18px;border-radius:8px;font-size:0.8rem;font-weight:700;background:#1E4D8C;color:#fff;text-decoration:none;transition:background .15s;}
-    .hbtn:hover{background:#163870;}
-    .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:#1E4D8C;border:none;padding:6px;border-radius:8px;}
-    .hamburger span{display:block;height:2px;background:#fff;border-radius:2px;}
-    .mobile-menu{display:none;flex-direction:column;background:#fff;border-top:1px solid #E2E8F0;padding:12px 16px 16px;}
-    .mobile-menu a{padding:12px 4px;font-size:0.9rem;font-weight:600;color:#1E293B;text-decoration:none;border-bottom:1px solid #F1F5F9;}
-    .mobile-menu a:last-child{border-bottom:none;}
-    .mobile-menu .mbtn{margin-top:12px;display:block;text-align:center;padding:12px;border-radius:8px;background:#1E4D8C;color:#fff;font-weight:700;text-decoration:none;}
-    .mobile-menu.open{display:flex;}
-    @media(max-width:768px){.hnav{display:none;}.hbtn{display:none;}.hamburger{display:flex;}}
+    .hbtn{padding:8px 18px;border-radius:8px;font-size:0.8rem;font-weight:700;background:#1E4D8C;color:#fff;text-decoration:none;}
+    @media(max-width:768px){.hnav{display:none;}.hbtn{display:none;}}
 
-    /* 메인 레이아웃 */
-    .main-wrap{max-width:1200px;margin:0 auto;padding:28px 16px 60px;}
-    .page-title{font-size:1.25rem;font-weight:800;color:#1E293B;margin-bottom:20px;}
-
+    /* 레이아웃 */
+    .wrap{max-width:1200px;margin:0 auto;padding:28px 16px 60px;}
     .layout{display:flex;gap:20px;align-items:flex-start;}
+    @media(max-width:860px){.layout{flex-direction:column;}}
 
-    /* 좌측: 채용공고 카드 그리드 */
-    .left-panel{flex:1;min-width:0;}
-    .left-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-    .panel-label{font-size:13px;font-weight:700;color:#64748B;}
-    .cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-    .job-card{background:#fff;border-radius:12px;border:1px solid rgba(0,0,0,.08);padding:18px;display:flex;flex-direction:column;min-height:140px;box-shadow:0 1px 4px rgba(0,0,0,.06);text-decoration:none;transition:box-shadow .2s;}
-    .job-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.12);}
-    .job-card img{height:50px;width:auto;max-width:100%;object-fit:contain;border-radius:4px;margin-bottom:8px;}
-    .job-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:#EFF6FF;color:#1E4D8C;margin-bottom:6px;}
-    .job-title{font-weight:700;font-size:0.8rem;line-height:1.4;flex:1;}
-    .job-date{font-size:10px;color:#94A3B8;margin-top:10px;}
-    /* 슬라이더 도트 */
-    .slider-nav{display:flex;align-items:center;justify-content:space-between;margin-top:14px;}
-    .slider-dots{display:flex;gap:6px;justify-content:center;flex:1;}
-    .s-arrow{width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid #E2E8F0;box-shadow:0 1px 4px rgba(0,0,0,.1);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#1E293B;flex-shrink:0;}
-    .s-arrow:hover{background:#EFF6FF;}
+    /* 좌측 카드 패널 */
+    .left{flex:1;min-width:0;}
+    .panel-hd{font-size:13px;font-weight:700;color:#64748B;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+    @media(max-width:560px){.cards{grid-template-columns:repeat(2,1fr);}}
+    .card{background:#fff;border-radius:12px;border:1px solid #E2E8F0;padding:16px;display:flex;flex-direction:column;min-height:140px;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,.06);transition:box-shadow .2s;}
+    .card:hover{box-shadow:0 4px 16px rgba(0,0,0,.12);}
+    .card img{height:48px;width:auto;max-width:100%;object-fit:contain;margin-bottom:8px;}
+    .card-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:#EFF6FF;color:#1E4D8C;margin-bottom:6px;}
+    .card-title{font-size:0.8rem;font-weight:700;line-height:1.4;flex:1;}
+    .card-date{font-size:10px;color:#94A3B8;margin-top:10px;}
+    .nav-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;}
+    .arrow{width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid #E2E8F0;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:#1E293B;box-shadow:0 1px 4px rgba(0,0,0,.08);}
+    .arrow:hover{background:#EFF6FF;}
+    .dot{height:8px;border-radius:4px;border:none;cursor:pointer;background:#CBD5E1;transition:all .3s;}
+    .dot.on{background:#1E4D8C;width:20px;}
+    .dot:not(.on){width:8px;}
 
-    /* 우측: 채용달력 스크롤 리스트 */
-    .right-panel{width:300px;flex-shrink:0;}
-    .right-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-    .cal-box{background:#fff;border-radius:12px;border:1px solid #E2E8F0;box-shadow:0 1px 6px rgba(0,0,0,.06);overflow:hidden;}
-    .cal-box-head{padding:12px 16px;border-bottom:1px solid #F1F5F9;font-size:12px;font-weight:700;color:#475569;display:flex;align-items:center;justify-content:space-between;}
-    .cal-scroll-wrap{height:440px;overflow:hidden;position:relative;}
-    .cal-scroll-inner{transition:transform .6s cubic-bezier(.4,0,.2,1);}
-    .cal-row{display:flex;align-items:center;gap:0;padding:9px 14px;border-bottom:1px solid #F8FAFF;}
-    .cal-row:last-child{border-bottom:none;}
-    .cal-row:hover{background:#F8FAFF;}
-    .cal-row-date{font-size:11px;font-weight:600;color:#64748B;width:68px;flex-shrink:0;font-family:monospace;}
-    .cal-row-type{font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;flex-shrink:0;width:42px;text-align:center;}
-    .type-시작{background:#DBEAFE;color:#1E40AF;}
-    .type-마감{background:#FEE2E2;color:#B91C1C;}
-    .type-인적성{background:#FEF3C7;color:#92400E;}
-    .type-기타{background:#F1F5F9;color:#475569;}
-    .cal-row-co{font-size:12px;color:#1E293B;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:8px;}
-    .cal-progress{height:3px;background:#EFF6FF;}
-    .cal-progress-bar{height:100%;background:#1E4D8C;transition:width .3s linear;}
-
-    /* 반응형 */
-    @media(max-width:900px){
-      .layout{flex-direction:column;}
-      .right-panel{width:100%;}
-      .cards-grid{grid-template-columns:repeat(3,1fr);}
-    }
-    @media(max-width:560px){
-      .cards-grid{grid-template-columns:repeat(2,1fr);}
-      .right-panel{width:100%;}
-    }
+    /* 우측 달력 패널 */
+    .right{width:300px;flex-shrink:0;}
+    @media(max-width:860px){.right{width:100%;}}
+    .cal-card{background:#fff;border-radius:12px;border:1px solid #E2E8F0;box-shadow:0 1px 6px rgba(0,0,0,.06);overflow:hidden;}
+    .cal-hd{padding:10px 14px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;}
+    .cal-hd-left{font-size:12px;font-weight:700;color:#475569;}
+    .cal-hd-right{font-size:11px;color:#94A3B8;}
+    .cal-body{overflow:hidden;}
+    .cal-list{list-style:none;}
+    .cal-item{display:flex;align-items:center;gap:0;padding:8px 14px;border-bottom:1px solid #F8FAFF;}
+    .cal-item:last-child{border-bottom:none;}
+    .cal-dt{font-size:11px;color:#64748B;font-weight:600;width:70px;flex-shrink:0;font-family:monospace;}
+    .cal-tp{font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;flex-shrink:0;width:40px;text-align:center;}
+    .tp-s{background:#DBEAFE;color:#1E40AF;}
+    .tp-e{background:#FEE2E2;color:#B91C1C;}
+    .tp-a{background:#FEF3C7;color:#92400E;}
+    .tp-o{background:#F1F5F9;color:#475569;}
+    .cal-co{font-size:12px;font-weight:600;color:#1E293B;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:8px;}
+    .cal-prog{height:3px;background:#EFF6FF;}
+    .cal-prog-bar{height:3px;background:#1E4D8C;transition:width .4s;}
   </style>
 </head>
 <body>
@@ -93,60 +77,46 @@
       <a href="job-calendar.html" class="active">채용달력</a>
       <a href="gtelp-score.html">점수대비표</a>
     </nav>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <a href="index.html#consultation-form" class="hbtn">무료 신청하기</a>
-      <button class="hamburger" id="hamburger" onclick="document.getElementById('mobile-menu').classList.toggle('open')" aria-label="메뉴">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </div>
-  <div class="mobile-menu" id="mobile-menu">
-    <a href="index.html#about">서비스 소개</a>
-    <a href="package.html">패키지</a>
-    <a href="student.html">IBT 학생 신청</a>
-    <a href="library-pdf.html">채용공고 자료실</a>
-    <a href="job-calendar.html">채용달력</a>
-    <a href="gtelp-score.html">점수대비표</a>
-    <a href="index.html#consultation-form" class="mbtn">무료 신청하기</a>
+    <a href="index.html#consultation-form" class="hbtn">무료 신청하기</a>
   </div>
 </header>
 
-<div class="main-wrap">
+<div class="wrap">
   <div class="layout">
 
-    <!-- ── 좌측: 채용공고 카드 3열 ── -->
-    <div class="left-panel">
-      <div class="left-header">
-        <span class="panel-label">채용공고</span>
-        <span id="jobs-count" style="font-size:11px;color:#94A3B8;"></span>
+    <!-- 좌측: 채용공고 카드 -->
+    <div class="left">
+      <div class="panel-hd">
+        <span>채용공고</span>
+        <span id="jobs-count" style="font-size:11px;color:#94A3B8;font-weight:400;"></span>
       </div>
-      <div class="cards-grid" id="cards-grid">
-        <div style="grid-column:1/-1;text-align:center;padding:40px;color:#94A3B8;font-size:14px;">불러오는 중...</div>
+      <div class="cards" id="cards">
+        <div style="grid-column:1/-1;text-align:center;padding:48px 0;color:#94A3B8;font-size:14px;">불러오는 중...</div>
       </div>
-      <div class="slider-nav" id="slider-nav" style="display:none;">
-        <button class="s-arrow" onclick="jobSlide(-1)">‹</button>
-        <div class="slider-dots" id="slider-dots"></div>
-        <button class="s-arrow" onclick="jobSlide(1)">›</button>
+      <div class="nav-row" id="nav-row" style="display:none;">
+        <button class="arrow" onclick="jPrev()">‹</button>
+        <div id="dots" style="display:flex;gap:6px;"></div>
+        <button class="arrow" onclick="jNext()">›</button>
       </div>
     </div>
 
-    <!-- ── 우측: 채용달력 스크롤 리스트 ── -->
-    <div class="right-panel">
-      <div class="right-header">
-        <span class="panel-label">채용달력</span>
-        <span id="cal-total" style="font-size:11px;color:#94A3B8;"></span>
+    <!-- 우측: 채용달력 -->
+    <div class="right">
+      <div class="panel-hd">
+        <span>채용달력</span>
+        <span id="cal-count" style="font-size:11px;color:#94A3B8;font-weight:400;"></span>
       </div>
-      <div class="cal-box">
-        <div class="cal-box-head">
-          <span id="cal-range-label">날짜</span>
-          <span id="cal-page-label" style="font-size:11px;color:#94A3B8;"></span>
+      <div class="cal-card">
+        <div class="cal-hd">
+          <span class="cal-hd-left" id="cal-label">로딩 중...</span>
+          <span class="cal-hd-right" id="cal-pg"></span>
         </div>
-        <div class="cal-scroll-wrap" id="cal-scroll-wrap">
-          <div class="cal-scroll-inner" id="cal-scroll-inner">
-            <div style="text-align:center;padding:40px;color:#94A3B8;font-size:13px;">불러오는 중...</div>
-          </div>
+        <div class="cal-body">
+          <ul class="cal-list" id="cal-list">
+            <li style="padding:40px;text-align:center;color:#94A3B8;font-size:13px;">불러오는 중...</li>
+          </ul>
         </div>
-        <div class="cal-progress"><div class="cal-progress-bar" id="cal-progress-bar" style="width:0%"></div></div>
+        <div class="cal-prog"><div class="cal-prog-bar" id="cal-bar" style="width:0%"></div></div>
       </div>
     </div>
 
@@ -154,158 +124,123 @@
 </div>
 
 <script>
-  const { createClient } = supabase;
-  const _sb = createClient(
-    'https://byzulmxcuhsrjdphmuym.supabase.co',
-    'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
-  );
+(function() {
+  var SB_URL = 'https://byzulmxcuhsrjdphmuym.supabase.co';
+  var SB_KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
+  var _sb = supabase.createClient(SB_URL, SB_KEY);
 
-  // ── 채용공고 카드 (3열, 6개/페이지) ──
-  const JOB_PER = 6;
-  let jobPage = 0, jobPages = [];
+  /* ── 채용공고 카드 ── */
+  var JP = 6, jPage = 0, jPages = [];
 
-  function buildJobCards() {
-    const grid = document.getElementById('cards-grid');
-    if (!jobPages.length) {
-      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#94A3B8;font-size:14px;">등록된 채용공고가 없습니다.</div>';
+  function buildCards() {
+    var g = document.getElementById('cards');
+    if (!jPages.length) { g.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:#94A3B8;font-size:14px;">채용공고가 없습니다.</div>'; return; }
+    var rows = jPages[jPage];
+    g.innerHTML = rows.map(function(r) {
+      var d = new Date(r.created_at);
+      var ds = d.getFullYear() + '.' + pad(d.getMonth()+1) + '.' + pad(d.getDate()) + '.';
+      var bg = (r.bg_color && r.bg_color.match(/^#[0-9a-fA-F]{6}$/)) ? r.bg_color : '#FFFFFF';
+      var dark = isDark(bg);
+      var tc = dark ? '#fff' : '#1E293B';
+      var sc = dark ? 'rgba(255,255,255,.6)' : '#94A3B8';
+      var bb = dark ? 'rgba(255,255,255,.2)' : '#EFF6FF';
+      var bc = dark ? '#fff' : '#1E4D8C';
+      var logo = r.logo_url ? '<img src="' + r.logo_url + '" alt="' + esc(r.school_name) + '"/>' : '';
+      var html = logo
+        + '<span class="card-badge" style="background:' + bb + ';color:' + bc + ';">' + esc(r.school_name) + '</span>'
+        + '<p class="card-title" style="color:' + tc + ';">' + esc(r.title) + '</p>'
+        + '<p class="card-date" style="color:' + sc + ';">' + ds + '</p>';
+      var style = 'background:' + bg + ';';
+      return r.link
+        ? '<a href="' + r.link + '" target="_blank" class="card" style="' + style + '">' + html + '</a>'
+        : '<div class="card" style="' + style + '">' + html + '</div>';
+    }).join('');
+    buildDots();
+  }
+
+  function buildDots() {
+    var d = document.getElementById('dots');
+    d.innerHTML = jPages.map(function(_, i) {
+      return '<button class="dot' + (i===jPage?' on':'') + '" onclick="jGo(' + i + ')"></button>';
+    }).join('');
+  }
+
+  function jGo(p) { jPage = p; buildCards(); }
+  window.jNext = function() { jGo((jPage+1) % jPages.length); };
+  window.jPrev = function() { jGo((jPage - 1 + jPages.length) % jPages.length); };
+
+  _sb.from('job_postings').select('*').order('sort_order', {ascending:true}).then(function(res) {
+    var g = document.getElementById('cards');
+    if (res.error) {
+      g.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:#EF4444;font-size:13px;">오류: ' + res.error.message + '</div>';
       return;
     }
-    const page = jobPages[jobPage];
-    grid.innerHTML = page.map(function(r) {
-      try {
-        const date = new Date(r.created_at);
-        const dateStr = date.getFullYear() + '.' + String(date.getMonth()+1).padStart(2,'0') + '.' + String(date.getDate()).padStart(2,'0') + '.';
-        const bg = r.bg_color && r.bg_color.length >= 7 ? r.bg_color : '#FFFFFF';
-        const rv = parseInt(bg.slice(1,3),16)||255, gv = parseInt(bg.slice(3,5),16)||255, bv = parseInt(bg.slice(5,7),16)||255;
-        const darkBg = (rv*.299 + gv*.587 + bv*.114) < 128;
-        const tc  = darkBg ? '#fff' : '#1E293B';
-        const sc  = darkBg ? 'rgba(255,255,255,.65)' : '#94A3B8';
-        const bbg = darkBg ? 'rgba(255,255,255,.2)' : '#EFF6FF';
-        const bc  = darkBg ? '#fff' : '#1E4D8C';
-        const logoHtml = r.logo_url ? '<img src="' + r.logo_url + '" alt="' + (r.school_name||'') + '" style="height:50px;width:auto;max-width:100%;object-fit:contain;border-radius:4px;margin-bottom:8px;"/>' : '';
-        const inner = logoHtml
-          + '<span style="display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:' + bbg + ';color:' + bc + ';margin-bottom:6px;">' + (r.school_name||'') + '</span>'
-          + '<p style="font-weight:700;font-size:0.8rem;line-height:1.4;color:' + tc + ';flex:1;">' + (r.title||'') + '</p>'
-          + '<p style="font-size:10px;color:' + sc + ';margin-top:10px;">' + dateStr + '</p>';
-        return r.link
-          ? '<a href="' + r.link + '" target="_blank" class="job-card" style="background:' + bg + ';">' + inner + '</a>'
-          : '<div class="job-card" style="background:' + bg + ';">' + inner + '</div>';
-      } catch(e) {
-        return '<div class="job-card"><p style="font-size:12px;color:#94A3B8;">' + (r.school_name||'') + '</p></div>';
-      }
-    }).join('');
-    renderJobDots();
-  }
+    var data = res.data || [];
+    if (!data.length) { buildCards(); return; }
+    document.getElementById('jobs-count').textContent = '총 ' + data.length + '건';
+    jPages = [];
+    for (var i = 0; i < data.length; i += JP) jPages.push(data.slice(i, i + JP));
+    buildCards();
+    document.getElementById('nav-row').style.display = 'flex';
+    setInterval(window.jNext, 5000);
+  });
 
-  function renderJobDots() {
-    const dots = document.getElementById('slider-dots');
-    dots.innerHTML = jobPages.map(function(_,i) {
-      return '<button onclick="jobGoTo(' + i + ')" style="width:' + (i===jobPage?'20px':'8px') + ';height:8px;border-radius:4px;border:none;cursor:pointer;transition:all .3s;background:' + (i===jobPage?'#1E4D8C':'#CBD5E1') + ';"></button>';
-    }).join('');
-  }
-
-  function jobGoTo(p) { jobPage = p; buildJobCards(); }
-  window.jobSlide = function(d) { jobGoTo(Math.max(0, Math.min(jobPages.length-1, jobPage+d))); };
-
-  (async function loadJobs() {
-    const grid = document.getElementById('cards-grid');
-    try {
-      const res = await _sb.from('job_postings').select('*').order('sort_order', { ascending: true });
-      const data = res.data, error = res.error;
-      if (error) throw new Error(error.message);
-      if (!data || !data.length) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#94A3B8;font-size:14px;">채용공고가 없습니다.</div>';
-        return;
-      }
-      document.getElementById('jobs-count').textContent = '총 ' + data.length + '건';
-      jobPages = [];
-      for (var i = 0; i < data.length; i += JOB_PER) jobPages.push(data.slice(i, i+JOB_PER));
-      buildJobCards();
-      document.getElementById('slider-nav').style.display = 'flex';
-      setInterval(function() { jobGoTo((jobPage+1) % jobPages.length); }, 5000);
-    } catch(e) {
-      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#EF4444;font-size:13px;">채용공고 로드 오류: ' + e.message + '</div>';
-    }
-  })();
-
-  // ── 채용달력 스크롤 리스트 ──
-  const CAL_PER = 10;
-  let calData = [], calPage = 0, calTimer = null, calFirstRender = true;
+  /* ── 채용달력 리스트 ── */
+  var CP = 10, cPage = 0, cData = [];
 
   function typeClass(t) {
-    if (t === '시작') return 'type-시작';
-    if (t === '마감') return 'type-마감';
-    if (t === '인적성') return 'type-인적성';
-    return 'type-기타';
+    if (t === '시작') return 'tp-s';
+    if (t === '마감') return 'tp-e';
+    if (t === '인적성') return 'tp-a';
+    return 'tp-o';
   }
 
-  function renderCalPage() {
-    if (!calData.length) return;
-    const total = calData.length;
-    const pages = Math.ceil(total / CAL_PER);
-    const start = calPage * CAL_PER;
-    const slice = calData.slice(start, start + CAL_PER);
-
-    // 레이블
-    const d0 = slice[0].event_date || '', d1 = slice[slice.length-1].event_date || '';
-    document.getElementById('cal-range-label').textContent = d0 === d1 ? d0 : d0 + ' ~ ' + d1;
-    document.getElementById('cal-page-label').textContent = (calPage+1) + '/' + pages;
-    document.getElementById('cal-total').textContent = '총 ' + total + '건';
-    document.getElementById('cal-progress-bar').style.width = ((calPage+1)/pages*100) + '%';
-
-    const html = slice.map(function(e) {
-      return '<div class="cal-row">' +
-        '<span class="cal-row-date">' + (e.event_date||'') + '</span>' +
-        '<span class="cal-row-type ' + typeClass(e.event_type) + '">' + (e.event_type||'') + '</span>' +
-        '<span class="cal-row-co" title="' + (e.company||'') + '">' + (e.company||'') + '</span>' +
-      '</div>';
+  function showCalPage() {
+    if (!cData.length) return;
+    var total = cData.length;
+    var pages = Math.ceil(total / CP);
+    var sl = cData.slice(cPage * CP, cPage * CP + CP);
+    var d0 = sl[0].event_date || '', d1 = sl[sl.length-1].event_date || '';
+    document.getElementById('cal-label').textContent = d0 === d1 ? d0 : d0 + ' ~ ' + d1;
+    document.getElementById('cal-pg').textContent = (cPage+1) + '/' + pages;
+    document.getElementById('cal-count').textContent = '총 ' + total + '건';
+    document.getElementById('cal-bar').style.width = Math.round((cPage+1)/pages*100) + '%';
+    document.getElementById('cal-list').innerHTML = sl.map(function(e) {
+      return '<li class="cal-item">'
+        + '<span class="cal-dt">' + (e.event_date||'') + '</span>'
+        + '<span class="cal-tp ' + typeClass(e.event_type) + '">' + (e.event_type||'') + '</span>'
+        + '<span class="cal-co" title="' + esc(e.company||'') + '">' + esc(e.company||'') + '</span>'
+        + '</li>';
     }).join('');
-
-    const inner = document.getElementById('cal-scroll-inner');
-
-    if (calFirstRender) {
-      // 첫 로드는 애니메이션 없이 바로 표시
-      inner.style.transition = 'none';
-      inner.style.opacity = '1';
-      inner.style.transform = 'translateY(0)';
-      inner.innerHTML = html;
-      calFirstRender = false;
-    } else {
-      // 이후는 페이드 전환
-      inner.style.transition = 'opacity .3s ease';
-      inner.style.opacity = '0';
-      setTimeout(function() {
-        inner.innerHTML = html;
-        inner.style.opacity = '1';
-      }, 300);
-    }
   }
 
-  function calNext() {
-    const pages = Math.ceil(calData.length / CAL_PER);
-    calPage = (calPage + 1) % pages;
-    renderCalPage();
-  }
-
-  (async function loadCalendar() {
-    try {
-      const { data, error } = await _sb.from('job_calendar').select('*').order('event_date', { ascending: true });
-      const inner = document.getElementById('cal-scroll-inner');
-      if (error) {
-        inner.innerHTML = '<div style="text-align:center;padding:30px;color:#EF4444;font-size:12px;">오류: ' + error.message + '</div>';
-        return;
-      }
-      calData = data || [];
-      if (!calData.length) {
-        inner.innerHTML = '<div style="text-align:center;padding:40px;color:#94A3B8;font-size:13px;">등록된 데이터가 없습니다.</div>';
-        return;
-      }
-      renderCalPage();
-      calTimer = setInterval(calNext, 5000);
-    } catch(e) {
-      document.getElementById('cal-scroll-inner').innerHTML = '<div style="text-align:center;padding:30px;color:#EF4444;font-size:12px;">' + e.message + '</div>';
+  _sb.from('job_calendar').select('*').order('event_date', {ascending:true}).then(function(res) {
+    var list = document.getElementById('cal-list');
+    if (res.error) {
+      list.innerHTML = '<li style="padding:20px 14px;color:#EF4444;font-size:12px;">오류: ' + res.error.message + '</li>';
+      return;
     }
-  })();
+    cData = res.data || [];
+    if (!cData.length) {
+      list.innerHTML = '<li style="padding:40px;text-align:center;color:#94A3B8;font-size:13px;">등록된 데이터가 없습니다.</li>';
+      return;
+    }
+    showCalPage();
+    setInterval(function() {
+      var pages = Math.ceil(cData.length / CP);
+      cPage = (cPage + 1) % pages;
+      showCalPage();
+    }, 5000);
+  });
+
+  /* 유틸 */
+  function pad(n) { return String(n).padStart(2,'0'); }
+  function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function isDark(hex) {
+    var r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+    return (r*.299 + g*.587 + b*.114) < 128;
+  }
+})();
 </script>
 </body>
 </html>
