@@ -134,7 +134,8 @@
         <button onclick="switchTab('cnews')"   id="tab-cnews"   class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">기업소식</button>
         <button onclick="switchTab('shorts')"  id="tab-shorts"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">유튜브쇼츠</button>
         <button onclick="switchTab('stats')"   id="tab-stats"   class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">통계</button>
-        <button onclick="switchTab('blog')"    id="tab-blog"    class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">블로그 원고</button>
+        <button onclick="switchTab('blog')"     id="tab-blog"     class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">블로그 원고</button>
+        <button onclick="switchTab('calendar')" id="tab-calendar" class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">채용달력</button>
       </div>
 
       <!-- ── 신청 관리 탭 ── -->
@@ -849,6 +850,104 @@
 
       </div>
 
+      <!-- ── 채용달력 탭 ── -->
+      <div id="section-calendar" class="hidden">
+
+        <!-- 입력 폼 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 class="font-bold text-slate-700 mb-5 text-base">📅 채용달력 등록</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">기관/회사명 <span style="color:#EF4444;">*</span></label>
+              <input id="cal-company" type="text" placeholder="예: 현대자동차㈜" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">날짜 <span style="color:#EF4444;">*</span></label>
+              <input id="cal-date" type="date" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">구분 <span style="color:#EF4444;">*</span></label>
+              <select id="cal-type" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                <option value="시작">시작 (공고 시작)</option>
+                <option value="마감">마감 (공고 마감)</option>
+                <option value="인적성">인적성</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">분류</label>
+              <select id="cal-category" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                <option value="공기업">공기업</option>
+                <option value="공공기관">공공기관</option>
+                <option value="연구원">연구원</option>
+                <option value="대학병원">대학병원</option>
+                <option value="대기업">대기업</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">공고 링크 (선택)</label>
+              <input id="cal-link" type="url" placeholder="https://..." class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+          </div>
+          <button onclick="saveCalendarItem()" class="px-6 py-2.5 rounded-lg text-sm font-bold text-white" style="background:#1E4D8C;">+ 등록</button>
+          <span id="cal-save-msg" class="text-xs ml-3 text-green-600 hidden">저장되었습니다!</span>
+        </div>
+
+        <!-- JSON 일괄 입력 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 class="font-bold text-slate-700 mb-2 text-base">📋 JSON 일괄 입력</h3>
+          <p class="text-xs text-slate-400 mb-3">아래 형식으로 JSON을 붙여넣고 가져오기를 누르세요.</p>
+          <pre class="text-xs bg-slate-50 rounded-lg p-3 mb-3 overflow-x-auto" style="color:#475569;">[
+  {"company":"현대자동차㈜","event_date":"2026-04-01","event_type":"시작","category":"대기업","link":"https://..."},
+  {"company":"기아㈜","event_date":"2026-04-08","event_type":"마감","category":"대기업"}
+]</pre>
+          <textarea id="cal-json-input" rows="8" placeholder="JSON 배열을 여기에 붙여넣으세요..." class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:border-blue-500 mb-3"></textarea>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <button onclick="importCalendarJSON()" class="px-6 py-2.5 rounded-lg text-sm font-bold text-white" style="background:#0891B2;">가져오기</button>
+            <button onclick="downloadCalendarJSON()" class="px-6 py-2.5 rounded-lg text-sm font-bold" style="background:#F1F5F9;color:#475569;">현재 데이터 JSON 다운로드</button>
+            <span id="cal-import-msg" class="text-xs text-green-600 hidden"></span>
+          </div>
+        </div>
+
+        <!-- 등록 목록 -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div style="padding:16px 20px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <h3 class="font-bold text-slate-700 text-base">등록 목록 <span id="cal-total-badge" class="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full ml-1">0건</span></h3>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <select id="cal-filter-month" onchange="filterCalendarList()" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500">
+                <option value="">전체 월</option>
+              </select>
+              <select id="cal-filter-type" onchange="filterCalendarList()" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500">
+                <option value="">전체 구분</option>
+                <option value="시작">시작</option>
+                <option value="마감">마감</option>
+                <option value="인적성">인적성</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="w-full text-sm">
+              <thead>
+                <tr style="background:#F8FAFF;">
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">날짜</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">구분</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">기관/회사명</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">분류</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">링크</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400">삭제</th>
+                </tr>
+              </thead>
+              <tbody id="cal-list-body">
+                <tr><td colspan="6" class="px-4 py-8 text-center text-slate-400 text-sm">불러오는 중...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
       <!-- ── 블로그 원고 탭 ── -->
       <div id="section-blog" class="hidden">
 
@@ -1172,7 +1271,7 @@
 
     // ─── 탭 전환 ───
     function switchTab(tab) {
-      ['consult', 'student', 'news', 'programs', 'jobs', 'cnews', 'shorts', 'stats', 'blog'].forEach(t => {
+      ['consult', 'student', 'news', 'programs', 'jobs', 'cnews', 'shorts', 'stats', 'blog', 'calendar'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (t === tab) {
@@ -1190,7 +1289,8 @@
       if (tab === 'cnews') loadCNews();
       if (tab === 'shorts') loadShorts();
       if (tab === 'stats')  requestAnimationFrame(() => loadStats());
-      if (tab === 'blog')   loadBlogDrafts();
+      if (tab === 'blog')     loadBlogDrafts();
+      if (tab === 'calendar') loadCalendarAdmin();
     }
 
     // ─── 학생접수 ───
@@ -3220,6 +3320,106 @@ ${d.hashtags}`;
       if (!confirm('초안을 삭제하시겠습니까?')) return;
       await db.from('blog_posts').delete().eq('id', id);
       loadBlogDrafts();
+    }
+
+    // ─── 채용달력 ───
+    let _calAllData = [];
+
+    async function loadCalendarAdmin() {
+      const { data, error } = await db.from('job_calendar').select('*').order('event_date', { ascending: true });
+      if (error) { console.error(error); return; }
+      _calAllData = data || [];
+      populateMonthFilter();
+      renderCalendarList(_calAllData);
+    }
+
+    function populateMonthFilter() {
+      const months = [...new Set(_calAllData.map(e => e.event_date ? e.event_date.substring(0,7) : ''))].filter(Boolean).sort();
+      const sel = document.getElementById('cal-filter-month');
+      sel.innerHTML = '<option value="">전체 월</option>' + months.map(m => `<option value="${m}">${m}</option>`).join('');
+    }
+
+    function filterCalendarList() {
+      const m = document.getElementById('cal-filter-month').value;
+      const t = document.getElementById('cal-filter-type').value;
+      const filtered = _calAllData.filter(e =>
+        (!m || (e.event_date && e.event_date.startsWith(m))) &&
+        (!t || e.event_type === t)
+      );
+      renderCalendarList(filtered);
+    }
+
+    function renderCalendarList(data) {
+      document.getElementById('cal-total-badge').textContent = data.length + '건';
+      const TYPE_COLOR = { '시작':'#DBEAFE;color:#1E40AF', '마감':'#FEE2E2;color:#B91C1C', '인적성':'#FEF3C7;color:#92400E', '기타':'#F1F5F9;color:#475569' };
+      const tbody = document.getElementById('cal-list-body');
+      if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400 text-sm">등록된 데이터가 없습니다.</td></tr>'; return; }
+      tbody.innerHTML = data.map(r => {
+        const tc = TYPE_COLOR[r.event_type] || TYPE_COLOR['기타'];
+        return `<tr class="border-b border-slate-50 hover:bg-slate-50">
+          <td class="px-4 py-2.5 font-mono text-xs text-slate-600">${r.event_date || ''}</td>
+          <td class="px-4 py-2.5"><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:${tc.split(';')[0]};${tc.split(';')[1]}">${r.event_type||''}</span></td>
+          <td class="px-4 py-2.5 font-medium text-slate-800">${r.company||''}</td>
+          <td class="px-4 py-2.5 text-xs text-slate-400">${r.category||''}</td>
+          <td class="px-4 py-2.5 text-xs">${r.link ? `<a href="${r.link}" target="_blank" style="color:#1E4D8C;text-decoration:none;">링크</a>` : '-'}</td>
+          <td class="px-4 py-2.5"><button onclick="deleteCalendarItem('${r.id}')" class="text-xs px-3 py-1 rounded" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;cursor:pointer;">삭제</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function saveCalendarItem() {
+      const company  = document.getElementById('cal-company').value.trim();
+      const date     = document.getElementById('cal-date').value;
+      const type     = document.getElementById('cal-type').value;
+      const category = document.getElementById('cal-category').value;
+      const link     = document.getElementById('cal-link').value.trim();
+      if (!company || !date) { alert('기관명과 날짜는 필수입니다.'); return; }
+      const { error } = await db.from('job_calendar').insert({ company, event_date: date, event_type: type, category, link: link || null });
+      if (error) { alert('저장 실패: ' + error.message); return; }
+      document.getElementById('cal-company').value = '';
+      document.getElementById('cal-link').value = '';
+      const msg = document.getElementById('cal-save-msg');
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 2000);
+      loadCalendarAdmin();
+    }
+
+    async function deleteCalendarItem(id) {
+      if (!confirm('삭제하시겠습니까?')) return;
+      await db.from('job_calendar').delete().eq('id', id);
+      loadCalendarAdmin();
+    }
+
+    async function importCalendarJSON() {
+      const raw = document.getElementById('cal-json-input').value.trim();
+      const msg = document.getElementById('cal-import-msg');
+      if (!raw) { alert('JSON을 입력해주세요.'); return; }
+      let arr;
+      try { arr = JSON.parse(raw); } catch(e) { alert('JSON 형식이 올바르지 않습니다.\n' + e.message); return; }
+      if (!Array.isArray(arr)) { alert('배열([]) 형식으로 입력해주세요.'); return; }
+      const rows = arr.map(r => ({
+        company:    r.company    || r['기관명'] || '',
+        event_date: r.event_date || r['날짜']   || '',
+        event_type: r.event_type || r['구분']   || '기타',
+        category:   r.category   || r['분류']   || '기타',
+        link:       r.link       || r['링크']   || null,
+      })).filter(r => r.company && r.event_date);
+      if (!rows.length) { alert('유효한 데이터가 없습니다. company와 event_date는 필수입니다.'); return; }
+      const { error } = await db.from('job_calendar').insert(rows);
+      if (error) { alert('가져오기 실패: ' + error.message); return; }
+      document.getElementById('cal-json-input').value = '';
+      msg.textContent = `${rows.length}건 가져오기 완료!`;
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 3000);
+      loadCalendarAdmin();
+    }
+
+    async function downloadCalendarJSON() {
+      const { data } = await db.from('job_calendar').select('company,event_date,event_type,category,link').order('event_date', { ascending: true });
+      const blob = new Blob([JSON.stringify(data || [], null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'job_calendar.json'; a.click();
+      URL.revokeObjectURL(url);
     }
 
     // Supabase 실시간 구독 (새 신청 자동 반영)
