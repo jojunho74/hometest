@@ -2810,7 +2810,7 @@ TITLE: (제목 1개)
 CONTENT:
 (본문 — 네이버 블로그에 바로 올릴 수 있는 형식)
 (소제목은 ▶ 기호 사용)
-(본문 1,200~1,500자)
+(본문 1,500~2,000자, 글자가 잘리지 않도록 반드시 완성된 문장으로 마무리)
 (마지막에 해시태그 10개 포함: #G-TELP #지텔프 등)`;
 
       msgEl.textContent = 'AI가 원고를 작성 중입니다...';
@@ -2831,8 +2831,61 @@ CONTENT:
         const title   = titleMatch   ? titleMatch[1].trim()   : keyword + ' 블로그 원고';
         const content = contentMatch ? contentMatch[1].trim() : text;
 
+        const commonFooter = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔷 G-TELP IBT란?
+
+​
+G-TELP IBT는 대학교 취업지원센터를 위한 전액 무료 영어 진단 프로그램입니다.
+
+담당자는 신청서 작성 후 응시 코드만 배포하면 됩니다. 시험 후 성적 안내와 결과 상담은 G-TELP 운영팀이 전담합니다.
+
+​
+G-TELP(General Tests of English Language Proficiency)는 미국 SDSU(샌디에이고주립대학교)가 개발한 국제공인 영어능력시험입니다.
+
+현재 2026년 기준 공공기관 200개 이상, 기업 600개 이상에서 채용 인정 시험으로 활용되고 있으며
+
+전국 64개 대학교에서 졸업인증 시험으로 채택하고 있습니다.
+
+​
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔷 핵심 특징
+
+​
+✅ 전액 무료 — 학교 예산 소요 없음
+✅ 최대 200명 동시 응시 가능
+✅ 온라인 IBT 방식 — 장소·시간 제약 없음
+✅ 국제공인 성적표 즉시 발급
+✅ 졸업인증·취업지원 연계 활용 가능
+✅ 공공기관 200+ 채용 인정 시험
+
+​
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 신청 절차
+
+1단계 · 신청서 작성 (5분 이내)
+2단계 · G-TELP 담당자가 응시 코드 발급
+3단계 · 학생들에게 코드 배포 (공지/카톡)
+4단계 · 시험 후 즉시 성적 확인 가능
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔷 신청 / 문의
+
+​
+지금 바로 무료 신청하기 → https://hometest-weld.vercel.app
+
+문의: 카카오톡 채널 @지텔프IBT대학컨설팅
+
+​
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+
         document.getElementById('blog-title-out').value   = title;
-        document.getElementById('blog-content-out').value = content;
+        document.getElementById('blog-content-out').value = content + commonFooter;
         document.getElementById('blog-editor-wrap').classList.remove('hidden');
       } catch(e) {
         alert('AI 원고 생성 오류: ' + e.message);
