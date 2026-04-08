@@ -140,6 +140,33 @@
   </div>
 </section>
 
+<!-- ══════ 채용달력 ══════ -->
+<section style="background:#fff;padding:32px 16px;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:15px;font-weight:800;color:#1E293B;">📅 채용달력</span>
+        <span id="lcal-range" style="font-size:12px;color:#94A3B8;"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span id="lcal-count" style="font-size:12px;color:#94A3B8;"></span>
+        <span id="lcal-pg" style="font-size:12px;font-weight:700;color:#64748B;"></span>
+      </div>
+    </div>
+    <div style="background:#F8FAFF;border-radius:12px;border:1px solid #E2E8F0;overflow:hidden;">
+      <div style="height:3px;background:#EFF6FF;"><div id="lcal-bar" style="height:3px;background:#1E4D8C;width:0%;transition:width .4s;"></div></div>
+      <div id="lcal-grid" style="display:grid;grid-template-columns:repeat(5,1fr);">
+        <div style="grid-column:1/-1;text-align:center;padding:32px;color:#94A3B8;font-size:14px;">불러오는 중...</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;">
+      <button onclick="lcalPrev()" style="width:28px;height:28px;border-radius:50%;background:#fff;border:1px solid #E2E8F0;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#1E293B;box-shadow:0 1px 3px rgba(0,0,0,.08);">‹</button>
+      <div id="lcal-dots" style="display:flex;gap:5px;"></div>
+      <button onclick="lcalNext()" style="width:28px;height:28px;border-radius:50%;background:#fff;border:1px solid #E2E8F0;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#1E293B;box-shadow:0 1px 3px rgba(0,0,0,.08);">›</button>
+    </div>
+  </div>
+</section>
+
 <div class="wrap">
   <input id="search" type="text" placeholder="기관명 또는 공고 제목 검색..." oninput="filterCards()"/>
   <div class="filters"><button class="filter-btn active" onclick="setCategory(this,'전체')">전체</button><button class="filter-btn" onclick="setCategory(this,'공공기관')">공공기관</button><button class="filter-btn" onclick="setCategory(this,'공기업')">공기업</button><button class="filter-btn" onclick="setCategory(this,'연구원')">연구원</button><button class="filter-btn" onclick="setCategory(this,'대학병원')">대학병원</button><button class="filter-btn" onclick="setCategory(this,'기타')">기타</button></div>
@@ -291,6 +318,69 @@
         setTimeout(function(){ btn.innerHTML = orig; }, 2000);
       });
     }
+  </script>
+
+  <script>
+    // ── 채용달력 ──
+    (function() {
+      var SB  = 'https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/';
+      var KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
+      var CP = 10, cPage = 0, cData = [];
+
+      function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+      function tpColor(t){
+        if(t==='시작') return 'background:#DBEAFE;color:#1E40AF;';
+        if(t==='마감') return 'background:#FEE2E2;color:#B91C1C;';
+        if(t==='인적성') return 'background:#FEF3C7;color:#92400E;';
+        return 'background:#F1F5F9;color:#475569;';
+      }
+
+      function showCal() {
+        if(!cData.length) return;
+        var pages = Math.ceil(cData.length / CP);
+        var sl = cData.slice(cPage * CP, cPage * CP + CP);
+        var d0 = sl[0].event_date||'', d1 = sl[sl.length-1].event_date||'';
+        document.getElementById('lcal-range').textContent = d0===d1 ? d0 : d0+' ~ '+d1;
+        document.getElementById('lcal-pg').textContent = (cPage+1)+'/'+pages;
+        document.getElementById('lcal-count').textContent = '총 '+cData.length+'건';
+        document.getElementById('lcal-bar').style.width = Math.round((cPage+1)/pages*100)+'%';
+
+        document.getElementById('lcal-grid').innerHTML = sl.map(function(e){
+          return '<div style="padding:12px 14px;border-right:1px solid #E2E8F0;border-bottom:1px solid #E2E8F0;display:flex;flex-direction:column;gap:4px;">'
+            +'<span style="font-size:10px;font-weight:700;color:#64748B;font-family:monospace;">'+esc(e.event_date)+'</span>'
+            +'<span style="display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;width:fit-content;'+tpColor(e.event_type)+'">'+esc(e.event_type)+'</span>'
+            +'<span style="font-size:12px;font-weight:700;color:#1E293B;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+esc(e.company)+'">'+esc(e.company)+'</span>'
+            +'</div>';
+        }).join('');
+
+        document.getElementById('lcal-dots').innerHTML = Array.from({length:pages},function(_,i){
+          return '<button onclick="lcalGo('+i+')" style="width:'+(i===cPage?'18px':'7px')+';height:7px;border-radius:4px;border:none;cursor:pointer;background:'+(i===cPage?'#1E4D8C':'#CBD5E1')+';transition:all .3s;"></button>';
+        }).join('');
+      }
+
+      window.lcalGo  = function(p){ cPage=p; showCal(); };
+      window.lcalNext = function(){ window.lcalGo((cPage+1)%Math.ceil(cData.length/CP)); };
+      window.lcalPrev = function(){ window.lcalGo((cPage-1+Math.ceil(cData.length/CP))%Math.ceil(cData.length/CP)); };
+
+      fetch(SB+'job_calendar?select=company,event_date,event_type&order=event_date.asc', {
+        headers: { 'apikey': KEY, 'Authorization': 'Bearer '+KEY }
+      }).then(function(r){ return r.json(); }).then(function(data){
+        var g = document.getElementById('lcal-grid');
+        if(!Array.isArray(data)){
+          g.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:#EF4444;font-size:13px;">오류: '+JSON.stringify(data).substring(0,120)+'</div>';
+          return;
+        }
+        cData = data;
+        if(!cData.length){
+          g.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:#94A3B8;font-size:14px;">등록된 채용일정이 없습니다.</div>';
+          return;
+        }
+        showCal();
+        setInterval(window.lcalNext, 5000);
+      }).catch(function(e){
+        document.getElementById('lcal-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:#EF4444;font-size:13px;">연결 오류: '+e.message+'</div>';
+      });
+    })();
   </script>
 
   <script>
