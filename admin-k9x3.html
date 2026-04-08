@@ -711,10 +711,15 @@
 
         <!-- 유입 경로 테이블 -->
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <div class="flex items-center justify-between mb-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
             <h3 class="font-bold text-slate-700">유입 경로 (어디서 접속했는지)</h3>
-            <span class="text-xs text-slate-400">최근 14일 기준</span>
+            <div class="flex gap-1" id="ref-period-btns">
+              <button onclick="renderReferrerTable('daily')"   id="ref-btn-daily"   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">일일</button>
+              <button onclick="renderReferrerTable('weekly')"  id="ref-btn-weekly"  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">주간</button>
+              <button onclick="renderReferrerTable('monthly')" id="ref-btn-monthly" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">월간</button>
+            </div>
           </div>
+          <p id="ref-period-label" class="text-xs text-slate-400 mb-3">이번달 기준</p>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
@@ -1870,6 +1875,8 @@
 
     // ─── 방문 통계 ───
     let statsCharts = {};
+    let _statsRows = [];   // 유입경로 period 필터용 캐시
+    let _statsKstNow = null;
 
     async function loadStats() {
       // KST(UTC+9) 기준 날짜 계산
@@ -1921,6 +1928,8 @@
 
       if (error) { console.error(error); return; }
       const rows = views || [];
+      _statsRows = rows;
+      _statsKstNow = kstNow;
 
       // 요약 카드
       document.getElementById('stats-total-views').textContent     = (totalCount ?? 0).toLocaleString();
@@ -2073,56 +2082,8 @@
         }
       });
 
-      // ── 유입 경로 테이블 ──
-      const refMap = {};
-      rows.forEach(r => {
-        let src = '직접 접속 (주소창/북마크)';
-        if (r.referrer) {
-          try {
-            const u = new URL(r.referrer);
-            const host = u.hostname.replace(/^www\./, '');
-            // 잘 알려진 소스 라벨링
-            if (host.includes('google'))       src = '🔍 Google 검색';
-            else if (host.includes('naver'))   src = '🔍 Naver 검색';
-            else if (host.includes('daum'))    src = '🔍 Daum 검색';
-            else if (host.includes('kakao'))   src = '💬 카카오톡';
-            else if (host.includes('t.co') || host.includes('twitter') || host.includes('x.com')) src = '🐦 X(트위터)';
-            else if (host.includes('instagram')) src = '📸 인스타그램';
-            else if (host.includes('facebook'))  src = '📘 페이스북';
-            else if (host.includes('youtube'))   src = '▶️ 유튜브';
-            else if (host.includes('blog.naver')) src = '📝 네이버 블로그';
-            else if (host.includes('vercel.app') || host === location.hostname) src = '🔗 내부 링크';
-            else src = `🌐 ${host}`;
-          } catch { src = '🌐 기타 외부'; }
-        }
-        refMap[src] = (refMap[src] || 0) + 1;
-      });
-
-      const refTotal = Object.values(refMap).reduce((a, b) => a + b, 0) || 1;
-      const sortedRefs = Object.entries(refMap).sort((a, b) => b[1] - a[1]);
-      const refColors = ['#6366F1','#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4','#F97316'];
-
-      const refTbody = document.getElementById('referrer-stats-body');
-      if (sortedRefs.length === 0) {
-        refTbody.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-slate-400 text-xs">데이터가 없습니다.</td></tr>';
-      } else {
-        refTbody.innerHTML = sortedRefs.map(([src, cnt], i) => {
-          const pct = Math.round((cnt / refTotal) * 100);
-          const color = refColors[i % refColors.length];
-          return `<tr class="border-b border-slate-50 hover:bg-slate-50">
-            <td class="py-2.5 pr-4 font-medium text-slate-700">${src}</td>
-            <td class="py-2.5 text-right font-bold text-slate-800">${cnt.toLocaleString()}</td>
-            <td class="py-2.5 pl-4">
-              <div class="flex items-center gap-2">
-                <div class="flex-1 bg-slate-100 rounded-full h-2" style="min-width:80px;">
-                  <div class="h-2 rounded-full" style="width:${pct}%;background:${color};"></div>
-                </div>
-                <span class="text-xs text-slate-400 w-8 text-right">${pct}%</span>
-              </div>
-            </td>
-          </tr>`;
-        }).join('');
-      }
+      // ── 유입 경로 테이블 (기본: 월간) ──
+      renderReferrerTable('monthly');
 
       // ── 페이지별 상세 수치 테이블 ──
       // 오늘 / 이번달 per-page 카운트는 rows(14일치)에서 계산
@@ -2173,6 +2134,99 @@
           </tr>`;
         }).join('');
       }
+    }
+
+    // ─── 유입 경로 테이블 렌더링 (period: 'daily' | 'weekly' | 'monthly') ───
+    function renderReferrerTable(period) {
+      if (!_statsKstNow) return;
+      const kstNow = _statsKstNow;
+      const today     = kstNow.toISOString().slice(0, 10);
+      const kstMonth  = kstNow.toISOString().slice(0, 7);
+      const since7    = new Date(kstNow.getTime() - 6 * 864e5).toISOString().slice(0, 10);
+
+      // 기간별 rows 필터
+      const filtered = _statsRows.filter(r => {
+        if (!r.visited_at) return false;
+        const kst = new Date(new Date(r.visited_at).getTime() + 9 * 60 * 60 * 1000);
+        const dayKey = kst.toISOString().slice(0, 10);
+        const monKey = kst.toISOString().slice(0, 7);
+        if (period === 'daily')   return dayKey === today;
+        if (period === 'weekly')  return dayKey >= since7 && dayKey <= today;
+        if (period === 'monthly') return monKey === kstMonth;
+        return true;
+      });
+
+      // 버튼 스타일 전환
+      ['daily', 'weekly', 'monthly'].forEach(p => {
+        const btn = document.getElementById(`ref-btn-${p}`);
+        if (!btn) return;
+        if (p === period) {
+          btn.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50';
+        } else {
+          btn.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white';
+        }
+      });
+
+      // 라벨 업데이트
+      const labelEl = document.getElementById('ref-period-label');
+      if (labelEl) {
+        const labels = {
+          daily:   `오늘 (${today}) 기준`,
+          weekly:  `최근 7일 (${since7} ~ ${today}) 기준`,
+          monthly: `이번달 (${kstMonth}) 기준`
+        };
+        labelEl.textContent = labels[period];
+      }
+
+      // referrer 집계
+      const refMap = {};
+      filtered.forEach(r => {
+        let src = '직접 접속 (주소창/북마크)';
+        if (r.referrer) {
+          try {
+            const u = new URL(r.referrer);
+            const host = u.hostname.replace(/^www\./, '');
+            if (host.includes('google'))              src = '🔍 Google 검색';
+            else if (host.includes('blog.naver'))     src = '📝 네이버 블로그';
+            else if (host.includes('naver'))          src = '🔍 Naver 검색';
+            else if (host.includes('daum'))           src = '🔍 Daum 검색';
+            else if (host.includes('kakao'))          src = '💬 카카오톡';
+            else if (host.includes('t.co') || host.includes('twitter') || host.includes('x.com')) src = '🐦 X(트위터)';
+            else if (host.includes('instagram'))      src = '📸 인스타그램';
+            else if (host.includes('facebook'))       src = '📘 페이스북';
+            else if (host.includes('youtube'))        src = '▶️ 유튜브';
+            else if (host.includes('vercel.app'))     src = '🔗 내부 링크';
+            else src = `🌐 ${host}`;
+          } catch { src = '🌐 기타 외부'; }
+        }
+        refMap[src] = (refMap[src] || 0) + 1;
+      });
+
+      const refTotal   = Object.values(refMap).reduce((a, b) => a + b, 0) || 1;
+      const sortedRefs = Object.entries(refMap).sort((a, b) => b[1] - a[1]);
+      const refColors  = ['#6366F1','#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4','#F97316'];
+      const refTbody   = document.getElementById('referrer-stats-body');
+
+      if (sortedRefs.length === 0) {
+        refTbody.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-slate-400 text-xs">해당 기간 데이터가 없습니다.</td></tr>';
+        return;
+      }
+      refTbody.innerHTML = sortedRefs.map(([src, cnt], i) => {
+        const pct   = Math.round((cnt / refTotal) * 100);
+        const color = refColors[i % refColors.length];
+        return `<tr class="border-b border-slate-50 hover:bg-slate-50">
+          <td class="py-2.5 pr-4 font-medium text-slate-700">${src}</td>
+          <td class="py-2.5 text-right font-bold text-slate-800">${cnt.toLocaleString()}</td>
+          <td class="py-2.5 pl-4">
+            <div class="flex items-center gap-2">
+              <div class="flex-1 bg-slate-100 rounded-full h-2" style="min-width:80px;">
+                <div class="h-2 rounded-full" style="width:${pct}%;background:${color};"></div>
+              </div>
+              <span class="text-xs text-slate-400 w-8 text-right">${pct}%</span>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
     }
 
     // ─── 블로그 원고 생성 ───
