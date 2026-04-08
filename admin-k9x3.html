@@ -2496,25 +2496,10 @@ ${internalSummary}
 
       // ── Anthropic API 호출 ──
       try {
-        let apiKey = localStorage.getItem('anthropic_api_key');
-        if (!apiKey) {
-          apiKey = window.prompt('Anthropic API 키를 입력하세요 (한 번만 입력하면 저장됩니다):');
-          if (!apiKey) { container.innerHTML = '<div class="text-xs text-slate-400 p-4">API 키가 없어 분석을 실행할 수 없습니다.</div>'; return; }
-          localStorage.setItem('anthropic_api_key', apiKey.trim());
-        }
-        const res = await fetch('https://api.anthropic.com/v1/messages', {
+        const res = await fetch('/api/ai-insights', {
           method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-            'x-api-key': apiKey.trim(),
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true'
-          },
-          body: JSON.stringify({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 1024,
-            messages: [{ role: 'user', content: aiPrompt }]
-          })
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ prompt: aiPrompt })
         });
         const data = await res.json();
         const text = data?.content?.[0]?.text || '분석 결과를 가져올 수 없습니다.';
