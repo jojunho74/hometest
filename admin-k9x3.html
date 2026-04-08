@@ -1946,6 +1946,15 @@
     let _statsRows = [];   // 유입경로 period 필터용 캐시
     let _statsKstNow = null;
 
+    // 페이지명 정규화: URL 디코딩 + 구 파일명 → 신 파일명 매핑
+    const PAGE_ALIASES = {
+      'gtelp점수비교.html': 'gtelp-score.html',
+    };
+    function normalizePage(page) {
+      try { page = decodeURIComponent(page); } catch(e) {}
+      return PAGE_ALIASES[page] || page;
+    }
+
     async function loadStats() {
       // KST(UTC+9) 기준 날짜 계산
       const now       = new Date();
@@ -2054,7 +2063,7 @@
           .select('page')
           .range(pageOffset, pageOffset + 999);
         if (pageErr || !pageRows || pageRows.length === 0) break;
-        pageRows.forEach(r => { if (r.page) pageMap[r.page] = (pageMap[r.page] || 0) + 1; });
+        pageRows.forEach(r => { if (r.page) { const p = normalizePage(r.page); pageMap[p] = (pageMap[p] || 0) + 1; } });
         if (pageRows.length < 1000) break;
         pageOffset += 1000;
       }
@@ -2118,15 +2127,16 @@
         const d = new Date(kstNow.getTime() - i * 864e5);
         dateKeys14.push(d.toISOString().slice(0, 10));
       }
-      const pageSet = [...new Set(rows.map(r => r.page).filter(Boolean))].sort();
+      const pageSet = [...new Set(rows.map(r => normalizePage(r.page)).filter(Boolean))].sort();
       const datePageData = {};
       pageSet.forEach(p => { datePageData[p] = Array(14).fill(0); });
       rows.forEach(r => {
         if (!r.page) return;
+        const p = normalizePage(r.page);
         const kst = new Date(new Date(r.visited_at).getTime() + 9 * 60 * 60 * 1000);
         const key = kst.toISOString().slice(0, 10);
         const di = dateKeys14.indexOf(key);
-        if (di !== -1) datePageData[r.page][di]++;
+        if (di !== -1) datePageData[p][di]++;
       });
 
       statsCharts.weekdayPages = new Chart(document.getElementById('chart-weekday-pages'), {
@@ -2166,11 +2176,12 @@
       const kstMonth = kstNow.toISOString().slice(0, 7); // "YYYY-MM"
       rows.forEach(r => {
         if (!r.page) return;
+        const p = normalizePage(r.page);
         const kst = new Date(new Date(r.visited_at).getTime() + 9 * 60 * 60 * 1000);
         const dayKey = kst.toISOString().slice(0, 10);
         const monKey = kst.toISOString().slice(0, 7);
-        if (dayKey === today) pageStatToday[r.page] = (pageStatToday[r.page] || 0) + 1;
-        if (monKey === kstMonth) pageStatMonth[r.page] = (pageStatMonth[r.page] || 0) + 1;
+        if (dayKey === today) pageStatToday[p] = (pageStatToday[p] || 0) + 1;
+        if (monKey === kstMonth) pageStatMonth[p] = (pageStatMonth[p] || 0) + 1;
       });
 
       const totalAll = Object.values(pageMap).reduce((a, b) => a + b, 0) || 1;
