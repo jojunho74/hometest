@@ -59,6 +59,16 @@
     .nav-link:hover { background: #1E4D8C; color: #fff; }
       .btn-primary { display: inline-flex; align-items: center; justify-content: center; padding: 0.6rem 1.25rem; border-radius: 50px; font-weight: 700; font-size: 0.875rem; background: linear-gradient(135deg,#1E4D8C,#0891B2); color: #fff; text-decoration: none; border: none; cursor: pointer; transition: opacity .2s, transform .15s; }
     .btn-primary:hover { opacity: .88; transform: scale(1.02); }
+    /* ── 히어로 ── */
+    .hero{background:linear-gradient(135deg,#0B1D3A 0%,#1E3A8A 60%,#1d4ed8 100%);color:#fff;padding:60px 16px 50px;text-align:center;}
+    .hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:5px 14px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);margin-bottom:20px;letter-spacing:.04em;}
+    .hero h1{font-size:2rem;font-weight:900;line-height:1.2;margin-bottom:12px;}
+    @media(min-width:640px){.hero h1{font-size:2.6rem;}}
+    .hero-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:24px;}
+    .hero-tag{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);}
+    .hero-sub{max-width:520px;margin:0 auto 32px;font-size:1rem;line-height:1.7;color:rgba(255,255,255,.85);}
+    .hero-sub s{color:rgba(255,255,255,.5);}
+    .hero-sub strong{color:#FCD34D;font-weight:800;}
   </style>
 </head>
 <body>
@@ -97,6 +107,25 @@
     <a href="index.html#consultation-form" class="mbtn">무료 신청하기</a>
   </div>
 </header>
+
+<!-- ══ 히어로 ══ -->
+<section class="hero">
+  <div class="hero-badge">🎓 대학생 전용 무료 프로그램</div>
+  <h1>정기시험과 동일 난이도<br>즉시 결과 확인 · 완전 무료</h1>
+  <div class="hero-tags">
+    <span class="hero-tag">✅ 정기시험과 동일 난이도</span>
+    <span class="hero-tag">⚡ 즉시 결과 확인</span>
+    <span class="hero-tag">🎁 완전 무료</span>
+  </div>
+  <p class="hero-sub">
+    지텔프 정기시험 응시료 <strong><s>69,300원</s></strong><br>
+    한 번 망치면 또 <strong>69,300원</strong><br><br>
+    IBT 사전진단으로 내 점수를 먼저 확인하고<br>
+    <strong>자신 있을 때 정기시험 접수하세요.</strong>
+  </p>
+  <a href="student.html#apply-form" style="display:inline-block;padding:14px 36px;border-radius:10px;background:#D97706;color:#fff;font-weight:800;font-size:1rem;text-decoration:none;transition:background .2s,transform .15s;" onmouseover="this.style.background='#b45309';this.style.transform='scale(1.03)'" onmouseout="this.style.background='#D97706';this.style.transform='scale(1)'">무료로 신청하기 →</a>
+</section>
+
 <div class="wrap">
   <h1>공공기관 채용공고 자료실</h1>
   <p class="subtitle">공공기관·공기업·연구원 채용공고 131개 — 검색 후 바로 다운로드</p>
