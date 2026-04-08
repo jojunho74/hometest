@@ -894,6 +894,70 @@
           <span id="cal-save-msg" class="text-xs ml-3 text-green-600 hidden">저장되었습니다!</span>
         </div>
 
+        <!-- 텍스트 → JSON 변환 등록 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 class="font-bold text-slate-700 mb-2 text-base">📝 텍스트 붙여넣기로 등록</h3>
+          <p class="text-xs text-slate-400 mb-4">아래 형식으로 텍스트를 붙여넣으면 자동으로 변환·등록됩니다.</p>
+          <pre class="text-xs bg-slate-50 rounded-lg p-3 mb-4 overflow-x-auto" style="color:#475569;">1
+시작기아㈜
+시작비테스코테크놀로지스코리아(유)
++17더보기
+4
+마감도미노피자(청오디피케이)
+9
+마감(주)코스알엑스
+인적성새마을금고중앙회</pre>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">연도</label>
+              <input id="txt-year" type="number" value="" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">월</label>
+              <select id="txt-month" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                <option value="01">1월</option><option value="02">2월</option><option value="03">3월</option>
+                <option value="04">4월</option><option value="05">5월</option><option value="06">6월</option>
+                <option value="07">7월</option><option value="08">8월</option><option value="09">9월</option>
+                <option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">기본 분류</label>
+              <select id="txt-category" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                <option value="공기업">공기업</option>
+                <option value="공공기관">공공기관</option>
+                <option value="대기업">대기업</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+          </div>
+          <textarea id="txt-input" rows="10" placeholder="여기에 텍스트를 붙여넣으세요..." class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:border-blue-500 mb-3"></textarea>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+            <button onclick="parseTextToCalendar()" class="px-6 py-2.5 rounded-lg text-sm font-bold text-white" style="background:#6D28D9;">변환 미리보기</button>
+            <span id="txt-parse-count" class="text-xs text-slate-400"></span>
+          </div>
+          <!-- 미리보기 -->
+          <div id="txt-preview-wrap" style="display:none;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <p class="text-xs font-semibold text-slate-500">변환 결과 미리보기 (<span id="txt-preview-count">0</span>건)</p>
+              <button onclick="registerParsedCalendar()" class="px-5 py-2 rounded-lg text-sm font-bold text-white" style="background:#1E4D8C;">전체 등록</button>
+            </div>
+            <div style="max-height:260px;overflow-y:auto;border:1px solid #E2E8F0;border-radius:8px;">
+              <table class="w-full text-sm">
+                <thead style="position:sticky;top:0;background:#F8FAFF;">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-xs text-slate-400 font-semibold">날짜</th>
+                    <th class="px-3 py-2 text-left text-xs text-slate-400 font-semibold">구분</th>
+                    <th class="px-3 py-2 text-left text-xs text-slate-400 font-semibold">기관/회사명</th>
+                  </tr>
+                </thead>
+                <tbody id="txt-preview-body"></tbody>
+              </table>
+            </div>
+            <span id="txt-register-msg" class="text-xs text-green-600 mt-2 hidden" style="display:none;">등록 완료!</span>
+          </div>
+        </div>
+
         <!-- JSON 일괄 입력 -->
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
           <h3 class="font-bold text-slate-700 mb-2 text-base">📋 JSON 일괄 입력</h3>
@@ -3323,7 +3387,96 @@ ${d.hashtags}`;
     }
 
     // ─── 채용달력 ───
+    // 연도·월 기본값 설정
+    (function() {
+      const now = new Date();
+      const yi = document.getElementById('txt-year');
+      const mi = document.getElementById('txt-month');
+      if (yi) yi.value = now.getFullYear();
+      if (mi) mi.value = String(now.getMonth()+1).padStart(2,'0');
+    })();
     let _calAllData = [];
+
+    let _parsedCalRows = [];
+
+    function parseTextToCalendar() {
+      const raw   = document.getElementById('txt-input').value;
+      const year  = document.getElementById('txt-year').value.trim();
+      const month = document.getElementById('txt-month').value;
+      const cat   = document.getElementById('txt-category').value;
+      if (!year || !month) { alert('연도와 월을 선택해주세요.'); return; }
+
+      const TYPES = ['시작', '마감', '인적성', '기타'];
+      const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+
+      let curDay = null;
+      const rows = [];
+
+      lines.forEach(line => {
+        // +N더보기 같은 라인 무시
+        if (/^\+\d+/.test(line)) return;
+
+        // 숫자만 있는 라인 → 날짜 변경
+        if (/^\d{1,2}$/.test(line)) {
+          curDay = parseInt(line, 10);
+          return;
+        }
+
+        // 구분 접두사 찾기
+        let found = null;
+        for (const t of TYPES) {
+          if (line.startsWith(t)) {
+            found = { event_type: t, company: line.slice(t.length).trim() };
+            break;
+          }
+        }
+        // 접두사 없으면 전체를 회사명으로 (기타)
+        if (!found && curDay !== null) {
+          found = { event_type: '기타', company: line };
+        }
+
+        if (found && curDay !== null && found.company) {
+          const pad = n => String(n).padStart(2,'0');
+          rows.push({
+            company:    found.company,
+            event_date: `${year}-${month}-${pad(curDay)}`,
+            event_type: found.event_type,
+            category:   cat,
+            link:       null,
+          });
+        }
+      });
+
+      _parsedCalRows = rows;
+
+      const TYPE_COLOR = { '시작':'#DBEAFE;color:#1E40AF', '마감':'#FEE2E2;color:#B91C1C', '인적성':'#FEF3C7;color:#92400E', '기타':'#F1F5F9;color:#475569' };
+      document.getElementById('txt-preview-count').textContent = rows.length;
+      document.getElementById('txt-parse-count').textContent = rows.length + '건 감지됨';
+      document.getElementById('txt-preview-body').innerHTML = rows.map(r => {
+        const tc = TYPE_COLOR[r.event_type] || TYPE_COLOR['기타'];
+        return `<tr class="border-b border-slate-50">
+          <td class="px-3 py-2 font-mono text-xs text-slate-600">${r.event_date}</td>
+          <td class="px-3 py-2"><span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:${tc.split(';')[0]};${tc.split(';')[1]}">${r.event_type}</span></td>
+          <td class="px-3 py-2 text-xs text-slate-800">${r.company}</td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="3" class="px-3 py-4 text-center text-slate-400 text-xs">변환된 데이터가 없습니다.</td></tr>';
+
+      document.getElementById('txt-preview-wrap').style.display = 'block';
+      document.getElementById('txt-register-msg').style.display = 'none';
+    }
+
+    async function registerParsedCalendar() {
+      if (!_parsedCalRows.length) { alert('등록할 데이터가 없습니다.'); return; }
+      const { error } = await db.from('job_calendar').insert(_parsedCalRows);
+      if (error) { alert('등록 실패: ' + error.message); return; }
+      const msg = document.getElementById('txt-register-msg');
+      msg.textContent = `${_parsedCalRows.length}건 등록 완료!`;
+      msg.style.display = 'inline';
+      document.getElementById('txt-input').value = '';
+      document.getElementById('txt-preview-wrap').style.display = 'none';
+      _parsedCalRows = [];
+      loadCalendarAdmin();
+    }
 
     async function loadCalendarAdmin() {
       const { data, error } = await db.from('job_calendar').select('*').order('event_date', { ascending: true });
