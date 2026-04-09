@@ -54,6 +54,13 @@
     .mobile-menu .mbtn{margin-top:12px;display:block;text-align:center;padding:12px;border-radius:8px;background:#1E4D8C;color:#fff;font-weight:700;text-decoration:none;}
     .mobile-menu.open{display:flex;}
     @media(max-width:640px){.hnav{display:none;}.hbtn{display:none;}.hamburger{display:none;}.mobile-menu{display:none!important;}}
+    /* 채용달력 모바일 */
+    @media(max-width:640px){
+      .lcal-table-wrap{flex-direction:column!important;}
+      .lcal-divider{width:100%!important;height:1px!important;}
+      .lcal-tbl{font-size:12px!important;}
+      .lcal-tbl th,.lcal-tbl td{padding:7px 8px!important;font-size:11px!important;}
+    }
       .nav-link { padding: 5px 9px; border-radius: 8px; color: var(--ink-mid, #475569); text-decoration: none; transition: background .18s, color .18s; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
     .nav-link:hover { background: #1E4D8C; color: #fff; }
       .btn-primary { display: inline-flex; align-items: center; justify-content: center; padding: 0.6rem 1.25rem; border-radius: 50px; font-weight: 700; font-size: 0.875rem; background: linear-gradient(135deg,#1E4D8C,#0891B2); color: #fff; text-decoration: none; border: none; cursor: pointer; transition: opacity .2s, transform .15s; }
@@ -155,9 +162,9 @@
     <!-- 테이블 2열 -->
     <div style="border-radius:12px;border:1px solid #E2E8F0;overflow:hidden;">
       <div style="height:3px;background:#EFF6FF;"><div id="lcal-bar" style="height:3px;background:#1E4D8C;width:0%;transition:width .4s;"></div></div>
-      <div style="display:flex;gap:0;">
+      <div class="lcal-table-wrap" style="display:flex;gap:0;">
         <!-- 좌 -->
-        <table style="flex:1;border-collapse:collapse;font-size:13px;min-width:0;">
+        <table class="lcal-tbl" style="flex:1;border-collapse:collapse;font-size:13px;min-width:0;">
           <thead>
             <tr style="background:#F8FAFF;border-bottom:1px solid #E2E8F0;">
               <th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748B;width:96px;">날짜</th>
@@ -170,9 +177,9 @@
           </tbody>
         </table>
         <!-- 구분선 -->
-        <div style="width:1px;background:#E2E8F0;flex-shrink:0;"></div>
+        <div class="lcal-divider" style="width:1px;background:#E2E8F0;flex-shrink:0;"></div>
         <!-- 우 -->
-        <table style="flex:1;border-collapse:collapse;font-size:13px;min-width:0;">
+        <table class="lcal-tbl" style="flex:1;border-collapse:collapse;font-size:13px;min-width:0;">
           <thead>
             <tr style="background:#F8FAFF;border-bottom:1px solid #E2E8F0;">
               <th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748B;width:96px;">날짜</th>
@@ -353,7 +360,7 @@
     (function() {
       var SB  = 'https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/';
       var KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
-      var CP = 20, cPage = 0, cData = [];
+      var CP = window.innerWidth <= 640 ? 10 : 20, cPage = 0, cData = [];
 
       function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
       function tpColor(t){
