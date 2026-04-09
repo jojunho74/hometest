@@ -373,10 +373,11 @@
     const input = document.getElementById('pw-input').value;
     if (input !== post.pw) { alert('비밀번호가 틀렸습니다.'); return; }
 
+    const action = pwAction;
     closePwModal();
-    if (pwAction === 'delete') {
+    if (action === 'delete') {
       deletePost();
-    } else if (pwAction === 'edit') {
+    } else if (action === 'edit') {
       openEditModal(post);
     }
   }
