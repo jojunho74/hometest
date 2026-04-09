@@ -800,10 +800,10 @@
           </div>
         </div>
 
-        <!-- 채용공고 자료실 다운로드 TOP 10 -->
+        <!-- 채용공고 자료실 다운로드 전체 -->
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <h3 class="font-bold text-slate-700">📥 채용공고 자료실 다운로드 TOP 10</h3>
+            <h3 class="font-bold text-slate-700">📥 채용공고 자료실 다운로드 <span id="dl-total-badge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600"></span></h3>
             <div class="flex gap-1" id="dl-period-btns">
               <button onclick="renderDownloadTable('daily')"   id="dl-btn-daily"   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">일일</button>
               <button onclick="renderDownloadTable('weekly')"  id="dl-btn-weekly"  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">주간</button>
@@ -2755,7 +2755,10 @@ ${internalSummary}
         const key = `${r.institution}||${r.title}||${r.category}`;
         dlMap[key] = (dlMap[key] || 0) + 1;
       });
-      const sorted = Object.entries(dlMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
+      const sorted = Object.entries(dlMap).sort((a, b) => b[1] - a[1]);
+      const totalDownloads = data.length;
+      const badgeEl = document.getElementById('dl-total-badge');
+      if (badgeEl) badgeEl.textContent = `총 ${totalDownloads.toLocaleString()}건`;
       const rankColors = ['#F59E0B','#94A3B8','#B45309','#6366F1','#3B82F6','#10B981','#EF4444','#8B5CF6','#06B6D4','#F97316'];
       const rankEmojis = ['🥇','🥈','🥉'];
 
