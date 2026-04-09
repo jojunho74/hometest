@@ -152,21 +152,39 @@
         <span id="lcal-pg" style="font-size:12px;font-weight:700;color:#64748B;"></span>
       </div>
     </div>
-    <!-- 테이블 -->
+    <!-- 테이블 2열 -->
     <div style="border-radius:12px;border:1px solid #E2E8F0;overflow:hidden;">
       <div style="height:3px;background:#EFF6FF;"><div id="lcal-bar" style="height:3px;background:#1E4D8C;width:0%;transition:width .4s;"></div></div>
-      <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <thead>
-          <tr style="background:#F8FAFF;border-bottom:1px solid #E2E8F0;">
-            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#64748B;width:110px;">날짜</th>
-            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#64748B;width:70px;">구분</th>
-            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#64748B;">기관 / 회사명</th>
-          </tr>
-        </thead>
-        <tbody id="lcal-tbody">
-          <tr><td colspan="3" style="text-align:center;padding:32px;color:#94A3B8;font-size:14px;">불러오는 중...</td></tr>
-        </tbody>
-      </table>
+      <div style="display:flex;gap:0;">
+        <!-- 좌 -->
+        <table style="flex:1;border-collapse:collapse;font-size:13px;min-width:0;">
+          <thead>
+            <tr style="background:#F8FAFF;border-bottom:1px solid #E2E8F0;">
+              <th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748B;width:96px;">날짜</th>
+              <th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748B;width:56px;">구분</th>
+              <th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748B;">기관 / 회사명</th>
+            </tr>
+          </thead>
+          <tbody id="lcal-tbody-l">
+            <tr><td colspan="3" style="text-align:center;padding:32px;color:#94A3B8;font-size:14px;">불러오는 중...</td></tr>
+          </tbody>
+        </table>
+        <!-- 구분선 -->
+        <div style="width:1px;background:#E2E8F0;flex-shrink:0;"></div>
+        <!-- 우 -->
+        <table style="flex:1;border-collapse:collapse;font-size:13px;min-width:0;">
+          <thead>
+            <tr style="background:#F8FAFF;border-bottom:1px solid #E2E8F0;">
+              <th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748B;width:96px;">날짜</th>
+              <th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748B;width:56px;">구분</th>
+              <th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748B;">기관 / 회사명</th>
+            </tr>
+          </thead>
+          <tbody id="lcal-tbody-r">
+            <tr><td colspan="3" style="text-align:center;padding:32px;color:#94A3B8;font-size:14px;"></td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     <!-- 네비게이션 -->
     <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;">
@@ -335,7 +353,7 @@
     (function() {
       var SB  = 'https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/';
       var KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
-      var CP = 10, cPage = 0, cData = [];
+      var CP = 20, cPage = 0, cData = [];
 
       function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
       function tpColor(t){
@@ -355,14 +373,22 @@
         document.getElementById('lcal-count').textContent = '총 '+cData.length+'건';
         document.getElementById('lcal-bar').style.width = Math.round((cPage+1)/pages*100)+'%';
 
-        document.getElementById('lcal-tbody').innerHTML = sl.map(function(e, i){
-          var bg = i%2===0 ? '#fff' : '#F8FAFF';
-          return '<tr style="border-bottom:1px solid #F1F5F9;background:'+bg+';">'
-            +'<td style="padding:10px 16px;font-size:12px;font-weight:600;color:#64748B;font-family:monospace;white-space:nowrap;">'+esc(e.event_date)+'</td>'
-            +'<td style="padding:10px 16px;"><span style="display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;'+tpColor(e.event_type)+'">'+esc(e.event_type)+'</span></td>'
-            +'<td style="padding:10px 16px;font-size:13px;font-weight:600;color:#1E293B;">'+esc(e.company)+'</td>'
-            +'</tr>';
-        }).join('');
+        var half = Math.ceil(sl.length / 2);
+        var left = sl.slice(0, half);
+        var right = sl.slice(half);
+        function makeRows(arr) {
+          if (!arr.length) return '<tr><td colspan="3" style="padding:8px;"></td></tr>';
+          return arr.map(function(e, i){
+            var bg = i%2===0 ? '#fff' : '#F8FAFF';
+            return '<tr style="border-bottom:1px solid #F1F5F9;background:'+bg+';">'
+              +'<td style="padding:9px 12px;font-size:11px;font-weight:600;color:#64748B;font-family:monospace;white-space:nowrap;">'+esc(e.event_date)+'</td>'
+              +'<td style="padding:9px 12px;"><span style="display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;'+tpColor(e.event_type)+'">'+esc(e.event_type)+'</span></td>'
+              +'<td style="padding:9px 12px;font-size:12px;font-weight:600;color:#1E293B;">'+esc(e.company)+'</td>'
+              +'</tr>';
+          }).join('');
+        }
+        document.getElementById('lcal-tbody-l').innerHTML = makeRows(left);
+        document.getElementById('lcal-tbody-r').innerHTML = makeRows(right);
 
         document.getElementById('lcal-dots').innerHTML = Array.from({length:pages},function(_,i){
           return '<button onclick="lcalGo('+i+')" style="width:'+(i===cPage?'18px':'7px')+';height:7px;border-radius:4px;border:none;cursor:pointer;background:'+(i===cPage?'#1E4D8C':'#CBD5E1')+';transition:all .3s;"></button>';
@@ -376,20 +402,22 @@
       fetch(SB+'job_calendar?select=company,event_date,event_type&order=event_date.asc', {
         headers: { 'apikey': KEY, 'Authorization': 'Bearer '+KEY }
       }).then(function(r){ return r.json(); }).then(function(data){
-        var tb = document.getElementById('lcal-tbody');
         if(!Array.isArray(data)){
-          tb.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:24px;color:#EF4444;font-size:13px;">오류: '+JSON.stringify(data).substring(0,120)+'</td></tr>';
+          document.getElementById('lcal-tbody-l').innerHTML = '<tr><td colspan="3" style="text-align:center;padding:24px;color:#EF4444;font-size:13px;">오류: '+JSON.stringify(data).substring(0,120)+'</td></tr>';
+          document.getElementById('lcal-tbody-r').innerHTML = '';
           return;
         }
         cData = data;
         if(!cData.length){
-          tb.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:32px;color:#94A3B8;font-size:14px;">등록된 채용일정이 없습니다.</td></tr>';
+          document.getElementById('lcal-tbody-l').innerHTML = '<tr><td colspan="3" style="text-align:center;padding:32px;color:#94A3B8;font-size:14px;">등록된 채용일정이 없습니다.</td></tr>';
+          document.getElementById('lcal-tbody-r').innerHTML = '';
           return;
         }
         showCal();
         setInterval(window.lcalNext, 5000);
       }).catch(function(e){
-        document.getElementById('lcal-tbody').innerHTML = '<tr><td colspan="3" style="text-align:center;padding:24px;color:#EF4444;font-size:13px;">연결 오류: '+e.message+'</td></tr>';
+        document.getElementById('lcal-tbody-l').innerHTML = '<tr><td colspan="3" style="text-align:center;padding:24px;color:#EF4444;font-size:13px;">연결 오류: '+e.message+'</td></tr>';
+        document.getElementById('lcal-tbody-r').innerHTML = '';
       });
     })();
   </script>
