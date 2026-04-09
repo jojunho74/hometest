@@ -12,8 +12,8 @@
     header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #E2E8F0;box-shadow:0 1px 4px rgba(0,0,0,.06);}
     .hinner{max-width:1100px;margin:0 auto;padding:0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;}
     .hlogo{font-size:1rem;font-weight:800;color:#1E4D8C;text-decoration:none;}
-    .hnav{display:flex;align-items:center;gap:4px;font-size:0.8rem;font-weight:600;}
-    .hnav a{color:#475569;text-decoration:none;padding:5px 9px;border-radius:8px;font-size:0.78rem;transition:background .18s,color .18s;}
+    .hnav{display:flex;align-items:center;gap:4px;}
+    .hnav a{color:#475569;text-decoration:none;padding:5px 9px;border-radius:8px;font-size:0.78rem;font-weight:600;transition:background .18s,color .18s;}
     .hnav a:hover,.hnav a.active{background:#1E4D8C;color:#fff;}
     .hbtn{padding:8px 18px;border-radius:8px;font-size:0.8rem;font-weight:700;background:#1E4D8C;color:#fff;text-decoration:none;}
     .hbtn:hover{background:#163870;}
@@ -32,12 +32,9 @@
 
     /* ── 본문 ── */
     .wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px;}
-
-    /* ── 글쓰기 버튼 ── */
     .board-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
     .board-top h2{font-size:1.1rem;font-weight:800;color:#0B1D3A;}
-    .btn-write{padding:9px 22px;border-radius:8px;background:#1E4D8C;color:#fff;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;transition:background .15s;}
-    .btn-write:hover{background:#163870;}
+    .board-top-btns{display:flex;gap:8px;}
 
     /* ── 게시판 테이블 ── */
     .board-table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);}
@@ -48,6 +45,7 @@
     .board-table tr:hover td{background:#F8FAFF;}
     .td-title{text-align:left!important;font-weight:600;color:#1E293B;cursor:pointer;}
     .td-title:hover{color:#1E4D8C;text-decoration:underline;}
+    .lock-icon{font-size:0.75rem;color:#94A3B8;margin-right:4px;}
     .no-data{text-align:center;padding:60px 0;color:#94A3B8;font-size:0.9rem;}
 
     /* ── 모달 공통 ── */
@@ -60,21 +58,28 @@
     .form-group input,.form-group textarea{padding:10px 14px;border:1.5px solid #CBD5E1;border-radius:8px;font-size:0.9rem;outline:none;font-family:inherit;transition:border-color .15s;}
     .form-group input:focus,.form-group textarea:focus{border-color:#1E4D8C;}
     .form-group textarea{resize:vertical;min-height:120px;}
-    .modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;}
+    .modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap;}
+    .pw-desc{font-size:0.85rem;color:#64748B;margin-bottom:16px;line-height:1.6;}
+
+    /* ── 버튼 ── */
     .btn-cancel{padding:9px 20px;border-radius:8px;border:1.5px solid #CBD5E1;background:#fff;color:#475569;font-size:0.85rem;font-weight:700;cursor:pointer;}
     .btn-cancel:hover{background:#F1F5F9;}
     .btn-submit{padding:9px 22px;border-radius:8px;background:#1E4D8C;color:#fff;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;}
     .btn-submit:hover{background:#163870;}
     .btn-danger{padding:9px 22px;border-radius:8px;background:#DC2626;color:#fff;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;}
     .btn-danger:hover{background:#B91C1C;}
+    .btn-admin{padding:9px 22px;border-radius:8px;background:#7C3AED;color:#fff;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;}
+    .btn-admin:hover{background:#6D28D9;}
+    .btn-write{padding:9px 22px;border-radius:8px;background:#1E4D8C;color:#fff;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;}
+    .btn-write:hover{background:#163870;}
+    .btn-admin-login{padding:9px 22px;border-radius:8px;background:#7C3AED;color:#fff;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;}
+    .btn-admin-login:hover{background:#6D28D9;}
 
-    /* ── 글 상세 모달 ── */
+    /* ── 글 상세 ── */
     .detail-meta{display:flex;gap:16px;font-size:0.78rem;color:#94A3B8;margin-bottom:16px;flex-wrap:wrap;}
     .detail-content{background:#F8FAFF;border-radius:8px;padding:16px;font-size:0.9rem;line-height:1.8;color:#334155;white-space:pre-wrap;min-height:100px;margin-bottom:20px;}
     .detail-btns{display:flex;gap:8px;flex-wrap:wrap;}
-
-    /* ── 비밀번호 확인 모달 ── */
-    .pw-desc{font-size:0.85rem;color:#64748B;margin-bottom:16px;}
+    .admin-badge{display:inline-block;padding:2px 8px;border-radius:4px;background:#F3E8FF;color:#7C3AED;font-size:0.72rem;font-weight:700;margin-left:6px;}
 
     /* ── 플로팅 ── */
     .float-btns{position:fixed;right:16px;bottom:100px;z-index:99;display:flex;flex-direction:column;gap:10px;}
@@ -119,14 +124,18 @@
 <!-- 히어로 -->
 <section class="hero">
   <h1>📋 채용정보 게시판</h1>
-  <p>G-TELP 관련 채용 정보를 자유롭게 공유하고 소통하세요.</p>
+  <p>G-TELP 관련 채용 정보를 자유롭게 공유하고 소통하세요.<br>
+  <span style="font-size:0.82rem;opacity:.7;">🔒 게시글은 작성 시 설정한 비밀번호로 열람할 수 있습니다.</span></p>
 </section>
 
 <!-- 본문 -->
 <div class="wrap">
   <div class="board-top">
     <h2>전체 글 <span id="total-count" style="color:#1E4D8C;"></span></h2>
-    <button class="btn-write" onclick="openWriteModal()">✏️ 글쓰기</button>
+    <div class="board-top-btns">
+      <button class="btn-admin-login" id="admin-btn" onclick="toggleAdmin()">🔐 관리자</button>
+      <button class="btn-write" onclick="openWriteModal()">✏️ 글쓰기</button>
+    </div>
   </div>
 
   <table class="board-table">
@@ -158,7 +167,7 @@
       <input id="w-author" type="text" placeholder="닉네임 (선택)" maxlength="20">
     </div>
     <div class="form-group">
-      <label>비밀번호 <span style="color:#DC2626;">*</span> <span style="font-weight:400;color:#94A3B8;">(수정·삭제 시 사용)</span></label>
+      <label>비밀번호 <span style="color:#DC2626;">*</span> <span style="font-weight:400;color:#94A3B8;">(열람·수정·삭제 시 사용)</span></label>
       <input id="w-pw" type="password" placeholder="비밀번호 4자리 이상">
     </div>
     <div class="form-group">
@@ -168,6 +177,21 @@
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeWriteModal()">취소</button>
       <button class="btn-submit" onclick="submitPost()">등록</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 비밀번호 입력 모달 (열람/수정/삭제/관리자 공용) ── -->
+<div class="modal-bg" id="pw-modal">
+  <div class="modal" style="max-width:380px;">
+    <h3 id="pw-modal-title">🔒 비밀번호 확인</h3>
+    <p class="pw-desc" id="pw-modal-desc"></p>
+    <div class="form-group">
+      <input id="pw-input" type="password" placeholder="비밀번호를 입력하세요">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closePwModal()">취소</button>
+      <button class="btn-submit" onclick="confirmPw()">확인</button>
     </div>
   </div>
 </div>
@@ -186,21 +210,7 @@
       <button class="btn-cancel" onclick="closeDetailModal()">닫기</button>
       <button class="btn-submit" onclick="openEditAuth()" style="background:#0891B2;">✏️ 수정</button>
       <button class="btn-danger" onclick="openDeleteAuth()">🗑️ 삭제</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── 비밀번호 확인 모달 (수정/삭제 공용) ── -->
-<div class="modal-bg" id="pw-modal">
-  <div class="modal" style="max-width:380px;">
-    <h3 id="pw-modal-title">비밀번호 확인</h3>
-    <p class="pw-desc" id="pw-modal-desc">수정하려면 비밀번호를 입력하세요.</p>
-    <div class="form-group">
-      <input id="pw-input" type="password" placeholder="비밀번호">
-    </div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closePwModal()">취소</button>
-      <button class="btn-submit" id="pw-confirm-btn" onclick="confirmPw()">확인</button>
+      <button class="btn-admin" id="admin-delete-btn" onclick="adminDeletePost()" style="display:none;">🛡️ 관리자 삭제</button>
     </div>
   </div>
 </div>
@@ -230,45 +240,57 @@
 
 <!-- 플로팅 -->
 <div class="float-btns">
-  <button onclick="shareKakao()" class="float-btn" style="background:#FEE500;color:#3C1E1E;border:none;cursor:pointer;animation:none;">
+  <button onclick="shareKakao()" class="float-btn" style="background:#FEE500;color:#3C1E1E;border:none;cursor:pointer;">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="#3C1E1E" style="vertical-align:middle;margin-right:4px;"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
     카카오 공유
   </button>
-  <a href="https://pf.kakao.com/_tFxiuX/chat" target="_blank" class="float-btn" style="background:#FEE500;color:#3C1E1E;animation:none;">
+  <a href="https://pf.kakao.com/_tFxiuX/chat" target="_blank" class="float-btn" style="background:#FEE500;color:#3C1E1E;">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="#3C1E1E" style="vertical-align:middle;margin-right:4px;"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
     카카오 상담톡
   </a>
-  <a href="http://pf.kakao.com/_NxirdX" target="_blank" class="float-btn" style="background:#3C1E1E;color:#FEE500;animation:none;">
+  <a href="http://pf.kakao.com/_NxirdX" target="_blank" class="float-btn" style="background:#3C1E1E;color:#FEE500;">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="#FEE500" style="vertical-align:middle;margin-right:4px;"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
     채널 구독
   </a>
 </div>
 
 <script>
-  // ── 모바일 메뉴 ──
+  // ══════════════════════════════════
+  //  설정
+  // ══════════════════════════════════
+  const ADMIN_PW    = 'gtelp2024';   // ← 관리자 비밀번호 (변경 가능)
+  const STORAGE_KEY = 'gtelp_job_board';
+
+  // ══════════════════════════════════
+  //  상태
+  // ══════════════════════════════════
+  let posts         = loadPosts();
+  let currentPostId = null;
+  let pwAction      = null;  // 'view' | 'edit' | 'delete' | 'admin-login'
+  let isAdmin       = false;
+
+  // ══════════════════════════════════
+  //  로컬스토리지
+  // ══════════════════════════════════
+  function loadPosts() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch { return []; }
+  }
+  function savePosts(p) { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }
+
+  // ══════════════════════════════════
+  //  모바일 메뉴
+  // ══════════════════════════════════
   function toggleMenu() {
     document.getElementById('mobile-menu').classList.toggle('open');
     document.getElementById('hamburger').classList.toggle('open');
   }
 
-  // ── 데이터 (localStorage) ──
-  const STORAGE_KEY = 'gtelp_job_board';
-
-  function loadPosts() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-    catch { return []; }
-  }
-  function savePosts(posts) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-  }
-
-  let posts = loadPosts();
-  let currentPostId = null;
-  let pwAction = null; // 'edit' | 'delete'
-
-  // ── 렌더링 ──
+  // ══════════════════════════════════
+  //  렌더링
+  // ══════════════════════════════════
   function renderBoard() {
-    const tbody = document.getElementById('board-body');
+    const tbody   = document.getElementById('board-body');
     const totalEl = document.getElementById('total-count');
     totalEl.textContent = `(${posts.length}건)`;
 
@@ -278,11 +300,16 @@
     }
 
     tbody.innerHTML = [...posts].reverse().map((p, i) => {
-      const num = posts.length - i;
+      const num  = posts.length - i;
       const date = new Date(p.createdAt).toLocaleDateString('ko-KR', { year:'2-digit', month:'2-digit', day:'2-digit' });
+      const adminDelBtn = isAdmin
+        ? `<button onclick="event.stopPropagation();adminDeleteById(${p.id})" style="margin-left:8px;padding:2px 10px;border-radius:4px;background:#7C3AED;color:#fff;font-size:0.72rem;font-weight:700;border:none;cursor:pointer;">삭제</button>`
+        : '';
       return `<tr>
         <td>${num}</td>
-        <td class="td-title" onclick="openDetail(${p.id})">${escHtml(p.title)}</td>
+        <td class="td-title" onclick="openViewAuth(${p.id})">
+          <span class="lock-icon">🔒</span>${escHtml(p.title)}${adminDelBtn}
+        </td>
         <td>${escHtml(p.author || '익명')}</td>
         <td>${date}</td>
         <td>${p.views}</td>
@@ -290,108 +317,122 @@
     }).join('');
   }
 
-  function escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  // ── 글쓰기 ──
+  // ══════════════════════════════════
+  //  글쓰기
+  // ══════════════════════════════════
   function openWriteModal() {
-    document.getElementById('w-title').value = '';
-    document.getElementById('w-author').value = '';
-    document.getElementById('w-pw').value = '';
-    document.getElementById('w-content').value = '';
+    ['w-title','w-author','w-pw','w-content'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('write-modal').classList.add('open');
   }
-  function closeWriteModal() {
-    document.getElementById('write-modal').classList.remove('open');
-  }
+  function closeWriteModal() { document.getElementById('write-modal').classList.remove('open'); }
+
   function submitPost() {
     const title   = document.getElementById('w-title').value.trim();
     const author  = document.getElementById('w-author').value.trim();
     const pw      = document.getElementById('w-pw').value;
     const content = document.getElementById('w-content').value.trim();
 
-    if (!title)          { alert('제목을 입력하세요.'); return; }
-    if (pw.length < 4)   { alert('비밀번호는 4자리 이상 입력하세요.'); return; }
-    if (!content)        { alert('내용을 입력하세요.'); return; }
+    if (!title)        { alert('제목을 입력하세요.'); return; }
+    if (pw.length < 4) { alert('비밀번호는 4자리 이상 입력하세요.'); return; }
+    if (!content)      { alert('내용을 입력하세요.'); return; }
 
-    const newPost = {
-      id: Date.now(),
-      title, author: author || '익명', pw, content,
-      createdAt: new Date().toISOString(),
-      views: 0
-    };
-    posts.push(newPost);
+    posts.push({ id: Date.now(), title, author: author || '익명', pw, content, createdAt: new Date().toISOString(), views: 0 });
     savePosts(posts);
     closeWriteModal();
     renderBoard();
+    alert('등록되었습니다.');
   }
 
-  // ── 상세 보기 ──
-  function openDetail(id) {
-    const post = posts.find(p => p.id === id);
-    if (!post) return;
-    post.views++;
-    savePosts(posts);
-    currentPostId = id;
-
-    document.getElementById('d-title').textContent = post.title;
-    document.getElementById('d-author').textContent = '✍️ ' + (post.author || '익명');
-    document.getElementById('d-date').textContent = '📅 ' + new Date(post.createdAt).toLocaleString('ko-KR');
-    document.getElementById('d-views').textContent = '👁 ' + post.views;
-    document.getElementById('d-content').textContent = post.content;
-    document.getElementById('detail-modal').classList.add('open');
-    renderBoard();
-  }
-  function closeDetailModal() {
-    document.getElementById('detail-modal').classList.remove('open');
-    currentPostId = null;
-  }
-
-  // ── 비밀번호 확인 ──
-  function openDeleteAuth() {
-    pwAction = 'delete';
-    document.getElementById('pw-modal-title').textContent = '🗑️ 삭제 확인';
-    document.getElementById('pw-modal-desc').textContent = '삭제하려면 비밀번호를 입력하세요.';
+  // ══════════════════════════════════
+  //  비밀번호 모달 공용
+  // ══════════════════════════════════
+  function openPwModal(title, desc, action) {
+    pwAction = action;
+    document.getElementById('pw-modal-title').textContent = title;
+    document.getElementById('pw-modal-desc').textContent  = desc;
     document.getElementById('pw-input').value = '';
     document.getElementById('pw-modal').classList.add('open');
-  }
-  function openEditAuth() {
-    pwAction = 'edit';
-    document.getElementById('pw-modal-title').textContent = '✏️ 수정 확인';
-    document.getElementById('pw-modal-desc').textContent = '수정하려면 비밀번호를 입력하세요.';
-    document.getElementById('pw-input').value = '';
-    document.getElementById('pw-modal').classList.add('open');
+    setTimeout(() => document.getElementById('pw-input').focus(), 100);
   }
   function closePwModal() {
     document.getElementById('pw-modal').classList.remove('open');
     pwAction = null;
   }
-  function confirmPw() {
-    const post = posts.find(p => p.id === currentPostId);
-    if (!post) return;
-    const input = document.getElementById('pw-input').value;
-    if (input !== post.pw) { alert('비밀번호가 틀렸습니다.'); return; }
 
+  function confirmPw() {
+    const input  = document.getElementById('pw-input').value;
     const action = pwAction;
-    closePwModal();
-    if (action === 'delete') {
-      deletePost();
-    } else if (action === 'edit') {
+    const post   = posts.find(p => p.id === currentPostId);
+
+    if (action === 'admin-login') {
+      if (input !== ADMIN_PW) { alert('관리자 비밀번호가 틀렸습니다.'); return; }
+      isAdmin = true;
+      closePwModal();
+      document.getElementById('admin-btn').textContent = '🛡️ 관리자 모드 ON';
+      document.getElementById('admin-btn').style.background = '#059669';
+      renderBoard();
+      return;
+    }
+
+    if (!post) return;
+
+    if (action === 'view') {
+      if (input !== post.pw) { alert('비밀번호가 틀렸습니다.'); return; }
+      closePwModal();
+      showDetail(post);
+      return;
+    }
+    if (action === 'edit') {
+      if (input !== post.pw) { alert('비밀번호가 틀렸습니다.'); return; }
+      closePwModal();
       openEditModal(post);
+      return;
+    }
+    if (action === 'delete') {
+      if (input !== post.pw) { alert('비밀번호가 틀렸습니다.'); return; }
+      closePwModal();
+      doDelete(currentPostId);
+      return;
     }
   }
 
-  // ── 삭제 ──
-  function deletePost() {
-    posts = posts.filter(p => p.id !== currentPostId);
-    savePosts(posts);
-    closeDetailModal();
-    renderBoard();
-    alert('삭제되었습니다.');
+  // ══════════════════════════════════
+  //  열람 (비밀번호 필요)
+  // ══════════════════════════════════
+  function openViewAuth(id) {
+    currentPostId = id;
+    openPwModal('🔒 열람 비밀번호 확인', '이 게시글은 비밀번호가 있어야 열람할 수 있습니다.', 'view');
   }
 
-  // ── 수정 ──
+  function showDetail(post) {
+    post.views++;
+    savePosts(posts);
+    document.getElementById('d-title').textContent   = post.title;
+    document.getElementById('d-author').textContent  = '✍️ ' + (post.author || '익명');
+    document.getElementById('d-date').textContent    = '📅 ' + new Date(post.createdAt).toLocaleString('ko-KR');
+    document.getElementById('d-views').textContent   = '👁 ' + post.views;
+    document.getElementById('d-content').textContent = post.content;
+    // 관리자 삭제 버튼 표시 여부
+    document.getElementById('admin-delete-btn').style.display = isAdmin ? 'inline-block' : 'none';
+    document.getElementById('detail-modal').classList.add('open');
+    renderBoard();
+  }
+
+  function closeDetailModal() {
+    document.getElementById('detail-modal').classList.remove('open');
+    currentPostId = null;
+  }
+
+  // ══════════════════════════════════
+  //  수정
+  // ══════════════════════════════════
+  function openEditAuth() {
+    openPwModal('✏️ 수정 비밀번호 확인', '수정하려면 작성 시 설정한 비밀번호를 입력하세요.', 'edit');
+  }
   function openEditModal(post) {
     closeDetailModal();
     document.getElementById('e-title').value   = post.title;
@@ -399,22 +440,18 @@
     document.getElementById('e-content').value = post.content;
     document.getElementById('edit-modal').classList.add('open');
   }
-  function closeEditModal() {
-    document.getElementById('edit-modal').classList.remove('open');
-  }
+  function closeEditModal() { document.getElementById('edit-modal').classList.remove('open'); }
+
   function submitEdit() {
     const title   = document.getElementById('e-title').value.trim();
     const author  = document.getElementById('e-author').value.trim();
     const content = document.getElementById('e-content').value.trim();
-
     if (!title)   { alert('제목을 입력하세요.'); return; }
     if (!content) { alert('내용을 입력하세요.'); return; }
 
     const post = posts.find(p => p.id === currentPostId);
     if (!post) return;
-    post.title   = title;
-    post.author  = author || '익명';
-    post.content = content;
+    post.title = title; post.author = author || '익명'; post.content = content;
     savePosts(posts);
     closeEditModal();
     currentPostId = null;
@@ -422,21 +459,64 @@
     alert('수정되었습니다.');
   }
 
-  // ── 카카오 공유 ──
+  // ══════════════════════════════════
+  //  삭제
+  // ══════════════════════════════════
+  function openDeleteAuth() {
+    openPwModal('🗑️ 삭제 비밀번호 확인', '삭제하려면 작성 시 설정한 비밀번호를 입력하세요.', 'delete');
+  }
+  function doDelete(id) {
+    posts = posts.filter(p => p.id !== id);
+    savePosts(posts);
+    closeDetailModal();
+    renderBoard();
+    alert('삭제되었습니다.');
+  }
+
+  // ══════════════════════════════════
+  //  관리자 삭제
+  // ══════════════════════════════════
+  function toggleAdmin() {
+    if (isAdmin) {
+      isAdmin = false;
+      document.getElementById('admin-btn').textContent = '🔐 관리자';
+      document.getElementById('admin-btn').style.background = '';
+      renderBoard();
+    } else {
+      openPwModal('🔐 관리자 로그인', '관리자 비밀번호를 입력하세요.', 'admin-login');
+    }
+  }
+
+  function adminDeletePost() {
+    if (!isAdmin) return;
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    doDelete(currentPostId);
+  }
+
+  function adminDeleteById(id) {
+    if (!isAdmin) return;
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    currentPostId = id;
+    doDelete(id);
+  }
+
+  // ══════════════════════════════════
+  //  카카오 공유
+  // ══════════════════════════════════
   function shareKakao() {
     const url = window.location.href;
     if (navigator.share) { navigator.share({ title: '채용정보 게시판', url }); return; }
     navigator.clipboard.writeText(url).then(() => alert('링크가 복사되었습니다.\n카카오톡에 붙여넣기 해주세요.'));
   }
 
-  // ── 모달 외부 클릭 닫기 ──
+  // ══════════════════════════════════
+  //  모달 외부 클릭 닫기 / 엔터키
+  // ══════════════════════════════════
   ['write-modal','detail-modal','pw-modal','edit-modal'].forEach(id => {
     document.getElementById(id).addEventListener('click', function(e) {
       if (e.target === this) this.classList.remove('open');
     });
   });
-
-  // ── 엔터키 ──
   document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') confirmPw(); });
 
   // ── 초기 렌더링 ──
