@@ -47,6 +47,13 @@
     .td-title:hover{color:#1E4D8C;text-decoration:underline;}
     .lock-icon{font-size:0.75rem;color:#94A3B8;margin-right:4px;}
     .no-data{text-align:center;padding:60px 0;color:#94A3B8;font-size:0.9rem;}
+    .notice-row td{background:#FFF9E6!important;}
+    .notice-row:hover td{background:#FFF3CD!important;}
+    .notice-badge{display:inline-block;padding:2px 7px;border-radius:4px;background:#F59E0B;color:#fff;font-size:0.7rem;font-weight:800;margin-right:6px;vertical-align:middle;}
+    .btn-notice{padding:9px 22px;border-radius:8px;background:#F59E0B;color:#fff;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;}
+    .btn-notice:hover{background:#D97706;}
+    .btn-notice.on{background:#1E4D8C;}
+    .btn-notice.on:hover{background:#163870;}
 
     /* ── 토스트 알림 ── */
     .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:#1E293B;color:#fff;padding:12px 24px;border-radius:50px;font-size:0.9rem;font-weight:600;z-index:9999;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;}
@@ -226,6 +233,7 @@
       <button class="btn-cancel" onclick="closeDetailModal()">닫기</button>
       <button class="btn-submit" onclick="openEditAuth()" style="background:#0891B2;">✏️ 수정</button>
       <button class="btn-danger" onclick="openDeleteAuth()">🗑️ 삭제</button>
+      <button class="btn-notice" id="notice-toggle-btn" onclick="toggleNotice()" style="display:none;">📌 공지 설정</button>
       <button class="btn-admin" id="admin-delete-btn" onclick="adminDeletePost()" style="display:none;">🛡️ 관리자 삭제</button>
     </div>
   </div>
@@ -308,7 +316,8 @@
     document.getElementById('board-body').innerHTML =
       '<tr><td colspan="5" class="no-data">불러오는 중...</td></tr>';
     const { data, error } = await db.from('job_board')
-      .select('id, title, author, content, views, created_at')
+      .select('id, title, author, content, views, created_at, is_notice')
+      .order('is_notice', { ascending: false })
       .order('created_at', { ascending: false });
     if (error) { console.error('fetchPosts error:', error); return; }
     posts = data || [];
@@ -336,16 +345,22 @@
       return;
     }
 
-    tbody.innerHTML = posts.map((p, i) => {
-      const num  = posts.length - i;
+    // 공지 수 파악 (번호 계산용)
+    const noticeCount = posts.filter(p => p.is_notice).length;
+    let regularIdx = 0;
+
+    tbody.innerHTML = posts.map((p) => {
+      const isNotice = p.is_notice;
+      const num  = isNotice ? '공지' : (posts.length - noticeCount - regularIdx++);
       const date = new Date(p.created_at).toLocaleDateString('ko-KR', { year:'2-digit', month:'2-digit', day:'2-digit' });
       const adminDelBtn = isAdmin
         ? `<button onclick="event.stopPropagation();adminDeleteById(${p.id})" style="margin-left:8px;padding:2px 10px;border-radius:4px;background:#7C3AED;color:#fff;font-size:0.72rem;font-weight:700;border:none;cursor:pointer;">삭제</button>`
         : '';
-      return `<tr>
-        <td>${num}</td>
+      const noticeBadge = isNotice ? `<span class="notice-badge">📌 공지</span>` : `<span class="lock-icon">🔒</span>`;
+      return `<tr class="${isNotice ? 'notice-row' : ''}">
+        <td style="font-weight:${isNotice ? '800' : '400'};color:${isNotice ? '#F59E0B' : ''};">${num}</td>
         <td class="td-title" onclick="openViewAuth(${p.id})">
-          <span class="lock-icon">🔒</span>${escHtml(p.title)}${adminDelBtn}
+          ${noticeBadge}${escHtml(p.title)}${adminDelBtn}
         </td>
         <td>${escHtml(maskAuthor(p.author))}</td>
         <td>${date}</td>
@@ -473,6 +488,14 @@
     document.getElementById('d-views').textContent   = '👁 ' + post.views;
     document.getElementById('d-content').textContent = post.content;
     document.getElementById('admin-delete-btn').style.display = isAdmin ? 'inline-block' : 'none';
+    const noticeBtn = document.getElementById('notice-toggle-btn');
+    if (isAdmin) {
+      noticeBtn.style.display = 'inline-block';
+      noticeBtn.textContent = post.is_notice ? '📌 공지 해제' : '📌 공지 설정';
+      noticeBtn.className = 'btn-notice' + (post.is_notice ? ' on' : '');
+    } else {
+      noticeBtn.style.display = 'none';
+    }
     document.getElementById('detail-modal').classList.add('open');
     renderBoard();
   }
@@ -550,6 +573,21 @@
     } else {
       openPwModal('🔐 관리자 로그인', '관리자 비밀번호를 입력하세요.', 'admin-login');
     }
+  }
+
+  async function toggleNotice() {
+    if (!isAdmin) return;
+    const post = posts.find(p => p.id === currentPostId);
+    if (!post) return;
+    const newVal = !post.is_notice;
+    const { error } = await db.from('job_board').update({ is_notice: newVal }).eq('id', currentPostId);
+    if (error) { showToast('공지 설정 중 오류가 발생했습니다.', 'error'); console.error(error); return; }
+    post.is_notice = newVal;
+    const noticeBtn = document.getElementById('notice-toggle-btn');
+    noticeBtn.textContent = newVal ? '📌 공지 해제' : '📌 공지 설정';
+    noticeBtn.className = 'btn-notice' + (newVal ? ' on' : '');
+    await fetchPosts();
+    showToast(newVal ? '공지로 설정되었습니다.' : '공지가 해제되었습니다.', 'success');
   }
 
   function adminDeletePost() {
