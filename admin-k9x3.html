@@ -739,6 +739,15 @@
             <canvas id="chart-weekday" height="200"></canvas>
           </div>
         </div>
+        <!-- 시간대별 방문 분포 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <h3 class="font-bold text-slate-700">시간대별 접속 현황 <span class="text-xs font-normal text-slate-400">(최근 14일 · KST)</span></h3>
+            <div id="hourly-peak" class="text-xs font-semibold px-3 py-1 rounded-full bg-orange-50 text-orange-600"></div>
+          </div>
+          <canvas id="chart-hourly" height="90"></canvas>
+        </div>
+
         <!-- 날짜별 페이지 방문수 -->
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
           <h3 class="font-bold text-slate-700 mb-1">날짜별 페이지 방문수 <span class="text-xs font-normal text-slate-400">(최근 14일)</span></h3>
@@ -2328,6 +2337,50 @@
         options: {
           responsive: true,
           plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+      });
+
+      // 시간대별 분포 (0~23시)
+      const hourlyCounts = Array(24).fill(0);
+      rows.forEach(r => {
+        const kst = new Date(new Date(r.visited_at).getTime() + 9 * 60 * 60 * 1000);
+        hourlyCounts[kst.getHours()]++;
+      });
+      const peakHour = hourlyCounts.indexOf(Math.max(...hourlyCounts));
+      const hourlyPeakEl = document.getElementById('hourly-peak');
+      if (hourlyPeakEl) hourlyPeakEl.textContent = `피크: ${peakHour}시 (${hourlyCounts[peakHour]}회)`;
+
+      const hourlyColors = hourlyCounts.map((_, h) => {
+        if (h >= 22 || h < 6)  return 'rgba(99,102,241,0.65)';   // 심야 - 보라
+        if (h >= 6  && h < 12) return 'rgba(16,185,129,0.65)';   // 오전 - 초록
+        if (h >= 12 && h < 18) return 'rgba(59,130,246,0.65)';   // 오후 - 파랑
+        return 'rgba(245,158,11,0.65)';                           // 저녁 - 주황
+      });
+      hourlyColors[peakHour] = '#F97316'; // 피크 강조
+
+      statsCharts.hourly = new Chart(document.getElementById('chart-hourly'), {
+        type: 'bar',
+        data: {
+          labels: Array.from({length:24}, (_,h) => h + '시'),
+          datasets: [{
+            label: '방문수',
+            data: hourlyCounts,
+            backgroundColor: hourlyColors,
+            borderRadius: 5
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.parsed.y}회`,
+                title: ctx => ctx[0].label + ' 접속'
+              }
+            }
+          },
           scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
         }
       });
