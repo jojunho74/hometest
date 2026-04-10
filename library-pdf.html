@@ -592,7 +592,7 @@
           var key = (r.institution||'') + '||' + (r.title||'') + '||' + (r.category||'');
           dlMap[key] = (dlMap[key] || 0) + 1;
         });
-        var sorted = Object.entries(dlMap).sort(function(a,b){ return b[1]-a[1]; }).slice(0, 10);
+        var sorted = Object.entries(dlMap).sort(function(a,b){ return b[1]-a[1]; }).slice(0, 9);
 
         var MEDALS = ['🥇','🥈','🥉'];
         var CAT_COLOR = {'공공기관':'#1E4D8C','공기업':'#0891B2','연구원':'#6D28D9','대학병원':'#BE185D','기타':'#475569'};
@@ -896,7 +896,7 @@
           dlMap[key] = (dlMap[key] || 0) + 1;
         });
         var sorted  = Object.entries(dlMap).sort(function(a,b){ return b[1]-a[1]; });
-        var top10   = sorted.slice(0, 10);
+        var top10   = sorted.slice(0, 9);
         var maxCnt  = top10[0][1];
 
         var badge = document.getElementById('rank-total-badge');
