@@ -48,6 +48,12 @@
     .lock-icon{font-size:0.75rem;color:#94A3B8;margin-right:4px;}
     .no-data{text-align:center;padding:60px 0;color:#94A3B8;font-size:0.9rem;}
 
+    /* ── 토스트 알림 ── */
+    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:#1E293B;color:#fff;padding:12px 24px;border-radius:50px;font-size:0.9rem;font-weight:600;z-index:9999;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    .toast.success{background:#059669;}
+    .toast.error{background:#DC2626;}
+
     /* ── 모달 공통 ── */
     .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:16px;}
     .modal-bg.open{display:flex;}
@@ -246,6 +252,9 @@
   </div>
 </div>
 
+<!-- 토스트 -->
+<div class="toast" id="toast"></div>
+
 <!-- 플로팅 -->
 <div class="float-btns">
   <button onclick="shareKakao()" class="float-btn" style="background:#FEE500;color:#3C1E1E;border:none;cursor:pointer;">
@@ -370,19 +379,19 @@
     const pw      = document.getElementById('w-pw').value;
     const content = document.getElementById('w-content').value.trim();
 
-    if (!title)        { alert('제목을 입력하세요.'); return; }
-    if (!author)       { alert('닉네임을 입력하세요.'); return; }
-    if (pw.length < 4) { alert('비밀번호는 4자리 이상 입력하세요.'); return; }
-    if (!content)      { alert('내용을 입력하세요.'); return; }
+    if (!title)        { showToast('제목을 입력하세요.', 'error'); return; }
+    if (!author)       { showToast('닉네임을 입력하세요.', 'error'); return; }
+    if (pw.length < 4) { showToast('비밀번호는 4자리 이상 입력하세요.', 'error'); return; }
+    if (!content)      { showToast('내용을 입력하세요.', 'error'); return; }
 
     const pw_hash = await hashPw(pw);
     const { error } = await db.from('job_board').insert({
       title, author: author || '익명', pw_hash, content
     });
-    if (error) { alert('등록 중 오류가 발생했습니다.'); console.error(error); return; }
+    if (error) { showToast('등록 중 오류가 발생했습니다.', 'error'); console.error(error); return; }
     closeWriteModal();
     await fetchPosts();
-    alert('등록되었습니다.');
+    showToast('등록되었습니다.', 'success');
   }
 
   // ══════════════════════════════════
@@ -414,7 +423,7 @@
     const action = pwAction;
 
     if (action === 'admin-login') {
-      if (input !== ADMIN_PW) { alert('관리자 비밀번호가 틀렸습니다.'); return; }
+      if (input !== ADMIN_PW) { showToast('관리자 비밀번호가 틀렸습니다.', 'error'); return; }
       isAdmin = true;
       closePwModal();
       document.getElementById('admin-btn').textContent = '🛡️ 관리자 모드 ON';
@@ -427,7 +436,7 @@
     const inputNick = document.getElementById('pw-nick-input').value.trim();
     const post = posts.find(p => p.id === currentPostId);
     if (!post) return;
-    if (inputNick !== post.author) { alert('닉네임이 틀렸습니다.'); return; }
+    if (inputNick !== post.author) { showToast('닉네임이 틀렸습니다.', 'error'); return; }
 
     // 비밀번호 해시 비교 (DB에서 pw_hash 조회)
     const inputHash = await hashPw(input);
@@ -435,8 +444,8 @@
       .select('pw_hash')
       .eq('id', currentPostId)
       .single();
-    if (error || !data) { alert('오류가 발생했습니다.'); return; }
-    if (inputHash !== data.pw_hash) { alert('비밀번호가 틀렸습니다.'); return; }
+    if (error || !data) { showToast('오류가 발생했습니다.', 'error'); return; }
+    if (inputHash !== data.pw_hash) { showToast('비밀번호가 틀렸습니다.', 'error'); return; }
 
     closePwModal();
 
@@ -490,17 +499,17 @@
     const title   = document.getElementById('e-title').value.trim();
     const author  = document.getElementById('e-author').value.trim();
     const content = document.getElementById('e-content').value.trim();
-    if (!title)   { alert('제목을 입력하세요.'); return; }
-    if (!content) { alert('내용을 입력하세요.'); return; }
+    if (!title)   { showToast('제목을 입력하세요.', 'error'); return; }
+    if (!content) { showToast('내용을 입력하세요.', 'error'); return; }
 
     const { error } = await db.from('job_board')
       .update({ title, author: author || '익명', content })
       .eq('id', currentPostId);
-    if (error) { alert('수정 중 오류가 발생했습니다.'); console.error(error); return; }
+    if (error) { showToast('수정 중 오류가 발생했습니다.', 'error'); console.error(error); return; }
     closeEditModal();
     currentPostId = null;
     await fetchPosts();
-    alert('수정되었습니다.');
+    showToast('수정되었습니다.', 'success');
   }
 
   // ══════════════════════════════════
@@ -513,16 +522,16 @@
     const { data, error } = await db.from('job_board').delete().eq('id', id).select();
     if (error) {
       console.error('delete error:', error);
-      alert('삭제 중 오류가 발생했습니다.\n' + error.message);
+      showToast('삭제 중 오류가 발생했습니다.', 'error');
       return;
     }
     if (!data || data.length === 0) {
-      alert('삭제에 실패했습니다.\nSupabase DELETE 정책을 확인하세요.');
+      showToast('삭제 실패 — Supabase RLS를 확인하세요.', 'error');
       return;
     }
     closeDetailModal();
     await fetchPosts();
-    alert('삭제되었습니다.');
+    showToast('삭제되었습니다.', 'success');
   }
 
   // ══════════════════════════════════
@@ -558,7 +567,7 @@
   function shareKakao() {
     const url = window.location.href;
     if (navigator.share) { navigator.share({ title: '채용정보 게시판', url }); return; }
-    navigator.clipboard.writeText(url).then(() => alert('링크가 복사되었습니다.\n카카오톡에 붙여넣기 해주세요.'));
+    navigator.clipboard.writeText(url).then(() => showToast('링크가 복사되었습니다.', 'success'));
   }
 
   // ══════════════════════════════════
@@ -571,6 +580,17 @@
   });
   document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') confirmPw(); });
   document.getElementById('pw-nick-input').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('pw-input').focus(); });
+
+  // ══════════════════════════════════
+  //  토스트 알림
+  // ══════════════════════════════════
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (type ? ' ' + type : '');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
 
   // ── 초기 로드 ──
   fetchPosts();
