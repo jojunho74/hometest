@@ -166,11 +166,11 @@
       <input id="w-title" type="text" placeholder="제목을 입력하세요" maxlength="60">
     </div>
     <div class="form-group">
-      <label>작성자</label>
-      <input id="w-author" type="text" placeholder="닉네임 (선택)" maxlength="20">
+      <label>닉네임 <span style="color:#DC2626;">*</span> <span style="font-weight:400;color:#94A3B8;">(열람·수정·삭제 시 사용)</span></label>
+      <input id="w-author" type="text" placeholder="닉네임을 입력하세요" maxlength="20">
     </div>
     <div class="form-group">
-      <label>비밀번호 <span style="color:#DC2626;">*</span> <span style="font-weight:400;color:#94A3B8;">(열람·수정·삭제 시 사용)</span></label>
+      <label>비밀번호 <span style="color:#DC2626;">*</span> <span style="font-weight:400;color:#94A3B8;">(닉네임과 함께 열람에 사용)</span></label>
       <input id="w-pw" type="password" placeholder="비밀번호 4자리 이상">
     </div>
     <div class="form-group">
@@ -187,9 +187,14 @@
 <!-- ── 비밀번호 입력 모달 (열람/수정/삭제/관리자 공용) ── -->
 <div class="modal-bg" id="pw-modal">
   <div class="modal" style="max-width:380px;">
-    <h3 id="pw-modal-title">🔒 비밀번호 확인</h3>
+    <h3 id="pw-modal-title">🔒 본인 확인</h3>
     <p class="pw-desc" id="pw-modal-desc"></p>
+    <div class="form-group" id="pw-nick-group">
+      <label style="font-size:0.8rem;font-weight:700;color:#475569;">닉네임</label>
+      <input id="pw-nick-input" type="text" placeholder="작성 시 입력한 닉네임">
+    </div>
     <div class="form-group">
+      <label style="font-size:0.8rem;font-weight:700;color:#475569;" id="pw-input-label">비밀번호</label>
       <input id="pw-input" type="password" placeholder="비밀번호를 입력하세요">
     </div>
     <div class="modal-btns">
@@ -358,6 +363,7 @@
     const content = document.getElementById('w-content').value.trim();
 
     if (!title)        { alert('제목을 입력하세요.'); return; }
+    if (!author)       { alert('닉네임을 입력하세요.'); return; }
     if (pw.length < 4) { alert('비밀번호는 4자리 이상 입력하세요.'); return; }
     if (!content)      { alert('내용을 입력하세요.'); return; }
 
@@ -379,8 +385,16 @@
     document.getElementById('pw-modal-title').textContent = title;
     document.getElementById('pw-modal-desc').textContent  = desc;
     document.getElementById('pw-input').value = '';
+    document.getElementById('pw-nick-input').value = '';
+    // 관리자 로그인은 닉네임 불필요
+    const showNick = action !== 'admin-login';
+    document.getElementById('pw-nick-group').style.display = showNick ? 'flex' : 'none';
+    document.getElementById('pw-input-label').textContent  = showNick ? '비밀번호' : '관리자 비밀번호';
     document.getElementById('pw-modal').classList.add('open');
-    setTimeout(() => document.getElementById('pw-input').focus(), 100);
+    setTimeout(() => {
+      if (showNick) document.getElementById('pw-nick-input').focus();
+      else document.getElementById('pw-input').focus();
+    }, 100);
   }
   function closePwModal() {
     document.getElementById('pw-modal').classList.remove('open');
@@ -401,6 +415,12 @@
       return;
     }
 
+    // 닉네임 확인
+    const inputNick = document.getElementById('pw-nick-input').value.trim();
+    const post = posts.find(p => p.id === currentPostId);
+    if (!post) return;
+    if (inputNick !== post.author) { alert('닉네임이 틀렸습니다.'); return; }
+
     // 비밀번호 해시 비교 (DB에서 pw_hash 조회)
     const inputHash = await hashPw(input);
     const { data, error } = await db.from('job_board')
@@ -411,7 +431,6 @@
     if (inputHash !== data.pw_hash) { alert('비밀번호가 틀렸습니다.'); return; }
 
     closePwModal();
-    const post = posts.find(p => p.id === currentPostId);
 
     if (action === 'view')   { showDetail(post); return; }
     if (action === 'edit')   { openEditModal(post); return; }
@@ -535,6 +554,7 @@
     });
   });
   document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') confirmPw(); });
+  document.getElementById('pw-nick-input').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('pw-input').focus(); });
 
   // ── 초기 로드 ──
   fetchPosts();
