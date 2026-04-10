@@ -753,13 +753,17 @@
             <button data-hkey="14days"    onclick="renderHourlyChart('14days')"    class="hourly-sel-btn px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">최근 14일</button>
             <button data-hkey="month"     onclick="renderHourlyChart('month')"     class="hourly-sel-btn px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 bg-white hover:border-blue-400 hover:text-blue-600">이번달</button>
           </div>
-          <!-- 특정 날짜 선택 -->
-          <div class="flex items-center gap-2 mb-4">
-            <span class="text-xs text-slate-400 whitespace-nowrap">특정 날짜</span>
-            <input type="date" id="hourly-date-input"
+          <!-- 날짜 범위 선택 -->
+          <div class="flex flex-wrap items-center gap-2 mb-4">
+            <span class="text-xs text-slate-400 whitespace-nowrap">기간 직접 선택</span>
+            <input type="date" id="hourly-date-from"
               class="border border-slate-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-blue-500"
               style="font-size:13px;" />
-            <button onclick="onHourlyDatePick()"
+            <span class="text-xs text-slate-400">~</span>
+            <input type="date" id="hourly-date-to"
+              class="border border-slate-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-blue-500"
+              style="font-size:13px;" />
+            <button onclick="onHourlyRangePick()"
               class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-slate-700 text-white hover:bg-slate-900">조회</button>
           </div>
           <canvas id="chart-hourly" height="90"></canvas>
@@ -2358,14 +2362,13 @@
         }
       });
 
-      // 시간대별 — 날짜 input max 설정 후 초기 렌더
-      (function initHourlyDateInput() {
-        const inp = document.getElementById('hourly-date-input');
-        if (inp) {
-          const todayKey = kstNow.toISOString().slice(0, 10);
-          inp.max = todayKey;
-          inp.value = todayKey;
-        }
+      // 시간대별 — 날짜 범위 input 초기화 후 렌더
+      (function initHourlyRangeInputs() {
+        const todayKey = kstNow.toISOString().slice(0, 10);
+        const from = document.getElementById('hourly-date-from');
+        const to   = document.getElementById('hourly-date-to');
+        if (from) { from.max = todayKey; from.value = new Date(kstNow.getTime() - 13 * 864e5).toISOString().slice(0, 10); }
+        if (to)   { to.max   = todayKey; to.value   = todayKey; }
       })();
       renderHourlyChart('14days');
 
@@ -2815,11 +2818,13 @@ ${internalSummary}
       }).join('');
     }
 
-    // ─── 특정 날짜 input 조회 ───
-    function onHourlyDatePick() {
-      const v = document.getElementById('hourly-date-input').value;
-      if (!v) return;
-      renderHourlyChart(v);
+    // ─── 날짜 범위 input 조회 ───
+    function onHourlyRangePick() {
+      const from = document.getElementById('hourly-date-from').value;
+      const to   = document.getElementById('hourly-date-to').value;
+      if (!from || !to) return;
+      if (from > to) { alert('시작 날짜가 종료 날짜보다 늦습니다.'); return; }
+      renderHourlyChart('range:' + from + ':' + to);
     }
 
     // ─── 시간대별 차트 렌더링 ───
@@ -2874,20 +2879,29 @@ ${internalSummary}
           .limit(10000);
         filtered = mRows || [];
 
-      } else {
-        // 특정 날짜 YYYY-MM-DD
-        const d = new Date(key + 'T12:00:00');
-        labelText = `${d.getMonth()+1}월 ${d.getDate()}일 · KST`;
-        filtered = _statsRows.filter(r => kstDate(r.visited_at) === key);
-        // 14일 이전 날짜면 DB 조회
+      } else if (key.startsWith('range:')) {
+        // 날짜 범위 YYYY-MM-DD ~ YYYY-MM-DD
+        const [, fromKey, toKey] = key.split(':');
+        const fd = new Date(fromKey + 'T12:00:00');
+        const td = new Date(toKey   + 'T12:00:00');
+        const fLabel = `${fd.getMonth()+1}/${fd.getDate()}`;
+        const tLabel = `${td.getMonth()+1}/${td.getDate()}`;
+        labelText = `${fLabel} ~ ${tLabel} · KST`;
+
         const since14 = new Date(kstNow.getTime() - 13 * 864e5).toISOString().slice(0, 10);
-        if (key < since14) {
-          const { data: dRows } = await db.from('page_views')
+        // 캐시 범위 안에 있으면 필터, 밖이면 DB 조회
+        if (fromKey >= since14) {
+          filtered = _statsRows.filter(r => {
+            const d = kstDate(r.visited_at);
+            return d >= fromKey && d <= toKey;
+          });
+        } else {
+          const { data: rRows } = await db.from('page_views')
             .select('visited_at')
-            .gte('visited_at', key + 'T00:00:00+09:00')
-            .lt('visited_at',  key + 'T23:59:59+09:00')
-            .limit(5000);
-          filtered = dRows || [];
+            .gte('visited_at', fromKey + 'T00:00:00+09:00')
+            .lte('visited_at', toKey   + 'T23:59:59+09:00')
+            .limit(20000);
+          filtered = rRows || [];
         }
       }
 
