@@ -83,6 +83,37 @@
       .hero-btn-orange{padding:18px 24px!important;font-size:1rem!important;}
       .hero-btn-sm{padding:11px 20px!important;font-size:0.85rem!important;width:100%!important;text-align:center!important;}
     }
+    /* ── 응원 메시지 티커 ── */
+    .cheer-section{background:linear-gradient(90deg,#0B1D3A 0%,#1E3A8A 100%);padding:10px 0;overflow:hidden;position:relative;}
+    .cheer-track{display:flex;gap:32px;white-space:nowrap;animation:cheerScroll 30s linear infinite;}
+    .cheer-track:hover{animation-play-state:paused;}
+    @keyframes cheerScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+    .cheer-item{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#fff;flex-shrink:0;}
+    .cheer-stars{color:#FCD34D;font-size:11px;letter-spacing:1px;}
+    .cheer-text{color:rgba(255,255,255,.9);}
+    .cheer-time{color:rgba(255,255,255,.45);font-size:11px;}
+    /* ── 다운로드 팝업 ── */
+    #dl-popup-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:center;justify-content:center;padding:16px;}
+    #dl-popup-bg.open{display:flex;}
+    #dl-popup{background:#fff;border-radius:20px;width:100%;max-width:420px;padding:28px 24px 24px;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;}
+    .dl-popup-title{font-size:1rem;font-weight:800;color:#0B1D3A;margin-bottom:4px;}
+    .dl-popup-file{font-size:12px;color:#64748B;margin-bottom:20px;word-break:break-all;}
+    .dl-stars{display:flex;gap:6px;margin-bottom:20px;justify-content:center;}
+    .dl-star{font-size:2.2rem;cursor:pointer;color:#CBD5E1;transition:color .15s,transform .15s;line-height:1;}
+    .dl-star.on{color:#FCD34D;}
+    .dl-star:hover{transform:scale(1.15);}
+    #dl-comment{width:100%;padding:10px 14px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:inherit;resize:vertical;min-height:72px;outline:none;transition:border-color .2s;}
+    #dl-comment:focus{border-color:#1E4D8C;}
+    .dl-popup-actions{display:flex;gap:8px;margin-top:14px;}
+    .dl-popup-kakao{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:10px;background:#FEE500;color:#3C1E1E;font-weight:800;font-size:13px;border:none;cursor:pointer;transition:background .15s,transform .15s;}
+    .dl-popup-kakao:hover{background:#f5dc00;transform:scale(1.02);}
+    .dl-popup-submit{flex:1.5;padding:11px;border-radius:10px;background:#1E4D8C;color:#fff;font-weight:800;font-size:13px;border:none;cursor:pointer;transition:background .15s,transform .15s;}
+    .dl-popup-submit:hover{background:#163870;transform:scale(1.02);}
+    .dl-popup-skip{font-size:12px;color:#94A3B8;text-align:center;margin-top:10px;cursor:pointer;background:none;border:none;width:100%;}
+    .dl-popup-skip:hover{color:#64748B;text-decoration:underline;}
+    .dl-popup-close{position:absolute;top:14px;right:16px;font-size:20px;color:#94A3B8;background:none;border:none;cursor:pointer;line-height:1;}
+    .dl-popup-close:hover{color:#1E293B;}
+    @media(max-width:480px){#dl-popup{padding:22px 16px 18px;}}
   </style>
 </head>
 <body>
@@ -141,6 +172,11 @@
     <a href="package.html" class="btn-breath hero-btn-orange" style="display:inline-block;padding:28px 56px;border-radius:14px;background:#1D4ED8;color:#fff;font-weight:900;font-size:1.25rem;text-decoration:none;line-height:1.3;text-align:center;" onmouseover="this.style.animationPlayState='paused';this.style.transform='scale(1.08)';this.style.boxShadow='0 12px 40px rgba(29,78,216,.8)'" onmouseout="this.style.animationPlayState='running';this.style.transform='';this.style.boxShadow=''">우리 대학도 G-TELP IBT<br>도입할 수 있나요? →</a>
   </div>
 </section>
+
+<!-- ══ 응원 메시지 티커 ══ -->
+<div class="cheer-section" id="cheer-section" style="display:none;">
+  <div class="cheer-track" id="cheer-track"></div>
+</div>
 
 <!-- ══════ 채용공고 슬라이더 ══════ -->
 <section style="background:#EFF6FF;padding:40px 16px;" id="job-postings">
@@ -284,34 +320,6 @@
     })();
   </script>
 
-  <!-- 다운로드 추적 -->
-  <script>
-    (function() {
-      function trackDownload(institution, title, category) {
-        fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/download_logs', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs',
-            'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs',
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({ institution: institution, title: title, category: category })
-        }).catch(function(){});
-      }
-
-      document.querySelectorAll('.dl-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var card = btn.closest('[data-institution]');
-          if (!card) return;
-          var institution = card.getAttribute('data-institution') || '';
-          var title       = card.getAttribute('data-title') || '';
-          var category    = card.getAttribute('data-category') || '';
-          trackDownload(institution, title, category);
-        });
-      });
-    })();
-  </script>
 
   <!-- 우측 플로팅 버튼 -->
   <style>
@@ -363,6 +371,176 @@
         setTimeout(function(){ btn.innerHTML = orig; }, 2000);
       });
     }
+  </script>
+
+  <!-- ══ 다운로드 팝업 ══ -->
+  <div id="dl-popup-bg">
+    <div id="dl-popup">
+      <button class="dl-popup-close" onclick="closeDlPopup()">✕</button>
+      <div class="dl-popup-title">📥 자료가 도움이 됐나요?</div>
+      <div class="dl-popup-file" id="dl-popup-filename"></div>
+      <!-- 별점 -->
+      <div style="text-align:center;margin-bottom:8px;font-size:13px;font-weight:700;color:#475569;">만족도를 선택해주세요</div>
+      <div class="dl-stars" id="dl-stars">
+        <span class="dl-star" data-v="1">★</span>
+        <span class="dl-star" data-v="2">★</span>
+        <span class="dl-star" data-v="3">★</span>
+        <span class="dl-star" data-v="4">★</span>
+        <span class="dl-star" data-v="5">★</span>
+      </div>
+      <!-- 응원 댓글 -->
+      <div style="font-size:13px;font-weight:700;color:#475569;margin-bottom:6px;">응원 한마디 남겨주세요 <span style="font-weight:400;color:#94A3B8;">(선택)</span></div>
+      <textarea id="dl-comment" placeholder="예) 덕분에 합격했어요! 감사합니다 🎉"></textarea>
+      <!-- 버튼 -->
+      <div class="dl-popup-actions">
+        <button class="dl-popup-kakao" onclick="popupShareKakao()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
+          카카오 공유
+        </button>
+        <button class="dl-popup-submit" onclick="submitAndDownload()">댓글 저장 후 다운로드</button>
+      </div>
+      <button class="dl-popup-skip" onclick="skipAndDownload()">건너뛰고 바로 다운로드</button>
+    </div>
+  </div>
+
+  <script>
+    // ── 다운로드 팝업 ──
+    (function() {
+      const SB_URL = 'https://byzulmxcuhsrjdphmuym.supabase.co';
+      const SB_KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
+      let dlPopupHref = null;
+      let dlPopupRating = 0;
+
+      // 별점
+      const stars = document.querySelectorAll('.dl-star');
+      stars.forEach(star => {
+        star.addEventListener('click', function() {
+          dlPopupRating = parseInt(this.getAttribute('data-v'));
+          stars.forEach(s => s.classList.toggle('on', parseInt(s.getAttribute('data-v')) <= dlPopupRating));
+        });
+        star.addEventListener('mouseover', function() {
+          const v = parseInt(this.getAttribute('data-v'));
+          stars.forEach(s => s.classList.toggle('on', parseInt(s.getAttribute('data-v')) <= v));
+        });
+        star.addEventListener('mouseout', function() {
+          stars.forEach(s => s.classList.toggle('on', parseInt(s.getAttribute('data-v')) <= dlPopupRating));
+        });
+      });
+
+      // dl-btn 클릭 인터셉트
+      document.querySelectorAll('.dl-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          dlPopupHref = btn.getAttribute('href');
+          dlPopupRating = 0;
+          document.getElementById('dl-comment').value = '';
+          stars.forEach(s => s.classList.remove('on'));
+          var card = btn.closest('[data-institution]');
+          var fname = card ? (card.getAttribute('data-title') || '') : (btn.getAttribute('href') || '');
+          document.getElementById('dl-popup-filename').textContent = fname;
+          document.getElementById('dl-popup-bg').classList.add('open');
+          // 다운로드 추적
+          if (card) {
+            fetch(SB_URL + '/rest/v1/download_logs', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'return=minimal' },
+              body: JSON.stringify({ institution: card.getAttribute('data-institution') || '', title: card.getAttribute('data-title') || '', category: card.getAttribute('data-category') || '' })
+            }).catch(function(){});
+          }
+        });
+      });
+
+      window.closeDlPopup = function() {
+        document.getElementById('dl-popup-bg').classList.remove('open');
+        dlPopupHref = null;
+      };
+
+      function doDownload() {
+        if (dlPopupHref) {
+          var a = document.createElement('a');
+          a.href = dlPopupHref;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+        document.getElementById('dl-popup-bg').classList.remove('open');
+      }
+
+      window.skipAndDownload = function() { doDownload(); };
+
+      window.submitAndDownload = async function() {
+        const comment = document.getElementById('dl-comment').value.trim();
+        const rating = dlPopupRating || 5;
+        const fname = document.getElementById('dl-popup-filename').textContent || '';
+        if (comment) {
+          try {
+            await fetch(SB_URL + '/rest/v1/cheer_comments', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'return=minimal' },
+              body: JSON.stringify({ comment: comment, rating: rating, file_name: fname })
+            });
+          } catch(e) { console.warn('cheer save failed', e); }
+        }
+        doDownload();
+        // 새 댓글 반영
+        setTimeout(loadCheerMessages, 600);
+      };
+
+      window.popupShareKakao = function() {
+        var url = 'https://hometest-weld.vercel.app/library-pdf.html';
+        var title = '공공기관 채용공고 자료실 — 지텔프IBT 대학컨설팅';
+        var desc = '취업 준비에 필요한 공공기관 채용공고 자료를 무료로 다운로드하세요.';
+        if (window.Kakao) {
+          try {
+            if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
+            Kakao.Share.sendDefault({ objectType: 'feed', content: { title: title, description: desc, imageUrl: 'https://hometest-weld.vercel.app/Gemini_Generated_Image_cz810vcz810vcz81.png', link: { mobileWebUrl: url, webUrl: url } }, buttons: [{ title: '자료실 보기', link: { mobileWebUrl: url, webUrl: url } }] });
+            return;
+          } catch(e) {}
+        }
+        if (navigator.share) { navigator.share({ title: title, text: desc, url: url }).catch(function(){}); return; }
+        navigator.clipboard.writeText(url).catch(function(){});
+      };
+
+      // 팝업 배경 클릭 닫기
+      document.getElementById('dl-popup-bg').addEventListener('click', function(e) {
+        if (e.target === this) closeDlPopup();
+      });
+    })();
+
+    // ── 응원 메시지 로드 ──
+    async function loadCheerMessages() {
+      try {
+        const res = await fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/cheer_comments?select=comment,rating,created_at&order=created_at.desc&limit=30', {
+          headers: { 'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs' }
+        });
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) return;
+        const section = document.getElementById('cheer-section');
+        const track = document.getElementById('cheer-track');
+        function starStr(n) { return '★'.repeat(Math.max(1,Math.min(5,n||5))); }
+        function timeStr(ts) {
+          const d = new Date(ts);
+          return d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0');
+        }
+        function esc(s){ return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        // 무한 스크롤을 위해 2배 복제
+        const doubled = [...data, ...data];
+        track.innerHTML = doubled.map(function(item) {
+          return '<span class="cheer-item">'
+            + '<span class="cheer-stars">' + starStr(item.rating) + '</span>'
+            + '<span class="cheer-text">' + esc(item.comment) + '</span>'
+            + '<span class="cheer-time">' + timeStr(item.created_at) + '</span>'
+            + '<span style="color:rgba(255,255,255,.2);margin-left:8px;">|</span>'
+            + '</span>';
+        }).join('');
+        // 애니메이션 duration: 데이터 수에 비례
+        track.style.animationDuration = Math.max(20, data.length * 5) + 's';
+        section.style.display = 'block';
+      } catch(e) { console.warn('cheer load failed', e); }
+    }
+    loadCheerMessages();
   </script>
 
   <script>
