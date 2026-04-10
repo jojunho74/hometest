@@ -819,17 +819,8 @@
         <span class="section-badge slide-up">대학소식</span>
         <h2 class="font-display text-2xl font-bold md:text-3xl slide-up" style="color:var(--ink);">We 대학일자리플러스센터</h2>
       </div>
-      <div style="position:relative;">
-        <div id="news-slider-wrap" style="overflow:hidden;border-radius:16px;">
-          <div id="news-grid" style="display:flex;gap:12px;transition:transform .4s cubic-bezier(.4,0,.2,1);will-change:transform;">
-            <p class="text-center text-sm" style="color:var(--ink-soft);padding:24px;">불러오는 중...</p>
-          </div>
-        </div>
-        <!-- 화살표 -->
-        <button id="news-prev" onclick="newsSlide(-1)" style="position:absolute;left:-20px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid #E2E8F0;box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--ink);z-index:5;">‹</button>
-        <button id="news-next" onclick="newsSlide(1)"  style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid #E2E8F0;box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--ink);z-index:5;">›</button>
-        <!-- 페이지 인디케이터 -->
-        <div id="news-dots" style="display:flex;justify-content:center;gap:6px;margin-top:16px;"></div>
+      <div id="news-grid" class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+        <p class="text-center text-sm col-span-3" style="color:var(--ink-soft);">불러오는 중...</p>
       </div>
       <p id="news-empty" class="hidden text-center text-sm mt-6" style="color:var(--ink-soft);">등록된 소식이 없습니다.</p>
     </div>
@@ -1159,31 +1150,7 @@
       setTimeout(cycle, 1200);
     })();
 
-    // ── 대학소식 슬라이더 ──
-    let newsPage = 0;
-    const NEWS_PER_PAGE = 3;
-    let newsPages = [];
-
-    function renderNewsDots() {
-      const dots = document.getElementById('news-dots');
-      dots.innerHTML = newsPages.map((_, i) =>
-        `<button onclick="newsGoTo(${i})" style="width:${i===newsPage?'20px':'8px'};height:8px;border-radius:4px;border:none;cursor:pointer;transition:all .3s;background:${i===newsPage?'#1E4D8C':'#CBD5E1'};"></button>`
-      ).join('');
-    }
-
-    function newsGoTo(page) {
-      newsPage = page;
-      const grid = document.getElementById('news-grid');
-      const wrap = document.getElementById('news-slider-wrap');
-      const pageW = wrap.offsetWidth;
-      grid.style.transform = `translateX(-${page * (pageW + 12)}px)`;
-      renderNewsDots();
-    }
-
-    window.newsSlide = function(dir) {
-      newsGoTo(Math.max(0, Math.min(newsPages.length - 1, newsPage + dir)));
-    };
-
+    // ── 대학소식 그리드 ──
     (async function loadUniversityNews() {
       try {
         const { data, error } = await _supabase.from('university_news').select('*').order('sort_order', { ascending: true });
@@ -1193,40 +1160,22 @@
         if (!data || data.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); return; }
         empty.classList.add('hidden');
 
-        // 5개씩 페이지 분할
-        newsPages = [];
-        for (let i = 0; i < data.length; i += NEWS_PER_PAGE) newsPages.push(data.slice(i, i + NEWS_PER_PAGE));
-
-        const wrap = document.getElementById('news-slider-wrap');
-        const cardW = () => (wrap.offsetWidth - 12 * (NEWS_PER_PAGE - 1)) / NEWS_PER_PAGE;
-
-        function buildCards() {
-          grid.innerHTML = newsPages.map(page => {
-            const cards = page.map((r, idx) => {
-              const date = new Date(r.created_at);
-              const dateStr = `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}.`;
-              const bg = r.bg_color || '#FFFFFF';
-              const darkBg = (function(hex){const rv=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return(rv*.299+g*.587+b*.114)<128;})(bg);
-              const textColor    = darkBg ? '#FFFFFF' : 'var(--ink)';
-              const subTextColor = darkBg ? 'rgba(255,255,255,0.7)' : 'var(--ink-soft)';
-              const badgeBg      = darkBg ? 'rgba(255,255,255,0.2)' : '#EFF6FF';
-              const badgeColor   = darkBg ? '#FFFFFF' : 'var(--blue-mid)';
-              const logoHtml = r.logo_url ? `<img src="${r.logo_url}" alt="${r.school_name}" style="height:60px;width:auto;max-width:100%;object-fit:contain;border-radius:4px;margin-bottom:10px;"/>` : '';
-              const inner = `${logoHtml}<span class="news-badge" data-badge-bg="${badgeBg}" data-badge-color="${badgeColor}" style="display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:${badgeBg};color:${badgeColor};margin-bottom:8px;transition:background .4s,color .4s,transform .4s;">${r.school_name}</span><p style="font-weight:700;font-size:0.875rem;line-height:1.4;color:${textColor};margin-bottom:auto;">${r.title}</p><p style="font-size:11px;color:${subTextColor};margin-top:12px;">${dateStr}</p>`;
-              const style = `background:${bg};border-radius:12px;border:1px solid rgba(0,0,0,0.08);padding:20px;display:flex;flex-direction:column;min-height:150px;box-shadow:0 1px 4px rgba(0,0,0,.06);flex:0 0 calc((100% - ${12*(NEWS_PER_PAGE-1)}px)/${NEWS_PER_PAGE});`;
-              return r.link
-                ? `<a href="${r.link}" target="_blank" style="${style}text-decoration:none;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.12)'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,.06)'">${inner}</a>`
-                : `<div style="${style}">${inner}</div>`;
-            }).join('');
-            return `<div style="display:flex;gap:12px;flex:0 0 100%;min-width:100%;">${cards}</div>`;
-          }).join('');
-          newsGoTo(0);
-        }
-        buildCards();
-        window.addEventListener('resize', () => { buildCards(); });
-
-        // 자동 슬라이드
-        setInterval(() => { newsGoTo((newsPage + 1) % newsPages.length); }, 4000);
+        grid.innerHTML = data.map(r => {
+          const date = new Date(r.created_at);
+          const dateStr = `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}.`;
+          const bg = r.bg_color || '#FFFFFF';
+          const darkBg = (function(hex){const rv=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return(rv*.299+g*.587+b*.114)<128;})(bg);
+          const textColor    = darkBg ? '#FFFFFF' : 'var(--ink)';
+          const subTextColor = darkBg ? 'rgba(255,255,255,0.7)' : 'var(--ink-soft)';
+          const badgeBg      = darkBg ? 'rgba(255,255,255,0.2)' : '#EFF6FF';
+          const badgeColor   = darkBg ? '#FFFFFF' : 'var(--blue-mid)';
+          const logoHtml = r.logo_url ? `<img src="${r.logo_url}" alt="${r.school_name}" style="height:60px;width:auto;max-width:100%;object-fit:contain;border-radius:4px;margin-bottom:10px;"/>` : '';
+          const inner = `${logoHtml}<span class="news-badge" data-badge-bg="${badgeBg}" data-badge-color="${badgeColor}" style="display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:${badgeBg};color:${badgeColor};margin-bottom:8px;transition:background .4s,color .4s,transform .4s;">${r.school_name}</span><p style="font-weight:700;font-size:0.875rem;line-height:1.4;color:${textColor};margin-bottom:auto;">${r.title}</p><p style="font-size:11px;color:${subTextColor};margin-top:12px;">${dateStr}</p>`;
+          const style = `background:${bg};border-radius:12px;border:1px solid rgba(0,0,0,0.08);padding:20px;display:flex;flex-direction:column;min-height:150px;box-shadow:0 1px 4px rgba(0,0,0,.06);`;
+          return r.link
+            ? `<a href="${r.link}" target="_blank" style="${style}text-decoration:none;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.12)'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,.06)'">${inner}</a>`
+            : `<div style="${style}">${inner}</div>`;
+        }).join('');
 
         // 학교명 순차 점등
         setInterval(() => {
