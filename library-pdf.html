@@ -74,12 +74,42 @@
     .mobile-menu .mbtn{margin-top:12px;display:block;text-align:center;padding:12px;border-radius:8px;background:#1E4D8C;color:#fff;font-weight:700;text-decoration:none;}
     .mobile-menu.open{display:flex;}
     @media(max-width:640px){.hnav{display:none;}.hbtn{display:none;}.hamburger{display:flex;}}
-    /* 채용달력 모바일 */
     @media(max-width:640px){
+      /* 채용달력 */
       .lcal-table-wrap{flex-direction:column!important;}
       .lcal-divider{width:100%!important;height:1px!important;}
       .lcal-tbl{font-size:12px!important;}
       .lcal-tbl th,.lcal-tbl td{padding:7px 8px!important;font-size:11px!important;}
+      /* wrap */
+      .wrap{padding:20px 12px 60px;}
+      /* 검색 */
+      #search{font-size:13px;padding:9px 14px;}
+      /* 카드 그리드: 2열 */
+      #grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+      .card{padding:13px;}
+      .title{font-size:12px;}
+      .institution{font-size:10px;}
+      .pages{font-size:10px;}
+      /* 순위 + 댓글 블록 */
+      #rank-comment-block{padding:14px 12px 12px;border-radius:12px;}
+      .hrank-list{gap:6px;}
+      .hrank-item{padding:7px 10px;}
+      .hrank-inst{font-size:11px;}
+      /* 다운로드 팝업 */
+      #dl-popup{border-radius:16px;}
+      .dl-star{font-size:2rem;}
+      /* job 슬라이더 화살표 숨김 */
+      #job-prev,#job-next{display:none!important;}
+      /* 채용달력 슬라이더 화살표 숨김 */
+      #lcal-prev,#lcal-next{display:none;}
+      /* 하단 순위 섹션 */
+      .rank-section{padding:28px 12px 36px;}
+      .rank-row{padding:10px 12px;}
+      .rank-institution{font-size:11px;}
+      .rank-doc{font-size:10px;}
+      /* 응원 댓글 섹션 */
+      .cheer-wall{padding:28px 12px 36px;}
+      .cheer-card{padding:12px;}
     }
       .nav-link { padding: 5px 9px; border-radius: 8px; color: var(--ink-mid, #475569); text-decoration: none; transition: background .18s, color .18s; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
     .nav-link:hover { background: #1E4D8C; color: #fff; }
@@ -97,11 +127,13 @@
     .hero-sub strong{color:#FCD34D;font-weight:800;}
     /* 히어로 모바일 최적화 */
     @media(max-width:640px){
-      .hero{padding:36px 16px 32px;}
-      .hero-main-text{font-size:1.35rem!important;margin-bottom:24px!important;}
-      .hero-btn-wrap{gap:10px!important;}
-      .hero-btn-orange{padding:18px 24px!important;font-size:1rem!important;}
-      .hero-btn-sm{padding:11px 20px!important;font-size:0.85rem!important;width:100%!important;text-align:center!important;}
+      .hero{padding:28px 16px 24px;}
+      .hero-main-text{font-size:1.2rem!important;margin-bottom:16px!important;}
+      .hero-btn-wrap{flex-direction:column!important;gap:8px!important;width:100%!important;}
+      .hero-btn-orange{padding:14px 20px!important;font-size:0.9rem!important;width:100%!important;text-align:center!important;border-radius:10px!important;}
+      .hero-btn-sm{padding:10px 16px!important;font-size:0.82rem!important;width:100%!important;text-align:center!important;border-radius:8px!important;}
+      /* 히어로 내 카카오 버튼 */
+      .hero a[href*="kakao"]{width:100%;justify-content:center;}
     }
     /* ── 응원 메시지 티커 ── */
     .cheer-section{background:linear-gradient(90deg,#0B1D3A 0%,#1E3A8A 100%);padding:10px 0;overflow:hidden;position:relative;}
