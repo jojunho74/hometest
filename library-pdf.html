@@ -22,9 +22,9 @@
     .filter-btn.pulse{background:#D4A017;color:#fff;border-color:#D4A017;transform:scale(1.08);box-shadow:0 4px 14px rgba(212,160,23,0.45);}
     #count{font-size:13px;color:#64748B;margin-bottom:16px;}
     /* ── 가로 순위 바 ── */
-    .hrank-wrap{width:100%;overflow-x:auto;margin:0 0 16px;scrollbar-width:none;}
-    .hrank-wrap::-webkit-scrollbar{display:none;}
-    .hrank-list{display:flex;gap:8px;min-width:max-content;padding:2px 0 4px;}
+    .hrank-wrap{width:100%;margin:0 0 16px;}
+    .hrank-list{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    @media(max-width:640px){.hrank-list{grid-template-columns:1fr;}}
     .hrank-item{display:flex;align-items:center;gap:7px;padding:6px 12px 6px 8px;border-radius:999px;background:#fff;border:1.5px solid #E2E8F0;white-space:nowrap;cursor:default;transition:box-shadow .15s;}
     .hrank-item:hover{box-shadow:0 2px 10px rgba(0,0,0,.1);}
     .hrank-medal{font-size:14px;line-height:1;flex-shrink:0;}
