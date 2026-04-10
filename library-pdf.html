@@ -32,11 +32,14 @@
     .hrank-inst{font-size:12px;font-weight:800;color:#0B1D3A;}
     .hrank-title{font-size:11px;color:#64748B;max-width:140px;overflow:hidden;text-overflow:ellipsis;}
     .hrank-cnt{font-size:11px;font-weight:900;color:#1E4D8C;background:#DBEAFE;padding:2px 7px;border-radius:999px;}
-    /* 인라인 댓글 칩 */
-    #inline-cheer-list::-webkit-scrollbar{display:none;}
-    .icheer-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:#fff;border:1.5px solid #E2E8F0;white-space:nowrap;flex-shrink:0;}
-    .icheer-stars{color:#FBBF24;font-size:11px;letter-spacing:0.5px;}
-    .icheer-text{font-size:12px;color:#1E293B;font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis;}
+    /* 인라인 댓글 칩 무빙 */
+    #inline-cheer-wrap{overflow:hidden;}
+    #inline-cheer-list{display:flex;gap:10px;width:max-content;animation:icheerScroll 25s linear infinite;}
+    #inline-cheer-list:hover{animation-play-state:paused;}
+    @keyframes icheerScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+    .icheer-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;background:#fff;border:1.5px solid #E2E8F0;white-space:nowrap;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+    .icheer-stars{color:#FBBF24;font-size:12px;letter-spacing:1px;}
+    .icheer-text{font-size:12px;color:#1E293B;font-weight:600;}
     .icheer-date{font-size:10px;color:#CBD5E1;}
     #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
     .card{background:#fff;border-radius:12px;padding:18px;border:1px solid #E2E8F0;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);transition:box-shadow .2s,transform .2s;}
@@ -694,13 +697,17 @@
         function starStr(n){ return '★'.repeat(Math.max(1,Math.min(5,n||5))); }
         function dateStr(ts){ const d=new Date(ts); return (d.getMonth()+1)+'/'+d.getDate(); }
         const list = document.getElementById('inline-cheer-list');
-        list.innerHTML = data.map(function(item){
+        const chips = data.map(function(item){
           return '<div class="icheer-chip">'
             + '<span class="icheer-stars">' + starStr(item.rating) + '</span>'
             + '<span class="icheer-text">' + esc(item.comment) + '</span>'
             + '<span class="icheer-date">' + dateStr(item.created_at) + '</span>'
             + '</div>';
         }).join('');
+        // 무한 스크롤을 위해 2배 복제
+        list.innerHTML = chips + chips;
+        const dur = Math.max(15, data.length * 3);
+        list.style.animationDuration = dur + 's';
         document.getElementById('inline-cheer-wrap').style.display = 'block';
       } catch(e) { console.warn('inline cheer load failed', e); }
     }
