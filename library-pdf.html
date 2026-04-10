@@ -93,27 +93,36 @@
     .cheer-text{color:rgba(255,255,255,.9);}
     .cheer-time{color:rgba(255,255,255,.45);font-size:11px;}
     /* ── 다운로드 팝업 ── */
-    #dl-popup-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:center;justify-content:center;padding:16px;}
+    /* ── 다운로드 팝업 (redesign) ── */
+    #dl-popup-bg{display:none;position:fixed;inset:0;background:rgba(11,29,58,.7);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:16px;}
     #dl-popup-bg.open{display:flex;}
-    #dl-popup{background:#fff;border-radius:20px;width:100%;max-width:420px;padding:28px 24px 24px;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;}
-    .dl-popup-title{font-size:1rem;font-weight:800;color:#0B1D3A;margin-bottom:4px;}
-    .dl-popup-file{font-size:12px;color:#64748B;margin-bottom:20px;word-break:break-all;}
-    .dl-stars{display:flex;gap:6px;margin-bottom:20px;justify-content:center;}
-    .dl-star{font-size:2.2rem;cursor:pointer;color:#CBD5E1;transition:color .15s,transform .15s;line-height:1;}
-    .dl-star.on{color:#FCD34D;}
-    .dl-star:hover{transform:scale(1.15);}
-    #dl-comment{width:100%;padding:10px 14px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:inherit;resize:vertical;min-height:72px;outline:none;transition:border-color .2s;}
-    #dl-comment:focus{border-color:#1E4D8C;}
-    .dl-popup-actions{display:flex;gap:8px;margin-top:14px;}
-    .dl-popup-kakao{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:10px;background:#FEE500;color:#3C1E1E;font-weight:800;font-size:13px;border:none;cursor:pointer;transition:background .15s,transform .15s;}
-    .dl-popup-kakao:hover{background:#f5dc00;transform:scale(1.02);}
-    .dl-popup-submit{flex:1.5;padding:11px;border-radius:10px;background:#1E4D8C;color:#fff;font-weight:800;font-size:13px;border:none;cursor:pointer;transition:background .15s,transform .15s;}
-    .dl-popup-submit:hover{background:#163870;transform:scale(1.02);}
-    .dl-popup-skip{font-size:12px;color:#94A3B8;text-align:center;margin-top:10px;cursor:pointer;background:none;border:none;width:100%;}
-    .dl-popup-skip:hover{color:#64748B;text-decoration:underline;}
-    .dl-popup-close{position:absolute;top:14px;right:16px;font-size:20px;color:#94A3B8;background:none;border:none;cursor:pointer;line-height:1;}
-    .dl-popup-close:hover{color:#1E293B;}
-    @media(max-width:480px){#dl-popup{padding:22px 16px 18px;}}
+    #dl-popup{background:#fff;border-radius:24px;width:100%;max-width:460px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.35);position:relative;animation:popIn .22s cubic-bezier(.34,1.56,.64,1);}
+    @keyframes popIn{from{opacity:0;transform:scale(.88) translateY(16px);}to{opacity:1;transform:scale(1) translateY(0);}}
+    .dl-popup-head{background:linear-gradient(135deg,#0B1D3A 0%,#1E3A8A 60%,#1D4ED8 100%);padding:24px 24px 20px;position:relative;}
+    .dl-popup-icon{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:12px;}
+    .dl-popup-head-title{font-size:1.05rem;font-weight:900;color:#fff;margin-bottom:4px;}
+    .dl-popup-head-file{font-size:11px;color:rgba(255,255,255,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:92%;}
+    .dl-popup-close{position:absolute;top:14px;right:16px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:14px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+    .dl-popup-close:hover{background:rgba(255,255,255,.3);}
+    .dl-popup-body{padding:24px 24px 20px;}
+    .dl-star-label{font-size:13px;font-weight:700;color:#475569;text-align:center;margin-bottom:14px;}
+    .dl-stars{display:flex;gap:4px;justify-content:center;margin-bottom:6px;}
+    .dl-star{font-size:2.8rem;cursor:pointer;color:#E2E8F0;transition:color .12s,transform .12s;line-height:1;user-select:none;}
+    .dl-star.on{color:#FBBF24;}
+    .dl-star:hover{transform:scale(1.18);}
+    .dl-star-hint{font-size:11px;color:#94A3B8;text-align:center;height:16px;margin-bottom:20px;}
+    .dl-popup-actions{display:flex;gap:10px;}
+    .dl-popup-kakao{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:13px;border-radius:12px;background:#FEE500;color:#3C1E1E;font-weight:900;font-size:13px;border:none;cursor:pointer;transition:filter .15s,transform .15s;box-shadow:0 2px 8px rgba(254,229,0,.5);}
+    .dl-popup-kakao:hover{filter:brightness(1.05);transform:scale(1.02);}
+    .dl-popup-dl{flex:1.2;display:flex;align-items:center;justify-content:center;gap:7px;padding:13px;border-radius:12px;background:linear-gradient(135deg,#1E4D8C,#1D4ED8);color:#fff;font-weight:900;font-size:13px;border:none;cursor:pointer;text-decoration:none;transition:filter .15s,transform .15s;box-shadow:0 2px 12px rgba(30,77,140,.4);}
+    .dl-popup-dl:hover{filter:brightness(1.1);transform:scale(1.02);}
+    .dl-popup-skip{display:block;text-align:center;font-size:11px;color:#94A3B8;margin-top:14px;cursor:pointer;background:none;border:none;width:100%;padding:4px;}
+    .dl-popup-skip:hover{color:#64748B;}
+    /* 카드 평점 배지 */
+    .card-rating{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#92400E;}
+    .card-rating-stars{color:#FBBF24;letter-spacing:1px;}
+    .card-rating-count{color:#94A3B8;font-weight:400;}
+    @media(max-width:480px){.dl-popup-head{padding:20px 16px 16px;}.dl-popup-body{padding:18px 16px 16px;}.dl-star{font-size:2.2rem;}}
   </style>
 </head>
 <body>
@@ -376,30 +385,36 @@
   <!-- ══ 다운로드 팝업 ══ -->
   <div id="dl-popup-bg">
     <div id="dl-popup">
-      <button class="dl-popup-close" onclick="closeDlPopup()">✕</button>
-      <div class="dl-popup-title">📥 자료가 도움이 됐나요?</div>
-      <div class="dl-popup-file" id="dl-popup-filename"></div>
-      <!-- 별점 -->
-      <div style="text-align:center;margin-bottom:8px;font-size:13px;font-weight:700;color:#475569;">만족도를 선택해주세요</div>
-      <div class="dl-stars" id="dl-stars">
-        <span class="dl-star" data-v="1">★</span>
-        <span class="dl-star" data-v="2">★</span>
-        <span class="dl-star" data-v="3">★</span>
-        <span class="dl-star" data-v="4">★</span>
-        <span class="dl-star" data-v="5">★</span>
+      <!-- 헤더 -->
+      <div class="dl-popup-head">
+        <div class="dl-popup-icon">📥</div>
+        <div class="dl-popup-head-title">이 자료가 도움이 됐나요?</div>
+        <div class="dl-popup-head-file" id="dl-popup-filename"></div>
+        <button class="dl-popup-close" onclick="closeDlPopup()">✕</button>
       </div>
-      <!-- 응원 댓글 -->
-      <div style="font-size:13px;font-weight:700;color:#475569;margin-bottom:6px;">응원 한마디 남겨주세요 <span style="font-weight:400;color:#94A3B8;">(선택)</span></div>
-      <textarea id="dl-comment" placeholder="예) 덕분에 합격했어요! 감사합니다 🎉"></textarea>
-      <!-- 버튼 -->
-      <div class="dl-popup-actions">
-        <button class="dl-popup-kakao" onclick="popupShareKakao()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
-          카카오 공유
-        </button>
-        <button class="dl-popup-submit" onclick="submitAndDownload()">댓글 저장 후 다운로드</button>
+      <!-- 바디 -->
+      <div class="dl-popup-body">
+        <div class="dl-star-label">만족도를 선택해 주세요</div>
+        <div class="dl-stars" id="dl-stars">
+          <span class="dl-star" data-v="1">★</span>
+          <span class="dl-star" data-v="2">★</span>
+          <span class="dl-star" data-v="3">★</span>
+          <span class="dl-star" data-v="4">★</span>
+          <span class="dl-star" data-v="5">★</span>
+        </div>
+        <div class="dl-star-hint" id="dl-star-hint"></div>
+        <div class="dl-popup-actions">
+          <button class="dl-popup-kakao" onclick="popupShareKakao()">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
+            카카오 공유
+          </button>
+          <a id="dl-popup-dl-btn" href="#" target="_blank" rel="noopener" class="dl-popup-dl" onclick="onDlBtnClick(event)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            바로 다운로드
+          </a>
+        </div>
+        <button class="dl-popup-skip" onclick="skipAndDownload()">별점 없이 바로 다운로드</button>
       </div>
-      <button class="dl-popup-skip" onclick="skipAndDownload()">건너뛰고 바로 다운로드</button>
     </div>
   </div>
 
@@ -408,24 +423,33 @@
     (function() {
       const SB_URL = 'https://byzulmxcuhsrjdphmuym.supabase.co';
       const SB_KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
+      const HINTS  = ['', '별로예요', '아쉬워요', '괜찮아요', '좋아요!', '최고예요! 🎉'];
       let dlPopupHref = null;
+      let dlPopupFileKey = '';
       let dlPopupRating = 0;
 
-      // 별점
       const stars = document.querySelectorAll('.dl-star');
-      stars.forEach(star => {
+      const hint  = document.getElementById('dl-star-hint');
+
+      stars.forEach(function(star) {
         star.addEventListener('click', function() {
           dlPopupRating = parseInt(this.getAttribute('data-v'));
-          stars.forEach(s => s.classList.toggle('on', parseInt(s.getAttribute('data-v')) <= dlPopupRating));
+          updateStars(dlPopupRating);
+          hint.textContent = HINTS[dlPopupRating] || '';
         });
         star.addEventListener('mouseover', function() {
-          const v = parseInt(this.getAttribute('data-v'));
-          stars.forEach(s => s.classList.toggle('on', parseInt(s.getAttribute('data-v')) <= v));
+          updateStars(parseInt(this.getAttribute('data-v')));
+          hint.textContent = HINTS[parseInt(this.getAttribute('data-v'))] || '';
         });
         star.addEventListener('mouseout', function() {
-          stars.forEach(s => s.classList.toggle('on', parseInt(s.getAttribute('data-v')) <= dlPopupRating));
+          updateStars(dlPopupRating);
+          hint.textContent = dlPopupRating ? (HINTS[dlPopupRating] || '') : '';
         });
       });
+
+      function updateStars(v) {
+        stars.forEach(function(s) { s.classList.toggle('on', parseInt(s.getAttribute('data-v')) <= v); });
+      }
 
       // dl-btn 클릭 인터셉트
       document.querySelectorAll('.dl-btn').forEach(function(btn) {
@@ -433,18 +457,22 @@
           e.preventDefault();
           dlPopupHref = btn.getAttribute('href');
           dlPopupRating = 0;
-          document.getElementById('dl-comment').value = '';
-          stars.forEach(s => s.classList.remove('on'));
+          updateStars(0);
+          hint.textContent = '';
           var card = btn.closest('[data-institution]');
-          var fname = card ? (card.getAttribute('data-title') || '') : (btn.getAttribute('href') || '');
-          document.getElementById('dl-popup-filename').textContent = fname;
+          var institution = card ? (card.getAttribute('data-institution') || '') : '';
+          var title       = card ? (card.getAttribute('data-title') || '') : '';
+          dlPopupFileKey  = institution + '|' + title;
+          document.getElementById('dl-popup-filename').textContent = institution + (title ? ' — ' + title : '');
+          var dlBtn = document.getElementById('dl-popup-dl-btn');
+          dlBtn.setAttribute('href', dlPopupHref || '#');
           document.getElementById('dl-popup-bg').classList.add('open');
           // 다운로드 추적
           if (card) {
             fetch(SB_URL + '/rest/v1/download_logs', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'return=minimal' },
-              body: JSON.stringify({ institution: card.getAttribute('data-institution') || '', title: card.getAttribute('data-title') || '', category: card.getAttribute('data-category') || '' })
+              body: JSON.stringify({ institution: institution, title: title, category: card.getAttribute('data-category') || '' })
             }).catch(function(){});
           }
         });
@@ -452,40 +480,27 @@
 
       window.closeDlPopup = function() {
         document.getElementById('dl-popup-bg').classList.remove('open');
-        dlPopupHref = null;
       };
 
-      function doDownload() {
-        if (dlPopupHref) {
-          var a = document.createElement('a');
-          a.href = dlPopupHref;
-          a.target = '_blank';
-          a.rel = 'noopener';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        }
-        document.getElementById('dl-popup-bg').classList.remove('open');
-      }
+      window.skipAndDownload = function() {
+        var href = dlPopupHref;
+        closeDlPopup();
+        if (href) { var a = document.createElement('a'); a.href = href; a.download = ''; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+      };
 
-      window.skipAndDownload = function() { doDownload(); };
-
-      window.submitAndDownload = async function() {
-        const comment = document.getElementById('dl-comment').value.trim();
-        const rating = dlPopupRating || 5;
-        const fname = document.getElementById('dl-popup-filename').textContent || '';
-        if (comment) {
+      window.onDlBtnClick = async function(e) {
+        // 별점이 선택된 경우 저장
+        if (dlPopupRating > 0) {
           try {
-            await fetch(SB_URL + '/rest/v1/cheer_comments', {
+            await fetch(SB_URL + '/rest/v1/pdf_ratings', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'return=minimal' },
-              body: JSON.stringify({ comment: comment, rating: rating, file_name: fname })
+              body: JSON.stringify({ file_key: dlPopupFileKey, rating: dlPopupRating })
             });
-          } catch(e) { console.warn('cheer save failed', e); }
+          } catch(err) { console.warn('rating save failed', err); }
+          setTimeout(function() { loadCardRatings(); }, 800);
         }
-        doDownload();
-        // 새 댓글 반영
-        setTimeout(loadCheerMessages, 600);
+        setTimeout(closeDlPopup, 200);
       };
 
       window.popupShareKakao = function() {
@@ -497,17 +512,56 @@
             if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
             Kakao.Share.sendDefault({ objectType: 'feed', content: { title: title, description: desc, imageUrl: 'https://hometest-weld.vercel.app/Gemini_Generated_Image_cz810vcz810vcz81.png', link: { mobileWebUrl: url, webUrl: url } }, buttons: [{ title: '자료실 보기', link: { mobileWebUrl: url, webUrl: url } }] });
             return;
-          } catch(e) {}
+          } catch(err) {}
         }
         if (navigator.share) { navigator.share({ title: title, text: desc, url: url }).catch(function(){}); return; }
         navigator.clipboard.writeText(url).catch(function(){});
       };
 
-      // 팝업 배경 클릭 닫기
       document.getElementById('dl-popup-bg').addEventListener('click', function(e) {
         if (e.target === this) closeDlPopup();
       });
     })();
+
+    // ── 카드별 평균 별점 로드 ──
+    async function loadCardRatings() {
+      try {
+        const res = await fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/pdf_ratings?select=file_key,rating', {
+          headers: { 'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs' }
+        });
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) return;
+
+        // file_key 별 평균 계산
+        const map = {};
+        data.forEach(function(r) {
+          if (!map[r.file_key]) map[r.file_key] = { sum: 0, cnt: 0 };
+          map[r.file_key].sum += r.rating;
+          map[r.file_key].cnt += 1;
+        });
+
+        // 카드에 표시
+        document.querySelectorAll('.card[data-institution]').forEach(function(card) {
+          var key = (card.getAttribute('data-institution') || '') + '|' + (card.getAttribute('data-title') || '');
+          var stat = map[key];
+          var existing = card.querySelector('.card-rating');
+          if (existing) existing.remove();
+          if (!stat) return;
+          var avg = (stat.sum / stat.cnt).toFixed(1);
+          var filled = Math.round(stat.sum / stat.cnt);
+          var starStr = '★'.repeat(filled) + '☆'.repeat(5 - filled);
+          var badge = document.createElement('div');
+          badge.className = 'card-rating';
+          badge.innerHTML = '<span class="card-rating-stars">' + starStr + '</span>'
+            + '<span style="color:#92400E;font-weight:800;">' + avg + '</span>'
+            + '<span class="card-rating-count">(' + stat.cnt + '명)</span>';
+          var dlBtn = card.querySelector('.dl-btn');
+          if (dlBtn) card.insertBefore(badge, dlBtn);
+          else card.appendChild(badge);
+        });
+      } catch(e) { console.warn('rating load failed', e); }
+    }
+    loadCardRatings();
 
     // ── 응원 메시지 로드 ──
     async function loadCheerMessages() {
