@@ -122,6 +122,8 @@
     .dl-star.on{color:#FBBF24;}
     .dl-star:hover{transform:scale(1.18);}
     .dl-star-hint{font-size:11px;color:#94A3B8;text-align:center;height:16px;margin-bottom:20px;}
+    #dl-comment{width:100%;padding:10px 13px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:inherit;resize:none;min-height:64px;outline:none;transition:border-color .2s;margin-bottom:14px;color:#1E293B;}
+    #dl-comment:focus{border-color:#1E4D8C;}
     .dl-popup-actions{display:flex;gap:10px;}
     .dl-popup-kakao{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:13px;border-radius:12px;background:#FEE500;color:#3C1E1E;font-weight:900;font-size:13px;border:none;cursor:pointer;transition:filter .15s,transform .15s;box-shadow:0 2px 8px rgba(254,229,0,.5);}
     .dl-popup-kakao:hover{filter:brightness(1.05);transform:scale(1.02);}
@@ -418,6 +420,8 @@
           <span class="dl-star" data-v="5">★</span>
         </div>
         <div class="dl-star-hint" id="dl-star-hint"></div>
+        <!-- 응원 댓글 -->
+        <textarea id="dl-comment" placeholder="응원 한마디 남겨주세요 (선택) 🎉"></textarea>
         <div class="dl-popup-actions">
           <button class="dl-popup-kakao" onclick="popupShareKakao()">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
@@ -474,6 +478,7 @@
           dlPopupRating = 0;
           updateStars(0);
           hint.textContent = '';
+          document.getElementById('dl-comment').value = '';
           var card = btn.closest('[data-institution]');
           var institution = card ? (card.getAttribute('data-institution') || '') : '';
           var title       = card ? (card.getAttribute('data-title') || '') : '';
@@ -504,16 +509,29 @@
       };
 
       window.onDlBtnClick = async function(e) {
-        // 별점이 선택된 경우 저장
-        if (dlPopupRating > 0) {
+        const comment = document.getElementById('dl-comment').value.trim();
+        const rating  = dlPopupRating || 0;
+        // 별점 저장
+        if (rating > 0) {
           try {
             await fetch(SB_URL + '/rest/v1/pdf_ratings', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'return=minimal' },
-              body: JSON.stringify({ file_key: dlPopupFileKey, rating: dlPopupRating })
+              body: JSON.stringify({ file_key: dlPopupFileKey, rating: rating })
             });
           } catch(err) { console.warn('rating save failed', err); }
           setTimeout(function() { loadCardRatings(); }, 800);
+        }
+        // 댓글 저장
+        if (comment) {
+          try {
+            await fetch(SB_URL + '/rest/v1/cheer_comments', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'return=minimal' },
+              body: JSON.stringify({ comment: comment, rating: rating || 5, file_name: dlPopupFileKey })
+            });
+          } catch(err) { console.warn('comment save failed', err); }
+          setTimeout(function() { loadCheerSection(); }, 800);
         }
         setTimeout(closeDlPopup, 200);
       };
@@ -620,6 +638,39 @@
         document.getElementById('hrank-wrap').style.display = 'block';
       } catch(e) { console.warn('hrank load failed', e); }
     })();
+
+    // ── 응원 댓글 카드 섹션 ──
+    async function loadCheerSection() {
+      try {
+        const res  = await fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/cheer_comments?select=comment,rating,file_name,created_at&order=created_at.desc&limit=50', {
+          headers: { 'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs' }
+        });
+        const data = await res.json();
+        const wall  = document.getElementById('cheer-wall');
+        const cards = document.getElementById('cheer-cards');
+        const cnt   = document.getElementById('cheer-wall-count');
+        if (!Array.isArray(data) || data.length === 0) { if (wall) wall.style.display = 'none'; return; }
+
+        function starStr(n) { return '★'.repeat(Math.max(1,Math.min(5,n||5))) + '☆'.repeat(5-Math.max(1,Math.min(5,n||5))); }
+        function esc(s)     { return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+        function dateStr(ts){ const d=new Date(ts); return d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0'); }
+
+        if (cnt) cnt.textContent = data.length + '개';
+        cards.innerHTML = data.map(function(item) {
+          const fname = item.file_name ? item.file_name.split('|').pop() : '';
+          return '<div class="cheer-card">'
+            + '<div class="cheer-card-stars">' + starStr(item.rating) + '</div>'
+            + '<div class="cheer-card-text">' + esc(item.comment) + '</div>'
+            + '<div class="cheer-card-meta">'
+            +   '<span class="cheer-card-file">' + esc(fname) + '</span>'
+            +   '<span class="cheer-card-date">' + dateStr(item.created_at) + '</span>'
+            + '</div>'
+            + '</div>';
+        }).join('');
+        wall.style.display = 'block';
+      } catch(e) { console.warn('cheer section load failed', e); }
+    }
+    loadCheerSection();
 
     // ── 응원 메시지 로드 ──
     async function loadCheerMessages() {
@@ -857,6 +908,32 @@
     <div class="rank-grid" id="rank-grid">
       <p class="rank-empty">불러오는 중...</p>
     </div>
+  </div>
+</section>
+
+<!-- ══ 응원 댓글 섹션 ══ -->
+<style>
+  .cheer-wall{background:#F8FAFF;padding:48px 16px 56px;border-top:1px solid #E2E8F0;}
+  .cheer-wall-inner{max-width:1100px;margin:0 auto;}
+  .cheer-wall-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px;}
+  .cheer-wall-title{font-size:1.1rem;font-weight:900;color:#0B1D3A;display:flex;align-items:center;gap:8px;}
+  .cheer-wall-count{font-size:12px;font-weight:700;padding:3px 12px;border-radius:999px;background:#DBEAFE;color:#1E4D8C;}
+  .cheer-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+  .cheer-card{background:#fff;border-radius:12px;padding:14px 16px;border:1px solid #E2E8F0;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+  .cheer-card-stars{color:#FBBF24;font-size:13px;letter-spacing:1px;margin-bottom:6px;}
+  .cheer-card-text{font-size:13px;color:#1E293B;line-height:1.6;font-weight:500;}
+  .cheer-card-meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+  .cheer-card-file{font-size:10px;color:#94A3B8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;}
+  .cheer-card-date{font-size:10px;color:#CBD5E1;flex-shrink:0;}
+  .cheer-empty{text-align:center;color:#94A3B8;padding:48px;font-size:14px;grid-column:1/-1;}
+  @media(max-width:640px){.cheer-cards{grid-template-columns:1fr;}}
+</style>
+<section class="cheer-wall" id="cheer-wall" style="display:none;">
+  <div class="cheer-wall-inner">
+    <div class="cheer-wall-header">
+      <div class="cheer-wall-title">💬 응원 댓글 <span class="cheer-wall-count" id="cheer-wall-count"></span></div>
+    </div>
+    <div class="cheer-cards" id="cheer-cards"></div>
   </div>
 </section>
 
