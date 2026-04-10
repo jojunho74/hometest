@@ -487,7 +487,9 @@
     openPwModal('✏️ 수정 비밀번호 확인', '수정하려면 작성 시 설정한 비밀번호를 입력하세요.', 'edit');
   }
   function openEditModal(post) {
+    const editId = post.id;       // closeDetailModal이 currentPostId를 null로 초기화하기 전에 저장
     closeDetailModal();
+    currentPostId = editId;       // 복원
     document.getElementById('e-title').value   = post.title;
     document.getElementById('e-author').value  = post.author;
     document.getElementById('e-content').value = post.content;
