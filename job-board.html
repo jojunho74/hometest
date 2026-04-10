@@ -336,7 +336,7 @@
         <td class="td-title" onclick="openViewAuth(${p.id})">
           <span class="lock-icon">🔒</span>${escHtml(p.title)}${adminDelBtn}
         </td>
-        <td>${escHtml(p.author || '익명')}</td>
+        <td>${escHtml(maskAuthor(p.author))}</td>
         <td>${date}</td>
         <td>${p.views}</td>
       </tr>`;
@@ -345,6 +345,14 @@
 
   function escHtml(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // 작성자 이름 마스킹: 첫 글자 + * + 끝 글자
+  function maskAuthor(name) {
+    if (!name || name === '익명') return '익명';
+    if (name.length === 1) return name;
+    if (name.length === 2) return name[0] + '*';
+    return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1];
   }
 
   // ══════════════════════════════════
@@ -449,7 +457,7 @@
     post.views++;
     await db.from('job_board').update({ views: post.views }).eq('id', post.id);
     document.getElementById('d-title').textContent   = post.title;
-    document.getElementById('d-author').textContent  = '✍️ ' + (post.author || '익명');
+    document.getElementById('d-author').textContent  = '✍️ ' + maskAuthor(post.author);
     document.getElementById('d-date').textContent    = '📅 ' + new Date(post.created_at).toLocaleString('ko-KR');
     document.getElementById('d-views').textContent   = '👁 ' + post.views;
     document.getElementById('d-content').textContent = post.content;
@@ -502,8 +510,16 @@
     openPwModal('🗑️ 삭제 비밀번호 확인', '삭제하려면 작성 시 설정한 비밀번호를 입력하세요.', 'delete');
   }
   async function doDelete(id) {
-    const { error } = await db.from('job_board').delete().eq('id', id);
-    if (error) { alert('삭제 중 오류가 발생했습니다.'); console.error(error); return; }
+    const { data, error } = await db.from('job_board').delete().eq('id', id).select();
+    if (error) {
+      console.error('delete error:', error);
+      alert('삭제 중 오류가 발생했습니다.\n' + error.message);
+      return;
+    }
+    if (!data || data.length === 0) {
+      alert('삭제에 실패했습니다.\nSupabase DELETE 정책을 확인하세요.');
+      return;
+    }
     closeDetailModal();
     await fetchPosts();
     alert('삭제되었습니다.');
