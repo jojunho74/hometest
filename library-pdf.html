@@ -660,7 +660,8 @@
     (function() {
       var SB  = 'https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/';
       var KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
-      var CP = window.innerWidth <= 640 ? 10 : 20, cPage = 0, cData = [];
+      var CP = 20, cPage = 0, cData = [];
+      var ROWS_PER_COL = 10;
 
       function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
       function tpColor(t){
@@ -680,19 +681,28 @@
         document.getElementById('lcal-count').textContent = '총 '+cData.length+'건';
         document.getElementById('lcal-bar').style.width = Math.round((cPage+1)/pages*100)+'%';
 
-        var half = Math.ceil(sl.length / 2);
-        var left = sl.slice(0, half);
-        var right = sl.slice(half);
+        var left  = sl.slice(0, ROWS_PER_COL);
+        var right = sl.slice(ROWS_PER_COL, ROWS_PER_COL * 2);
         function makeRows(arr) {
-          if (!arr.length) return '<tr><td colspan="3" style="padding:8px;"></td></tr>';
-          return arr.map(function(e, i){
+          var rows = '';
+          for (var i = 0; i < ROWS_PER_COL; i++) {
+            var e  = arr[i];
             var bg = i%2===0 ? '#fff' : '#F8FAFF';
-            return '<tr style="border-bottom:1px solid #F1F5F9;background:'+bg+';">'
-              +'<td style="padding:9px 12px;font-size:11px;font-weight:600;color:#64748B;font-family:monospace;white-space:nowrap;">'+esc(e.event_date)+'</td>'
-              +'<td style="padding:9px 12px;"><span style="display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;'+tpColor(e.event_type)+'">'+esc(e.event_type)+'</span></td>'
-              +'<td style="padding:9px 12px;font-size:12px;font-weight:600;color:#1E293B;">'+esc(e.company)+'</td>'
-              +'</tr>';
-          }).join('');
+            if (e) {
+              rows += '<tr style="border-bottom:1px solid #F1F5F9;background:'+bg+';">'
+                +'<td style="padding:9px 12px;font-size:11px;font-weight:600;color:#64748B;font-family:monospace;white-space:nowrap;">'+esc(e.event_date)+'</td>'
+                +'<td style="padding:9px 12px;"><span style="display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;'+tpColor(e.event_type)+'">'+esc(e.event_type)+'</span></td>'
+                +'<td style="padding:9px 12px;font-size:12px;font-weight:600;color:#1E293B;">'+esc(e.company)+'</td>'
+                +'</tr>';
+            } else {
+              rows += '<tr style="border-bottom:1px solid #F1F5F9;background:'+bg+';">'
+                +'<td style="padding:9px 12px;">&nbsp;</td>'
+                +'<td style="padding:9px 12px;"></td>'
+                +'<td style="padding:9px 12px;"></td>'
+                +'</tr>';
+            }
+          }
+          return rows;
         }
         document.getElementById('lcal-tbody-l').innerHTML = makeRows(left);
         document.getElementById('lcal-tbody-r').innerHTML = makeRows(right);
