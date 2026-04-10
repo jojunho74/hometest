@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>채용정보 게시판 — 지텔프IBT 대학컨설팅</title>
+  <title>게시판 — 지텔프IBT 대학컨설팅</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F8FAFF;color:#1E293B;}
@@ -108,7 +108,7 @@
       <a href="schedule.html">정기시험 일정</a>
       <a href="student.html">IBT 학생 신청</a>
       <a href="library-pdf.html">채용공고 자료실</a>
-      <a href="job-board.html" class="active">채용정보 게시판</a>
+      <a href="job-board.html" class="active">게시판</a>
       <a href="index.html#faq">FAQ</a>
       <a href="gtelp-score.html">점수대비표</a>
     </nav>
@@ -124,7 +124,7 @@
     <a href="schedule.html">정기시험 일정</a>
     <a href="student.html">IBT 학생 신청</a>
     <a href="library-pdf.html">채용공고 자료실</a>
-    <a href="job-board.html">채용정보 게시판</a>
+    <a href="job-board.html">게시판</a>
     <a href="index.html#faq">FAQ</a>
     <a href="gtelp-score.html">점수대비표</a>
     <a href="student.html" class="mbtn" style="background:#D97706;margin-top:6px;">학생IBT무료신청</a>
@@ -134,7 +134,7 @@
 
 <!-- 히어로 -->
 <section class="hero">
-  <h1>📋 채용정보 게시판</h1>
+  <h1>📋 게시판</h1>
   <p>G-TELP IBT관련 채용 정보를 자유롭게 공유하고 소통하세요.<br>
   <span style="font-size:0.82rem;opacity:.7;">🔒 게시글은 작성 시 설정한 비밀번호로 열람할 수 있습니다.</span></p>
 </section>
@@ -570,7 +570,7 @@
   // ══════════════════════════════════
   function shareKakao() {
     const url = window.location.href;
-    if (navigator.share) { navigator.share({ title: '채용정보 게시판', url }); return; }
+    if (navigator.share) { navigator.share({ title: '게시판', url }); return; }
     navigator.clipboard.writeText(url).then(() => showToast('링크가 복사되었습니다.', 'success'));
   }
 
