@@ -745,3 +745,135 @@
   </script>
 </body>
 </html>
+
+<!-- ══ 다운로드 순위 섹션 (</body> 바로 앞에 삽입) ══ -->
+<style>
+  .rank-section{background:#fff;padding:48px 16px 56px;border-top:1px solid #E2E8F0;}
+  .rank-inner{max-width:1100px;margin:0 auto;}
+  .rank-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px;}
+  .rank-title{font-size:1.15rem;font-weight:900;color:#0B1D3A;display:flex;align-items:center;gap:8px;}
+  .rank-badge{font-size:12px;font-weight:700;padding:3px 12px;border-radius:999px;background:#DBEAFE;color:#1E4D8C;}
+  .rank-period-btns{display:flex;gap:6px;}
+  .rank-pbtn{padding:5px 14px;border-radius:8px;font-size:12px;font-weight:700;border:1.5px solid #E2E8F0;background:#fff;color:#64748B;cursor:pointer;transition:all .15s;}
+  .rank-pbtn.active{background:#1E4D8C;color:#fff;border-color:#1E4D8C;}
+  .rank-period-label{font-size:11px;color:#94A3B8;margin-bottom:16px;}
+  .rank-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;}
+  .rank-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:#F8FAFF;border:1px solid #E2E8F0;transition:box-shadow .15s;}
+  .rank-row:hover{box-shadow:0 2px 12px rgba(0,0,0,.08);}
+  .rank-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0;}
+  .rank-info{flex:1;min-width:0;}
+  .rank-institution{font-size:12px;font-weight:700;color:#1E4D8C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rank-doc{font-size:11px;color:#64748B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+  .rank-count{font-size:13px;font-weight:900;color:#1E293B;flex-shrink:0;}
+  .rank-count span{font-size:10px;font-weight:400;color:#94A3B8;margin-left:1px;}
+  .rank-bar-wrap{height:3px;background:#E2E8F0;border-radius:2px;margin-top:6px;}
+  .rank-bar{height:3px;border-radius:2px;background:linear-gradient(90deg,#1E4D8C,#0891B2);transition:width .6s ease;}
+  .rank-empty{text-align:center;color:#94A3B8;padding:40px;font-size:14px;grid-column:1/-1;}
+  @media(max-width:640px){.rank-grid{grid-template-columns:1fr;}.rank-header{gap:8px;}}
+</style>
+
+<section class="rank-section">
+  <div class="rank-inner">
+    <div class="rank-header">
+      <div class="rank-title">
+        🏆 다운로드 인기 순위
+        <span class="rank-badge" id="rank-total-badge">집계 중...</span>
+      </div>
+      <div class="rank-period-btns">
+        <button class="rank-pbtn" id="rpb-weekly"  onclick="loadRanking('weekly')">주간</button>
+        <button class="rank-pbtn" id="rpb-monthly" onclick="loadRanking('monthly')">월간</button>
+        <button class="rank-pbtn active" id="rpb-all" onclick="loadRanking('all')">전체</button>
+      </div>
+    </div>
+    <p class="rank-period-label" id="rank-period-label">전체 누적 기준</p>
+    <div class="rank-grid" id="rank-grid">
+      <p class="rank-empty">불러오는 중...</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    const SB_URL = 'https://byzulmxcuhsrjdphmuym.supabase.co';
+    const SB_KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
+    const RANK_COLORS = ['#F59E0B','#94A3B8','#B45309','#6366F1','#3B82F6','#10B981','#EF4444','#8B5CF6','#06B6D4','#F97316'];
+    const RANK_EMOJIS = ['🥇','🥈','🥉'];
+    const CAT_COLORS  = {'공공기관':'#1E4D8C','공기업':'#0891B2','연구원':'#6D28D9','대학병원':'#BE185D','기타':'#475569'};
+
+    window.loadRanking = async function(period) {
+      ['weekly','monthly','all'].forEach(function(p) {
+        var btn = document.getElementById('rpb-' + p);
+        if (btn) btn.className = 'rank-pbtn' + (p === period ? ' active' : '');
+      });
+      var labelEl = document.getElementById('rank-period-label');
+      var grid    = document.getElementById('rank-grid');
+      grid.innerHTML = '<p class="rank-empty">불러오는 중...</p>';
+
+      var now     = new Date();
+      var kstNow  = new Date(now.getTime() + 9 * 3600000);
+      var today   = kstNow.toISOString().slice(0,10);
+      var kstMonth= kstNow.toISOString().slice(0,7);
+      var since7  = new Date(kstNow.getTime() - 6 * 864e5).toISOString().slice(0,10);
+
+      var params = 'select=institution,title,category,downloaded_at&limit=3000';
+      if (period === 'weekly')  { params += '&downloaded_at=gte.' + since7 + 'T00:00:00+09:00'; if (labelEl) labelEl.textContent = '최근 7일 (' + since7 + ' ~ ' + today + ') 기준'; }
+      else if (period === 'monthly') { params += '&downloaded_at=gte.' + kstMonth + '-01T00:00:00+09:00'; if (labelEl) labelEl.textContent = '이번달 (' + kstMonth + ') 기준'; }
+      else { if (labelEl) labelEl.textContent = '전체 누적 기준'; }
+
+      try {
+        var res  = await fetch(SB_URL + '/rest/v1/download_logs?' + params, {
+          headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+        });
+        var data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          grid.innerHTML = '<p class="rank-empty">아직 다운로드 데이터가 없습니다.</p>';
+          var badge = document.getElementById('rank-total-badge');
+          if (badge) badge.textContent = '총 0건';
+          return;
+        }
+
+        var dlMap = {};
+        data.forEach(function(r) {
+          var key = (r.institution||'') + '||' + (r.title||'') + '||' + (r.category||'');
+          dlMap[key] = (dlMap[key] || 0) + 1;
+        });
+        var sorted  = Object.entries(dlMap).sort(function(a,b){ return b[1]-a[1]; });
+        var top10   = sorted.slice(0, 10);
+        var maxCnt  = top10[0][1];
+
+        var badge = document.getElementById('rank-total-badge');
+        if (badge) badge.textContent = '총 ' + data.length.toLocaleString() + '건';
+
+        grid.innerHTML = top10.map(function(entry, i) {
+          var parts = entry[0].split('||');
+          var inst  = parts[0] || '-';
+          var title = parts[1] || '-';
+          var cat   = parts[2] || '';
+          var cnt   = entry[1];
+          var rankLabel = i < 3 ? RANK_EMOJIS[i] : (i + 1) + '위';
+          var numBg  = i < 3 ? (i===0?'#FEF3C7':i===1?'#F1F5F9':'#FDE8D0') : '#EFF6FF';
+          var numColor = RANK_COLORS[i] || '#94A3B8';
+          var catColor = CAT_COLORS[cat] || '#475569';
+          var barPct = Math.round((cnt / maxCnt) * 100);
+          return '<div class="rank-row">'
+            + '<div class="rank-num" style="background:' + numBg + ';color:' + numColor + ';">' + rankLabel + '</div>'
+            + '<div class="rank-info">'
+            +   '<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;">'
+            +     '<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:' + catColor + '22;color:' + catColor + ';">' + (cat||'기타') + '</span>'
+            +     '<span class="rank-institution">' + inst + '</span>'
+            +   '</div>'
+            +   '<div class="rank-doc">' + title + '</div>'
+            +   '<div class="rank-bar-wrap"><div class="rank-bar" style="width:' + barPct + '%;"></div></div>'
+            + '</div>'
+            + '<div class="rank-count">' + cnt + '<span>회</span></div>'
+            + '</div>';
+        }).join('');
+      } catch(e) {
+        grid.innerHTML = '<p class="rank-empty">데이터를 불러오지 못했습니다.</p>';
+        console.warn('ranking load failed', e);
+      }
+    };
+
+    loadRanking('all');
+  })();
+</script>
