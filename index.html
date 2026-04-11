@@ -1666,7 +1666,9 @@
 <script>
   (function(){
     var EP_KEY = 'ep_hide_until';
+    var EP_PERM = 'ep_closed';
     function epShouldShow() {
+      if (localStorage.getItem(EP_PERM) === '1') return false;
       var v = localStorage.getItem(EP_KEY);
       if (!v) return true;
       return Date.now() > parseInt(v);
@@ -1696,8 +1698,8 @@
       });
     };
     window.epClose = function() {
-      var el = document.getElementById('ep-overlay');
-      el.classList.remove('ep-visible');
+      localStorage.setItem(EP_PERM, '1');
+      document.getElementById('ep-overlay').classList.remove('ep-visible');
     };
     window.epHideToday = function() {
       var midnight = new Date(); midnight.setHours(23,59,59,999);
