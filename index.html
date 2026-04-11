@@ -321,25 +321,35 @@
         <!-- 텍스트 -->
         <div class="slide-up">
           <div class="flex flex-wrap justify-center gap-3 mb-8" id="hero-pkg-banners">
-            <a href="package.html" id="hero-pkg-0" style="display:inline-flex;align-items:center;padding:20px 56px;border-radius:16px;font-size:1.35rem;font-weight:800;color:#fff;text-decoration:none;background:#1E3A8A;box-shadow:0 4px 16px rgba(30,58,138,.5);transition:all .3s;">영어평가</a>
-            <a href="package.html" id="hero-pkg-1" style="display:inline-flex;align-items:center;padding:20px 56px;border-radius:16px;font-size:1.35rem;font-weight:800;color:#fff;text-decoration:none;background:#334155;box-shadow:0 2px 8px rgba(30,41,59,.4);transition:all .3s;">인적성</a>
-            <a href="package.html" id="hero-pkg-2" style="display:inline-flex;align-items:center;padding:20px 56px;border-radius:16px;font-size:1.35rem;font-weight:800;color:#fff;text-decoration:none;background:#334155;box-shadow:0 2px 8px rgba(30,41,59,.4);transition:all .3s;">AI감독</a>
-            <a href="https://hometest-weld.vercel.app/library-pdf.html" id="hero-pkg-3" style="display:inline-flex;align-items:center;padding:20px 56px;border-radius:16px;font-size:1.35rem;font-weight:800;color:#fff;text-decoration:none;background:#334155;box-shadow:0 2px 8px rgba(30,41,59,.4);transition:all .3s;">채용공고 자료실</a>
+            <a href="package.html" id="hero-pkg-0" style="display:inline-flex;align-items:center;padding:14px 36px;border-radius:50px;font-size:1.1rem;font-weight:800;color:#fff;text-decoration:none;background:#fff;color:#1E3A8A;border:2px solid #fff;transition:all .3s;">영어평가</a>
+            <a href="package.html" id="hero-pkg-1" style="display:inline-flex;align-items:center;padding:14px 36px;border-radius:50px;font-size:1.1rem;font-weight:800;text-decoration:none;background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4);transition:all .3s;">인적성</a>
+            <a href="package.html" id="hero-pkg-2" style="display:inline-flex;align-items:center;padding:14px 36px;border-radius:50px;font-size:1.1rem;font-weight:800;text-decoration:none;background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4);transition:all .3s;">AI감독</a>
+            <a href="./library-pdf.html" id="hero-pkg-3" style="display:inline-flex;align-items:center;padding:14px 36px;border-radius:50px;font-size:1.1rem;font-weight:800;text-decoration:none;background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4);transition:all .3s;">채용공고 자료실</a>
           </div>
           <script>
             (function(){
               var hp = [
-                {el:document.getElementById('hero-pkg-0'), on:'#1E3A8A', onS:'rgba(30,58,138,.7)', off:'#334155', offS:'rgba(30,41,59,.4)'},
-                {el:document.getElementById('hero-pkg-1'), on:'#065F46', onS:'rgba(6,95,70,.7)',   off:'#334155', offS:'rgba(30,41,59,.4)'},
-                {el:document.getElementById('hero-pkg-2'), on:'#78350F', onS:'rgba(120,53,15,.7)', off:'#334155', offS:'rgba(30,41,59,.4)'},
-                {el:document.getElementById('hero-pkg-3'), on:'#0F766E', onS:'rgba(15,118,110,.7)', off:'#334155', offS:'rgba(30,41,59,.4)'}
+                {el:document.getElementById('hero-pkg-0')},
+                {el:document.getElementById('hero-pkg-1')},
+                {el:document.getElementById('hero-pkg-2')},
+                {el:document.getElementById('hero-pkg-3')}
               ];
               var cur = 0;
               function tick(){
                 hp.forEach(function(p,i){
-                  p.el.style.background = i===cur ? p.on  : p.off;
-                  p.el.style.boxShadow  = i===cur ? '0 4px 20px '+p.onS : '0 2px 8px '+p.offS;
-                  p.el.style.transform  = i===cur ? 'scale(1.06)' : 'scale(1)';
+                  if(i === cur){
+                    p.el.style.background = '#fff';
+                    p.el.style.color = '#1E3A8A';
+                    p.el.style.borderColor = '#fff';
+                    p.el.style.transform = 'scale(1.05)';
+                    p.el.style.boxShadow = '0 6px 24px rgba(255,255,255,.2)';
+                  } else {
+                    p.el.style.background = 'transparent';
+                    p.el.style.color = '#fff';
+                    p.el.style.borderColor = 'rgba(255,255,255,.4)';
+                    p.el.style.transform = 'scale(1)';
+                    p.el.style.boxShadow = 'none';
+                  }
                 });
                 cur = (cur+1) % hp.length;
               }
