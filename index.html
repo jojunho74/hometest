@@ -398,15 +398,13 @@
           <!-- 2단계 플로우 -->
           <div class="flow-wrap">
             <a href="library-pdf.html" class="flow-card flow-card-1" style="text-decoration:none;cursor:pointer;display:block;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-              <div class="flow-step">STEP 1</div>
-              <div class="flow-icon">📋</div>
+              <div class="flow-num">01</div>
               <div class="flow-title">채용공고 검색</div>
               <div class="flow-desc">원하는 공기업·공공기관<br>공고를 확인하세요</div>
             </a>
             <div class="flow-arrow">→</div>
-            <a href="https://hometest-weld.vercel.app/student.html" target="_blank" class="flow-card flow-card-2" style="text-decoration:none;display:block;cursor:pointer;">
-              <div class="flow-step">STEP 2</div>
-              <div class="flow-icon">🎯</div>
+            <a href="./student.html" class="flow-card flow-card-2" style="text-decoration:none;display:block;cursor:pointer;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+              <div class="flow-num" style="color:#FCD34D;">02</div>
               <div class="flow-title flow-title-2">무료 영어진단 신청</div>
               <div class="flow-desc">필요 점수 파악 후<br>IBT로 영어 실력 증명</div>
             </a>
@@ -414,20 +412,18 @@
           <style>
             .flow-wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:16px;margin-top:32px;}
             .flow-card{border-radius:18px;padding:28px 36px;text-align:center;flex:1;min-width:240px;max-width:300px;}
-            .flow-card-1{background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.3);}
-            .flow-card-2{background:rgba(217,119,6,.3);border:1.5px solid rgba(217,119,6,.6);}
-            .flow-step{font-size:14px;font-weight:800;letter-spacing:.1em;color:rgba(255,255,255,.6);margin-bottom:10px;}
-            .flow-icon{font-size:2.8rem;margin-bottom:10px;}
-            .flow-title{font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:6px;}
+            .flow-card-1{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.25);}
+            .flow-card-2{background:rgba(217,119,6,.25);border:1.5px solid rgba(217,119,6,.5);}
+            .flow-num{font-size:2.8rem;font-weight:900;color:rgba(255,255,255,.25);line-height:1;margin-bottom:12px;font-family:'Noto Sans KR',sans-serif;letter-spacing:-.02em;}
+            .flow-title{font-size:1.35rem;font-weight:900;color:#fff;margin-bottom:8px;}
             .flow-title-2{color:#FCD34D;}
-            .flow-desc{font-size:1rem;color:rgba(255,255,255,.75);line-height:1.6;}
-            .flow-arrow{font-size:3rem;color:rgba(255,255,255,.7);font-weight:900;flex-shrink:0;}
+            .flow-desc{font-size:.9rem;color:rgba(255,255,255,.65);line-height:1.65;}
+            .flow-arrow{font-size:2rem;color:rgba(255,255,255,.4);font-weight:300;flex-shrink:0;}
             @media(max-width:640px){
               .flow-wrap{flex-direction:column;align-items:center;}
               .flow-arrow{transform:rotate(90deg);}
-              .flow-card{min-width:0;width:100%;max-width:320px;padding:24px 28px;}
-              .flow-title{font-size:1.4rem;}
-              .flow-desc{font-size:.95rem;}
+              .flow-card{min-width:0;width:100%;max-width:320px;padding:22px 24px;}
+              .flow-title{font-size:1.2rem;}
             }
           </style>
 
