@@ -1640,82 +1640,34 @@
 </style>
 
 <div class="ep-overlay" id="ep-overlay">
-  <div class="ep-popup">
-
+  <div class="ep-popup" id="ep-popup-inner">
     <button class="ep-close" onclick="epClose()" aria-label="닫기">✕</button>
-
-    <!-- 좌측: 커피 이미지 + 제목 -->
-    <div class="ep-left">
-      <div class="ep-event-label">🎉 5월 이벤트</div>
-      <div class="ep-left-title">
-        <h2>친구 추천하고<br>커피 받자! ☕</h2>
-        <p>사연 추첨 10명 · MEGA 아메리카노 카카오 선물</p>
-      </div>
-      <img src="커피.jpg" alt="MEGA COFFEE 아이스아메리카노" class="ep-coffee-img"
-        onerror="this.style.display='none'">
+    <!-- 좌측: 이미지 -->
+    <div class="ep-left" id="ep-left">
+      <div class="ep-event-label" id="ep-label">📢 이벤트</div>
+      <div class="ep-left-title" id="ep-left-title"></div>
+      <img id="ep-coffee-img" class="ep-coffee-img" alt="" style="display:none;" onerror="this.style.display='none'">
     </div>
-
-    <!-- 우측: 이벤트 내용 -->
-    <div class="ep-right">
-
-      <div class="ep-steps">
-        <div class="ep-step">
-          <div class="ep-num">1</div>
-          <div>
-            <div class="ep-stext">친구에게 카카오톡으로 추천하기</div>
-            <div class="ep-ssub">취업 준비 중인 친구에게 지텔프IBT를 추천해 주세요</div>
-          </div>
-        </div>
-        <div class="ep-step">
-          <div class="ep-num">2</div>
-          <div>
-            <div class="ep-stext">추천한 사연을 게시판에 남기기</div>
-            <div class="ep-ssub">어떤 친구에게, 왜 추천했는지 게시판에 글로 남겨주세요</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="ep-prize">
-        <div class="ep-prize-icon">🏆</div>
-        <div>
-          <div class="ep-prize-name">MEGA 아메리카노 커피쿠폰</div>
-          <div><span class="ep-prize-count">🎯 추첨 10명</span></div>
-          <div class="ep-prize-desc">추첨 후 카카오톡 선물로 직접 전달드립니다</div>
-        </div>
-      </div>
-
-      <div class="ep-announce">
-        <span style="font-size:1.1rem;">📢</span>
-        <div class="ep-announce-text">
-          <strong>당첨자 발표 5월 30일</strong> — 게시판 공지 예정<br>
-          당첨자는 관리자에게 연락처를 전달해 주세요
-        </div>
-      </div>
-
-      <button onclick="epKakaoShare()" class="ep-btn-kakao">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
-        카카오톡으로 친구에게 추천하기
-      </button>
-      <a href="job-board.html" class="ep-btn-board">✏️ 추천 사연 게시판에 남기기</a>
-
+    <!-- 우측: 내용 -->
+    <div class="ep-right" id="ep-right">
+      <div id="ep-body-content"></div>
       <div class="ep-footer">
-        <span class="ep-fine">이벤트는 예고 없이 종료될 수 있습니다 · 1인 1회 참여</span>
+        <span class="ep-fine">이벤트는 예고 없이 종료될 수 있습니다</span>
         <button class="ep-today-hide" onclick="epHideToday()">오늘 하루 보지 않기</button>
       </div>
     </div>
-
   </div>
 </div>
 
 <!-- ── 플로팅 이벤트 배너 ── -->
-<div class="ep-float" id="ep-float" onclick="epShow()" role="button" aria-label="이벤트 보기">
+<div class="ep-float ep-float-hidden" id="ep-float" onclick="epShow()" role="button" aria-label="이벤트 보기">
   <div class="ep-float-img">
-    <img src="커피.jpg" alt="커피">
+    <img id="ep-float-img" src="" alt="이벤트">
   </div>
   <div class="ep-float-info">
-    <span class="ep-float-tag">🎉 5월 이벤트</span>
-    <span class="ep-float-title">친구 추천하고<br>커피 받자!</span>
-    <span class="ep-float-sub">추첨 10명 · MEGA 아메리카노</span>
+    <span class="ep-float-tag" id="ep-float-tag">📢 이벤트</span>
+    <span class="ep-float-title" id="ep-float-title">이벤트 진행 중</span>
+    <span class="ep-float-sub" id="ep-float-sub"></span>
   </div>
   <button class="ep-float-close" onclick="event.stopPropagation();document.getElementById('ep-float').classList.add('ep-float-hidden');" aria-label="배너 닫기">✕</button>
 </div>
@@ -1723,13 +1675,95 @@
 <script>
   (function(){
     var EP_KEY  = 'ep_hide_until';
-    var EP_PERM = 'ep_closed';
-    function epShouldShow() {
-      if (localStorage.getItem(EP_PERM) === '1') return false;
-      var v = localStorage.getItem(EP_KEY);
+    var EP_PERM_PREFIX = 'ep_closed_';  /* 광고 ID별로 관리 */
+    var _currentAdId = null;
+
+    function epShouldShow(adId) {
+      if (localStorage.getItem(EP_PERM_PREFIX + adId) === '1') return false;
+      var v = localStorage.getItem(EP_KEY + '_' + adId);
       if (!v) return true;
       return Date.now() > parseInt(v);
     }
+
+    function escHtml(s) {
+      if (!s) return '';
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    /* DB에서 활성 팝업광고 로드 */
+    async function loadActiveAd() {
+      try {
+        const today = new Date().toISOString().slice(0,10);
+        const { data } = await _supabase
+          .from('popup_ads')
+          .select('*')
+          .eq('is_active', true)
+          .or(`start_date.is.null,start_date.lte.${today}`)
+          .or(`end_date.is.null,end_date.gte.${today}`)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (!data || data.length === 0) return;
+        const ad = data[0];
+        _currentAdId = ad.id;
+        renderAd(ad);
+      } catch(e) { console.warn('팝업광고 로드 실패', e); }
+    }
+
+    function renderAd(ad) {
+      /* 좌측 이미지 */
+      if (ad.image_url) {
+        var img = document.getElementById('ep-coffee-img');
+        img.src = ad.image_url;
+        img.alt = escHtml(ad.title);
+        img.style.display = 'block';
+      }
+
+      /* 좌측 제목 */
+      document.getElementById('ep-left-title').innerHTML =
+        '<h2>' + escHtml(ad.title) + '</h2>' +
+        (ad.description ? '<p>' + escHtml(ad.description.split('\n')[0]) + '</p>' : '');
+
+      /* 우측 본문 */
+      var body = '';
+      if (ad.description) {
+        var lines = ad.description.split('\n').slice(1).join('\n').trim();
+        if (lines) body += '<div style="font-size:.85rem;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:16px;white-space:pre-line;">' + escHtml(lines) + '</div>';
+      }
+      if (ad.link_url) {
+        body += '<a href="' + escHtml(ad.link_url) + '" target="_blank" rel="noopener" class="ep-btn-kakao" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">자세히 보기 →</a>';
+      }
+      document.getElementById('ep-body-content').innerHTML = body;
+
+      /* 플로팅 배너 업데이트 */
+      if (ad.image_url) document.getElementById('ep-float-img').src = ad.image_url;
+      document.getElementById('ep-float-title').textContent = ad.title;
+      if (ad.description) document.getElementById('ep-float-sub').textContent = ad.description.split('\n')[0];
+
+      /* 플로팅 배너 표시 */
+      document.getElementById('ep-float').classList.remove('ep-float-hidden');
+
+      /* 팝업 표시 여부 */
+      if (epShouldShow(ad.id)) {
+        setTimeout(function(){
+          document.getElementById('ep-overlay').classList.add('ep-visible');
+        }, 1200);
+      }
+    }
+
+    window.epShow = function() {
+      document.getElementById('ep-overlay').classList.add('ep-visible');
+    };
+    window.epClose = function() {
+      if (_currentAdId) localStorage.setItem(EP_PERM_PREFIX + _currentAdId, '1');
+      document.getElementById('ep-overlay').classList.remove('ep-visible');
+    };
+    window.epHideToday = function() {
+      var midnight = new Date(); midnight.setHours(23,59,59,999);
+      if (_currentAdId) localStorage.setItem(EP_KEY + '_' + _currentAdId, midnight.getTime());
+      document.getElementById('ep-overlay').classList.remove('ep-visible');
+    };
+
     window.epKakaoShare = function() {
       var url   = 'https://hometest-weld.vercel.app/';
       var title = '취업 준비 중인 친구에게 추천해요!';
@@ -1770,23 +1804,8 @@
         alert('링크가 복사됐습니다!\n카카오톡을 열어 친구에게 붙여넣기 해주세요 😊');
       }
     };
-    window.epShow = function() {
-      document.getElementById('ep-overlay').classList.add('ep-visible');
-    };
-    window.epClose = function() {
-      localStorage.setItem(EP_PERM, '1');
-      document.getElementById('ep-overlay').classList.remove('ep-visible');
-    };
-    window.epHideToday = function() {
-      var midnight = new Date(); midnight.setHours(23,59,59,999);
-      localStorage.setItem(EP_KEY, midnight.getTime());
-      document.getElementById('ep-overlay').classList.remove('ep-visible');
-    };
-    if (epShouldShow()) {
-      setTimeout(function(){
-        document.getElementById('ep-overlay').classList.add('ep-visible');
-      }, 1200);
-    }
+    /* 페이지 로드 시 DB에서 광고 불러오기 */
+    loadActiveAd();
   })();
 </script>
 </body>
