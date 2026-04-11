@@ -320,6 +320,33 @@
 
         <!-- 텍스트 -->
         <div class="slide-up">
+          <!-- 소셜 프루프 -->
+          <div id="hero-stats" style="display:flex;justify-content:center;align-items:center;gap:32px;flex-wrap:wrap;margin-bottom:32px;">
+            <div style="text-align:center;">
+              <p style="font-size:clamp(2rem,5vw,3rem);font-weight:900;color:#60A5FA;line-height:1;"><span class="hero-count" data-target="64" data-suffix="개">0개</span></p>
+              <p style="font-size:.75rem;color:rgba(255,255,255,.55);margin-top:5px;">졸업인증 대상 대학</p>
+            </div>
+            <div style="width:1px;height:36px;background:rgba(255,255,255,.15);flex-shrink:0;"></div>
+            <div style="text-align:center;">
+              <p style="font-size:clamp(2rem,5vw,3rem);font-weight:900;color:#60A5FA;line-height:1;"><span class="hero-count" data-target="200" data-suffix="+">0+</span></p>
+              <p style="font-size:.75rem;color:rgba(255,255,255,.55);margin-top:5px;">공공기관·정부부처 채용 인정</p>
+            </div>
+            <div style="width:1px;height:36px;background:rgba(255,255,255,.15);flex-shrink:0;"></div>
+            <div style="text-align:center;">
+              <p style="font-size:clamp(2rem,5vw,3rem);font-weight:900;color:#60A5FA;line-height:1;"><span class="hero-count" data-target="600" data-suffix="+">0+</span></p>
+              <p style="font-size:.75rem;color:rgba(255,255,255,.55);margin-top:5px;">대상 기업</p>
+            </div>
+            <div style="display:none;">
+              <span id="hero-apply-count">-</span>
+            </div>
+          </div>
+          <style>
+            @media(max-width:480px){
+              #hero-stats { gap:20px; }
+              #hero-stats [style*="width:1px"] { display:none; }
+            }
+          </style>
+
           <div class="flex flex-wrap justify-center gap-3 mb-8" id="hero-pkg-banners">
             <a href="package.html" id="hero-pkg-0" style="display:inline-flex;align-items:center;padding:14px 36px;border-radius:50px;font-size:1.1rem;font-weight:800;color:#fff;text-decoration:none;background:#fff;color:#1E3A8A;border:2px solid #fff;transition:all .3s;">영어평가</a>
             <a href="package.html" id="hero-pkg-1" style="display:inline-flex;align-items:center;padding:14px 36px;border-radius:50px;font-size:1.1rem;font-weight:800;text-decoration:none;background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4);transition:all .3s;">인적성</a>
@@ -427,34 +454,6 @@
             }
           </style>
 
-          <!-- 소셜 프루프 -->
-          <div id="hero-stats" class="flex justify-center gap-8 mt-12 pt-10 border-t" style="border-color:rgba(255,255,255,.15);flex-wrap:wrap;">
-            <div style="text-align:center;">
-              <p class="text-3xl font-bold" style="color:#60A5FA;"><span class="hero-count" data-target="64" data-suffix="개">0개</span></p>
-              <p class="text-xs mt-1" style="color:rgba(255,255,255,.6);">졸업인증 대상 대학</p>
-            </div>
-            <div class="w-px" style="background:rgba(255,255,255,.15);"></div>
-            <div style="text-align:center;">
-              <p class="text-3xl font-bold" style="color:#60A5FA;"><span class="hero-count" data-target="200" data-suffix="+">0+</span></p>
-              <p class="text-xs mt-1" style="color:rgba(255,255,255,.6);">공공기관·정부부처 채용 인정</p>
-            </div>
-            <div class="w-px" style="background:rgba(255,255,255,.15);"></div>
-            <div style="text-align:center;">
-              <p class="text-3xl font-bold" style="color:#60A5FA;"><span class="hero-count" data-target="600" data-suffix="+">0+</span></p>
-              <p class="text-xs mt-1" style="color:rgba(255,255,255,.6);">대상 기업</p>
-            </div>
-            <div class="w-px" style="background:rgba(255,255,255,.15);"></div>
-            <div style="text-align:center;display:none;">
-              <p class="text-3xl font-bold" style="color:#34D399;"><span id="hero-apply-count">-</span></p>
-              <p class="text-xs mt-1" style="color:rgba(255,255,255,.6);">누적 도입 신청</p>
-            </div>
-          </div>
-          <style>
-            @media(max-width:480px){
-              #hero-stats { gap:16px; }
-              #hero-stats .w-px { display:none; }
-            }
-          </style>
 
         </div>
 
