@@ -2873,9 +2873,8 @@ ${internalSummary}
         const commentCnt = commentMap[commentKey] || 0;
         const rankLabel = i < 3 ? rankEmojis[i] : `${i+1}위`;
         const color = rankColors[i] || '#94A3B8';
-        const ck = commentKey.replace(/"/g, '&quot;');
         const commentBadge = commentCnt > 0
-          ? `<button onclick="openDlCommentModal('${ck}','${(institution||'').replace(/'/g,"\\'")}','${(title||'').replace(/'/g,"\\'")}'')" class="inline-flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full cursor-pointer transition hover:opacity-80" style="background:#EFF6FF;color:#1D4ED8;border:none;">💬 ${commentCnt}</button>`
+          ? `<button class="dl-comment-btn inline-flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full cursor-pointer transition hover:opacity-80" data-fkey="${commentKey.replace(/"/g,'&quot;')}" style="background:#EFF6FF;color:#1D4ED8;border:none;">💬 ${commentCnt}</button>`
           : `<span class="text-xs text-slate-300">-</span>`;
         return `<tr class="border-b border-slate-50 hover:bg-slate-50">
           <td class="py-2.5 pr-2 text-center font-bold text-sm" style="color:${color};">${rankLabel}</td>
@@ -2889,6 +2888,15 @@ ${internalSummary}
         </tr>`;
       }).join('');
     }
+
+    // 댓글 뱃지 클릭 — 이벤트 위임
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('.dl-comment-btn');
+      if (!btn) return;
+      const fkey = btn.dataset.fkey;
+      const [institution, title] = fkey.split('|');
+      openDlCommentModal(fkey, institution, title);
+    });
 
     // ─── 다운로드 댓글 모달 ───
     function openDlCommentModal(fileKey, institution, title) {
