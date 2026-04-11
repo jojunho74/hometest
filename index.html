@@ -1591,51 +1591,49 @@
   .ep-today-hide { font-size:.63rem; color:#555; background:none; border:none; cursor:pointer; text-decoration:underline; white-space:nowrap; }
   .ep-today-hide:hover { color:#888; }
 
-  /* 모바일: 세로형 (600px 이하) */
+  /* 모바일: 좌측 패널 숨기고 단일 컬럼 */
   @media(max-width:600px){
-    .ep-overlay { padding:44px 10px 10px; align-items:flex-start; }
-    .ep-popup { flex-direction:column; max-width:100%; border-radius:18px; }
-    .ep-close { top:8px; right:8px; width:38px; height:38px; font-size:1.1rem; border-width:2px; box-shadow:none; }
-    .ep-left  { width:100%; border-radius:18px 18px 0 0; padding:14px 14px 0; flex-direction:row; justify-content:space-between; align-items:flex-end; min-height:130px; max-height:170px; }
-    .ep-left-title { text-align:left; margin-bottom:0; flex:1; padding-bottom:10px; }
-    .ep-left-title h2 { font-size:1.1rem; }
-    .ep-left-title p { font-size:.62rem; }
-    .ep-event-label { display:none; }
-    .ep-coffee-img { width:100px; flex-shrink:0; }
-    .ep-right { border-radius:0 0 18px 18px; padding:14px 13px 13px; max-height:none; }
-    .ep-steps { gap:5px; margin-bottom:8px; }
-    .ep-step  { padding:8px 10px; gap:8px; }
-    .ep-stext { font-size:.74rem; }
-    .ep-ssub  { font-size:.61rem; }
-    .ep-prize { padding:9px 11px; margin-bottom:8px; gap:8px; }
-    .ep-prize-icon { font-size:1.4rem; }
-    .ep-prize-name { font-size:.82rem; }
-    .ep-announce { margin-bottom:9px; padding:7px 10px; }
-    .ep-announce-text { font-size:.63rem; }
-    .ep-btn-kakao { padding:11px; font-size:.8rem; }
-    .ep-btn-board { padding:9px; font-size:.73rem; }
-    .ep-footer { padding-top:7px; }
+    .ep-overlay { padding:40px 8px 8px !important; align-items:flex-start !important; }
+    .ep-popup   { flex-direction:column !important; max-width:100% !important; width:calc(100vw - 16px) !important; border-radius:16px !important; overflow:hidden !important; }
+    .ep-close   { top:8px !important; right:8px !important; width:36px !important; height:36px !important; font-size:1rem !important; border-width:2px !important; box-shadow:none !important; }
+    .ep-left    { display:none !important; }
+    .ep-right   { border-radius:16px !important; padding:48px 14px 14px !important; max-height:none !important; width:100% !important; box-sizing:border-box !important; }
+    .ep-steps   { gap:6px; margin-bottom:10px; }
+    .ep-step    { padding:9px 11px; gap:8px; }
+    .ep-stext   { font-size:.78rem; }
+    .ep-ssub    { font-size:.64rem; }
+    .ep-prize   { padding:10px 13px; margin-bottom:9px; }
+    .ep-prize-icon { font-size:1.5rem; }
+    .ep-prize-name { font-size:.86rem; }
+    .ep-announce { margin-bottom:11px; padding:8px 11px; }
+    .ep-announce-text { font-size:.66rem; }
+    .ep-btn-kakao { padding:12px; font-size:.84rem; }
+    .ep-btn-board { padding:10px; font-size:.76rem; }
+    .ep-footer  { padding-top:8px; }
+    /* 커스텀 HTML 모드 모바일 */
+    #ep-custom-wrap { border-radius:16px !important; }
+    #ep-custom-content { overflow-x:hidden; word-break:keep-all; }
+    #ep-custom-content > * { max-width:100% !important; box-sizing:border-box; }
+    #ep-custom-content [style*="display:flex"] { flex-direction:column !important; }
+    #ep-custom-content [style*="width:260px"],
+    #ep-custom-content [style*="width:280px"] { width:100% !important; max-height:160px !important; }
   }
 
-  /* 초소형 화면: Z Fold 커버 등 360px 이하 */
+  /* Z Fold 커버 등 400px 이하 추가 축소 */
   @media(max-width:400px){
-    .ep-overlay { padding:36px 8px 8px; }
-    .ep-popup { border-radius:16px; }
-    .ep-close { top:6px; right:6px; width:34px; height:34px; font-size:1rem; }
-    .ep-left  { min-height:110px; max-height:150px; padding:12px 12px 0; }
-    .ep-left-title h2 { font-size:.98rem; }
-    .ep-left-title p  { font-size:.58rem; }
-    .ep-coffee-img { width:85px; }
-    .ep-right { padding:12px 11px 12px; }
-    .ep-steps { gap:4px; margin-bottom:7px; }
-    .ep-step  { padding:7px 9px; gap:7px; }
-    .ep-num   { width:18px; height:18px; font-size:.58rem; }
-    .ep-stext { font-size:.7rem; }
-    .ep-ssub  { font-size:.58rem; }
-    .ep-prize { padding:8px 10px; gap:7px; margin-bottom:7px; }
-    .ep-prize-icon { font-size:1.2rem; }
-    .ep-prize-name { font-size:.78rem; }
-    .ep-prize-count { font-size:.56rem; }
+    .ep-overlay { padding:36px 6px 6px !important; }
+    .ep-popup   { width:calc(100vw - 12px) !important; }
+    .ep-right   { padding:44px 12px 12px !important; }
+    .ep-step    { padding:8px 10px; gap:7px; }
+    .ep-num     { width:18px; height:18px; font-size:.58rem; }
+    .ep-stext   { font-size:.73rem; }
+    .ep-ssub    { font-size:.6rem; }
+    .ep-prize   { padding:9px 11px; }
+    .ep-prize-icon { font-size:1.3rem; }
+    .ep-btn-kakao { padding:11px; font-size:.8rem; }
+    .ep-btn-board { padding:9px; font-size:.72rem; }
+    .ep-fine    { font-size:.55rem; }
+    .ep-today-hide { font-size:.58rem; }
     .ep-announce { padding:7px 9px; margin-bottom:8px; gap:6px; }
     .ep-announce-text { font-size:.6rem; }
     .ep-btn-kakao { padding:10px; font-size:.75rem; gap:5px; margin-bottom:5px; }
