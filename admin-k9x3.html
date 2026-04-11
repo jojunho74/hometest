@@ -851,10 +851,11 @@
                   <th class="pb-2 font-semibold hidden md:table-cell">공고명</th>
                   <th class="pb-2 font-semibold hidden md:table-cell">분류</th>
                   <th class="pb-2 font-semibold text-right">다운로드</th>
+                  <th class="pb-2 font-semibold text-right">💬 댓글</th>
                 </tr>
               </thead>
               <tbody id="download-stats-body">
-                <tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
+                <tr><td colspan="6" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
               </tbody>
             </table>
           </div>
@@ -2770,7 +2771,7 @@ ${internalSummary}
 
       const labelEl = document.getElementById('dl-period-label');
       const tbody   = document.getElementById('download-stats-body');
-      tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>';
 
       // 기간별 쿼리 조건
       let query = db.from('download_logs').select('institution, title, category, downloaded_at');
@@ -2781,13 +2782,22 @@ ${internalSummary}
 
       const { data, error } = await query.limit(3000);
       if (error) {
-        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-red-400 text-xs">오류: ${error.message}<br><span class="text-slate-400">Supabase에 download_logs 테이블이 없으면 아래 SQL을 실행하세요.</span></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-red-400 text-xs">오류: ${error.message}<br><span class="text-slate-400">Supabase에 download_logs 테이블이 없으면 아래 SQL을 실행하세요.</span></td></tr>`;
         return;
       }
       if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">해당 기간 다운로드 데이터가 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-400 text-xs">해당 기간 다운로드 데이터가 없습니다.</td></tr>';
         return;
       }
+
+      // 댓글 수 조회 (cheer_comments.file_name = "institution|title")
+      const commentMap = {};
+      try {
+        const { data: cData } = await db.from('cheer_comments').select('file_name');
+        (cData || []).forEach(r => {
+          if (r.file_name) commentMap[r.file_name] = (commentMap[r.file_name] || 0) + 1;
+        });
+      } catch(e) {}
 
       // 집계
       const dlMap = {};
@@ -2804,8 +2814,13 @@ ${internalSummary}
 
       tbody.innerHTML = sorted.map(([key, cnt], i) => {
         const [institution, title, category] = key.split('||');
+        const commentKey = `${institution}|${title}`;
+        const commentCnt = commentMap[commentKey] || 0;
         const rankLabel = i < 3 ? rankEmojis[i] : `${i+1}위`;
         const color = rankColors[i] || '#94A3B8';
+        const commentBadge = commentCnt > 0
+          ? `<span class="inline-flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full" style="background:#EFF6FF;color:#1D4ED8;">💬 ${commentCnt}</span>`
+          : `<span class="text-xs text-slate-300">-</span>`;
         return `<tr class="border-b border-slate-50 hover:bg-slate-50">
           <td class="py-2.5 pr-2 text-center font-bold text-sm" style="color:${color};">${rankLabel}</td>
           <td class="py-2.5 pr-3 font-medium text-slate-700">${institution || '-'}</td>
@@ -2814,6 +2829,7 @@ ${internalSummary}
             <span class="text-xs px-2 py-0.5 rounded-full font-semibold" style="background:#EFF6FF;color:#1D4ED8;">${category || '-'}</span>
           </td>
           <td class="py-2.5 text-right font-bold text-slate-800">${cnt.toLocaleString()}</td>
+          <td class="py-2.5 text-right">${commentBadge}</td>
         </tr>`;
       }).join('');
     }
