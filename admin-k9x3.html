@@ -2844,7 +2844,7 @@ ${internalSummary}
       const commentMap = {};   // key → count
       const commentData = {};  // key → [{comment, rating, created_at}]
       try {
-        const { data: cData } = await db.from('cheer_comments').select('file_name,comment,rating,created_at').order('created_at', { ascending: false });
+        const { data: cData } = await db.from('cheer_comments').select('file_name,comment,rating,created_at,ip_address').order('created_at', { ascending: false });
         (cData || []).forEach(r => {
           if (!r.file_name) return;
           commentMap[r.file_name] = (commentMap[r.file_name] || 0) + 1;
@@ -2913,9 +2913,12 @@ ${internalSummary}
       } else {
         body.innerHTML = items.map(c => {
           const date = new Date(c.created_at).toLocaleDateString('ko-KR', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+          const ip   = c.ip_address ? `<span style="font-size:0.7rem;color:#94A3B8;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:4px;padding:1px 6px;margin-left:6px;">🌐 ${c.ip_address}</span>` : '';
           return `<div style="padding:12px 0;border-bottom:1px solid #F1F5F9;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-              <span style="color:#F59E0B;font-size:0.8rem;letter-spacing:1px;">${stars(c.rating||5)}</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:4px;">
+              <div style="display:flex;align-items:center;">
+                <span style="color:#F59E0B;font-size:0.8rem;letter-spacing:1px;">${stars(c.rating||5)}</span>${ip}
+              </div>
               <span style="font-size:0.72rem;color:#94A3B8;">${date}</span>
             </div>
             <p style="font-size:0.85rem;color:#334155;margin:0;line-height:1.5;">${c.comment || ''}</p>

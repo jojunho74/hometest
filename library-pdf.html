@@ -576,10 +576,12 @@
         // 댓글 저장
         if (comment) {
           try {
+            let ip = '';
+            try { const r = await fetch('https://api.ipify.org?format=json'); const j = await r.json(); ip = j.ip || ''; } catch(e) {}
             await fetch(SB_URL + '/rest/v1/cheer_comments', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'return=minimal' },
-              body: JSON.stringify({ comment: comment, rating: rating || 5, file_name: dlPopupFileKey })
+              body: JSON.stringify({ comment: comment, rating: rating || 5, file_name: dlPopupFileKey, ip_address: ip })
             });
           } catch(err) { console.warn('comment save failed', err); }
           setTimeout(function() { loadCheerSection(); loadInlineCheer(); }, 800);
