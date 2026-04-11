@@ -9,57 +9,112 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
-    body { font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; }
-    .btn {
-      padding: 0.5rem 1.25rem;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: opacity 0.15s, transform 0.15s;
-      border: none;
+    body { font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; background:#F0F4F8; overflow:hidden; height:100vh; }
+
+    /* ── 버튼 공통 ── */
+    .btn { padding:.5rem 1.25rem; border-radius:8px; font-weight:600; font-size:.875rem; cursor:pointer; transition:opacity .15s,transform .15s; border:none; }
+    .btn:hover  { opacity:.88; transform:scale(1.02); }
+    .btn:active { transform:scale(0.97); }
+    .btn-primary   { background:#4F7EF7; color:#fff; }
+    .btn-success   { background:#16A34A; color:#fff; }
+    .btn-danger    { background:#DC2626; color:#fff; }
+    .btn-secondary { background:#E8EEF7; color:#334155; }
+
+    .badge-pending { background:#FEF9C3; color:#854D0E; padding:2px 10px; border-radius:999px; font-size:.75rem; font-weight:600; }
+    .badge-done    { background:#DCFCE7; color:#166534; padding:2px 10px; border-radius:999px; font-size:.75rem; font-weight:600; }
+
+    /* ── 레이아웃 ── */
+    #main-app:not(.hidden) { display:flex !important; height:100vh; overflow:hidden; }
+
+    /* ── 사이드바 ── */
+    #sidebar {
+      width:220px; flex-shrink:0;
+      background:linear-gradient(180deg,#0D1F3C 0%,#162848 100%);
+      display:flex; flex-direction:column;
+      overflow-y:auto; overflow-x:hidden;
     }
-    .btn:hover  { opacity: 0.85; transform: scale(1.02); }
-    .btn:active { transform: scale(0.97); }
-    .btn-primary   { background: #1E4D8C; color: #fff; }
-    .btn-success   { background: #16A34A; color: #fff; }
-    .btn-danger    { background: #DC2626; color: #fff; }
-    .btn-secondary { background: #E2E8F0; color: #334155; }
-
-    .badge-pending  { background: #FEF9C3; color: #854D0E; padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
-    .badge-done     { background: #DCFCE7; color: #166534; padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
-
-    /* 로그인 오버레이 */
-    #login-screen {
-      position: fixed; inset: 0;
-      background: #0B1D3A;
-      display: flex; align-items: center; justify-content: center;
-      z-index: 999;
+    .sb-logo {
+      padding:24px 20px 20px;
+      border-bottom:1px solid rgba(255,255,255,.07);
     }
-    #login-screen.hidden { display: none; }
+    .sb-logo-title { font-size:1rem; font-weight:800; color:#fff; letter-spacing:-.01em; }
+    .sb-logo-sub   { font-size:.68rem; color:rgba(255,255,255,.38); margin-top:2px; }
 
-    /* 모달 */
-    #modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.5);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 100;
-      padding: 16px;
+    .sb-section-label {
+      font-size:.6rem; font-weight:700; color:rgba(255,255,255,.3);
+      letter-spacing:.12em; text-transform:uppercase;
+      padding:18px 20px 6px;
     }
-    #modal-overlay.hidden { display: none; }
-
-    /* 테이블 스크롤 */
-    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-
-    /* 세션 타임아웃 경고 */
-    #timeout-banner {
-      position: fixed; top: 0; left: 0; right: 0;
-      background: #DC2626; color: #fff;
-      text-align: center; padding: 10px;
-      font-size: 0.875rem; font-weight: 600;
-      z-index: 200;
-      display: none;
+    .sb-item {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 20px; margin:1px 10px; border-radius:10px;
+      font-size:.82rem; font-weight:600; color:rgba(255,255,255,.5);
+      cursor:pointer; border:none; background:transparent; width:calc(100% - 20px);
+      text-align:left; transition:background .15s, color .15s;
     }
+    .sb-item:hover { background:rgba(255,255,255,.07); color:rgba(255,255,255,.85); }
+    .sb-item.active {
+      background:linear-gradient(90deg,rgba(79,126,247,.3),rgba(79,126,247,.1));
+      color:#fff;
+      box-shadow:inset 3px 0 0 #4F7EF7;
+    }
+    .sb-item .sb-icon { font-size:1rem; width:20px; text-align:center; flex-shrink:0; }
+    .sb-bottom {
+      margin-top:auto; padding:16px 10px;
+      border-top:1px solid rgba(255,255,255,.07);
+    }
+    .sb-bottom-btn {
+      display:flex; align-items:center; gap:8px;
+      padding:9px 10px; border-radius:8px; width:100%;
+      font-size:.78rem; font-weight:600; color:rgba(255,255,255,.45);
+      background:transparent; border:none; cursor:pointer; text-align:left;
+      transition:background .15s, color .15s;
+    }
+    .sb-bottom-btn:hover { background:rgba(255,255,255,.07); color:rgba(255,255,255,.8); }
+
+    /* ── 우측 메인 ── */
+    #main-content { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+    /* 상단 바 */
+    #topbar {
+      background:#fff; height:56px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 24px;
+      box-shadow:0 1px 0 rgba(0,0,0,.07);
+    }
+    #topbar-title { font-size:.95rem; font-weight:700; color:#1E293B; }
+    #topbar-actions { display:flex; align-items:center; gap:8px; }
+
+    /* 콘텐츠 스크롤 영역 */
+    #content-area { flex:1; overflow-y:auto; padding:24px; }
+
+    /* 섹션 카드 배경 통일 */
+    .bg-white { background:#fff !important; }
+    .bg-slate-100, body { background:#F0F4F8; }
+
+    /* ── 로그인 ── */
+    #login-screen { position:fixed; inset:0; background:linear-gradient(135deg,#0D1F3C,#1E3A6E); display:flex; align-items:center; justify-content:center; z-index:999; }
+    #login-screen.hidden { display:none; }
+
+    /* ── 모달 ── */
+    #modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; z-index:100; padding:16px; }
+    #modal-overlay.hidden { display:none; }
+
+    /* ── 테이블 ── */
+    .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+
+    /* ── 세션 만료 ── */
+    #timeout-banner { position:fixed; top:0; left:0; right:0; background:#DC2626; color:#fff; text-align:center; padding:10px; font-size:.875rem; font-weight:600; z-index:200; display:none; }
+
+    /* ── 통계 카드 스타일 강화 ── */
+    .stat-card {
+      background:#fff; border-radius:14px; padding:20px 22px;
+      box-shadow:0 2px 12px rgba(0,0,0,.06);
+      display:flex; flex-direction:column; gap:4px;
+    }
+    .stat-card-label { font-size:.72rem; color:#94A3B8; font-weight:600; text-transform:uppercase; letter-spacing:.05em; }
+    .stat-card-value { font-size:2rem; font-weight:800; color:#0F172A; line-height:1.1; }
+    .stat-card-sub   { font-size:.72rem; color:#94A3B8; margin-top:2px; }
   </style>
 </head>
 <body class="bg-slate-100 min-h-screen">
@@ -114,38 +169,50 @@
   <!-- ─── 메인 ─── -->
   <div id="main-app" class="hidden">
 
-    <!-- 헤더 -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-      <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="font-bold text-slate-800">IBT 컨설팅</span>
-          <span class="text-slate-300">|</span>
-          <span class="text-slate-500 text-sm">관리자</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <button onclick="toggleNoTrack()" id="notrack-btn" class="btn text-xs px-3 py-1.5">🙈 내 방문 제외 OFF</button>
-          <a href="index.html" class="btn btn-secondary text-xs px-3 py-1.5">← 메인으로</a>
-          <button onclick="logout()" class="btn btn-secondary text-xs px-3 py-1.5">로그아웃</button>
+    <!-- ── 사이드바 ── -->
+    <nav id="sidebar">
+      <div class="sb-logo">
+        <div class="sb-logo-title">IBT 컨설팅</div>
+        <div class="sb-logo-sub">관리자 대시보드</div>
+      </div>
+
+      <div class="sb-section-label">신청 관리</div>
+      <button onclick="switchTab('consult')"  id="tab-consult"  class="sb-item active"><span class="sb-icon">📋</span>신청 관리</button>
+      <button onclick="switchTab('student')"  id="tab-student"  class="sb-item"><span class="sb-icon">🎓</span>학생접수</button>
+
+      <div class="sb-section-label">콘텐츠</div>
+      <button onclick="switchTab('news')"     id="tab-news"     class="sb-item"><span class="sb-icon">📰</span>대학소식</button>
+      <button onclick="switchTab('programs')" id="tab-programs" class="sb-item"><span class="sb-icon">🏫</span>대학활동</button>
+      <button onclick="switchTab('jobs')"     id="tab-jobs"     class="sb-item"><span class="sb-icon">💼</span>채용공고</button>
+      <button onclick="switchTab('cnews')"    id="tab-cnews"    class="sb-item"><span class="sb-icon">🏢</span>기업소식</button>
+      <button onclick="switchTab('shorts')"   id="tab-shorts"   class="sb-item"><span class="sb-icon">🎬</span>유튜브쇼츠</button>
+      <button onclick="switchTab('calendar')" id="tab-calendar" class="sb-item"><span class="sb-icon">📅</span>채용달력</button>
+
+      <div class="sb-section-label">분석 · 운영</div>
+      <button onclick="switchTab('stats')"    id="tab-stats"    class="sb-item"><span class="sb-icon">📊</span>통계</button>
+      <button onclick="switchTab('blog')"     id="tab-blog"     class="sb-item"><span class="sb-icon">✍️</span>블로그 원고</button>
+      <button onclick="switchTab('popupads')" id="tab-popupads" class="sb-item"><span class="sb-icon">📢</span>팝업광고</button>
+
+      <div class="sb-bottom">
+        <button onclick="toggleNoTrack()" id="notrack-btn" class="sb-bottom-btn">🙈 <span id="notrack-label">내 방문 제외 OFF</span></button>
+        <a href="index.html" class="sb-bottom-btn" style="text-decoration:none;">🏠 메인으로</a>
+        <button onclick="logout()" class="sb-bottom-btn">🚪 로그아웃</button>
+      </div>
+    </nav>
+
+    <!-- ── 우측 메인 ── -->
+    <div id="main-content">
+
+      <!-- 상단 바 -->
+      <div id="topbar">
+        <span id="topbar-title">신청 관리</span>
+        <div id="topbar-actions">
+          <span id="topbar-date" style="font-size:.75rem;color:#94A3B8;margin-right:8px;"></span>
         </div>
       </div>
-    </header>
 
-    <main class="max-w-6xl mx-auto px-4 py-8">
-
-      <!-- 탭 -->
-      <div class="flex flex-wrap gap-2 mb-8 border-b border-slate-200" style="position:sticky;top:56px;z-index:40;background:#f8fafc;padding-top:12px;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px;">
-        <button onclick="switchTab('consult')"  id="tab-consult"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-blue-700 text-blue-700 -mb-px">신청 관리</button>
-        <button onclick="switchTab('student')"  id="tab-student"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">학생접수</button>
-        <button onclick="switchTab('news')"     id="tab-news"     class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">대학소식</button>
-        <button onclick="switchTab('programs')" id="tab-programs" class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">대학활동</button>
-        <button onclick="switchTab('jobs')"     id="tab-jobs"     class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">채용공고</button>
-        <button onclick="switchTab('cnews')"   id="tab-cnews"   class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">기업소식</button>
-        <button onclick="switchTab('shorts')"  id="tab-shorts"  class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">유튜브쇼츠</button>
-        <button onclick="switchTab('stats')"   id="tab-stats"   class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">통계</button>
-        <button onclick="switchTab('blog')"     id="tab-blog"     class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">블로그 원고</button>
-        <button onclick="switchTab('calendar')" id="tab-calendar" class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">채용달력</button>
-        <button onclick="switchTab('popupads')" id="tab-popupads" class="px-5 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px hover:text-slate-600">팝업광고</button>
-      </div>
+      <!-- 콘텐츠 -->
+      <main id="content-area">
 
       <!-- ── 신청 관리 탭 ── -->
       <div id="section-consult">
@@ -1189,8 +1256,9 @@
 
       </div>
 
-    </main>
-  </div>
+      </main>
+    </div><!-- /main-content -->
+  </div><!-- /main-app -->
 
   <!-- ── 팝업광고 등록/수정 모달 ── -->
   <div id="ad-modal-overlay" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;z-index:200;padding:16px;">
@@ -1346,13 +1414,10 @@
     }
 
     function updateNoTrackBtn() {
-      const btn = document.getElementById('notrack-btn');
-      if (!btn) return;
+      const label = document.getElementById('notrack-label');
+      if (!label) return;
       const on = localStorage.getItem(NOTRACK_KEY) === '1';
-      btn.textContent = on ? '👁 내 방문 제외 ON' : '🙈 내 방문 제외 OFF';
-      btn.className   = on
-        ? 'btn text-xs px-3 py-1.5 border border-emerald-500 text-emerald-600 bg-emerald-50 rounded-lg font-semibold cursor-pointer'
-        : 'btn btn-secondary text-xs px-3 py-1.5';
+      label.textContent = on ? '내 방문 제외 ON ✅' : '내 방문 제외 OFF';
     }
 
     function toggleNoTrack() {
@@ -1513,18 +1578,26 @@
     }
 
     // ─── 탭 전환 ───
+    const TAB_LABELS = {
+      consult:'신청 관리', student:'학생접수', news:'대학소식', programs:'대학활동',
+      jobs:'채용공고', cnews:'기업소식', shorts:'유튜브쇼츠', stats:'통계',
+      blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고'
+    };
+
     function switchTab(tab) {
       ['consult', 'student', 'news', 'programs', 'jobs', 'cnews', 'shorts', 'stats', 'blog', 'calendar', 'popupads'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
-        if (t === tab) {
-          btn.classList.add('border-blue-700', 'text-blue-700');
-          btn.classList.remove('border-transparent', 'text-slate-400');
-        } else {
-          btn.classList.remove('border-blue-700', 'text-blue-700');
-          btn.classList.add('border-transparent', 'text-slate-400');
-        }
+        if (t === tab) btn.classList.add('active');
+        else           btn.classList.remove('active');
       });
+      // 상단 바 타이틀 업데이트
+      const titleEl = document.getElementById('topbar-title');
+      if (titleEl) titleEl.textContent = TAB_LABELS[tab] || tab;
+      // 콘텐츠 영역 스크롤 상단 초기화
+      const ca = document.getElementById('content-area');
+      if (ca) ca.scrollTop = 0;
+
       if (tab === 'student') loadStudents();
       if (tab === 'news') loadNews();
       if (tab === 'programs') loadPrograms();
