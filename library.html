@@ -200,38 +200,38 @@
   <!-- ══════ STICKY INPUT FORM ══════ -->
   <section class="px-4 py-8">
     <div class="max-w-3xl mx-auto">
-      <div class="card p-6 md:p-8 fade-in">
-        <h2 class="text-base font-bold mb-5 flex items-center gap-2" style="color:var(--blue);">
+      <div class="fade-in" style="background:linear-gradient(180deg,#0D1F3C 0%,#162848 100%);border-radius:20px;padding:28px 32px;">
+        <h2 class="text-base font-bold mb-5 flex items-center gap-2" style="color:#fff;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           학교 정보 입력 — 모든 문구에 자동 반영됩니다
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-semibold mb-1.5" style="color:var(--ink-mid);">대학명 <span class="text-red-500">*</span></label>
-            <input id="inp-univ" type="text" class="form-input" placeholder="예: 한국대학교" oninput="updateTemplates()" />
+            <label class="block text-sm font-semibold mb-1.5" style="color:rgba(255,255,255,.65);">대학명 <span style="color:#F87171;">*</span></label>
+            <input id="inp-univ" type="text" class="form-input" placeholder="예: 한국대학교" oninput="updateTemplates()" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;" />
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1.5" style="color:var(--ink-mid);">신청 링크 <span class="text-red-500">*</span></label>
-            <input id="inp-link" type="url" class="form-input" placeholder="예: https://forms.gle/..." oninput="updateTemplates()" />
+            <label class="block text-sm font-semibold mb-1.5" style="color:rgba(255,255,255,.65);">신청 링크 <span style="color:#F87171;">*</span></label>
+            <input id="inp-link" type="url" class="form-input" placeholder="예: https://forms.gle/..." oninput="updateTemplates()" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;" />
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1.5" style="color:var(--ink-mid);">마감일 <span class="text-red-500">*</span></label>
-            <input id="inp-deadline" type="text" class="form-input" placeholder="예: 4월 20일(일)" oninput="updateTemplates()" />
+            <label class="block text-sm font-semibold mb-1.5" style="color:rgba(255,255,255,.65);">마감일 <span style="color:#F87171;">*</span></label>
+            <input id="inp-deadline" type="text" class="form-input" placeholder="예: 4월 20일(일)" oninput="updateTemplates()" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;" />
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1.5" style="color:var(--ink-mid);">선착순 인원</label>
-            <input id="inp-limit" type="text" class="form-input" placeholder="예: 200명" oninput="updateTemplates()" />
+            <label class="block text-sm font-semibold mb-1.5" style="color:rgba(255,255,255,.65);">선착순 인원</label>
+            <input id="inp-limit" type="text" class="form-input" placeholder="예: 200명" oninput="updateTemplates()" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;" />
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1.5" style="color:var(--ink-mid);">담당자명</label>
-            <input id="inp-manager" type="text" class="form-input" placeholder="예: 홍길동 선생님" oninput="updateTemplates()" />
+            <label class="block text-sm font-semibold mb-1.5" style="color:rgba(255,255,255,.65);">담당자명</label>
+            <input id="inp-manager" type="text" class="form-input" placeholder="예: 홍길동 선생님" oninput="updateTemplates()" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;" />
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1.5" style="color:var(--ink-mid);">연락처</label>
-            <input id="inp-phone" type="text" class="form-input" placeholder="예: 02-1234-5678" oninput="updateTemplates()" />
+            <label class="block text-sm font-semibold mb-1.5" style="color:rgba(255,255,255,.65);">연락처</label>
+            <input id="inp-phone" type="text" class="form-input" placeholder="예: 02-1234-5678" oninput="updateTemplates()" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;" />
           </div>
         </div>
-        <p class="text-xs mt-4" style="color:var(--ink-soft);">* 입력 즉시 아래 모든 채널 문구가 자동 업데이트됩니다. 페이지를 새로고침하면 초기화됩니다.</p>
+        <p class="text-xs mt-4" style="color:rgba(255,255,255,.35);">* 입력 즉시 아래 모든 채널 문구가 자동 업데이트됩니다. 페이지를 새로고침하면 초기화됩니다.</p>
       </div>
     </div>
   </section>
