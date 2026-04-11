@@ -320,9 +320,30 @@
 
         <!-- 텍스트 -->
         <div class="slide-up">
-          <div class="inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full mb-8 border" style="border-color:rgba(252,211,77,.4);background:rgba(252,211,77,.1);color:#FCD34D;">
-            <span>⏰</span><span>이번 달 한정 무료진단 운영 중 — 선착순 200명</span>
+          <div class="flex flex-wrap justify-center gap-3 mb-8" id="hero-pkg-banners">
+            <a href="package.html" id="hero-pkg-0" style="display:inline-flex;align-items:center;padding:14px 36px;border-radius:14px;font-size:1.05rem;font-weight:800;color:#fff;text-decoration:none;background:#1E3A8A;box-shadow:0 4px 16px rgba(30,58,138,.5);transition:all .3s;">영어평가</a>
+            <a href="package.html" id="hero-pkg-1" style="display:inline-flex;align-items:center;padding:14px 36px;border-radius:14px;font-size:1.05rem;font-weight:800;color:#fff;text-decoration:none;background:#334155;box-shadow:0 2px 8px rgba(30,41,59,.4);transition:all .3s;">인적성</a>
+            <a href="package.html" id="hero-pkg-2" style="display:inline-flex;align-items:center;padding:14px 36px;border-radius:14px;font-size:1.05rem;font-weight:800;color:#fff;text-decoration:none;background:#334155;box-shadow:0 2px 8px rgba(30,41,59,.4);transition:all .3s;">AI감독</a>
           </div>
+          <script>
+            (function(){
+              var hp = [
+                {el:document.getElementById('hero-pkg-0'), on:'#1E3A8A', onS:'rgba(30,58,138,.7)', off:'#334155', offS:'rgba(30,41,59,.4)'},
+                {el:document.getElementById('hero-pkg-1'), on:'#065F46', onS:'rgba(6,95,70,.7)',   off:'#334155', offS:'rgba(30,41,59,.4)'},
+                {el:document.getElementById('hero-pkg-2'), on:'#78350F', onS:'rgba(120,53,15,.7)', off:'#334155', offS:'rgba(30,41,59,.4)'}
+              ];
+              var cur = 0;
+              function tick(){
+                hp.forEach(function(p,i){
+                  p.el.style.background = i===cur ? p.on  : p.off;
+                  p.el.style.boxShadow  = i===cur ? '0 4px 20px '+p.onS : '0 2px 8px '+p.offS;
+                  p.el.style.transform  = i===cur ? 'scale(1.06)' : 'scale(1)';
+                });
+                cur = (cur+1) % hp.length;
+              }
+              tick(); setInterval(tick, 1000);
+            })();
+          </script>
 
           <h1 class="font-display leading-tight font-bold mb-6" style="font-size:clamp(35px,5vw,65px);color:#fff;">
             <span class="hero-line" id="hero-line-1" style="display:block;opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s;">취업 준비 학생의</span>
