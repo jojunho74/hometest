@@ -1642,18 +1642,27 @@
 <div class="ep-overlay" id="ep-overlay">
   <div class="ep-popup" id="ep-popup-inner">
     <button class="ep-close" onclick="epClose()" aria-label="닫기">✕</button>
-    <!-- 좌측: 이미지 -->
-    <div class="ep-left" id="ep-left">
-      <div class="ep-event-label" id="ep-label">📢 이벤트</div>
-      <div class="ep-left-title" id="ep-left-title"></div>
-      <img id="ep-coffee-img" class="ep-coffee-img" alt="" style="display:none;" onerror="this.style.display='none'">
-    </div>
-    <!-- 우측: 내용 -->
-    <div class="ep-right" id="ep-right">
-      <div id="ep-body-content"></div>
-      <div class="ep-footer">
+    <!-- 커스텀 HTML 모드 (custom_html 있을 때) -->
+    <div id="ep-custom-wrap" style="display:none;width:100%;background:#111;border-radius:24px;overflow:hidden;">
+      <div id="ep-custom-content"></div>
+      <div class="ep-footer" style="padding:10px 20px 16px;">
         <span class="ep-fine">이벤트는 예고 없이 종료될 수 있습니다</span>
         <button class="ep-today-hide" onclick="epHideToday()">오늘 하루 보지 않기</button>
+      </div>
+    </div>
+    <!-- 자동 레이아웃 모드 -->
+    <div id="ep-auto-wrap" style="display:contents;">
+      <div class="ep-left" id="ep-left">
+        <div class="ep-event-label" id="ep-label">📢 이벤트</div>
+        <div class="ep-left-title" id="ep-left-title"></div>
+        <img id="ep-coffee-img" class="ep-coffee-img" alt="" style="display:none;" onerror="this.style.display='none'">
+      </div>
+      <div class="ep-right" id="ep-right">
+        <div id="ep-body-content"></div>
+        <div class="ep-footer">
+          <span class="ep-fine">이벤트는 예고 없이 종료될 수 있습니다</span>
+          <button class="ep-today-hide" onclick="epHideToday()">오늘 하루 보지 않기</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1711,29 +1720,33 @@
     }
 
     function renderAd(ad) {
-      /* 좌측 이미지 */
-      if (ad.image_url) {
-        var img = document.getElementById('ep-coffee-img');
-        img.src = ad.image_url;
-        img.alt = escHtml(ad.title);
-        img.style.display = 'block';
-      }
+      /* ── 커스텀 HTML 모드 ── */
+      if (ad.custom_html) {
+        document.getElementById('ep-custom-wrap').style.display = 'block';
+        document.getElementById('ep-auto-wrap').style.display = 'none';
+        document.getElementById('ep-custom-content').innerHTML = ad.custom_html;
+      } else {
+        /* ── 자동 레이아웃 모드 ── */
+        document.getElementById('ep-custom-wrap').style.display = 'none';
+        document.getElementById('ep-auto-wrap').style.display = 'contents';
 
-      /* 좌측 제목 */
-      document.getElementById('ep-left-title').innerHTML =
-        '<h2>' + escHtml(ad.title) + '</h2>' +
-        (ad.description ? '<p>' + escHtml(ad.description.split('\n')[0]) + '</p>' : '');
-
-      /* 우측 본문 */
-      var body = '';
-      if (ad.description) {
-        var lines = ad.description.split('\n').slice(1).join('\n').trim();
-        if (lines) body += '<div style="font-size:.85rem;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:16px;white-space:pre-line;">' + escHtml(lines) + '</div>';
+        if (ad.image_url) {
+          var img = document.getElementById('ep-coffee-img');
+          img.src = ad.image_url; img.alt = escHtml(ad.title); img.style.display = 'block';
+        }
+        document.getElementById('ep-left-title').innerHTML =
+          '<h2>' + escHtml(ad.title) + '</h2>' +
+          (ad.description ? '<p>' + escHtml(ad.description.split('\n')[0]) + '</p>' : '');
+        var body = '';
+        if (ad.description) {
+          var lines = ad.description.split('\n').slice(1).join('\n').trim();
+          if (lines) body += '<div style="font-size:.85rem;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:16px;white-space:pre-line;">' + escHtml(lines) + '</div>';
+        }
+        if (ad.link_url) {
+          body += '<a href="' + escHtml(ad.link_url) + '" target="_blank" rel="noopener" class="ep-btn-kakao" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">자세히 보기 →</a>';
+        }
+        document.getElementById('ep-body-content').innerHTML = body;
       }
-      if (ad.link_url) {
-        body += '<a href="' + escHtml(ad.link_url) + '" target="_blank" rel="noopener" class="ep-btn-kakao" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">자세히 보기 →</a>';
-      }
-      document.getElementById('ep-body-content').innerHTML = body;
 
       /* 플로팅 배너 업데이트 */
       if (ad.image_url) document.getElementById('ep-float-img').src = ad.image_url;

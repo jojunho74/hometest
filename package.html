@@ -616,16 +616,25 @@
 <div class="ep-overlay" id="ep-overlay">
   <div class="ep-popup">
     <button class="ep-close" onclick="epClose()" aria-label="닫기">&#x2715;</button>
-    <div class="ep-left">
-      <div class="ep-event-label">&#x1F4E2; 이벤트</div>
-      <div class="ep-left-title" id="ep-left-title"></div>
-      <img id="ep-coffee-img" class="ep-coffee-img" alt="" style="display:none;" onerror="this.style.display='none'">
-    </div>
-    <div class="ep-right">
-      <div id="ep-body-content" style="flex:1;"></div>
-      <div class="ep-footer">
+    <div id="ep-custom-wrap" style="display:none;width:100%;background:#111;border-radius:24px;overflow:hidden;">
+      <div id="ep-custom-content"></div>
+      <div class="ep-footer" style="padding:10px 20px 16px;">
         <span class="ep-fine">이벤트는 예고 없이 종료될 수 있습니다</span>
         <button class="ep-today-hide" onclick="epHideToday()">오늘 하루 보지 않기</button>
+      </div>
+    </div>
+    <div id="ep-auto-wrap" style="display:contents;">
+      <div class="ep-left">
+        <div class="ep-event-label">&#x1F4E2; 이벤트</div>
+        <div class="ep-left-title" id="ep-left-title"></div>
+        <img id="ep-coffee-img" class="ep-coffee-img" alt="" style="display:none;" onerror="this.style.display='none'">
+      </div>
+      <div class="ep-right">
+        <div id="ep-body-content" style="flex:1;"></div>
+        <div class="ep-footer">
+          <span class="ep-fine">이벤트는 예고 없이 종료될 수 있습니다</span>
+          <button class="ep-today-hide" onclick="epHideToday()">오늘 하루 보지 않기</button>
+        </div>
       </div>
     </div>
   </div>
@@ -633,7 +642,7 @@
 <div class="ep-float ep-float-hidden" id="ep-float" onclick="epShow()" role="button" aria-label="이벤트 보기">
   <div class="ep-float-img"><img id="ep-float-img" src="" alt="이벤트"></div>
   <div class="ep-float-info">
-    <span class="ep-float-tag" id="ep-float-tag">&#x1F4E2; 이벤트</span>
+    <span class="ep-float-tag">&#x1F4E2; 이벤트</span>
     <span class="ep-float-title" id="ep-float-title">이벤트 진행 중</span>
     <span class="ep-float-sub" id="ep-float-sub"></span>
   </div>
@@ -663,16 +672,26 @@
       var data=await r.json();
       if(!data||!data.length)return;
       var ad=data[0];_adId=ad.id;
-      if(ad.image_url){var img=document.getElementById('ep-coffee-img');img.src=ad.image_url;img.style.display='block';document.getElementById('ep-float-img').src=ad.image_url;}
-      var lines=(ad.description||'').split('\n');
-      document.getElementById('ep-left-title').innerHTML='<h2>'+esc(ad.title)+'</h2>'+(lines[0]?'<p>'+esc(lines[0])+'</p>':'');
-      var body='';
-      var rest=lines.slice(1).join('\n').trim();
-      if(rest)body+='<div style="font-size:.85rem;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:16px;white-space:pre-line;">'+esc(rest)+'</div>';
-      if(ad.link_url)body+='<a href="'+esc(ad.link_url)+'" target="_blank" rel="noopener" class="ep-btn-cta">자세히 보기 &#x2192;</a>';
-      document.getElementById('ep-body-content').innerHTML=body;
+      if(ad.custom_html){
+        document.getElementById('ep-custom-wrap').style.display='block';
+        document.getElementById('ep-auto-wrap').style.display='none';
+        document.getElementById('ep-custom-content').innerHTML=ad.custom_html;
+      } else {
+        document.getElementById('ep-custom-wrap').style.display='none';
+        document.getElementById('ep-auto-wrap').style.display='contents';
+        if(ad.image_url){var img=document.getElementById('ep-coffee-img');img.src=ad.image_url;img.style.display='block';document.getElementById('ep-float-img').src=ad.image_url;}
+        var lines=(ad.description||'').split('\n');
+        document.getElementById('ep-left-title').innerHTML='<h2>'+esc(ad.title)+'</h2>'+(lines[0]?'<p>'+esc(lines[0])+'</p>':'');
+        var body='';
+        var rest=lines.slice(1).join('\n').trim();
+        if(rest)body+='<div style="font-size:.85rem;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:16px;white-space:pre-line;">'+esc(rest)+'</div>';
+        if(ad.link_url)body+='<a href="'+esc(ad.link_url)+'" target="_blank" rel="noopener" class="ep-btn-cta">자세히 보기 &#x2192;</a>';
+        document.getElementById('ep-body-content').innerHTML=body;
+      }
+      if(ad.image_url)document.getElementById('ep-float-img').src=ad.image_url;
       document.getElementById('ep-float-title').textContent=ad.title;
-      if(lines[0])document.getElementById('ep-float-sub').textContent=lines[0];
+      var lines2=(ad.description||'').split('\n');
+      if(lines2[0])document.getElementById('ep-float-sub').textContent=lines2[0];
       document.getElementById('ep-float').classList.remove('ep-float-hidden');
       if(shouldShow(ad.id))setTimeout(function(){document.getElementById('ep-overlay').classList.add('ep-visible');},1200);
     }catch(e){console.warn('팝업광고 로드 실패',e);}
@@ -683,6 +702,5 @@
   loadAd();
 })();
 </script>
-
 </body>
 </html>
