@@ -591,12 +591,20 @@
         // 댓글 저장 (비동기)
         if (comment) {
           try {
+            // IP 수집 — 여러 API 순차 시도
             let ip = '';
-            try { const r = await fetch('https://api.ipify.org?format=json'); const j = await r.json(); ip = j.ip || ''; } catch(e) {}
+            const ipApis = [
+              () => fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(j=>j.ip),
+              () => fetch('https://api64.ipify.org?format=json').then(r=>r.json()).then(j=>j.ip),
+              () => fetch('https://ipapi.co/json/').then(r=>r.json()).then(j=>j.ip),
+            ];
+            for (const apiFn of ipApis) {
+              try { ip = await apiFn(); if (ip) break; } catch(e) {}
+            }
             await fetch(SB_URL + '/rest/v1/cheer_comments', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'return=minimal' },
-              body: JSON.stringify({ comment: comment, rating: rating || 5, file_name: dlPopupFileKey, ip_address: ip })
+              body: JSON.stringify({ comment: comment, rating: rating || 5, file_name: dlPopupFileKey, ip_address: ip || null })
             });
           } catch(err) { console.warn('comment save failed', err); }
           setTimeout(function() { loadCheerSection(); loadInlineCheer(); }, 800);
