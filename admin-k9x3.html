@@ -1162,8 +1162,12 @@
     emailjs.init('pfch4UljsmWPFOJf9');
     const REPLY_TEMPLATE = 'template_tyx4s4b';
 
-    // ─── 비밀번호 (해시 비교) ───
-    const PASS = 'qwer1234))';
+    // ─── 비밀번호 (SHA-256 해시 비교 — 원문 비밀번호는 소스에 없음) ───
+    const PASS_HASH = '5d55e0106a552e6137cb77d5603a21dc92561c95a84e7d2442fbc672891a5898';
+    async function hashPw(pw) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
     let SESSION_KEY = 'ibt_admin_authed';
     let sessionTimer, warningTimer;
     const SESSION_DURATION = 30 * 60 * 1000; // 30분
@@ -1196,9 +1200,10 @@
     // 페이지 로드 시 버튼 상태 초기화
     updateNoTrackBtn();
 
-    function tryLogin() {
-      const val = document.getElementById('pw-input').value;
-      if (val === PASS) {
+    async function tryLogin() {
+      const val  = document.getElementById('pw-input').value;
+      const hash = await hashPw(val);
+      if (hash === PASS_HASH) {
         sessionStorage.setItem(SESSION_KEY, '1');
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
