@@ -88,15 +88,16 @@
 
     /* 채널 탭 */
     .tab-btn {
-      padding: .5rem 1rem; border-radius: 20px; font-size: .85rem; font-weight: 600;
-      border: none; cursor: pointer;
-      background: #fff; color: var(--ink-mid);
-      border: 1.5px solid var(--cream-dark);
-      transition: background .15s, color .15s, border-color .15s;
+      padding: .6rem 1.25rem; border-radius: 50px; font-size: .88rem; font-weight: 700;
+      cursor: pointer; background: transparent; color: var(--ink-mid);
+      border: 2px solid #CBD5E1;
+      transition: background .15s, color .15s, border-color .15s, transform .1s;
       white-space: nowrap;
     }
+    .tab-btn:hover { border-color: var(--blue); color: var(--blue); }
     .tab-btn.active {
       background: var(--blue); color: #fff; border-color: var(--blue);
+      box-shadow: 0 4px 14px rgba(30,58,138,.2);
     }
 
     /* 채널 섹션 */
@@ -240,10 +241,10 @@
     <div class="max-w-3xl mx-auto">
       <div class="card px-4 py-3">
         <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style="scrollbar-width:none; -ms-overflow-style:none;">
-          <button class="tab-btn active" onclick="showChannel('board')">📌 취업게시판</button>
-          <button class="tab-btn" onclick="showChannel('kakao')">💬 카카오톡</button>
-          <button class="tab-btn" onclick="showChannel('sns')">📷 인스타그램</button>
-          <button class="tab-btn" onclick="showChannel('email')">✉️ 교수 전달 메일</button>
+          <button class="tab-btn active" onclick="showChannel('board')">취업게시판</button>
+          <button class="tab-btn" onclick="showChannel('kakao')">카카오톡</button>
+          <button class="tab-btn" onclick="showChannel('sns')">인스타그램</button>
+          <button class="tab-btn" onclick="showChannel('email')">교수 전달 메일</button>
         </div>
       </div>
     </div>
