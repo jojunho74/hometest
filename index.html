@@ -471,23 +471,33 @@
         <p class="text-sm md:text-base" style="color:var(--ink-mid);">역량측정 · 점프업 실적 · 공기업 패키지 — 3가지 운영 유형에 맞춰<br class="hidden md:block"/>G-TELP IBT를 완전 무료로 연계해드립니다.</p>
         <p class="text-sm md:text-base font-bold mt-3" style="color:#DC2626;">※ 역량검사의 일부 프로그램은 유료로 제공됩니다.</p>
         <div class="flex flex-wrap justify-center gap-3 mt-5" id="pkg-banners">
-          <a href="package.html" id="pkg-banner-0" class="pkg-banner inline-flex items-center px-10 py-5 rounded-2xl font-bold text-white transition-all duration-500" style="font-size:1.25rem;background:#1E3A8A;box-shadow:0 4px 16px rgba(30,58,138,.4);text-decoration:none;cursor:pointer;">영어평가</a>
-          <a href="package.html" id="pkg-banner-1" class="pkg-banner inline-flex items-center px-10 py-5 rounded-2xl font-bold text-white transition-all duration-500" style="font-size:1.25rem;background:#065F46;box-shadow:0 4px 16px rgba(6,95,70,.4);text-decoration:none;cursor:pointer;">인적성</a>
-          <a href="package.html" id="pkg-banner-2" class="pkg-banner inline-flex items-center px-10 py-5 rounded-2xl font-bold text-white transition-all duration-500" style="font-size:1.25rem;background:#78350F;box-shadow:0 4px 16px rgba(120,53,15,.4);text-decoration:none;cursor:pointer;">AI감독</a>
+          <a href="package.html" id="pkg-banner-0" class="pkg-banner" style="display:inline-flex;align-items:center;padding:13px 32px;border-radius:50px;font-size:1.05rem;font-weight:800;text-decoration:none;transition:all .3s;background:#1E3A8A;color:#fff;border:2px solid #1E3A8A;cursor:pointer;">영어평가</a>
+          <a href="package.html" id="pkg-banner-1" class="pkg-banner" style="display:inline-flex;align-items:center;padding:13px 32px;border-radius:50px;font-size:1.05rem;font-weight:800;text-decoration:none;transition:all .3s;background:transparent;color:#475569;border:2px solid #CBD5E1;cursor:pointer;">인적성</a>
+          <a href="package.html" id="pkg-banner-2" class="pkg-banner" style="display:inline-flex;align-items:center;padding:13px 32px;border-radius:50px;font-size:1.05rem;font-weight:800;text-decoration:none;transition:all .3s;background:transparent;color:#475569;border:2px solid #CBD5E1;cursor:pointer;">AI감독</a>
         </div>
         <script>
           (function(){
             var banners = [
-              {el: document.getElementById('pkg-banner-0'), on:'#1E3A8A', onShadow:'rgba(30,58,138,.6)', off:'#334155', offShadow:'rgba(30,41,59,.3)'},
-              {el: document.getElementById('pkg-banner-1'), on:'#065F46', onShadow:'rgba(6,95,70,.6)',  off:'#334155', offShadow:'rgba(30,41,59,.3)'},
-              {el: document.getElementById('pkg-banner-2'), on:'#78350F', onShadow:'rgba(120,53,15,.6)', off:'#334155', offShadow:'rgba(30,41,59,.3)'}
+              document.getElementById('pkg-banner-0'),
+              document.getElementById('pkg-banner-1'),
+              document.getElementById('pkg-banner-2')
             ];
             var cur = 0;
             function tick() {
-              banners.forEach(function(b, i) {
-                b.el.style.background = i === cur ? b.on : b.off;
-                b.el.style.boxShadow = i === cur ? '0 4px 20px ' + b.onShadow : '0 2px 8px ' + b.offShadow;
-                b.el.style.transform = i === cur ? 'scale(1.06)' : 'scale(1)';
+              banners.forEach(function(el, i) {
+                if(i === cur){
+                  el.style.background = '#1E3A8A';
+                  el.style.color = '#fff';
+                  el.style.borderColor = '#1E3A8A';
+                  el.style.transform = 'scale(1.05)';
+                  el.style.boxShadow = '0 4px 16px rgba(30,58,138,.25)';
+                } else {
+                  el.style.background = 'transparent';
+                  el.style.color = '#475569';
+                  el.style.borderColor = '#CBD5E1';
+                  el.style.transform = 'scale(1)';
+                  el.style.boxShadow = 'none';
+                }
               });
               cur = (cur + 1) % banners.length;
             }
