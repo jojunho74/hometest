@@ -236,6 +236,50 @@
   </div>
 </section>
 
+<!-- ══ 취업 준비 학생 배너 ══ -->
+<section style="position:relative;background-image:url('./Gemini_Generated_Image_cz810vcz810vcz81.png');background-size:cover;background-position:center;padding:56px 16px 48px;text-align:center;">
+  <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(6,13,31,0.78) 0%,rgba(13,31,74,0.72) 50%,rgba(26,47,107,0.68) 100%);"></div>
+  <div style="position:relative;z-index:1;max-width:800px;margin:0 auto;">
+    <h2 style="font-size:clamp(1.6rem,4vw,2.8rem);font-weight:900;color:#fff;line-height:1.25;margin:0 0 24px;">
+      취업 준비 학생의<br>
+      <span style="background:linear-gradient(135deg,#60A5FA,#38BDF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">영어실력을 무료로</span><br>
+      진단해드립니다
+    </h2>
+    <a href="student.html" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:50px;font-size:1rem;font-weight:800;text-decoration:none;background:#D97706;color:#fff;box-shadow:0 4px 20px rgba(217,119,6,.6);transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">무료 영어진단 신청하기 →</a>
+  </div>
+</section>
+
+<!-- ══ IBT 패키지 배너 ══ -->
+<section style="background:#EFF6FF;padding:32px 16px;text-align:center;border-bottom:1px solid #BFDBFE;">
+  <p style="font-size:0.75rem;font-weight:700;color:#1E4D8C;background:#DBEAFE;display:inline-block;padding:4px 14px;border-radius:999px;margin-bottom:12px;">대학일자리플러스센터 전용</p>
+  <h3 style="font-size:clamp(1.3rem,3vw,2rem);font-weight:900;color:#1E293B;margin:0 0 6px;">우리 센터에 딱 맞는 <span style="background:linear-gradient(135deg,#1E3A8A,#0891B2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">IBT 패키지</span>를 선택하세요</h3>
+  <p style="font-size:0.85rem;color:#64748B;margin:0 0 16px;">역량측정 · 점프업 실적 · 공기업 패키지 — G-TELP IBT 완전 무료 연계</p>
+  <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;" id="lib-pkg-banners">
+    <a href="package.html" id="lib-pkg-0" style="display:inline-flex;align-items:center;padding:18px 40px;border-radius:16px;font-size:1.1rem;font-weight:800;color:#fff;text-decoration:none;background:#1E3A8A;box-shadow:0 4px 16px rgba(30,58,138,.4);transition:all .3s;">영어평가</a>
+    <a href="package.html" id="lib-pkg-1" style="display:inline-flex;align-items:center;padding:18px 40px;border-radius:16px;font-size:1.1rem;font-weight:800;color:#fff;text-decoration:none;background:#334155;box-shadow:0 2px 8px rgba(30,41,59,.3);transition:all .3s;">인적성</a>
+    <a href="package.html" id="lib-pkg-2" style="display:inline-flex;align-items:center;padding:18px 40px;border-radius:16px;font-size:1.1rem;font-weight:800;color:#fff;text-decoration:none;background:#334155;box-shadow:0 2px 8px rgba(30,41,59,.3);transition:all .3s;">AI감독</a>
+  </div>
+  <script>
+    (function(){
+      var pkgs = [
+        {el:document.getElementById('lib-pkg-0'), on:'#1E3A8A', onS:'rgba(30,58,138,.6)', off:'#334155', offS:'rgba(30,41,59,.3)'},
+        {el:document.getElementById('lib-pkg-1'), on:'#065F46', onS:'rgba(6,95,70,.6)',   off:'#334155', offS:'rgba(30,41,59,.3)'},
+        {el:document.getElementById('lib-pkg-2'), on:'#78350F', onS:'rgba(120,53,15,.6)', off:'#334155', offS:'rgba(30,41,59,.3)'}
+      ];
+      var cur = 0;
+      function tick(){
+        pkgs.forEach(function(p,i){
+          p.el.style.background  = i===cur ? p.on  : p.off;
+          p.el.style.boxShadow   = i===cur ? '0 4px 20px '+p.onS : '0 2px 8px '+p.offS;
+          p.el.style.transform   = i===cur ? 'scale(1.06)' : 'scale(1)';
+        });
+        cur=(cur+1)%pkgs.length;
+      }
+      tick(); setInterval(tick,1000);
+    })();
+  </script>
+</section>
+
 <!-- ══ 응원 메시지 티커 ══ -->
 <div class="cheer-section" id="cheer-section" style="display:none;">
   <div class="cheer-track" id="cheer-track"></div>
