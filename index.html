@@ -1491,39 +1491,39 @@
   }
   .ep-overlay.ep-visible { opacity:1; pointer-events:auto; }
   .ep-popup {
-    position:relative; width:100%; max-width:340px;
-    border-radius:24px; overflow:hidden;
+    position:relative; width:100%; max-width:272px;
+    border-radius:20px; overflow:hidden;
     box-shadow:0 32px 80px rgba(0,0,0,.8), 0 0 0 1.5px rgba(255,214,0,.2);
     transform:translateY(24px) scale(.97); transition:transform .35s;
   }
   .ep-overlay.ep-visible .ep-popup { transform:translateY(0) scale(1); }
-  /* 팝업 상단 닫기 바 */
+  /* 상단 닫기 바 */
   .ep-topbar {
     background:#111; display:flex; align-items:center; justify-content:space-between;
-    padding:10px 16px;
+    padding:8px 12px;
   }
-  .ep-topbar-label { font-size:.7rem; font-weight:700; color:#FFD600; letter-spacing:.06em; }
+  .ep-topbar-label { font-size:.62rem; font-weight:700; color:#FFD600; letter-spacing:.06em; }
   .ep-close {
     display:flex; align-items:center; justify-content:center;
-    width:36px; height:36px; border-radius:50%;
-    background:#FFD600; border:none; cursor:pointer;
-    color:#111; font-size:1.1rem; font-weight:900;
-    box-shadow:0 2px 8px rgba(0,0,0,.3);
+    width:44px; height:44px; border-radius:50%;
+    background:#FFD600; border:3px solid #111; cursor:pointer;
+    color:#111; font-size:1.3rem; font-weight:900;
+    box-shadow:0 4px 12px rgba(0,0,0,.5);
     transition:background .15s, transform .15s;
     flex-shrink:0;
   }
-  .ep-close:hover { background:#FFC200; transform:scale(1.08); }
+  .ep-close:hover { background:#FFC200; transform:scale(1.12); }
   .ep-header {
     background:#FFD600; position:relative; overflow:hidden;
-    padding:14px 20px 0; text-align:center; min-height:170px;
+    padding:10px 16px 0; text-align:center; min-height:136px;
     display:flex; flex-direction:column; align-items:center;
   }
   .ep-badge {
     position:relative; z-index:2;
-    display:inline-flex; align-items:center; gap:5px;
-    font-size:.63rem; font-weight:900; letter-spacing:.1em;
-    padding:4px 12px; border-radius:999px;
-    background:#111; color:#FFD600; margin-bottom:10px;
+    display:inline-flex; align-items:center; gap:4px;
+    font-size:.55rem; font-weight:900; letter-spacing:.1em;
+    padding:3px 10px; border-radius:999px;
+    background:#111; color:#FFD600; margin-bottom:8px;
   }
   .ep-img-wrap {
     position:relative; z-index:2;
@@ -1531,57 +1531,57 @@
     width:100%; flex:1;
   }
   .ep-coffee-img {
-    height:130px; object-fit:contain;
+    height:104px; object-fit:contain;
     animation:epFloat 3s ease-in-out infinite;
-    filter:drop-shadow(0 10px 20px rgba(0,0,0,.35));
+    filter:drop-shadow(0 8px 16px rgba(0,0,0,.35));
   }
-  @keyframes epFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  @keyframes epFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
   .ep-kakao-bubble {
-    position:absolute; left:14px; bottom:10px; z-index:3;
+    position:absolute; left:10px; bottom:8px; z-index:3;
     background:#FEE500; border-radius:50% 50% 50% 10%;
-    width:38px; height:38px;
+    width:30px; height:30px;
     display:flex; align-items:center; justify-content:center;
-    box-shadow:3px 3px 0 rgba(0,0,0,.2);
+    box-shadow:2px 2px 0 rgba(0,0,0,.2);
     animation:epBubble 2.6s ease-in-out infinite;
   }
-  @keyframes epBubble { 0%,100%{transform:translateY(0) rotate(-10deg)} 50%{transform:translateY(-6px) rotate(-10deg)} }
+  @keyframes epBubble { 0%,100%{transform:translateY(0) rotate(-10deg)} 50%{transform:translateY(-5px) rotate(-10deg)} }
   .ep-gift-badge {
-    position:absolute; right:14px; bottom:8px; z-index:3;
-    background:#111; border-radius:10px; padding:6px 8px;
-    text-align:center; box-shadow:4px 4px 0 rgba(0,0,0,.25);
+    position:absolute; right:10px; bottom:6px; z-index:3;
+    background:#111; border-radius:8px; padding:5px 7px;
+    text-align:center; box-shadow:3px 3px 0 rgba(0,0,0,.25);
     animation:epCard 3.5s ease-in-out infinite;
   }
-  @keyframes epCard { 0%,100%{transform:translateY(0) rotate(5deg)} 50%{transform:translateY(-6px) rotate(5deg)} }
-  .ep-body { background:#111; padding:16px 18px 18px; }
-  .ep-title { font-size:1.2rem; font-weight:900; color:#FFD600; text-align:center; line-height:1.25; margin-bottom:3px; }
-  .ep-sub   { font-size:.7rem; color:rgba(255,255,255,.5); text-align:center; margin-bottom:14px; }
-  .ep-steps { display:flex; flex-direction:column; gap:7px; margin-bottom:12px; }
-  .ep-step  { display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border-radius:11px; background:#1C1C1C; border:1.5px solid #272727; }
-  .ep-num   { width:22px; height:22px; border-radius:50%; background:#FFD600; color:#111; font-size:.65rem; font-weight:900; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
-  .ep-stext { font-size:.78rem; color:#fff; font-weight:700; line-height:1.4; }
-  .ep-ssub  { font-size:.65rem; color:#777; margin-top:2px; }
-  .ep-prize { background:linear-gradient(90deg,#FFD600,#FFC200); border-radius:11px; padding:11px 14px; display:flex; align-items:center; gap:10px; margin-bottom:10px; box-shadow:0 4px 16px rgba(255,214,0,.2); }
-  .ep-prize-icon { font-size:1.7rem; }
-  .ep-prize-name { font-size:.88rem; font-weight:900; color:#111; }
-  .ep-prize-count { display:inline-flex; align-items:center; font-size:.63rem; font-weight:900; color:#FFD600; background:#111; border-radius:999px; padding:2px 9px; margin-top:3px; }
-  .ep-prize-desc  { font-size:.65rem; color:#555; margin-top:2px; }
-  .ep-announce { background:#1A1A1A; border:1.5px solid #272727; border-radius:10px; padding:9px 12px; display:flex; align-items:center; gap:9px; margin-bottom:14px; }
-  .ep-announce-text { font-size:.7rem; color:#bbb; line-height:1.5; }
+  @keyframes epCard { 0%,100%{transform:translateY(0) rotate(5deg)} 50%{transform:translateY(-5px) rotate(5deg)} }
+  .ep-body { background:#111; padding:13px 14px 15px; }
+  .ep-title { font-size:.96rem; font-weight:900; color:#FFD600; text-align:center; line-height:1.25; margin-bottom:2px; }
+  .ep-sub   { font-size:.58rem; color:rgba(255,255,255,.5); text-align:center; margin-bottom:11px; }
+  .ep-steps { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+  .ep-step  { display:flex; align-items:flex-start; gap:8px; padding:8px 10px; border-radius:9px; background:#1C1C1C; border:1.5px solid #272727; }
+  .ep-num   { width:18px; height:18px; border-radius:50%; background:#FFD600; color:#111; font-size:.58rem; font-weight:900; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .ep-stext { font-size:.65rem; color:#fff; font-weight:700; line-height:1.4; }
+  .ep-ssub  { font-size:.56rem; color:#777; margin-top:1px; }
+  .ep-prize { background:linear-gradient(90deg,#FFD600,#FFC200); border-radius:9px; padding:9px 11px; display:flex; align-items:center; gap:8px; margin-bottom:8px; box-shadow:0 3px 12px rgba(255,214,0,.2); }
+  .ep-prize-icon { font-size:1.4rem; }
+  .ep-prize-name { font-size:.72rem; font-weight:900; color:#111; }
+  .ep-prize-count { display:inline-flex; align-items:center; font-size:.55rem; font-weight:900; color:#FFD600; background:#111; border-radius:999px; padding:1px 8px; margin-top:2px; }
+  .ep-prize-desc  { font-size:.55rem; color:#555; margin-top:2px; }
+  .ep-announce { background:#1A1A1A; border:1.5px solid #272727; border-radius:8px; padding:7px 10px; display:flex; align-items:center; gap:7px; margin-bottom:11px; }
+  .ep-announce-text { font-size:.6rem; color:#bbb; line-height:1.5; }
   .ep-announce-text strong { color:#FFD600; }
   .ep-btn-kakao {
-    width:100%; padding:13px; border-radius:11px; border:none; cursor:pointer;
-    background:#FEE500; color:#3C1E1E; font-size:.88rem; font-weight:900;
-    display:flex; align-items:center; justify-content:center; gap:7px;
-    box-shadow:0 4px 16px rgba(254,229,0,.3);
-    text-decoration:none; margin-bottom:8px;
+    width:100%; padding:11px; border-radius:9px; border:none; cursor:pointer;
+    background:#FEE500; color:#3C1E1E; font-size:.74rem; font-weight:900;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    box-shadow:0 3px 12px rgba(254,229,0,.3);
+    text-decoration:none; margin-bottom:6px;
     transition:transform .15s, box-shadow .15s;
   }
-  .ep-btn-kakao:hover { transform:scale(1.02); box-shadow:0 8px 28px rgba(254,229,0,.5); }
+  .ep-btn-kakao:hover { transform:scale(1.02); box-shadow:0 6px 22px rgba(254,229,0,.5); }
   .ep-btn-board {
-    width:100%; padding:10px; border-radius:11px;
+    width:100%; padding:8px; border-radius:9px;
     border:1.5px solid #2A2A2A; cursor:pointer;
-    background:transparent; color:#aaa; font-size:.8rem; font-weight:700;
-    display:flex; align-items:center; justify-content:center; gap:6px;
+    background:transparent; color:#aaa; font-size:.68rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; gap:5px;
     text-decoration:none; transition:border-color .15s, color .15s;
   }
   .ep-btn-board:hover { border-color:#FFD600; color:#FFD600; }
