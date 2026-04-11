@@ -560,11 +560,22 @@
       };
 
       window.onDlBtnClick = async function(e) {
+        e.preventDefault(); // <a> 기본 동작 차단 (팝업 중복 방지)
         const comment = document.getElementById('dl-comment').value.trim();
         const rating  = dlPopupRating || 0;
 
-        // 팝업 차단 방지: 클릭 이벤트 직접 컨텍스트에서 즉시 새 창 열기
-        const studentWin = window.open('https://hometest-weld.vercel.app/student.html', '_blank');
+        // 1. 파일 다운로드 트리거 (숨김 <a> 클릭 — 팝업 아님)
+        if (dlPopupHref && dlPopupHref !== '#') {
+          var da = document.createElement('a');
+          da.href = dlPopupHref;
+          da.download = '';
+          document.body.appendChild(da);
+          da.click();
+          document.body.removeChild(da);
+        }
+
+        // 2. student.html 새 탭 (단 하나의 window.open — 차단 안 됨)
+        window.open('https://hometest-weld.vercel.app/student.html', '_blank');
 
         // 별점 저장 (비동기)
         if (rating > 0) {
