@@ -1514,21 +1514,36 @@
 
   /* 좌측: 커피 이미지 패널 */
   .ep-left {
-    width:260px; flex-shrink:0;
-    background:#fff; border-radius:24px 0 0 24px;
+    width:280px; flex-shrink:0;
+    background:#111; border-radius:24px 0 0 24px;
     display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
-    padding:20px 16px 0; overflow:hidden;
+    padding:20px 16px 0; overflow:hidden; position:relative;
   }
   .ep-event-label {
     display:inline-flex; align-items:center; gap:5px;
     font-size:.68rem; font-weight:900; letter-spacing:.08em;
     padding:4px 12px; border-radius:999px;
-    background:#111; color:#FFD600; margin-bottom:12px;
+    background:#FFD600; color:#111; margin-bottom:10px;
+    position:relative; z-index:2;
+  }
+  /* 제목을 이미지 위에 오버레이 */
+  .ep-left-title {
+    position:relative; z-index:2; text-align:center;
+    margin-bottom:10px;
+  }
+  .ep-left-title h2 {
+    font-size:1.55rem; font-weight:900; color:#fff; line-height:1.2;
+    margin:0 0 5px; text-shadow:0 2px 12px rgba(0,0,0,.5);
+  }
+  .ep-left-title p {
+    font-size:.72rem; color:rgba(255,255,255,.7); margin:0;
+    text-shadow:0 1px 6px rgba(0,0,0,.5);
   }
   .ep-coffee-img {
     width:100%; object-fit:contain; display:block;
     animation:epFloat 3s ease-in-out infinite;
-    filter:drop-shadow(0 10px 24px rgba(0,0,0,.18));
+    filter:drop-shadow(0 10px 24px rgba(0,0,0,.3));
+    position:relative; z-index:1;
   }
   @keyframes epFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 
@@ -1538,9 +1553,6 @@
     padding:22px 20px 20px; display:flex; flex-direction:column;
     overflow-y:auto; max-height:90vh;
   }
-  .ep-title { font-size:1.25rem; font-weight:900; color:#FFD600; line-height:1.25; margin-bottom:3px; }
-  .ep-sub   { font-size:.7rem; color:rgba(255,255,255,.5); margin-bottom:14px; }
-
   .ep-steps { display:flex; flex-direction:column; gap:7px; margin-bottom:12px; }
   .ep-step  { display:flex; align-items:flex-start; gap:9px; padding:10px 12px; border-radius:11px; background:#1C1C1C; border:1.5px solid #272727; }
   .ep-num   { width:21px; height:21px; border-radius:50%; background:#FFD600; color:#111; font-size:.65rem; font-weight:900; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
@@ -1592,17 +1604,19 @@
 
     <button class="ep-close" onclick="epClose()" aria-label="닫기">✕</button>
 
-    <!-- 좌측: 커피 이미지 -->
+    <!-- 좌측: 커피 이미지 + 제목 -->
     <div class="ep-left">
       <div class="ep-event-label">🎉 5월 이벤트</div>
+      <div class="ep-left-title">
+        <h2>친구 추천하고<br>커피 받자! ☕</h2>
+        <p>사연 추첨 10명 · MEGA 아메리카노 카카오 선물</p>
+      </div>
       <img src="커피.jpg" alt="MEGA COFFEE 아이스아메리카노" class="ep-coffee-img"
         onerror="this.style.display='none'">
     </div>
 
     <!-- 우측: 이벤트 내용 -->
     <div class="ep-right">
-      <div class="ep-title">친구 추천하고<br>커피 받자! ☕</div>
-      <div class="ep-sub">사연 추첨 10명 · MEGA 아메리카노 카카오 선물</div>
 
       <div class="ep-steps">
         <div class="ep-step">
