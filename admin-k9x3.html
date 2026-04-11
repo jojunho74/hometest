@@ -2899,34 +2899,43 @@ ${internalSummary}
     });
 
     // ─── 다운로드 댓글 모달 ───
-    function openDlCommentModal(fileKey, institution, title) {
-      const bg    = document.getElementById('dl-comment-modal-bg');
-      const tEl   = document.getElementById('dl-comment-modal-title');
-      const body  = document.getElementById('dl-comment-modal-body');
-      const items = (window._dlCommentData || {})[fileKey] || [];
+    async function openDlCommentModal(fileKey, institution, title) {
+      const bg   = document.getElementById('dl-comment-modal-bg');
+      const tEl  = document.getElementById('dl-comment-modal-title');
+      const body = document.getElementById('dl-comment-modal-body');
 
       tEl.textContent = institution + ' · ' + title;
+      body.innerHTML  = '<p class="text-center text-slate-400 text-sm py-8">불러오는 중...</p>';
+      bg.style.display = 'flex';
 
-      const stars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
-      if (items.length === 0) {
+      // Supabase에서 실시간 직접 조회
+      const { data: items, error } = await db
+        .from('cheer_comments')
+        .select('comment, rating, created_at, ip_address')
+        .eq('file_name', fileKey)
+        .order('created_at', { ascending: false });
+
+      if (error || !items || items.length === 0) {
         body.innerHTML = '<p class="text-center text-slate-400 text-sm py-8">댓글이 없습니다.</p>';
-      } else {
-        body.innerHTML = items.map(c => {
-          const date = new Date(c.created_at).toLocaleDateString('ko-KR', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
-          const ip   = c.ip_address ? `<span style="font-size:0.7rem;color:#94A3B8;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:4px;padding:1px 6px;margin-left:6px;">🌐 ${c.ip_address}</span>` : '';
-          return `<div style="padding:12px 0;border-bottom:1px solid #F1F5F9;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:4px;">
-              <div style="display:flex;align-items:center;">
-                <span style="color:#F59E0B;font-size:0.8rem;letter-spacing:1px;">${stars(c.rating||5)}</span>${ip}
-              </div>
-              <span style="font-size:0.72rem;color:#94A3B8;">${date}</span>
-            </div>
-            <p style="font-size:0.85rem;color:#334155;margin:0;line-height:1.5;">${c.comment || ''}</p>
-          </div>`;
-        }).join('');
+        return;
       }
 
-      bg.style.display = 'flex';
+      const stars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+      body.innerHTML = items.map(c => {
+        const date = new Date(c.created_at).toLocaleDateString('ko-KR', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+        const ip   = c.ip_address
+          ? `<span style="font-size:0.7rem;color:#94A3B8;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:4px;padding:1px 6px;margin-left:6px;">🌐 ${c.ip_address}</span>`
+          : '';
+        return `<div style="padding:12px 0;border-bottom:1px solid #F1F5F9;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:4px;">
+            <div style="display:flex;align-items:center;">
+              <span style="color:#F59E0B;font-size:0.8rem;letter-spacing:1px;">${stars(c.rating||5)}</span>${ip}
+            </div>
+            <span style="font-size:0.72rem;color:#94A3B8;">${date}</span>
+          </div>
+          <p style="font-size:0.85rem;color:#334155;margin:0;line-height:1.5;">${c.comment || ''}</p>
+        </div>`;
+      }).join('');
     }
 
     function closeDlCommentModal() {
