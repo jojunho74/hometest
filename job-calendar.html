@@ -238,5 +238,113 @@ sbGet('job_calendar','select=company,event_date,event_type&order=event_date.asc'
   document.getElementById('cal-grid').innerHTML='<div class="err" style="grid-column:1/-1;">연결 오류: '+e.message+'</div>';
 });
 </script>
+
+<!-- ── 팝업광고 플로팅 배너 ── -->
+<style>
+.ep-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:80px 16px 16px;opacity:0;transition:opacity .35s;pointer-events:none;}
+.ep-overlay.ep-visible{opacity:1;pointer-events:auto;}
+.ep-popup{position:relative;width:100%;max-width:680px;border-radius:24px;overflow:visible;box-shadow:0 32px 80px rgba(0,0,0,.75);display:flex;transform:translateY(20px) scale(.97);transition:transform .35s;}
+.ep-overlay.ep-visible .ep-popup{transform:translateY(0) scale(1);}
+.ep-close{position:absolute;top:-22px;right:-22px;z-index:20;width:56px;height:56px;border-radius:50%;background:#FF3B30;border:3px solid #fff;cursor:pointer;color:#fff;font-size:1.6rem;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(255,59,48,.65);transition:transform .15s,box-shadow .15s;}
+.ep-close:hover{transform:scale(1.13);box-shadow:0 10px 32px rgba(255,59,48,.9);}
+.ep-left{width:280px;flex-shrink:0;background:#111;border-radius:24px 0 0 24px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:20px 16px 0;overflow:hidden;position:relative;}
+.ep-event-label{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:900;letter-spacing:.08em;padding:4px 12px;border-radius:999px;background:#FFD600;color:#111;margin-bottom:10px;position:relative;z-index:2;}
+.ep-left-title{position:relative;z-index:2;text-align:center;margin-bottom:10px;}
+.ep-left-title h2{font-size:1.45rem;font-weight:900;color:#fff;line-height:1.2;margin:0 0 5px;text-shadow:0 2px 12px rgba(0,0,0,.5);}
+.ep-left-title p{font-size:.72rem;color:rgba(255,255,255,.7);margin:0;text-shadow:0 1px 6px rgba(0,0,0,.5);}
+.ep-coffee-img{width:100%;object-fit:contain;display:block;animation:epFloat 3s ease-in-out infinite;filter:drop-shadow(0 10px 24px rgba(0,0,0,.3));position:relative;z-index:1;}
+@keyframes epFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.ep-right{flex:1;background:#111;border-radius:0 24px 24px 0;padding:22px 20px 20px;display:flex;flex-direction:column;overflow-y:auto;max-height:90vh;}
+.ep-btn-cta{width:100%;padding:13px;border-radius:11px;border:none;cursor:pointer;background:#FEE500;color:#3C1E1E;font-size:.88rem;font-weight:900;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 14px rgba(254,229,0,.3);text-decoration:none;margin-bottom:7px;transition:transform .15s,box-shadow .15s;}
+.ep-btn-cta:hover{transform:scale(1.02);box-shadow:0 8px 24px rgba(254,229,0,.5);}
+.ep-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+.ep-fine{font-size:.6rem;color:#333;}
+.ep-today-hide{font-size:.65rem;color:#555;background:none;border:none;cursor:pointer;text-decoration:underline;}
+.ep-today-hide:hover{color:#888;}
+@media(max-width:560px){.ep-popup{flex-direction:column;max-width:340px;}.ep-left{width:100%;border-radius:24px 24px 0 0;padding:16px 16px 0;max-height:220px;}.ep-right{border-radius:0 0 24px 24px;}}
+.ep-float{position:fixed;bottom:28px;right:24px;z-index:8888;display:flex;align-items:center;border-radius:18px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.35),0 0 0 2px rgba(255,214,0,.5);cursor:pointer;border:none;padding:0;background:none;animation:epFloatBounce 2.8s ease-in-out infinite;transition:transform .15s,box-shadow .15s;}
+.ep-float:hover{transform:scale(1.05) translateY(-3px)!important;box-shadow:0 16px 44px rgba(0,0,0,.45),0 0 0 2.5px #FFD600;animation:none;}
+@keyframes epFloatBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.ep-float-img{background:#FFD600;width:62px;height:70px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex-shrink:0;}
+.ep-float-img img{width:54px;object-fit:contain;display:block;}
+.ep-float-info{background:#111;padding:10px 36px 10px 12px;display:flex;flex-direction:column;justify-content:center;gap:2px;}
+.ep-float-tag{font-size:.58rem;font-weight:900;color:#FFD600;letter-spacing:.07em;}
+.ep-float-title{font-size:.82rem;font-weight:900;color:#fff;line-height:1.2;white-space:nowrap;}
+.ep-float-sub{font-size:.6rem;color:rgba(255,255,255,.5);white-space:nowrap;}
+.ep-float-close{position:absolute;top:5px;right:8px;font-size:.75rem;color:rgba(255,255,255,.35);background:none;border:none;cursor:pointer;line-height:1;padding:2px 3px;}
+.ep-float-close:hover{color:#fff;}
+.ep-float.ep-float-hidden{display:none;}
+</style>
+<div class="ep-overlay" id="ep-overlay">
+  <div class="ep-popup">
+    <button class="ep-close" onclick="epClose()" aria-label="닫기">&#x2715;</button>
+    <div class="ep-left">
+      <div class="ep-event-label">&#x1F4E2; 이벤트</div>
+      <div class="ep-left-title" id="ep-left-title"></div>
+      <img id="ep-coffee-img" class="ep-coffee-img" alt="" style="display:none;" onerror="this.style.display='none'">
+    </div>
+    <div class="ep-right">
+      <div id="ep-body-content" style="flex:1;"></div>
+      <div class="ep-footer">
+        <span class="ep-fine">이벤트는 예고 없이 종료될 수 있습니다</span>
+        <button class="ep-today-hide" onclick="epHideToday()">오늘 하루 보지 않기</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="ep-float ep-float-hidden" id="ep-float" onclick="epShow()" role="button" aria-label="이벤트 보기">
+  <div class="ep-float-img"><img id="ep-float-img" src="" alt="이벤트"></div>
+  <div class="ep-float-info">
+    <span class="ep-float-tag" id="ep-float-tag">&#x1F4E2; 이벤트</span>
+    <span class="ep-float-title" id="ep-float-title">이벤트 진행 중</span>
+    <span class="ep-float-sub" id="ep-float-sub"></span>
+  </div>
+  <button class="ep-float-close" onclick="event.stopPropagation();document.getElementById('ep-float').classList.add('ep-float-hidden');" aria-label="배너 닫기">&#x2715;</button>
+</div>
+<script>
+(function(){
+  var SB_URL='https://byzulmxcuhsrjdphmuym.supabase.co';
+  var SB_KEY='sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
+  var EP_PERM='ep_closed_';
+  var EP_KEY='ep_hide_';
+  var _adId=null;
+  function shouldShow(id){
+    if(localStorage.getItem(EP_PERM+id)==='1')return false;
+    var v=localStorage.getItem(EP_KEY+id);
+    if(!v)return true;
+    return Date.now()>parseInt(v);
+  }
+  function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  async function loadAd(){
+    try{
+      var today=new Date().toISOString().slice(0,10);
+      var q=SB_URL+'/rest/v1/popup_ads?is_active=eq.true&order=created_at.desc&limit=1'
+        +'&or=(start_date.is.null,start_date.lte.'+today+')'
+        +'&or=(end_date.is.null,end_date.gte.'+today+')';
+      var r=await fetch(q,{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});
+      var data=await r.json();
+      if(!data||!data.length)return;
+      var ad=data[0];_adId=ad.id;
+      if(ad.image_url){var img=document.getElementById('ep-coffee-img');img.src=ad.image_url;img.style.display='block';document.getElementById('ep-float-img').src=ad.image_url;}
+      var lines=(ad.description||'').split('\n');
+      document.getElementById('ep-left-title').innerHTML='<h2>'+esc(ad.title)+'</h2>'+(lines[0]?'<p>'+esc(lines[0])+'</p>':'');
+      var body='';
+      var rest=lines.slice(1).join('\n').trim();
+      if(rest)body+='<div style="font-size:.85rem;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:16px;white-space:pre-line;">'+esc(rest)+'</div>';
+      if(ad.link_url)body+='<a href="'+esc(ad.link_url)+'" target="_blank" rel="noopener" class="ep-btn-cta">자세히 보기 &#x2192;</a>';
+      document.getElementById('ep-body-content').innerHTML=body;
+      document.getElementById('ep-float-title').textContent=ad.title;
+      if(lines[0])document.getElementById('ep-float-sub').textContent=lines[0];
+      document.getElementById('ep-float').classList.remove('ep-float-hidden');
+      if(shouldShow(ad.id))setTimeout(function(){document.getElementById('ep-overlay').classList.add('ep-visible');},1200);
+    }catch(e){console.warn('팝업광고 로드 실패',e);}
+  }
+  window.epShow=function(){document.getElementById('ep-overlay').classList.add('ep-visible');};
+  window.epClose=function(){if(_adId)localStorage.setItem(EP_PERM+_adId,'1');document.getElementById('ep-overlay').classList.remove('ep-visible');};
+  window.epHideToday=function(){var m=new Date();m.setHours(23,59,59,999);if(_adId)localStorage.setItem(EP_KEY+_adId,m.getTime());document.getElementById('ep-overlay').classList.remove('ep-visible');};
+  loadAd();
+})();
+</script>
+
 </body>
 </html>
