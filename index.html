@@ -619,6 +619,15 @@
           </div>
           <h3 class="font-display text-xl font-bold mb-2" style="color:var(--ink);">신청이 완료되었습니다!</h3>
           <p class="text-sm leading-relaxed" style="color:var(--ink-soft);">접수 완료! 2영업일 내 연락드립니다.</p>
+
+          <!-- 리퍼럴 공유 -->
+          <div style="margin-top:28px;padding-top:24px;border-top:1px solid #F1F5F9;">
+            <p style="font-size:.78rem;font-weight:700;color:#94A3B8;letter-spacing:.05em;margin-bottom:12px;">👋 같은 업무 담당하는 동료에게도 알려주세요</p>
+            <button onclick="shareKakao('referral')" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;border-radius:50px;border:none;cursor:pointer;background:#FEE500;color:#3C1E1E;font-size:.9rem;font-weight:800;transition:opacity .15s;box-shadow:0 4px 14px rgba(254,229,0,.4);" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><ellipse cx="9" cy="7.5" rx="7.5" ry="6" fill="#3C1E1E"/><path d="M5 7.5c0-.8.7-1.5 1.5-1.5S8 6.7 8 7.5 7.3 9 6.5 9 5 8.3 5 7.5zm3.5 0c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5S11.3 9 10.5 9 8.5 8.3 8.5 7.5zm3.5 0c0-.8.7-1.5 1.5-1.5S15 6.7 15 7.5 14.3 9 13.5 9 12 8.3 12 7.5z" fill="#FEE500"/><path d="M9 12.5c-.9 0-1.8-.15-2.6-.42L4.5 13.5l.8-2.1A5.94 5.94 0 0 1 3 7.5C3 4.46 5.69 2 9 2s6 2.46 6 5.5-2.69 5.5-6 5.5z" fill="none"/></svg>
+              카카오톡으로 공유하기
+            </button>
+          </div>
         </div>
 
       </form>
@@ -1084,10 +1093,16 @@
   <!-- 카카오 SDK -->
   <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
   <script>
-    function shareKakao() {
+    function shareKakao(mode) {
       var url = 'https://hometest-weld.vercel.app';
-      var title = '지텔프IBT 대학컨설팅 — 취업 영어실력 무료 진단';
-      var desc  = '국제공인 G-TELP IBT 시험 최대 200명 전액 무료 지원. 대학교 취업지원센터 맞춤 프로그램.';
+      var title, desc;
+      if (mode === 'referral') {
+        title = '취업지원센터 담당자분들께 추천드려요';
+        desc  = '저도 방금 신청했는데, G-TELP IBT 최대 200명 전액 무료 지원입니다. 코드 배포만 하면 돼서 업무 부담이 거의 없어요.';
+      } else {
+        title = '지텔프IBT 대학컨설팅 — 취업 영어실력 무료 진단';
+        desc  = '국제공인 G-TELP IBT 시험 최대 200명 전액 무료 지원. 대학교 취업지원센터 맞춤 프로그램.';
+      }
       // ① Kakao SDK
       if (window.Kakao) {
         try {
