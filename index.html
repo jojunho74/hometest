@@ -1486,7 +1486,9 @@
     position:fixed; inset:0; z-index:9999;
     background:rgba(0,0,0,0.75); backdrop-filter:blur(6px);
     display:flex; align-items:center; justify-content:center;
-    padding:80px 16px 16px; opacity:0; transition:opacity .35s; pointer-events:none;
+    padding:70px 16px 16px;
+    opacity:0; transition:opacity .35s; pointer-events:none;
+    overflow-y:auto;
   }
   .ep-overlay.ep-visible { opacity:1; pointer-events:auto; }
 
@@ -1495,17 +1497,17 @@
     position:relative; width:100%; max-width:680px;
     border-radius:24px; overflow:visible;
     box-shadow:0 32px 80px rgba(0,0,0,.75);
-    display:flex;
+    display:flex; flex-shrink:0;
     transform:translateY(20px) scale(.97); transition:transform .35s;
   }
   .ep-overlay.ep-visible .ep-popup { transform:translateY(0) scale(1); }
 
-  /* X 닫기 — 우상단 밖 */
+  /* X 닫기 */
   .ep-close {
     position:absolute; top:-22px; right:-22px; z-index:20;
-    width:56px; height:56px; border-radius:50%;
+    width:52px; height:52px; border-radius:50%;
     background:#FF3B30; border:3px solid #fff; cursor:pointer;
-    color:#fff; font-size:1.6rem; font-weight:900;
+    color:#fff; font-size:1.5rem; font-weight:900;
     display:flex; align-items:center; justify-content:center;
     box-shadow:0 6px 24px rgba(255,59,48,.65);
     transition:transform .15s, box-shadow .15s;
@@ -1514,29 +1516,27 @@
 
   /* 좌측: 커피 이미지 패널 */
   .ep-left {
-    width:280px; flex-shrink:0;
+    width:260px; flex-shrink:0;
     background:#111; border-radius:24px 0 0 24px;
     display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
-    padding:20px 16px 0; overflow:hidden; position:relative;
+    padding:20px 14px 0; overflow:hidden; position:relative;
   }
   .ep-event-label {
     display:inline-flex; align-items:center; gap:5px;
-    font-size:.68rem; font-weight:900; letter-spacing:.08em;
-    padding:4px 12px; border-radius:999px;
-    background:#FFD600; color:#111; margin-bottom:10px;
+    font-size:.65rem; font-weight:900; letter-spacing:.08em;
+    padding:4px 11px; border-radius:999px;
+    background:#FFD600; color:#111; margin-bottom:8px;
     position:relative; z-index:2;
   }
-  /* 제목을 이미지 위에 오버레이 */
   .ep-left-title {
-    position:relative; z-index:2; text-align:center;
-    margin-bottom:10px;
+    position:relative; z-index:2; text-align:center; margin-bottom:8px;
   }
   .ep-left-title h2 {
-    font-size:1.55rem; font-weight:900; color:#fff; line-height:1.2;
-    margin:0 0 5px; text-shadow:0 2px 12px rgba(0,0,0,.5);
+    font-size:1.35rem; font-weight:900; color:#fff; line-height:1.2;
+    margin:0 0 4px; text-shadow:0 2px 12px rgba(0,0,0,.5);
   }
   .ep-left-title p {
-    font-size:.72rem; color:rgba(255,255,255,.7); margin:0;
+    font-size:.68rem; color:rgba(255,255,255,.7); margin:0;
     text-shadow:0 1px 6px rgba(0,0,0,.5);
   }
   .ep-coffee-img {
@@ -1549,29 +1549,29 @@
 
   /* 우측: 이벤트 정보 패널 */
   .ep-right {
-    flex:1; background:#111; border-radius:0 24px 24px 0;
-    padding:22px 20px 20px; display:flex; flex-direction:column;
-    overflow-y:auto; max-height:90vh;
+    flex:1; min-width:0; background:#111; border-radius:0 24px 24px 0;
+    padding:20px 18px 18px; display:flex; flex-direction:column;
+    overflow-y:auto;
   }
-  .ep-steps { display:flex; flex-direction:column; gap:7px; margin-bottom:12px; }
-  .ep-step  { display:flex; align-items:flex-start; gap:9px; padding:10px 12px; border-radius:11px; background:#1C1C1C; border:1.5px solid #272727; }
-  .ep-num   { width:21px; height:21px; border-radius:50%; background:#FFD600; color:#111; font-size:.65rem; font-weight:900; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
-  .ep-stext { font-size:.78rem; color:#fff; font-weight:700; line-height:1.4; }
-  .ep-ssub  { font-size:.65rem; color:#777; margin-top:2px; }
+  .ep-steps { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+  .ep-step  { display:flex; align-items:flex-start; gap:9px; padding:9px 11px; border-radius:11px; background:#1C1C1C; border:1.5px solid #272727; }
+  .ep-num   { width:20px; height:20px; border-radius:50%; background:#FFD600; color:#111; font-size:.62rem; font-weight:900; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .ep-stext { font-size:.76rem; color:#fff; font-weight:700; line-height:1.4; }
+  .ep-ssub  { font-size:.63rem; color:#777; margin-top:2px; }
 
-  .ep-prize { background:linear-gradient(90deg,#FFD600,#FFC200); border-radius:11px; padding:11px 14px; display:flex; align-items:center; gap:10px; margin-bottom:10px; box-shadow:0 4px 14px rgba(255,214,0,.22); }
-  .ep-prize-icon { font-size:1.8rem; }
-  .ep-prize-name { font-size:.88rem; font-weight:900; color:#111; }
-  .ep-prize-count { display:inline-flex; align-items:center; font-size:.63rem; font-weight:900; color:#FFD600; background:#111; border-radius:999px; padding:2px 9px; margin-top:3px; }
-  .ep-prize-desc  { font-size:.63rem; color:#555; margin-top:2px; }
+  .ep-prize { background:linear-gradient(90deg,#FFD600,#FFC200); border-radius:11px; padding:10px 13px; display:flex; align-items:center; gap:10px; margin-bottom:9px; box-shadow:0 4px 14px rgba(255,214,0,.22); }
+  .ep-prize-icon { font-size:1.6rem; }
+  .ep-prize-name { font-size:.85rem; font-weight:900; color:#111; }
+  .ep-prize-count { display:inline-flex; align-items:center; font-size:.6rem; font-weight:900; color:#FFD600; background:#111; border-radius:999px; padding:2px 9px; margin-top:3px; }
+  .ep-prize-desc  { font-size:.6rem; color:#555; margin-top:2px; }
 
-  .ep-announce { background:#1A1A1A; border:1.5px solid #272727; border-radius:10px; padding:9px 12px; display:flex; align-items:center; gap:8px; margin-bottom:14px; }
-  .ep-announce-text { font-size:.68rem; color:#bbb; line-height:1.55; }
+  .ep-announce { background:#1A1A1A; border:1.5px solid #272727; border-radius:10px; padding:8px 11px; display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .ep-announce-text { font-size:.65rem; color:#bbb; line-height:1.55; }
   .ep-announce-text strong { color:#FFD600; }
 
   .ep-btn-kakao {
-    width:100%; padding:13px; border-radius:11px; border:none; cursor:pointer;
-    background:#FEE500; color:#3C1E1E; font-size:.88rem; font-weight:900;
+    width:100%; padding:12px; border-radius:11px; border:none; cursor:pointer;
+    background:#FEE500; color:#3C1E1E; font-size:.85rem; font-weight:900;
     display:flex; align-items:center; justify-content:center; gap:7px;
     box-shadow:0 4px 14px rgba(254,229,0,.3); text-decoration:none; margin-bottom:7px;
     transition:transform .15s, box-shadow .15s;
@@ -1579,23 +1579,37 @@
   .ep-btn-kakao:hover { transform:scale(1.02); box-shadow:0 8px 24px rgba(254,229,0,.5); }
   .ep-btn-board {
     width:100%; padding:10px; border-radius:11px; border:none; cursor:pointer;
-    background:linear-gradient(135deg,#1E3A8A,#0891B2); color:#fff; font-size:.8rem; font-weight:900;
+    background:linear-gradient(135deg,#1E3A8A,#0891B2); color:#fff; font-size:.78rem; font-weight:900;
     display:flex; align-items:center; justify-content:center; gap:6px;
     text-decoration:none; box-shadow:0 4px 14px rgba(8,145,178,.35);
     transition:transform .15s, box-shadow .15s;
   }
   .ep-btn-board:hover { transform:scale(1.02); box-shadow:0 8px 24px rgba(8,145,178,.55); }
 
-  .ep-footer { display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
-  .ep-fine { font-size:.6rem; color:#333; }
-  .ep-today-hide { font-size:.65rem; color:#555; background:none; border:none; cursor:pointer; text-decoration:underline; }
+  .ep-footer { display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:10px; }
+  .ep-fine { font-size:.58rem; color:#333; }
+  .ep-today-hide { font-size:.63rem; color:#555; background:none; border:none; cursor:pointer; text-decoration:underline; white-space:nowrap; }
   .ep-today-hide:hover { color:#888; }
 
-  /* 모바일: 세로형으로 전환 */
-  @media(max-width:560px){
-    .ep-popup { flex-direction:column; max-width:340px; }
-    .ep-left  { width:100%; border-radius:24px 24px 0 0; padding:16px 16px 0; max-height:220px; }
-    .ep-right { border-radius:0 0 24px 24px; }
+  /* 모바일: 세로형 */
+  @media(max-width:600px){
+    .ep-overlay { padding:44px 12px 12px; align-items:flex-start; }
+    .ep-popup { flex-direction:column; max-width:100%; border-radius:20px; }
+    .ep-close { top:10px; right:10px; width:40px; height:40px; font-size:1.2rem; border-width:2px; }
+    .ep-left  { width:100%; border-radius:20px 20px 0 0; padding:16px 16px 0; flex-direction:row; justify-content:space-between; align-items:flex-end; min-height:140px; max-height:180px; }
+    .ep-left-title { text-align:left; margin-bottom:0; flex:1; padding-bottom:12px; }
+    .ep-left-title h2 { font-size:1.15rem; }
+    .ep-left-title p { font-size:.63rem; }
+    .ep-event-label { display:none; }
+    .ep-coffee-img { width:110px; flex-shrink:0; }
+    .ep-right { border-radius:0 0 20px 20px; padding:16px 14px 14px; max-height:none; }
+    .ep-steps { gap:5px; margin-bottom:9px; }
+    .ep-step  { padding:8px 10px; }
+    .ep-prize { padding:9px 12px; margin-bottom:8px; }
+    .ep-announce { margin-bottom:10px; }
+    .ep-btn-kakao { padding:11px; font-size:.82rem; }
+    .ep-btn-board { padding:9px; font-size:.75rem; }
+    .ep-footer { padding-top:8px; }
   }
 
   /* ── 플로팅 이벤트 배너 ── */
