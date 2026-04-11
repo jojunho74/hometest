@@ -554,15 +554,19 @@
 
       window.skipAndDownload = function() {
         var href = dlPopupHref;
+        window.open('https://hometest-weld.vercel.app/student.html', '_blank');
         closeDlPopup();
         if (href) { var a = document.createElement('a'); a.href = href; a.download = ''; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
-        setTimeout(function() { window.open('https://hometest-weld.vercel.app/student.html', '_blank'); }, 300);
       };
 
       window.onDlBtnClick = async function(e) {
         const comment = document.getElementById('dl-comment').value.trim();
         const rating  = dlPopupRating || 0;
-        // 별점 저장
+
+        // 팝업 차단 방지: 클릭 이벤트 직접 컨텍스트에서 즉시 새 창 열기
+        const studentWin = window.open('https://hometest-weld.vercel.app/student.html', '_blank');
+
+        // 별점 저장 (비동기)
         if (rating > 0) {
           try {
             await fetch(SB_URL + '/rest/v1/pdf_ratings', {
@@ -573,7 +577,7 @@
           } catch(err) { console.warn('rating save failed', err); }
           setTimeout(function() { loadCardRatings(); }, 800);
         }
-        // 댓글 저장
+        // 댓글 저장 (비동기)
         if (comment) {
           try {
             let ip = '';
@@ -587,8 +591,6 @@
           setTimeout(function() { loadCheerSection(); loadInlineCheer(); }, 800);
         }
         setTimeout(closeDlPopup, 200);
-        // 신청 페이지 열기
-        setTimeout(function() { window.open('https://hometest-weld.vercel.app/student.html', '_blank'); }, 300);
       };
 
       window.popupShareKakao = function() {
