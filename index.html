@@ -1597,6 +1597,46 @@
     .ep-left  { width:100%; border-radius:24px 24px 0 0; padding:16px 16px 0; max-height:220px; }
     .ep-right { border-radius:0 0 24px 24px; }
   }
+
+  /* ── 플로팅 이벤트 배너 ── */
+  .ep-float {
+    position:fixed; bottom:28px; right:24px; z-index:8888;
+    display:flex; align-items:center;
+    border-radius:18px; overflow:hidden;
+    box-shadow:0 8px 32px rgba(0,0,0,.35), 0 0 0 2px rgba(255,214,0,.5);
+    cursor:pointer; border:none; padding:0; background:none;
+    animation:epFloatBounce 2.8s ease-in-out infinite;
+    transition:transform .15s, box-shadow .15s;
+  }
+  .ep-float:hover {
+    transform:scale(1.05) translateY(-3px) !important;
+    box-shadow:0 16px 44px rgba(0,0,0,.45), 0 0 0 2.5px #FFD600;
+    animation:none;
+  }
+  @keyframes epFloatBounce {
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-7px)}
+  }
+  .ep-float-img {
+    background:#FFD600; width:62px; height:70px;
+    display:flex; align-items:flex-end; justify-content:center;
+    overflow:hidden; flex-shrink:0;
+  }
+  .ep-float-img img { width:54px; object-fit:contain; display:block; }
+  .ep-float-info {
+    background:#111; padding:10px 36px 10px 12px;
+    display:flex; flex-direction:column; justify-content:center; gap:2px;
+  }
+  .ep-float-tag   { font-size:.58rem; font-weight:900; color:#FFD600; letter-spacing:.07em; }
+  .ep-float-title { font-size:.82rem; font-weight:900; color:#fff; line-height:1.2; white-space:nowrap; }
+  .ep-float-sub   { font-size:.6rem; color:rgba(255,255,255,.5); white-space:nowrap; }
+  .ep-float-close {
+    position:absolute; top:5px; right:8px;
+    font-size:.75rem; color:rgba(255,255,255,.35); background:none; border:none;
+    cursor:pointer; line-height:1; padding:2px 3px;
+  }
+  .ep-float-close:hover { color:#fff; }
+  .ep-float.ep-float-hidden { display:none; }
 </style>
 
 <div class="ep-overlay" id="ep-overlay">
@@ -1667,6 +1707,19 @@
   </div>
 </div>
 
+<!-- ── 플로팅 이벤트 배너 ── -->
+<div class="ep-float" id="ep-float" onclick="epShow()" role="button" aria-label="이벤트 보기">
+  <div class="ep-float-img">
+    <img src="커피.jpg" alt="커피">
+  </div>
+  <div class="ep-float-info">
+    <span class="ep-float-tag">🎉 5월 이벤트</span>
+    <span class="ep-float-title">친구 추천하고<br>커피 받자!</span>
+    <span class="ep-float-sub">추첨 10명 · MEGA 아메리카노</span>
+  </div>
+  <button class="ep-float-close" onclick="event.stopPropagation();document.getElementById('ep-float').classList.add('ep-float-hidden');" aria-label="배너 닫기">✕</button>
+</div>
+
 <script>
   (function(){
     var EP_KEY  = 'ep_hide_until';
@@ -1716,6 +1769,9 @@
         document.body.removeChild(ta);
         alert('링크가 복사됐습니다!\n카카오톡을 열어 친구에게 붙여넣기 해주세요 😊');
       }
+    };
+    window.epShow = function() {
+      document.getElementById('ep-overlay').classList.add('ep-visible');
     };
     window.epClose = function() {
       localStorage.setItem(EP_PERM, '1');
