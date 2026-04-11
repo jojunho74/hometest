@@ -1578,13 +1578,13 @@
   }
   .ep-btn-kakao:hover { transform:scale(1.02); box-shadow:0 8px 24px rgba(254,229,0,.5); }
   .ep-btn-board {
-    width:100%; padding:10px; border-radius:11px;
-    border:1.5px solid #2A2A2A; cursor:pointer;
-    background:transparent; color:#aaa; font-size:.8rem; font-weight:700;
+    width:100%; padding:10px; border-radius:11px; border:none; cursor:pointer;
+    background:linear-gradient(135deg,#1E3A8A,#0891B2); color:#fff; font-size:.8rem; font-weight:900;
     display:flex; align-items:center; justify-content:center; gap:6px;
-    text-decoration:none; transition:border-color .15s, color .15s;
+    text-decoration:none; box-shadow:0 4px 14px rgba(8,145,178,.35);
+    transition:transform .15s, box-shadow .15s;
   }
-  .ep-btn-board:hover { border-color:#FFD600; color:#FFD600; }
+  .ep-btn-board:hover { transform:scale(1.02); box-shadow:0 8px 24px rgba(8,145,178,.55); }
 
   .ep-footer { display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
   .ep-fine { font-size:.6rem; color:#333; }
@@ -1678,19 +1678,44 @@
       return Date.now() > parseInt(v);
     }
     window.epKakaoShare = function() {
-      var url  = 'https://hometest-weld.vercel.app/';
+      var url   = 'https://hometest-weld.vercel.app/';
       var title = '취업 준비 중인 친구에게 추천해요!';
       var desc  = '지텔프IBT로 영어실력을 무료로 진단받고, 취업 스펙을 쌓아보세요 🎯';
       var img   = 'https://hometest-weld.vercel.app/Gemini_Generated_Image_cz810vcz810vcz81.png';
+
+      /* 1순위: Kakao SDK (PC·모바일 모두 작동) */
       if (window.Kakao) {
         try {
           if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
-          Kakao.Share.sendDefault({ objectType:'feed', content:{ title:title, description:desc, imageUrl:img, link:{ mobileWebUrl:url, webUrl:url } }, buttons:[{ title:'사이트 바로가기', link:{ mobileWebUrl:url, webUrl:url } }] });
+          Kakao.Share.sendDefault({
+            objectType: 'feed',
+            content: { title: title, description: desc, imageUrl: img,
+              link: { mobileWebUrl: url, webUrl: url } },
+            buttons: [{ title: '사이트 바로가기', link: { mobileWebUrl: url, webUrl: url } }]
+          });
           return;
-        } catch(e) {}
+        } catch(e) { console.warn('Kakao SDK share failed:', e); }
       }
-      if (navigator.share) { navigator.share({ title:title, text:desc, url:url }).catch(function(){}); return; }
-      navigator.clipboard && navigator.clipboard.writeText(url).then(function(){ alert('링크가 복사됐습니다. 친구에게 붙여넣기 해주세요!'); });
+
+      /* 2순위: 모바일 Web Share API (Android·iOS 브라우저) */
+      if (navigator.share) {
+        navigator.share({ title: title, text: desc, url: url }).catch(function(){});
+        return;
+      }
+
+      /* 3순위: 클립보드 복사 후 안내 */
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(function(){
+          alert('링크가 복사됐습니다!\n카카오톡을 열어 친구에게 붙여넣기 해주세요 😊');
+        });
+      } else {
+        /* 구형 브라우저 fallback */
+        var ta = document.createElement('textarea');
+        ta.value = url; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+        alert('링크가 복사됐습니다!\n카카오톡을 열어 친구에게 붙여넣기 해주세요 😊');
+      }
     };
     window.epClose = function() {
       localStorage.setItem(EP_PERM, '1');
