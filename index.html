@@ -422,22 +422,33 @@
           </style>
 
           <!-- 소셜 프루프 -->
-          <div class="flex justify-center gap-8 mt-12 pt-10 border-t" style="border-color:rgba(255,255,255,.15);">
-            <div>
-              <p class="text-3xl font-bold" style="color:#60A5FA;">64개</p>
+          <div id="hero-stats" class="flex justify-center gap-8 mt-12 pt-10 border-t" style="border-color:rgba(255,255,255,.15);flex-wrap:wrap;">
+            <div style="text-align:center;">
+              <p class="text-3xl font-bold" style="color:#60A5FA;"><span class="hero-count" data-target="64" data-suffix="개">0개</span></p>
               <p class="text-xs mt-1" style="color:rgba(255,255,255,.6);">졸업인증 대상 대학</p>
             </div>
             <div class="w-px" style="background:rgba(255,255,255,.15);"></div>
-            <div>
-              <p class="text-3xl font-bold" style="color:#60A5FA;">200+</p>
+            <div style="text-align:center;">
+              <p class="text-3xl font-bold" style="color:#60A5FA;"><span class="hero-count" data-target="200" data-suffix="+">0+</span></p>
               <p class="text-xs mt-1" style="color:rgba(255,255,255,.6);">공공기관·정부부처 채용 인정</p>
             </div>
             <div class="w-px" style="background:rgba(255,255,255,.15);"></div>
-            <div>
-              <p class="text-3xl font-bold" style="color:#60A5FA;">600+</p>
+            <div style="text-align:center;">
+              <p class="text-3xl font-bold" style="color:#60A5FA;"><span class="hero-count" data-target="600" data-suffix="+">0+</span></p>
               <p class="text-xs mt-1" style="color:rgba(255,255,255,.6);">대상 기업</p>
             </div>
+            <div class="w-px" style="background:rgba(255,255,255,.15);"></div>
+            <div style="text-align:center;">
+              <p class="text-3xl font-bold" style="color:#34D399;"><span id="hero-apply-count">-</span></p>
+              <p class="text-xs mt-1" style="color:rgba(255,255,255,.6);">누적 도입 신청</p>
+            </div>
           </div>
+          <style>
+            @media(max-width:480px){
+              #hero-stats { gap:16px; }
+              #hero-stats .w-px { display:none; }
+            }
+          </style>
 
         </div>
 
@@ -1402,6 +1413,71 @@
       const { count } = await _supabase.from('page_views').select('*', { count: 'exact', head: true });
       const el = document.getElementById('visit-counter');
       if (el && count !== null) el.textContent = count.toLocaleString() + '회';
+    })();
+
+    // ── 히어로 카운터 애니메이션 ──
+    (function(){
+      function animateCount(el, target, suffix, duration){
+        var start = 0, startTime = null;
+        function step(ts){
+          if(!startTime) startTime = ts;
+          var progress = Math.min((ts - startTime) / duration, 1);
+          // easeOutExpo
+          var eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+          var cur = Math.floor(eased * target);
+          el.textContent = cur.toLocaleString() + suffix;
+          if(progress < 1) requestAnimationFrame(step);
+          else el.textContent = target.toLocaleString() + suffix;
+        }
+        requestAnimationFrame(step);
+      }
+
+      var fired = false;
+      var statsEl = document.getElementById('hero-stats');
+      if(!statsEl) return;
+
+      var observer = new IntersectionObserver(function(entries){
+        if(fired) return;
+        if(entries[0].isIntersecting){
+          fired = true;
+          document.querySelectorAll('.hero-count').forEach(function(el){
+            var target = parseInt(el.dataset.target, 10);
+            var suffix = el.dataset.suffix || '';
+            animateCount(el, target, suffix, 1200);
+          });
+          observer.disconnect();
+        }
+      }, { threshold: 0.3 });
+      observer.observe(statsEl);
+    })();
+
+    // ── 누적 도입 신청 수 (Supabase) ──
+    (async function(){
+      try {
+        var res = await _supabase.from('consultations').select('*', { count: 'exact', head: true });
+        var el = document.getElementById('hero-apply-count');
+        if(!el) return;
+        var n = res.count || 0;
+        // 카운트업 애니메이션
+        var start = 0, duration = 1200, startTime = null;
+        function step(ts){
+          if(!startTime) startTime = ts;
+          var progress = Math.min((ts - startTime) / duration, 1);
+          var eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+          el.textContent = Math.floor(eased * n).toLocaleString() + '건';
+          if(progress < 1) requestAnimationFrame(step);
+          else el.textContent = n.toLocaleString() + '건';
+        }
+        // hero-stats가 보일 때 시작 (기존 observer와 타이밍 맞춤)
+        var fired = false;
+        var statsEl = document.getElementById('hero-stats');
+        var obs = new IntersectionObserver(function(entries){
+          if(fired) return;
+          if(entries[0].isIntersecting){ fired = true; requestAnimationFrame(step); obs.disconnect(); }
+        }, { threshold: 0.3 });
+        if(statsEl) obs.observe(statsEl);
+        else requestAnimationFrame(step);
+      } catch(e){ /* 실패 시 무시 */ }
     })();
 
     // ── 모바일 메뉴 ──
