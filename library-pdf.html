@@ -556,6 +556,7 @@
         var href = dlPopupHref;
         closeDlPopup();
         if (href) { var a = document.createElement('a'); a.href = href; a.download = ''; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+        setTimeout(function() { window.open('https://hometest-weld.vercel.app/student.html', '_blank'); }, 300);
       };
 
       window.onDlBtnClick = async function(e) {
@@ -584,6 +585,8 @@
           setTimeout(function() { loadCheerSection(); loadInlineCheer(); }, 800);
         }
         setTimeout(closeDlPopup, 200);
+        // 신청 페이지 열기
+        setTimeout(function() { window.open('https://hometest-weld.vercel.app/student.html', '_blank'); }, 300);
       };
 
       window.popupShareKakao = function() {
