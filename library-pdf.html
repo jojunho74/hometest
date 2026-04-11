@@ -635,16 +635,29 @@
         // 댓글 저장 (비동기)
         if (comment) {
           try {
-            // IP 수집 — 여러 API 순차 시도
+            // IP 수집 — 타임아웃 3초, 여러 API 순차 시도
+            function fetchIP(url, extract) {
+              return new Promise(function(resolve, reject) {
+                var ctrl = new AbortController();
+                var tid = setTimeout(function(){ ctrl.abort(); }, 3000);
+                fetch(url, { signal: ctrl.signal })
+                  .then(function(r){ return r.json(); })
+                  .then(function(j){ clearTimeout(tid); resolve(extract(j)); })
+                  .catch(function(e){ clearTimeout(tid); reject(e); });
+              });
+            }
             let ip = '';
             const ipApis = [
-              () => fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(j=>j.ip),
-              () => fetch('https://api64.ipify.org?format=json').then(r=>r.json()).then(j=>j.ip),
-              () => fetch('https://ipapi.co/json/').then(r=>r.json()).then(j=>j.ip),
+              () => fetchIP('https://api.ipify.org?format=json',    j => j.ip),
+              () => fetchIP('https://freeipapi.com/api/json',       j => j.ipAddress),
+              () => fetchIP('https://ip.seeip.org/json',            j => j.ip),
+              () => fetchIP('https://api64.ipify.org?format=json',  j => j.ip),
+              () => fetchIP('https://ipapi.co/json/',               j => j.ip),
             ];
             for (const apiFn of ipApis) {
-              try { ip = await apiFn(); if (ip) break; } catch(e) {}
+              try { const v = await apiFn(); if (v && typeof v === 'string') { ip = v; break; } } catch(e) { console.warn('IP API failed, trying next:', e); }
             }
+            console.log('[IP]', ip || '(not detected)');
             await fetch(SB_URL + '/rest/v1/cheer_comments', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'return=minimal' },
