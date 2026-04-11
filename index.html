@@ -1650,10 +1650,10 @@
           당첨자는 관리자에게 연락처를 전달해 주세요
         </div>
       </div>
-      <a href="http://pf.kakao.com/_NxirdX" target="_blank" class="ep-btn-kakao">
+      <button onclick="epKakaoShare()" class="ep-btn-kakao">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
         카카오톡으로 친구에게 추천하기
-      </a>
+      </button>
       <a href="job-board.html" class="ep-btn-board">✏️ 추천 사연 게시판에 남기기</a>
       <div class="ep-footer">
         <span class="ep-fine">이벤트는 예고 없이 종료될 수 있습니다 · 1인 1회 참여</span>
@@ -1671,6 +1671,30 @@
       if (!v) return true;
       return Date.now() > parseInt(v);
     }
+    window.epKakaoShare = function() {
+      var url = 'https://hometest-weld.vercel.app/';
+      var title = '취업 준비 중인 친구에게 추천해요!';
+      var desc = '지텔프IBT로 영어실력을 무료로 진단받고, 취업 스펙을 쌓아보세요 🎯';
+      var img = 'https://hometest-weld.vercel.app/Gemini_Generated_Image_cz810vcz810vcz81.png';
+      if (window.Kakao) {
+        try {
+          if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
+          Kakao.Share.sendDefault({
+            objectType: 'feed',
+            content: {
+              title: title, description: desc, imageUrl: img,
+              link: { mobileWebUrl: url, webUrl: url }
+            },
+            buttons: [{ title: '사이트 바로가기', link: { mobileWebUrl: url, webUrl: url } }]
+          });
+          return;
+        } catch(e) {}
+      }
+      if (navigator.share) { navigator.share({ title: title, text: desc, url: url }).catch(function(){}); return; }
+      navigator.clipboard && navigator.clipboard.writeText(url).then(function(){
+        alert('링크가 복사됐습니다. 친구에게 붙여넣기 해주세요!');
+      });
+    };
     window.epClose = function() {
       var el = document.getElementById('ep-overlay');
       el.classList.remove('ep-visible');
