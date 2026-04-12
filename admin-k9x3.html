@@ -184,6 +184,7 @@
       <button onclick="switchTab('news')"     id="tab-news"     class="sb-item"><span class="sb-icon">📰</span>대학소식</button>
       <button onclick="switchTab('programs')" id="tab-programs" class="sb-item"><span class="sb-icon">🏫</span>대학활동</button>
       <button onclick="switchTab('jobs')"     id="tab-jobs"     class="sb-item"><span class="sb-icon">💼</span>채용공고</button>
+      <button onclick="switchTab('staffjobs')" id="tab-staffjobs" class="sb-item"><span class="sb-icon">👔</span>직원채용공고</button>
       <button onclick="switchTab('cnews')"    id="tab-cnews"    class="sb-item"><span class="sb-icon">🏢</span>기업소식</button>
       <button onclick="switchTab('shorts')"   id="tab-shorts"   class="sb-item"><span class="sb-icon">🎬</span>유튜브쇼츠</button>
       <button onclick="switchTab('calendar')" id="tab-calendar" class="sb-item"><span class="sb-icon">📅</span>채용달력</button>
@@ -468,6 +469,118 @@
           </table>
         </div>
         <p id="job-empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">등록된 채용공고가 없습니다.</p>
+      </div>
+
+      <!-- ── 직원채용공고 탭 ── -->
+      <div id="section-staffjobs" class="hidden">
+        <!-- 등록 폼 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 class="font-bold text-slate-700 mb-4">새 직원채용공고 등록</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">회사명 *</label>
+              <input id="sj-company" type="text" placeholder="예) 한국수자원공사" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">부서 / 직군 (선택)</label>
+              <input id="sj-dept" type="text" placeholder="예) 전산직, 사무직" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">공고 제목 *</label>
+              <input id="sj-title" type="text" placeholder="채용공고 제목을 입력하세요" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">링크 (선택)</label>
+              <input id="sj-link" type="url" placeholder="https://..." class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">마감일 (선택)</label>
+              <input id="sj-deadline" type="date" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">로고 이미지 (선택)</label>
+            <input id="sj-logo" type="file" accept="image/*" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+            <p id="sj-logo-preview-wrap" class="hidden mt-2"><img id="sj-logo-preview" src="" class="h-12 object-contain rounded border border-slate-200 p-1"/></p>
+          </div>
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-500 mb-2">카드 배경색</label>
+            <input type="hidden" id="sj-color" value="#FFFFFF"/>
+            <div id="sj-color-swatches" class="flex flex-wrap gap-2"></div>
+          </div>
+          <button onclick="addStaffJob()" class="btn btn-primary">+ 등록하기</button>
+          <p id="sj-msg" class="hidden text-sm text-green-600 mt-2 font-semibold">✓ 등록되었습니다.</p>
+        </div>
+        <!-- 목록 -->
+        <div class="bg-white rounded-xl shadow-sm table-wrap">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-slate-400 text-xs border-b">
+                <th class="px-4 py-3 font-semibold">순서</th>
+                <th class="px-4 py-3 font-semibold">회사명</th>
+                <th class="px-4 py-3 font-semibold">부서/직군</th>
+                <th class="px-4 py-3 font-semibold">제목</th>
+                <th class="px-4 py-3 font-semibold hidden md:table-cell">마감일</th>
+                <th class="px-4 py-3 font-semibold hidden md:table-cell">링크</th>
+                <th class="px-4 py-3 font-semibold">수정</th>
+                <th class="px-4 py-3 font-semibold">삭제</th>
+              </tr>
+            </thead>
+            <tbody id="sj-body">
+              <tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">불러오는 중...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p id="sj-empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">등록된 직원채용공고가 없습니다.</p>
+      </div>
+
+      <!-- 직원채용공고 수정 모달 -->
+      <div id="sj-modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:200;padding:16px;">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+          <div class="flex items-center justify-between px-6 py-4 border-b">
+            <h2 class="font-bold text-lg text-slate-800">직원채용공고 수정</h2>
+            <button onclick="closeSjModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+          </div>
+          <div class="px-6 py-5 space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">회사명</label>
+              <input id="edit-sj-company" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">부서 / 직군 (선택)</label>
+              <input id="edit-sj-dept" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">공고 제목</label>
+              <input id="edit-sj-title" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">링크 (선택)</label>
+              <input id="edit-sj-link" type="url" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">마감일 (선택)</label>
+              <input id="edit-sj-deadline" type="date" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">로고 교체 (선택)</label>
+              <input id="edit-sj-logo" type="file" accept="image/*" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+              <p id="edit-sj-logo-preview-wrap" class="hidden mt-2"><img id="edit-sj-logo-preview" src="" class="h-12 object-contain rounded border border-slate-200 p-1"/></p>
+              <p id="edit-sj-logo-current" class="hidden mt-2 text-xs text-slate-400">현재 로고: <img id="edit-sj-logo-current-img" src="" class="inline h-10 object-contain rounded border border-slate-200 p-1 ml-1"/></p>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-2">카드 배경색</label>
+              <input type="hidden" id="edit-sj-color" value="#FFFFFF"/>
+              <div id="edit-sj-color-swatches" class="flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t flex justify-end gap-2">
+            <button onclick="closeSjModal()" class="btn btn-secondary">취소</button>
+            <button onclick="saveSjEdit()" class="btn btn-primary">저장</button>
+          </div>
+        </div>
       </div>
 
       <!-- 채용공고 수정 모달 -->
@@ -1580,12 +1693,12 @@
     // ─── 탭 전환 ───
     const TAB_LABELS = {
       consult:'신청 관리', student:'학생접수', news:'대학소식', programs:'대학활동',
-      jobs:'채용공고', cnews:'기업소식', shorts:'유튜브쇼츠', stats:'통계',
+      jobs:'채용공고', staffjobs:'직원채용공고', cnews:'기업소식', shorts:'유튜브쇼츠', stats:'통계',
       blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고'
     };
 
     function switchTab(tab) {
-      ['consult', 'student', 'news', 'programs', 'jobs', 'cnews', 'shorts', 'stats', 'blog', 'calendar', 'popupads'].forEach(t => {
+      ['consult', 'student', 'news', 'programs', 'jobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'blog', 'calendar', 'popupads'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (t === tab) btn.classList.add('active');
@@ -1602,6 +1715,7 @@
       if (tab === 'news') loadNews();
       if (tab === 'programs') loadPrograms();
       if (tab === 'jobs') loadJobs();
+      if (tab === 'staffjobs') loadStaffJobs();
       if (tab === 'cnews') loadCNews();
       if (tab === 'shorts') loadShorts();
       if (tab === 'stats')  requestAnimationFrame(() => loadStats());
@@ -2056,6 +2170,150 @@
       if (error) { alert('수정 실패: ' + error.message); return; }
       closeCNewsModal();
       loadCNews();
+    }
+
+    // ─── 직원채용공고 ───
+    let sjData = [];
+    let editingSjId = null;
+
+    async function loadStaffJobs() {
+      const { data, error } = await db.from('staff_job_postings').select('*').order('sort_order', { ascending: true });
+      if (error) { console.error(error); return; }
+      sjData = data || [];
+      renderSwatches('sj-color-swatches', 'sj-color', '#FFFFFF');
+      document.getElementById('sj-logo').onchange = function() {
+        const f = this.files[0]; if (!f) return;
+        document.getElementById('sj-logo-preview').src = URL.createObjectURL(f);
+        document.getElementById('sj-logo-preview-wrap').classList.remove('hidden');
+      };
+      const tbody = document.getElementById('sj-body');
+      const empty = document.getElementById('sj-empty-msg');
+      if (sjData.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+      tbody.innerHTML = sjData.map((r, i) => `
+        <tr class="border-b last:border-0 hover:bg-slate-50">
+          <td class="px-4 py-3">
+            <div class="flex flex-col gap-1">
+              <button onclick="moveStaffJob(${i}, -1)" ${i === 0 ? 'disabled' : ''} class="text-slate-400 hover:text-slate-700 disabled:opacity-20 text-xs leading-none">▲</button>
+              <button onclick="moveStaffJob(${i},  1)" ${i === sjData.length-1 ? 'disabled' : ''} class="text-slate-400 hover:text-slate-700 disabled:opacity-20 text-xs leading-none">▼</button>
+            </div>
+          </td>
+          <td class="px-4 py-3 font-medium text-slate-700">${esc(r.company_name)}</td>
+          <td class="px-4 py-3 text-slate-500 text-xs">${esc(r.department || '-')}</td>
+          <td class="px-4 py-3 text-slate-700">${esc(r.title)}</td>
+          <td class="px-4 py-3 hidden md:table-cell text-slate-500 text-xs">${r.deadline || '-'}</td>
+          <td class="px-4 py-3 hidden md:table-cell">${r.link ? `<a href="${esc(r.link)}" target="_blank" class="text-blue-600 underline text-xs">링크</a>` : '-'}</td>
+          <td class="px-4 py-3"><button onclick="openSjEdit('${r.id}')" class="btn text-xs px-3 py-1.5 btn-secondary">수정</button></td>
+          <td class="px-4 py-3"><button onclick="deleteStaffJob('${r.id}')" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">삭제</button></td>
+        </tr>`).join('');
+    }
+
+    async function moveStaffJob(idx, dir) {
+      const swapIdx = idx + dir;
+      if (swapIdx < 0 || swapIdx >= sjData.length) return;
+      const newOrder = [...sjData];
+      [newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx], newOrder[idx]];
+      for (let i = 0; i < newOrder.length; i++) {
+        await db.from('staff_job_postings').update({ sort_order: -(i + 1) }).eq('id', newOrder[i].id);
+      }
+      for (let i = 0; i < newOrder.length; i++) {
+        await db.from('staff_job_postings').update({ sort_order: i + 1 }).eq('id', newOrder[i].id);
+      }
+      loadStaffJobs();
+    }
+
+    async function uploadSjLogo(fileInput) {
+      const file = fileInput.files[0];
+      if (!file) return null;
+      const ext = file.name.split('.').pop();
+      const path = `sj_${Date.now()}.${ext}`;
+      const { error } = await db.storage.from('logo').upload(path, file, { upsert: true });
+      if (error) { alert('이미지 업로드 실패: ' + error.message); return null; }
+      const { data } = db.storage.from('logo').getPublicUrl(path);
+      return data.publicUrl;
+    }
+
+    async function addStaffJob() {
+      const company  = document.getElementById('sj-company').value.trim();
+      const dept     = document.getElementById('sj-dept').value.trim();
+      const title    = document.getElementById('sj-title').value.trim();
+      const link     = document.getElementById('sj-link').value.trim();
+      const deadline = document.getElementById('sj-deadline').value.trim();
+      const color    = document.getElementById('sj-color').value || '#FFFFFF';
+      if (!company || !title) { alert('회사명과 공고 제목을 입력해주세요.'); return; }
+      const logo_url = await uploadSjLogo(document.getElementById('sj-logo'));
+      const maxOrder = sjData.length > 0 ? Math.max(...sjData.map(r => r.sort_order)) + 1 : 1;
+      const { error } = await db.from('staff_job_postings').insert([{
+        company_name: company, department: dept || null, title,
+        link: link || null, deadline: deadline || null,
+        sort_order: maxOrder, bg_color: color, logo_url
+      }]);
+      if (error) { alert('등록 실패: ' + error.message); return; }
+      ['sj-company','sj-dept','sj-title','sj-link','sj-deadline','sj-logo'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('sj-color').value = '#FFFFFF';
+      document.getElementById('sj-logo-preview-wrap').classList.add('hidden');
+      const msg = document.getElementById('sj-msg');
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 2000);
+      loadStaffJobs();
+    }
+
+    async function deleteStaffJob(id) {
+      if (!confirm('이 채용공고를 삭제하시겠습니까?')) return;
+      const { error } = await db.from('staff_job_postings').delete().eq('id', id);
+      if (error) { alert('삭제 실패: ' + error.message); return; }
+      loadStaffJobs();
+    }
+
+    function openSjEdit(id) {
+      const r = sjData.find(p => String(p.id) === String(id));
+      if (!r) return;
+      editingSjId = id;
+      document.getElementById('edit-sj-company').value  = r.company_name;
+      document.getElementById('edit-sj-dept').value     = r.department || '';
+      document.getElementById('edit-sj-title').value    = r.title;
+      document.getElementById('edit-sj-link').value     = r.link || '';
+      document.getElementById('edit-sj-deadline').value = r.deadline || '';
+      document.getElementById('edit-sj-color').value    = r.bg_color || '#FFFFFF';
+      renderSwatches('edit-sj-color-swatches', 'edit-sj-color', r.bg_color || '#FFFFFF');
+      document.getElementById('edit-sj-logo').value = '';
+      document.getElementById('edit-sj-logo-preview-wrap').classList.add('hidden');
+      document.getElementById('edit-sj-logo').onchange = function() {
+        const f = this.files[0]; if (!f) return;
+        document.getElementById('edit-sj-logo-preview').src = URL.createObjectURL(f);
+        document.getElementById('edit-sj-logo-preview-wrap').classList.remove('hidden');
+      };
+      const curWrap = document.getElementById('edit-sj-logo-current');
+      if (r.logo_url) {
+        document.getElementById('edit-sj-logo-current-img').src = r.logo_url;
+        curWrap.classList.remove('hidden');
+      } else { curWrap.classList.add('hidden'); }
+      document.getElementById('sj-modal').style.display = 'flex';
+    }
+
+    function closeSjModal() {
+      document.getElementById('sj-modal').style.display = 'none';
+      editingSjId = null;
+    }
+
+    async function saveSjEdit() {
+      const company  = document.getElementById('edit-sj-company').value.trim();
+      const dept     = document.getElementById('edit-sj-dept').value.trim();
+      const title    = document.getElementById('edit-sj-title').value.trim();
+      const link     = document.getElementById('edit-sj-link').value.trim();
+      const deadline = document.getElementById('edit-sj-deadline').value.trim();
+      const color    = document.getElementById('edit-sj-color').value || '#FFFFFF';
+      if (!company || !title) { alert('회사명과 공고 제목을 입력해주세요.'); return; }
+      const newLogoUrl = await uploadSjLogo(document.getElementById('edit-sj-logo'));
+      const existing = sjData.find(p => String(p.id) === String(editingSjId));
+      const logo_url = newLogoUrl !== null ? newLogoUrl : (existing ? existing.logo_url : null);
+      const { error } = await db.from('staff_job_postings').update({
+        company_name: company, department: dept || null, title,
+        link: link || null, deadline: deadline || null, bg_color: color, logo_url
+      }).eq('id', editingSjId);
+      if (error) { alert('수정 실패: ' + error.message); return; }
+      closeSjModal();
+      loadStaffJobs();
     }
 
     // ─── 대학활동 ───
