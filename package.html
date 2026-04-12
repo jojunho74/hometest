@@ -80,6 +80,10 @@
     /* ── 애니메이션 ── */
     .fade-in { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
     .fade-in.visible { opacity: 1; transform: translateY(0); }
+    @keyframes sjCardIn { from { opacity:0; transform:translateY(24px) scale(.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+    @keyframes sjShimmer { 0%,100%{box-shadow:0 2px 8px rgba(0,0,0,.25),0 0 0 0 rgba(255,255,255,0);} 50%{box-shadow:0 6px 24px rgba(0,0,0,.4),0 0 16px 2px rgba(255,255,255,.06);} }
+    .sj-card { animation: sjCardIn .5s cubic-bezier(.34,1.56,.64,1) both, sjShimmer 4s ease-in-out infinite; }
+    .sj-card:hover { animation: sjShimmer 0s; }
   </style>
 </head>
 <body>
@@ -491,10 +495,11 @@
         var dept = r.department ? '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:'+p.tb+';color:'+p.tcolor+';display:inline-block;margin-bottom:6px;">'+esc(r.department)+'</span>' : '';
         var deadline = r.deadline ? '<p style="font-size:11px;color:'+p.sc+';margin-top:8px;">마감 '+esc(r.deadline)+'</p>' : '';
         var inner = logo+'<p style="font-size:12px;font-weight:800;color:'+p.sc+';margin-bottom:4px;">'+esc(r.company_name)+'</p>'+dept+'<p style="font-size:0.875rem;font-weight:700;line-height:1.4;color:'+p.tc+';flex:1;">'+esc(r.title)+'</p>'+deadline;
-        var style = 'background:'+p.bg+';border-radius:12px;border:1px solid rgba(255,255,255,.1);padding:16px;display:flex;flex-direction:column;min-height:130px;box-shadow:0 2px 8px rgba(0,0,0,.25);text-decoration:none;transition:box-shadow .2s,transform .2s;';
+        var delay = (i * 0.1).toFixed(1) + 's';
+        var style = 'background:'+p.bg+';border-radius:12px;border:1px solid rgba(255,255,255,.1);padding:16px;display:flex;flex-direction:column;min-height:130px;text-decoration:none;animation-delay:'+delay+';';
         return r.link
-          ? '<a href="'+esc(r.link)+'" target="_blank" style="'+style+'" onmouseover="this.style.boxShadow=\'0 8px 24px rgba(0,0,0,.4)\';this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.boxShadow=\'0 2px 8px rgba(0,0,0,.25)\';this.style.transform=\'translateY(0)\'">'+inner+'</a>'
-          : '<div style="'+style+'">'+inner+'</div>';
+          ? '<a href="'+esc(r.link)+'" target="_blank" class="sj-card" style="'+style+'" onmouseover="this.style.transform=\'translateY(-4px) scale(1.02)\';this.style.boxShadow=\'0 12px 32px rgba(0,0,0,.5)\'" onmouseout="this.style.transform=\'translateY(0) scale(1)\';this.style.boxShadow=\'\'">'+inner+'</a>'
+          : '<div class="sj-card" style="'+style+'animation-delay:'+delay+';">'+inner+'</div>';
       }).join('');
     } catch(e) { console.error('pkg sj load failed:', e); }
   })();
