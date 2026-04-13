@@ -217,19 +217,21 @@
   function esc(s){ return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
   function fmtDate(d){ if(!d) return '-'; const dt=new Date(d); return dt.getFullYear()+'.'+(dt.getMonth()+1).toString().padStart(2,'0')+'.'+dt.getDate().toString().padStart(2,'0'); }
 
-  // ── 데이터 로드 (대학활동 + 대학소식 병렬) ──
+  // ── 데이터 로드 (대학활동 + 대학소식 + 직원채용공고 병렬) ──
   async function loadData() {
     try {
       const headers = { 'apikey': SB_KEY, 'Authorization': 'Bearer '+SB_KEY };
-      const [r1, r2] = await Promise.all([
+      const [r1, r2, r3] = await Promise.all([
         fetch(SB_URL+'/rest/v1/school_programs?select=*&order=sort_order.asc,created_at.desc', { headers }),
-        fetch(SB_URL+'/rest/v1/university_news?select=*&order=sort_order.asc,created_at.desc', { headers })
+        fetch(SB_URL+'/rest/v1/university_news?select=*&order=sort_order.asc,created_at.desc', { headers }),
+        fetch(SB_URL+'/rest/v1/staff_job_postings?select=*&order=sort_order.asc,created_at.desc', { headers })
       ]);
-      const [programs, news] = await Promise.all([r1.json(), r2.json()]);
+      const [programs, news, staffJobs] = await Promise.all([r1.json(), r2.json(), r3.json()]);
 
-      const prog = Array.isArray(programs) ? programs.map(r => ({ ...r, _type:'활동' })) : [];
-      const nws  = Array.isArray(news)     ? news.map(r => ({ ...r, _type:'소식' })) : [];
-      allData = [...prog, ...nws];
+      const prog  = Array.isArray(programs)  ? programs.map(r => ({ ...r, _type:'활동' })) : [];
+      const nws   = Array.isArray(news)      ? news.map(r => ({ ...r, _type:'소식' })) : [];
+      const jobs  = Array.isArray(staffJobs) ? staffJobs.map(r => ({ ...r, school_name: r.company_name, _type:'채용' })) : [];
+      allData = [...prog, ...nws, ...jobs];
 
       schoolMap = {};
       allData.forEach(r => {
@@ -302,9 +304,11 @@
       wrap.innerHTML = '<div class="placeholder"><div class="ico">📭</div><p>등록된 소식이 없습니다</p></div>';
       return;
     }
-    const typeBadge = (type) => type === '활동'
-      ? `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;background:#EFF6FF;color:#1E4D8C;margin-right:6px;">활동</span>`
-      : `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;background:#F0FDF4;color:#16A34A;margin-right:6px;">소식</span>`;
+    const typeBadge = (type) => {
+      if (type === '활동') return `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;background:#EFF6FF;color:#1E4D8C;margin-right:6px;">활동</span>`;
+      if (type === '소식') return `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;background:#F0FDF4;color:#16A34A;margin-right:6px;">소식</span>`;
+      return `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;background:#FFF7ED;color:#C2410C;margin-right:6px;">채용</span>`;
+    };
 
     if (currentView === 'table') {
       wrap.innerHTML = `
