@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>대학교 소식 게시판</title>
+  <title>대학교 활동 게시판</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
@@ -118,7 +118,7 @@
 <header>
   <a href="index.html" class="h-logo">IBT 컨설팅</a>
   <div class="h-sep"></div>
-  <span class="h-title">대학교 소식 게시판</span>
+  <span class="h-title">대학교 활동 게시판</span>
 </header>
 
 <div class="layout">
@@ -174,7 +174,7 @@
   // ── 데이터 로드 ──
   async function loadData() {
     try {
-      const res = await fetch(SB_URL+'/rest/v1/university_news?select=*&order=sort_order.asc,created_at.desc', {
+      const res = await fetch(SB_URL+'/rest/v1/school_programs?select=*&order=sort_order.asc,created_at.desc', {
         headers:{ 'apikey': SB_KEY, 'Authorization': 'Bearer '+SB_KEY }
       });
       allData = await res.json();
