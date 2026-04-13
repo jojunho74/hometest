@@ -209,24 +209,28 @@
   const SB_URL = 'https://byzulmxcuhsrjdphmuym.supabase.co';
   const SB_KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
 
-  let allData = [];       // 전체 뉴스 데이터
-  let schoolMap = {};     // { school_name: [posts] }
+  let allData = [];
+  let schoolMap = {};
   let selectedSchool = null;
   let currentView = 'table';
 
   function esc(s){ return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
   function fmtDate(d){ if(!d) return '-'; const dt=new Date(d); return dt.getFullYear()+'.'+(dt.getMonth()+1).toString().padStart(2,'0')+'.'+dt.getDate().toString().padStart(2,'0'); }
 
-  // ── 데이터 로드 ──
+  // ── 데이터 로드 (대학활동 + 대학소식 병렬) ──
   async function loadData() {
     try {
-      const res = await fetch(SB_URL+'/rest/v1/school_programs?select=*&order=sort_order.asc,created_at.desc', {
-        headers:{ 'apikey': SB_KEY, 'Authorization': 'Bearer '+SB_KEY }
-      });
-      allData = await res.json();
-      if (!Array.isArray(allData)) { allData=[]; }
+      const headers = { 'apikey': SB_KEY, 'Authorization': 'Bearer '+SB_KEY };
+      const [r1, r2] = await Promise.all([
+        fetch(SB_URL+'/rest/v1/school_programs?select=*&order=sort_order.asc,created_at.desc', { headers }),
+        fetch(SB_URL+'/rest/v1/university_news?select=*&order=sort_order.asc,created_at.desc', { headers })
+      ]);
+      const [programs, news] = await Promise.all([r1.json(), r2.json()]);
 
-      // school_name 기준으로 그루핑
+      const prog = Array.isArray(programs) ? programs.map(r => ({ ...r, _type:'활동' })) : [];
+      const nws  = Array.isArray(news)     ? news.map(r => ({ ...r, _type:'소식' })) : [];
+      allData = [...prog, ...nws];
+
       schoolMap = {};
       allData.forEach(r => {
         const s = r.school_name || '기타';
@@ -298,12 +302,17 @@
       wrap.innerHTML = '<div class="placeholder"><div class="ico">📭</div><p>등록된 소식이 없습니다</p></div>';
       return;
     }
+    const typeBadge = (type) => type === '활동'
+      ? `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;background:#EFF6FF;color:#1E4D8C;margin-right:6px;">활동</span>`
+      : `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;background:#F0FDF4;color:#16A34A;margin-right:6px;">소식</span>`;
+
     if (currentView === 'table') {
       wrap.innerHTML = `
         <table class="post-table">
           <thead>
             <tr>
               <th class="post-num">번호</th>
+              <th>구분</th>
               <th>제목</th>
               <th>링크</th>
               <th class="post-date">등록일</th>
@@ -313,6 +322,7 @@
             ${posts.map((r, i) => `
               <tr class="row-anim" style="animation-delay:${(i*0.04).toFixed(2)}s">
                 <td class="post-num">${posts.length - i}</td>
+                <td>${typeBadge(r._type)}</td>
                 <td class="title-cell">${r.link
                   ? `<a href="${esc(r.link)}" target="_blank">${esc(r.title)}</a>`
                   : esc(r.title)}</td>
@@ -325,6 +335,7 @@
       wrap.innerHTML = `<div class="card-grid">
         ${posts.map((r, i) => `
           <div class="post-card row-anim" style="animation-delay:${(i*0.05).toFixed(2)}s" ${r.link?`onclick="window.open('${esc(r.link)}','_blank')"`:''}>
+            <div style="margin-bottom:6px;">${typeBadge(r._type)}</div>
             <div class="post-card-title">${esc(r.title)}</div>
             ${r.link ? `<a href="${esc(r.link)}" target="_blank" class="post-card-link" onclick="event.stopPropagation()">바로가기 ↗</a>` : ''}
             <div class="post-card-date">${fmtDate(r.created_at)}</div>
