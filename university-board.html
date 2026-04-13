@@ -239,10 +239,10 @@
         schoolMap[s].push(r);
       });
 
-      // 직원채용공고는 이미 있는 학교명과 일치할 때만 추가
+      // 직원채용공고는 department(학교명)가 기존 학교와 일치할 때만 추가
       if (Array.isArray(staffJobs)) {
         staffJobs.forEach(r => {
-          const s = r.company_name;
+          const s = r.department;
           if (s && schoolMap[s]) {
             schoolMap[s].push({ ...r, school_name: s, _type:'채용' });
           }
