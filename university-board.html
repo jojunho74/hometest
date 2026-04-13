@@ -228,17 +228,28 @@
       ]);
       const [programs, news, staffJobs] = await Promise.all([r1.json(), r2.json(), r3.json()]);
 
-      const prog  = Array.isArray(programs)  ? programs.map(r => ({ ...r, _type:'활동' })) : [];
-      const nws   = Array.isArray(news)      ? news.map(r => ({ ...r, _type:'소식' })) : [];
-      const jobs  = Array.isArray(staffJobs) ? staffJobs.map(r => ({ ...r, school_name: r.company_name, _type:'채용' })) : [];
-      allData = [...prog, ...nws, ...jobs];
+      const prog = Array.isArray(programs)  ? programs.map(r => ({ ...r, _type:'활동' })) : [];
+      const nws  = Array.isArray(news)      ? news.map(r => ({ ...r, _type:'소식' })) : [];
 
+      // 대학활동+대학소식으로 schoolMap 먼저 구성
       schoolMap = {};
-      allData.forEach(r => {
+      [...prog, ...nws].forEach(r => {
         const s = r.school_name || '기타';
         if (!schoolMap[s]) schoolMap[s] = [];
         schoolMap[s].push(r);
       });
+
+      // 직원채용공고는 이미 있는 학교명과 일치할 때만 추가
+      if (Array.isArray(staffJobs)) {
+        staffJobs.forEach(r => {
+          const s = r.company_name;
+          if (s && schoolMap[s]) {
+            schoolMap[s].push({ ...r, school_name: s, _type:'채용' });
+          }
+        });
+      }
+
+      allData = Object.values(schoolMap).flat();
 
       renderSchoolList(Object.keys(schoolMap));
     } catch(e) {
