@@ -257,11 +257,7 @@
     el.innerHTML = schools.map(s => {
       const cnt = schoolMap[s] ? schoolMap[s].length : 0;
       const isActive = selectedSchool === s;
-      const logo = schoolMap[s] && schoolMap[s][0].logo_url
-        ? `<img src="${esc(schoolMap[s][0].logo_url)}" class="school-logo" onerror="this.style.display='none'"/>`
-        : '';
       return `<div class="school-item${isActive?' active':''}" onclick="selectSchool('${esc(s).replace(/'/g,"\\'")}')">
-        ${logo}
         <span class="school-name">${esc(s)}</span>
         <span class="school-cnt">${cnt}</span>
       </div>`;
