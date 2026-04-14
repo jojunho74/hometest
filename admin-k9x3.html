@@ -4892,7 +4892,8 @@ ${d.hashtags}`;
       const btn = document.getElementById('crawler-detect-btn');
       btn.disabled = true;
       btn.textContent = '⏳ 감지 중...';
-      addCrawlerLog('🔍 셀렉터 감지 시작...');
+      addCrawlerLog('🔍 셀렉터 감지 시작... (사이트 수에 따라 1~2분 소요)');
+      addCrawlerLog('   각 사이트를 순차적으로 분석 중입니다...');
 
       try {
         const res = await fetch('http://127.0.0.1:8765/detect', { method: 'POST' });

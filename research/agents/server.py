@@ -69,10 +69,20 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
 
-            results = agent_selector.run()
+            detect_results = {'status': 'running', 'results': []}
+
+            def do_detect():
+                detect_results['results'] = agent_selector.run()
+                detect_results['status'] = 'done'
+                print(f"[감지완료] {len(detect_results['results'])}개")
+
+            t = threading.Thread(target=do_detect)
+            t.start()
+            t.join(timeout=120)  # 최대 2분 대기
+
             self.wfile.write(json.dumps({
                 'status': 'ok',
-                'results': results
+                'results': detect_results['results']
             }, ensure_ascii=False).encode('utf-8'))
         else:
             self.send_response(404)

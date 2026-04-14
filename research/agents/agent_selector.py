@@ -41,7 +41,7 @@ CANDIDATE_SELECTORS = [
 def detect_rss(url: str) -> str | None:
     """페이지에서 RSS URL 감지"""
     try:
-        res = requests.get(url, headers=HEADERS, timeout=10)
+        res = requests.get(url, headers=HEADERS, timeout=6)
         soup = BeautifulSoup(res.text, 'html.parser')
         tag = soup.find('link', type=lambda t: t and ('rss' in t.lower() or 'atom' in t.lower()))
         if tag and tag.get('href'):
@@ -107,7 +107,7 @@ def detect_selector_for_site(site: dict) -> dict:
 
     # 2. HTML 페이지 로드
     try:
-        res = requests.get(url, headers=HEADERS, timeout=15)
+        res = requests.get(url, headers=HEADERS, timeout=8)
         res.encoding = res.apparent_encoding
         soup = BeautifulSoup(res.text, 'html.parser')
     except Exception as e:
