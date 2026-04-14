@@ -1362,6 +1362,24 @@
       <!-- ── 대학활동 수집 대시보드 탭 ── -->
       <div id="section-crawler" class="hidden">
 
+        <!-- 진행 중 오버레이 -->
+        <div id="crawler-overlay" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center" style="background:rgba(15,23,42,0.55);backdrop-filter:blur(4px);">
+          <div class="bg-white rounded-2xl shadow-2xl px-10 py-8 flex flex-col items-center gap-4 min-w-[280px]">
+            <div id="crawler-overlay-spinner" style="width:52px;height:52px;border:5px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:crawlerSpin 0.8s linear infinite;"></div>
+            <p id="crawler-overlay-title" class="font-bold text-slate-700 text-base text-center"></p>
+            <p id="crawler-overlay-sub" class="text-sm text-slate-400 text-center"></p>
+            <div id="crawler-overlay-dots" class="flex gap-1 mt-1">
+              <span class="w-2 h-2 rounded-full bg-blue-400" style="animation:crawlerDot 1.2s 0s infinite both"></span>
+              <span class="w-2 h-2 rounded-full bg-blue-400" style="animation:crawlerDot 1.2s 0.2s infinite both"></span>
+              <span class="w-2 h-2 rounded-full bg-blue-400" style="animation:crawlerDot 1.2s 0.4s infinite both"></span>
+            </div>
+          </div>
+        </div>
+        <style>
+          @keyframes crawlerSpin { to { transform: rotate(360deg); } }
+          @keyframes crawlerDot { 0%,80%,100%{opacity:.2;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
+        </style>
+
         <!-- 상단: 제목 + 수집 시작 버튼 -->
         <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
           <h3 class="font-bold text-slate-700 text-base">🤖 대학활동 자동 수집</h3>
@@ -4888,10 +4906,20 @@ ${d.hashtags}`;
       loadUnivSites();
     }
 
+    function showCrawlerOverlay(title, sub) {
+      document.getElementById('crawler-overlay-title').textContent = title;
+      document.getElementById('crawler-overlay-sub').textContent = sub;
+      document.getElementById('crawler-overlay').classList.remove('hidden');
+    }
+    function hideCrawlerOverlay() {
+      document.getElementById('crawler-overlay').classList.add('hidden');
+    }
+
     async function detectSelectors() {
       const btn = document.getElementById('crawler-detect-btn');
       btn.disabled = true;
       btn.textContent = '⏳ 감지 중...';
+      showCrawlerOverlay('셀렉터 감지 중...', '사이트 수에 따라 1~2분 소요됩니다');
       addCrawlerLog('🔍 셀렉터 감지 시작... (사이트 수에 따라 1~2분 소요)');
       addCrawlerLog('   각 사이트를 순차적으로 분석 중입니다...');
 
@@ -4931,6 +4959,7 @@ ${d.hashtags}`;
       } catch(e) {
         addCrawlerLog('❌ 연결 실패: server.py가 실행되지 않았습니다');
       } finally {
+        hideCrawlerOverlay();
         btn.disabled = false;
         btn.textContent = '🔍 1단계: 셀렉터 감지';
       }
@@ -5022,7 +5051,16 @@ ${d.hashtags}`;
       const btn = document.getElementById('crawler-start-btn');
       btn.disabled = true;
       btn.textContent = '⏳ 수집 중...';
+      showCrawlerOverlay('게시글 수집 중...', '등록된 사이트를 순차적으로 수집하고 있습니다');
       addCrawlerLog('수집 시작 요청 전송 중...');
+
+      // 오버레이 부제목 주기적 업데이트
+      const steps = ['RSS 피드 확인 중...', '정적 페이지 수집 중...', '중복 비교 중...', 'DB 저장 중...'];
+      let stepIdx = 0;
+      const stepTimer = setInterval(() => {
+        stepIdx = (stepIdx + 1) % steps.length;
+        document.getElementById('crawler-overlay-sub').textContent = steps[stepIdx];
+      }, 4000);
 
       try {
         // server.py 직접 호출 (port 8765)
@@ -5043,8 +5081,10 @@ ${d.hashtags}`;
         addCrawlerLog('❌ 연결 실패: server.py가 실행되지 않았습니다');
         addCrawlerLog('   → PowerShell에서 python server.py 실행 후 다시 시도하세요');
       } finally {
+        clearInterval(stepTimer);
+        hideCrawlerOverlay();
         btn.disabled = false;
-        btn.textContent = '▶ 수집 시작';
+        btn.textContent = '▶ 2단계: 수집 시작';
       }
     }
 
