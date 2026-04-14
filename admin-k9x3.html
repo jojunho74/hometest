@@ -1413,6 +1413,36 @@
             <p class="text-xs mt-1">+ 사이트 등록 버튼으로 추가하세요</p>
           </div>
         </div>
+
+        <!-- 수집된 게시글 목록 -->
+        <div class="bg-white rounded-xl shadow-sm mt-5">
+          <div class="px-5 py-4 border-b flex items-center justify-between flex-wrap gap-2">
+            <p class="font-semibold text-slate-700 text-sm">수집된 게시글</p>
+            <div class="flex items-center gap-3">
+              <select id="crawler-school-filter" onchange="loadCrawledPosts()" class="text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none">
+                <option value="">전체 학교</option>
+              </select>
+              <span id="crawled-posts-count" class="text-xs text-slate-400">0개</span>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-slate-400 text-xs border-b bg-slate-50">
+                  <th class="px-4 py-3 font-semibold">학교명</th>
+                  <th class="px-4 py-3 font-semibold">제목</th>
+                  <th class="px-4 py-3 font-semibold hidden md:table-cell">링크</th>
+                  <th class="px-4 py-3 font-semibold hidden md:table-cell">수집일</th>
+                  <th class="px-4 py-3 font-semibold">삭제</th>
+                </tr>
+              </thead>
+              <tbody id="crawled-posts-tbody"></tbody>
+            </table>
+          </div>
+          <div id="crawled-posts-empty" class="hidden text-center py-10 text-slate-300">
+            <p class="text-sm">수집된 게시글이 없습니다</p>
+          </div>
+        </div>
       </div>
 
       <!-- 대학 사이트 등록/수정 모달 -->
@@ -4581,6 +4611,44 @@ ${d.hashtags}`;
     // ─── 대학활동 수집 대시보드 ───
     let univSiteEditId = null;
 
+    async function loadCrawledPosts() {
+      const filter = document.getElementById('crawler-school-filter').value;
+      let query = db.from('school_programs').select('*').order('created_at', { ascending: false }).limit(200);
+      if (filter) query = query.eq('school_name', filter);
+      const { data, error } = await query;
+      if (error) { console.error(error); return; }
+      const rows = data || [];
+
+      document.getElementById('crawled-posts-count').textContent = rows.length + '개';
+
+      const tbody = document.getElementById('crawled-posts-tbody');
+      const empty = document.getElementById('crawled-posts-empty');
+      if (rows.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+
+      tbody.innerHTML = rows.map(r => `
+        <tr class="border-b last:border-0 hover:bg-slate-50 transition-colors">
+          <td class="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">${esc(r.school_name || '-')}</td>
+          <td class="px-4 py-3 font-medium text-slate-800 max-w-xs truncate">${esc(r.title || '-')}</td>
+          <td class="px-4 py-3 hidden md:table-cell">
+            ${r.link ? `<a href="${esc(r.link)}" target="_blank" class="text-blue-500 text-xs hover:underline truncate block max-w-xs">${esc(r.link)}</a>` : '-'}
+          </td>
+          <td class="px-4 py-3 text-slate-400 text-xs hidden md:table-cell whitespace-nowrap">${r.created_at ? formatDate(r.created_at) : '-'}</td>
+          <td class="px-4 py-3">
+            <button onclick="deleteCrawledPost('${r.id}')" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">삭제</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function deleteCrawledPost(id) {
+      if (!confirm('이 게시글을 삭제하시겠습니까?')) return;
+      const { error } = await db.from('school_programs').delete().eq('id', id);
+      if (error) { alert('삭제 실패: ' + error.message); return; }
+      loadCrawledPosts();
+      loadUnivSites(); // 통계 갱신
+    }
+
     async function loadUnivSites() {
       const { data, error } = await db.from('university_sites').select('*').order('school_name');
       if (error) { console.error('university_sites 로드 오류:', error); return; }
@@ -4588,6 +4656,14 @@ ${d.hashtags}`;
 
       document.getElementById('univ-sites-count').textContent = rows.length + '개';
       document.getElementById('stat-sites').textContent = rows.length;
+
+      // 학교 필터 드롭다운 갱신
+      const filter = document.getElementById('crawler-school-filter');
+      const current = filter.value;
+      filter.innerHTML = '<option value="">전체 학교</option>' +
+        rows.map(r => `<option value="${esc(r.school_name)}" ${current === r.school_name ? 'selected' : ''}>${esc(r.school_name)}</option>`).join('');
+
+      loadCrawledPosts();
 
       // 전체 게시글 수
       const { count } = await db.from('school_programs').select('*', { count: 'exact', head: true });
