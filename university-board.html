@@ -222,7 +222,7 @@
     try {
       const headers = { 'apikey': SB_KEY, 'Authorization': 'Bearer '+SB_KEY };
       const [r1, r2, r3] = await Promise.all([
-        fetch(SB_URL+'/rest/v1/school_programs?select=*&order=sort_order.asc,created_at.desc', { headers }),
+        fetch(SB_URL+'/rest/v1/school_programs?select=*&is_deleted=eq.false&order=sort_order.asc,created_at.desc', { headers }),
         fetch(SB_URL+'/rest/v1/university_news?select=*&order=sort_order.asc,created_at.desc', { headers }),
         fetch(SB_URL+'/rest/v1/staff_job_postings?select=*&order=sort_order.asc,created_at.desc', { headers })
       ]);

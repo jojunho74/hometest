@@ -2474,7 +2474,7 @@
     let editingProgId = null;
 
     async function loadPrograms() {
-      const { data, error } = await db.from('school_programs').select('*').order('sort_order', { ascending: true });
+      const { data, error } = await db.from('school_programs').select('*').eq('is_deleted', false).order('sort_order', { ascending: true });
       if (error) { console.error(error); return; }
       progData = data || [];
       renderSwatches('prog-color-swatches', 'prog-color', '#FFFFFF');
@@ -2555,7 +2555,7 @@
       if (checked.length === 0) return;
       if (!confirm(`선택한 ${checked.length}개를 삭제하시겠습니까?`)) return;
       const ids = Array.from(checked).map(c => c.value);
-      const { error } = await db.from('school_programs').delete().in('id', ids);
+      const { error } = await db.from('school_programs').update({ is_deleted: true }).in('id', ids);
       if (error) { alert('삭제 실패: ' + error.message); return; }
       loadPrograms();
     }
@@ -2611,7 +2611,7 @@
 
     async function deleteProgram(id) {
       if (!confirm('이 프로그램을 삭제하시겠습니까?')) return;
-      const { error } = await db.from('school_programs').delete().eq('id', id);
+      const { error } = await db.from('school_programs').update({ is_deleted: true }).eq('id', id);
       if (error) { alert('삭제 실패: ' + error.message); return; }
       loadPrograms();
     }
@@ -4695,6 +4695,7 @@ ${d.hashtags}`;
       // 등록된 학교명만 필터링
       let query = db.from('school_programs').select('*')
         .in('school_name', registeredNames)
+        .eq('is_deleted', false)
         .order('created_at', { ascending: false })
         .limit(200);
       if (filter) query = query.eq('school_name', filter);
@@ -4729,7 +4730,7 @@ ${d.hashtags}`;
 
     async function deleteCrawledPost(id) {
       if (!confirm('이 게시글을 삭제하시겠습니까?')) return;
-      const { error } = await db.from('school_programs').delete().eq('id', id);
+      const { error } = await db.from('school_programs').update({ is_deleted: true }).eq('id', id);
       if (error) { alert('삭제 실패: ' + error.message); return; }
       loadCrawledPosts();
       loadUnivSites();
@@ -4743,7 +4744,7 @@ ${d.hashtags}`;
       const checked = [...document.querySelectorAll('.crawled-check:checked')].map(cb => cb.value);
       if (checked.length === 0) { alert('삭제할 게시글을 선택해주세요.'); return; }
       if (!confirm(`선택한 ${checked.length}개를 삭제하시겠습니까?`)) return;
-      const { error } = await db.from('school_programs').delete().in('id', checked);
+      const { error } = await db.from('school_programs').update({ is_deleted: true }).in('id', checked);
       if (error) { alert('삭제 실패: ' + error.message); return; }
       loadCrawledPosts();
       loadUnivSites();
@@ -4756,8 +4757,8 @@ ${d.hashtags}`;
 
       const { data: sites } = await db.from('university_sites').select('school_name');
       const names = (sites || []).map(s => s.school_name);
-      let query = db.from('school_programs').delete().in('school_name', names);
-      if (filter) query = db.from('school_programs').delete().eq('school_name', filter);
+      let query = db.from('school_programs').update({ is_deleted: true }).in('school_name', names);
+      if (filter) query = db.from('school_programs').update({ is_deleted: true }).eq('school_name', filter);
       const { error } = await query;
       if (error) { alert('삭제 실패: ' + error.message); return; }
       loadCrawledPosts();

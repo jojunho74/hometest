@@ -21,6 +21,7 @@ def get_existing_posts(school_name: str = None) -> set:
     school_name 지정 시 해당 학교만 조회
     """
     sb = create_client(SUPABASE_URL, SUPABASE_KEY)
+    # is_deleted 포함 전체 조회 (삭제된 글도 중복 체크에 포함)
     query = sb.table('school_programs').select('title, link')
     if school_name:
         query = query.eq('school_name', school_name)
