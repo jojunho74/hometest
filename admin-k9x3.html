@@ -1887,7 +1887,7 @@
       if (tab === 'blog')     loadBlogDrafts();
       if (tab === 'calendar') loadCalendarAdmin();
       if (tab === 'popupads') loadPopupAds();
-      if (tab === 'crawler') loadUnivSites();
+      if (tab === 'crawler') { loadUnivSites(); restoreDetectResults(); }
     }
 
     // ─── 학생접수 ───
@@ -4939,9 +4939,28 @@ ${d.hashtags}`;
     function showDetectPreview(results) {
       const section = document.getElementById('preview-section');
       const grid = document.getElementById('preview-grid');
+      const detectEl = document.getElementById('detect-result');
       if (!section || !grid) return;
       section.classList.remove('hidden');
+
+      // localStorage에 저장 (새로고침 후에도 유지)
+      try { localStorage.setItem('detectResults', JSON.stringify(results)); } catch(e) {}
+
       const methodIcon = { 'RSS':'📡', '기존셀렉터':'✓', '자동감지':'🎯', '자동추출':'🔎', '감지실패':'❌', '실패':'❌' };
+
+      // 셀렉터 감지 결과 섹션 업데이트
+      if (detectEl) {
+        detectEl.innerHTML = results.map(r => {
+          const icon = methodIcon[r.method] || '?';
+          const color = r.count > 0 ? 'text-green-600' : 'text-red-400';
+          return `<div class="flex justify-between items-center py-0.5 border-b border-slate-50">
+            <span class="font-medium text-slate-700">${icon} ${esc(r.school_name)}</span>
+            <span class="${color} font-bold">${r.count}개</span>
+          </div>`;
+        }).join('');
+      }
+
+      // 카드 그리드 업데이트
       grid.innerHTML = results.map(r => {
         const icon = methodIcon[r.method] || '?';
         const countColor = r.count > 0 ? 'text-green-600' : 'text-red-400';
@@ -4955,6 +4974,17 @@ ${d.hashtags}`;
           <p class="text-xs text-slate-400 truncate">${esc(method)}</p>
         </div>`;
       }).join('');
+    }
+
+    // 페이지 로드 시 이전 감지 결과 복원
+    function restoreDetectResults() {
+      try {
+        const saved = localStorage.getItem('detectResults');
+        if (saved) {
+          const results = JSON.parse(saved);
+          if (results && results.length > 0) showDetectPreview(results);
+        }
+      } catch(e) {}
     }
 
     async function loadPreview() {
