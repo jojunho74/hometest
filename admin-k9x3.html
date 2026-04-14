@@ -1367,7 +1367,8 @@
           <h3 class="font-bold text-slate-700 text-base">🤖 대학활동 자동 수집</h3>
           <div class="flex gap-2">
             <button onclick="openUnivSiteModal()" class="btn btn-primary text-sm px-4 py-2">+ 사이트 등록</button>
-            <button onclick="startCrawler()" id="crawler-start-btn" class="btn btn-success text-sm px-4 py-2">▶ 수집 시작</button>
+            <button onclick="detectSelectors()" id="crawler-detect-btn" class="btn btn-secondary text-sm px-4 py-2">🔍 1단계: 셀렉터 감지</button>
+            <button onclick="startCrawler()" id="crawler-start-btn" class="btn btn-success text-sm px-4 py-2">▶ 2단계: 수집 시작</button>
           </div>
         </div>
 
@@ -4874,6 +4875,38 @@ ${d.hashtags}`;
       const { error } = await db.from('university_sites').delete().eq('id', id);
       if (error) { alert('삭제 실패: ' + error.message); return; }
       loadUnivSites();
+    }
+
+    async function detectSelectors() {
+      const btn = document.getElementById('crawler-detect-btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ 감지 중...';
+      addCrawlerLog('🔍 셀렉터 감지 시작...');
+
+      try {
+        const res = await fetch('http://127.0.0.1:8765/detect', { method: 'POST' });
+        if (res.ok) {
+          const data = await res.json().catch(() => ({}));
+          const results = data.results || [];
+          addCrawlerLog(`✅ ${results.length}개 사이트 감지 완료:`);
+          const methodIcon = { 'RSS':'📡', '기존셀렉터':'✓', '자동감지':'🎯', '자동추출':'🔎', '감지실패':'❌', '실패':'❌' };
+          results.forEach(r => {
+            const icon = methodIcon[r.method] || '?';
+            const sel = r.method === 'RSS' ? `RSS (${r.rss_url||''})` : (r.selector || '자동추출');
+            addCrawlerLog(`  ${icon} ${r.school_name}: [${r.method}] ${sel} → ${r.count}개 예상`);
+          });
+          addCrawlerLog('▶ 2단계 수집 시작 버튼을 눌러주세요');
+          // 자동 감지된 셀렉터 저장 후 목록 갱신
+          loadUnivSites();
+        } else {
+          addCrawlerLog('⚠️ 감지 오류: ' + res.status);
+        }
+      } catch(e) {
+        addCrawlerLog('❌ 연결 실패: server.py가 실행되지 않았습니다');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔍 1단계: 셀렉터 감지';
+      }
     }
 
     async function startCrawler() {

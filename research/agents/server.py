@@ -13,6 +13,7 @@ import os
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import agent_automation
+import agent_selector
 
 class Handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
@@ -41,6 +42,17 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({
                 'status': 'started',
                 'message': '수집 파이프라인이 시작되었습니다'
+            }, ensure_ascii=False).encode('utf-8'))
+        elif self.path == '/detect':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+
+            results = agent_selector.run()
+            self.wfile.write(json.dumps({
+                'status': 'ok',
+                'results': results
             }, ensure_ascii=False).encode('utf-8'))
         else:
             self.send_response(404)
