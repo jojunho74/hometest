@@ -4992,13 +4992,17 @@ ${d.hashtags}`;
       // 텍스트 목록 업데이트
       grid.innerHTML = results.map(r => {
         const icon = methodIcon[r.method] || '?';
-        const countColor = r.count > 0 ? 'text-green-600 font-bold' : 'text-red-400';
+        const countColor = r.count > 0 ? 'color:#16A34A;font-weight:700' : 'color:#EF4444';
         const method = r.method === 'RSS' ? 'RSS' : (r.selector || '자동추출');
-        return `<div class="flex items-center gap-2 py-1.5">
-          <span class="w-4 text-center">${icon}</span>
-          <span class="w-28 text-slate-700 truncate" title="${esc(r.school_name)}">${esc(r.school_name)}</span>
-          <span class="flex-1 text-slate-400 truncate">${esc(method)}</span>
-          <span class="${countColor}">${r.count}개</span>
+        const updatedBadge = r.changed
+          ? `<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:#FEF9C3;color:#A16207;margin-left:4px;flex-shrink:0;">업데이트</span>`
+          : '';
+        return `<div class="flex items-center gap-2 py-1.5" style="${r.changed ? 'background:#FEFCE8;margin:0 -16px;padding-left:16px;padding-right:16px;' : ''}">
+          <span style="width:16px;text-align:center;flex-shrink:0;">${icon}</span>
+          <span style="width:108px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${r.changed ? '#92400E' : '#334155'};font-weight:${r.changed ? '700' : '400'};" title="${esc(r.school_name)}">${esc(r.school_name)}</span>
+          ${updatedBadge}
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#94A3B8;">${esc(method)}</span>
+          <span style="${countColor}">${r.count}개</span>
         </div>`;
       }).join('');
     }
