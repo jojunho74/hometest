@@ -4649,7 +4649,7 @@ ${d.hashtags}`;
         <tr class="border-b last:border-0 hover:bg-slate-50 transition-colors">
           <td class="px-4 py-3"><input type="checkbox" class="crawled-check w-4 h-4 accent-blue-500" value="${r.id}"></td>
           <td class="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">${esc(r.school_name || '-')}</td>
-          <td class="px-4 py-3 font-medium text-slate-800 max-w-xs truncate">${esc(r.title || '-')}</td>
+          <td class="px-4 py-3 font-medium text-slate-800">${esc((r.title||'-').length > 15 ? (r.title).slice(0,15)+'...' : (r.title||'-'))}</td>
           <td class="px-4 py-3 hidden md:table-cell">
             ${r.link ? `<a href="${esc(r.link)}" target="_blank" class="text-blue-500 text-xs hover:underline truncate block max-w-xs">${esc(r.link)}</a>` : '-'}
           </td>
