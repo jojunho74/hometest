@@ -52,18 +52,33 @@ def parse_board_rows(soup, base_url: str, selector: str = None) -> list[dict]:
 
     if selector:
         items = soup.select(selector)
+        seen_links = set()
         for item in items:
             if item.name == 'a':
-                title = item.get_text(strip=True)
                 href = item.get('href', '')
+                # <a> 안에 <h3>, <h2>, <h4>, <p>, <span> 순서로 제목 추출 시도
+                title_tag = item.find(['h3', 'h2', 'h4', 'p', 'span'])
+                if title_tag:
+                    title = title_tag.get_text(strip=True)
+                else:
+                    # img 태그 제거 후 텍스트 추출
+                    for img in item.find_all('img'):
+                        img.decompose()
+                    title = item.get_text(strip=True)
             else:
                 a = item.find('a', href=True)
                 if not a:
                     continue
-                title = a.get_text(strip=True)
                 href = a.get('href', '')
-            if title and href and len(title) > 3:
-                results.append({'title': title, 'link': make_absolute(href, base_url)})
+                title_tag = item.find(['h3', 'h2', 'h4', 'p', 'span'])
+                if title_tag:
+                    title = title_tag.get_text(strip=True)
+                else:
+                    title = a.get_text(strip=True)
+            abs_link = make_absolute(href, base_url)
+            if title and href and len(title) > 3 and abs_link not in seen_links:
+                seen_links.add(abs_link)
+                results.append({'title': title, 'link': abs_link})
         return results
 
     # ── 자동 감지: 테이블 행 방식 ──

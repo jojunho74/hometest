@@ -402,11 +402,25 @@
           <p id="prog-msg" class="hidden text-sm text-green-600 mt-2 font-semibold">✓ 등록되었습니다.</p>
         </div>
 
+        <!-- 검색 + 일괄삭제 -->
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-3 flex flex-wrap items-center gap-3">
+          <input id="prog-search" type="text" placeholder="학교명 검색..." oninput="renderPrograms()"
+            class="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 w-48"/>
+          <span id="prog-selected-count" class="text-xs text-slate-400"></span>
+          <button onclick="bulkDeletePrograms()" id="prog-bulk-delete-btn"
+            class="hidden btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;">
+            선택 삭제
+          </button>
+          <button onclick="selectAllPrograms()" class="btn text-xs px-3 py-1.5 btn-secondary ml-auto">전체 선택</button>
+          <button onclick="deselectAllPrograms()" class="btn text-xs px-3 py-1.5 btn-secondary">전체 해제</button>
+        </div>
+
         <!-- 프로그램 목록 -->
         <div class="bg-white rounded-xl shadow-sm table-wrap">
           <table class="w-full text-sm">
             <thead>
               <tr class="text-left text-slate-400 text-xs border-b">
+                <th class="px-4 py-3 font-semibold w-8"><input type="checkbox" id="prog-check-all" onchange="toggleAllPrograms(this)"/></th>
                 <th class="px-4 py-3 font-semibold">순서</th>
                 <th class="px-4 py-3 font-semibold">학교/부서</th>
                 <th class="px-4 py-3 font-semibold">제목</th>
@@ -417,7 +431,7 @@
               </tr>
             </thead>
             <tbody id="prog-body">
-              <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">불러오는 중...</td></tr>
+              <tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">불러오는 중...</td></tr>
             </tbody>
           </table>
         </div>
@@ -2471,18 +2485,26 @@
         img.src = URL.createObjectURL(f);
         document.getElementById('prog-logo-preview-wrap').classList.remove('hidden');
       };
+      renderPrograms();
+    }
+
+    function renderPrograms() {
+      const keyword = (document.getElementById('prog-search')?.value || '').toLowerCase();
       const tbody = document.getElementById('prog-body');
       const empty = document.getElementById('prog-empty-msg');
-      if (progData.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
+      const filtered = keyword ? progData.filter(r => r.school_name?.toLowerCase().includes(keyword) || r.title?.toLowerCase().includes(keyword)) : progData;
+      if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">검색 결과가 없습니다.</td></tr>`; empty.classList.add('hidden'); return; }
       empty.classList.add('hidden');
-      tbody.innerHTML = progData.map((r, i) => {
+      tbody.innerHTML = filtered.map((r, i) => {
         const bg = r.bg_color || '#FFFFFF';
+        const origIdx = progData.indexOf(r);
         return `
         <tr class="border-b last:border-0 hover:bg-slate-50">
+          <td class="px-4 py-3"><input type="checkbox" class="prog-row-check" value="${r.id}" onchange="updateProgBulkBtn()"/></td>
           <td class="px-4 py-3">
             <div class="flex flex-col gap-1">
-              <button onclick="moveProgram(${i}, -1)" ${i === 0 ? 'disabled' : ''} class="text-slate-400 hover:text-slate-700 disabled:opacity-20 text-xs leading-none">▲</button>
-              <button onclick="moveProgram(${i},  1)" ${i === progData.length-1 ? 'disabled' : ''} class="text-slate-400 hover:text-slate-700 disabled:opacity-20 text-xs leading-none">▼</button>
+              <button onclick="moveProgram(${origIdx}, -1)" ${origIdx === 0 ? 'disabled' : ''} class="text-slate-400 hover:text-slate-700 disabled:opacity-20 text-xs leading-none">▲</button>
+              <button onclick="moveProgram(${origIdx},  1)" ${origIdx === progData.length-1 ? 'disabled' : ''} class="text-slate-400 hover:text-slate-700 disabled:opacity-20 text-xs leading-none">▼</button>
             </div>
           </td>
           <td class="px-4 py-3 font-medium text-slate-700">${esc(r.school_name)}</td>
@@ -2493,6 +2515,49 @@
           <td class="px-4 py-3"><button onclick="deleteProgram('${r.id}')" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">삭제</button></td>
         </tr>`;
       }).join('');
+      updateProgBulkBtn();
+    }
+
+    function updateProgBulkBtn() {
+      const checked = document.querySelectorAll('.prog-row-check:checked');
+      const btn = document.getElementById('prog-bulk-delete-btn');
+      const cnt = document.getElementById('prog-selected-count');
+      if (checked.length > 0) {
+        btn.classList.remove('hidden');
+        cnt.textContent = `${checked.length}개 선택됨`;
+      } else {
+        btn.classList.add('hidden');
+        cnt.textContent = '';
+      }
+    }
+
+    function toggleAllPrograms(cb) {
+      document.querySelectorAll('.prog-row-check').forEach(c => c.checked = cb.checked);
+      updateProgBulkBtn();
+    }
+
+    function selectAllPrograms() {
+      document.querySelectorAll('.prog-row-check').forEach(c => c.checked = true);
+      const allCb = document.getElementById('prog-check-all');
+      if (allCb) allCb.checked = true;
+      updateProgBulkBtn();
+    }
+
+    function deselectAllPrograms() {
+      document.querySelectorAll('.prog-row-check').forEach(c => c.checked = false);
+      const allCb = document.getElementById('prog-check-all');
+      if (allCb) allCb.checked = false;
+      updateProgBulkBtn();
+    }
+
+    async function bulkDeletePrograms() {
+      const checked = document.querySelectorAll('.prog-row-check:checked');
+      if (checked.length === 0) return;
+      if (!confirm(`선택한 ${checked.length}개를 삭제하시겠습니까?`)) return;
+      const ids = Array.from(checked).map(c => c.value);
+      const { error } = await db.from('school_programs').delete().in('id', ids);
+      if (error) { alert('삭제 실패: ' + error.message); return; }
+      loadPrograms();
     }
 
     async function moveProgram(idx, dir) {
