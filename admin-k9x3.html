@@ -1418,17 +1418,20 @@
         <div class="bg-white rounded-xl shadow-sm mt-5">
           <div class="px-5 py-4 border-b flex items-center justify-between flex-wrap gap-2">
             <p class="font-semibold text-slate-700 text-sm">수집된 게시글</p>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 flex-wrap">
               <select id="crawler-school-filter" onchange="loadCrawledPosts()" class="text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none">
                 <option value="">전체 학교</option>
               </select>
               <span id="crawled-posts-count" class="text-xs text-slate-400">0개</span>
+              <button onclick="bulkDeleteCrawledPosts()" class="btn btn-danger text-xs px-3 py-1.5">선택 삭제</button>
+              <button onclick="deleteAllCrawledPosts()" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">전체 삭제</button>
             </div>
           </div>
           <div class="table-wrap">
             <table class="w-full text-sm">
               <thead>
                 <tr class="text-left text-slate-400 text-xs border-b bg-slate-50">
+                  <th class="px-4 py-3"><input type="checkbox" id="crawled-check-all" onchange="toggleAllCrawledChecks(this)" class="w-4 h-4 accent-blue-500"></th>
                   <th class="px-4 py-3 font-semibold">학교명</th>
                   <th class="px-4 py-3 font-semibold">제목</th>
                   <th class="px-4 py-3 font-semibold hidden md:table-cell">링크</th>
@@ -4644,6 +4647,7 @@ ${d.hashtags}`;
 
       tbody.innerHTML = rows.map(r => `
         <tr class="border-b last:border-0 hover:bg-slate-50 transition-colors">
+          <td class="px-4 py-3"><input type="checkbox" class="crawled-check w-4 h-4 accent-blue-500" value="${r.id}"></td>
           <td class="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">${esc(r.school_name || '-')}</td>
           <td class="px-4 py-3 font-medium text-slate-800 max-w-xs truncate">${esc(r.title || '-')}</td>
           <td class="px-4 py-3 hidden md:table-cell">
@@ -4655,6 +4659,7 @@ ${d.hashtags}`;
           </td>
         </tr>
       `).join('');
+      document.getElementById('crawled-check-all').checked = false;
     }
 
     async function deleteCrawledPost(id) {
@@ -4662,7 +4667,36 @@ ${d.hashtags}`;
       const { error } = await db.from('school_programs').delete().eq('id', id);
       if (error) { alert('삭제 실패: ' + error.message); return; }
       loadCrawledPosts();
-      loadUnivSites(); // 통계 갱신
+      loadUnivSites();
+    }
+
+    function toggleAllCrawledChecks(el) {
+      document.querySelectorAll('.crawled-check').forEach(cb => cb.checked = el.checked);
+    }
+
+    async function bulkDeleteCrawledPosts() {
+      const checked = [...document.querySelectorAll('.crawled-check:checked')].map(cb => cb.value);
+      if (checked.length === 0) { alert('삭제할 게시글을 선택해주세요.'); return; }
+      if (!confirm(`선택한 ${checked.length}개를 삭제하시겠습니까?`)) return;
+      const { error } = await db.from('school_programs').delete().in('id', checked);
+      if (error) { alert('삭제 실패: ' + error.message); return; }
+      loadCrawledPosts();
+      loadUnivSites();
+    }
+
+    async function deleteAllCrawledPosts() {
+      const filter = document.getElementById('crawler-school-filter').value;
+      const target = filter ? `${filter} 게시글 전체` : '현재 필터된 게시글 전체';
+      if (!confirm(`${target}를 삭제하시겠습니까?\n복구할 수 없습니다.`)) return;
+
+      const { data: sites } = await db.from('university_sites').select('school_name');
+      const names = (sites || []).map(s => s.school_name);
+      let query = db.from('school_programs').delete().in('school_name', names);
+      if (filter) query = db.from('school_programs').delete().eq('school_name', filter);
+      const { error } = await query;
+      if (error) { alert('삭제 실패: ' + error.message); return; }
+      loadCrawledPosts();
+      loadUnivSites();
     }
 
     async function loadUnivSites() {
