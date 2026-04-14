@@ -4983,7 +4983,10 @@ ${d.hashtags}`;
           const icon = methodIcon[r.method] || '?';
           const color = r.count > 0 ? 'text-green-600' : 'text-red-400';
           return `<div class="flex justify-between items-center py-0.5 border-b border-slate-50">
-            <span class="font-medium text-slate-700">${icon} ${esc(r.school_name)}</span>
+            <span class="flex items-center gap-1 font-medium text-slate-700">
+              <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#EF4444;flex-shrink:0;"></span>
+              ${icon} ${esc(r.school_name)}
+            </span>
             <span class="${color} font-bold">${r.count}개</span>
           </div>`;
         }).join('');
@@ -4998,8 +5001,9 @@ ${d.hashtags}`;
           ? `<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:#FEF9C3;color:#A16207;margin-left:4px;flex-shrink:0;">업데이트</span>`
           : '';
         return `<div class="flex items-center gap-2 py-1.5" style="${r.changed ? 'background:#FEFCE8;margin:0 -16px;padding-left:16px;padding-right:16px;' : ''}">
+          <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#EF4444;flex-shrink:0;"></span>
           <span style="width:16px;text-align:center;flex-shrink:0;">${icon}</span>
-          <span style="width:108px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${r.changed ? '#92400E' : '#334155'};font-weight:${r.changed ? '700' : '400'};" title="${esc(r.school_name)}">${esc(r.school_name)}</span>
+          <span style="width:100px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${r.changed ? '#92400E' : '#334155'};font-weight:${r.changed ? '700' : '400'};" title="${esc(r.school_name)}">${esc(r.school_name)}</span>
           ${updatedBadge}
           <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#94A3B8;">${esc(method)}</span>
           <span style="${countColor}">${r.count}개</span>
