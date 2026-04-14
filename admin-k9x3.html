@@ -4613,8 +4613,24 @@ ${d.hashtags}`;
 
     async function loadCrawledPosts() {
       const filter = document.getElementById('crawler-school-filter').value;
-      let query = db.from('school_programs').select('*').order('created_at', { ascending: false }).limit(200);
+
+      // university_sites에 등록된 학교명 목록 가져오기
+      const { data: sites } = await db.from('university_sites').select('school_name');
+      const registeredNames = (sites || []).map(s => s.school_name);
+      if (registeredNames.length === 0) {
+        document.getElementById('crawled-posts-tbody').innerHTML = '';
+        document.getElementById('crawled-posts-empty').classList.remove('hidden');
+        document.getElementById('crawled-posts-count').textContent = '0개';
+        return;
+      }
+
+      // 등록된 학교명만 필터링
+      let query = db.from('school_programs').select('*')
+        .in('school_name', registeredNames)
+        .order('created_at', { ascending: false })
+        .limit(200);
       if (filter) query = query.eq('school_name', filter);
+
       const { data, error } = await query;
       if (error) { console.error(error); return; }
       const rows = data || [];
