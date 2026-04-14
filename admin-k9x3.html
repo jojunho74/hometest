@@ -191,6 +191,9 @@
       <button onclick="switchTab('shorts')"   id="tab-shorts"   class="sb-item"><span class="sb-icon">🎬</span>유튜브쇼츠</button>
       <button onclick="switchTab('calendar')" id="tab-calendar" class="sb-item"><span class="sb-icon">📅</span>채용달력</button>
 
+      <div class="sb-section-label">자동화</div>
+      <button onclick="switchTab('crawler')" id="tab-crawler" class="sb-item"><span class="sb-icon">🤖</span>대학활동 수집</button>
+
       <div class="sb-section-label">분석 · 운영</div>
       <button onclick="switchTab('stats')"    id="tab-stats"    class="sb-item"><span class="sb-icon">📊</span>통계</button>
       <button onclick="switchTab('blog')"     id="tab-blog"     class="sb-item"><span class="sb-icon">✍️</span>블로그 원고</button>
@@ -1341,6 +1344,106 @@
       </div>
 
       <!-- ── 팝업광고 탭 ── -->
+      <!-- ── 대학활동 수집 대시보드 탭 ── -->
+      <div id="section-crawler" class="hidden">
+
+        <!-- 상단: 제목 + 수집 시작 버튼 -->
+        <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+          <h3 class="font-bold text-slate-700 text-base">🤖 대학활동 자동 수집</h3>
+          <div class="flex gap-2">
+            <button onclick="openUnivSiteModal()" class="btn btn-primary text-sm px-4 py-2">+ 사이트 등록</button>
+            <button onclick="startCrawler()" id="crawler-start-btn" class="btn btn-success text-sm px-4 py-2">▶ 수집 시작</button>
+          </div>
+        </div>
+
+        <!-- 4개 섹션 패널 -->
+        <div class="grid grid-cols-2 gap-4 mb-5">
+          <!-- 섹션 1: 수집 현황 -->
+          <div class="bg-white rounded-xl shadow-sm p-4">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">수집 현황</p>
+            <div id="crawler-stats" class="space-y-2 text-sm text-slate-600">
+              <div class="flex justify-between"><span>등록 사이트</span><span id="stat-sites" class="font-bold text-slate-800">-</span></div>
+              <div class="flex justify-between"><span>마지막 수집</span><span id="stat-last" class="font-bold text-slate-800">-</span></div>
+              <div class="flex justify-between"><span>오늘 신규 게시글</span><span id="stat-today" class="font-bold text-blue-600">-</span></div>
+              <div class="flex justify-between"><span>전체 게시글</span><span id="stat-total" class="font-bold text-slate-800">-</span></div>
+            </div>
+          </div>
+          <!-- 섹션 2: 실행 로그 -->
+          <div class="bg-white rounded-xl shadow-sm p-4">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">실행 로그</p>
+            <div id="crawler-log" class="text-xs font-mono text-slate-500 h-28 overflow-y-auto space-y-1">
+              <p class="text-slate-300 italic">수집 시작 버튼을 눌러주세요</p>
+            </div>
+          </div>
+          <!-- 섹션 3 (추후 결정) -->
+          <div class="bg-white rounded-xl shadow-sm p-4">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">섹션 3 (추후 결정)</p>
+            <p class="text-sm text-slate-300 italic">기능 준비 중</p>
+          </div>
+          <!-- 섹션 4 (추후 결정) -->
+          <div class="bg-white rounded-xl shadow-sm p-4">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">섹션 4 (추후 결정)</p>
+            <p class="text-sm text-slate-300 italic">기능 준비 중</p>
+          </div>
+        </div>
+
+        <!-- 등록된 대학 사이트 목록 -->
+        <div class="bg-white rounded-xl shadow-sm">
+          <div class="px-5 py-4 border-b flex items-center justify-between">
+            <p class="font-semibold text-slate-700 text-sm">등록된 수집 대상 사이트</p>
+            <span id="univ-sites-count" class="text-xs text-slate-400">0개</span>
+          </div>
+          <div class="table-wrap">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-slate-400 text-xs border-b bg-slate-50">
+                  <th class="px-4 py-3 font-semibold">학교명</th>
+                  <th class="px-4 py-3 font-semibold hidden md:table-cell">URL</th>
+                  <th class="px-4 py-3 font-semibold">활성화</th>
+                  <th class="px-4 py-3 font-semibold hidden md:table-cell">마지막 수집</th>
+                  <th class="px-4 py-3 font-semibold">관리</th>
+                </tr>
+              </thead>
+              <tbody id="univ-sites-tbody"></tbody>
+            </table>
+          </div>
+          <div id="univ-sites-empty" class="hidden text-center py-12 text-slate-300">
+            <p class="text-3xl mb-2">🏫</p>
+            <p class="text-sm">등록된 사이트가 없습니다</p>
+            <p class="text-xs mt-1">+ 사이트 등록 버튼으로 추가하세요</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 대학 사이트 등록/수정 모달 -->
+      <div id="univ-site-modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:200;padding:16px;">
+        <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:480px;">
+          <h3 class="font-bold text-slate-800 text-base mb-5" id="univ-site-modal-title">대학 사이트 등록</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">학교명 <span class="text-red-400">*</span></label>
+              <input id="usm-school" type="text" placeholder="예: 한국대학교" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">수집 URL <span class="text-red-400">*</span></label>
+              <input id="usm-url" type="url" placeholder="https://www.university.ac.kr/news" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">CSS 선택자 <span class="text-slate-300">(선택, 없으면 자동 감지)</span></label>
+              <input id="usm-selector" type="text" placeholder="예: .board-list li a" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+            </div>
+            <div class="flex items-center gap-2">
+              <input id="usm-active" type="checkbox" checked class="w-4 h-4 accent-blue-500">
+              <label class="text-sm text-slate-600">수집 활성화</label>
+            </div>
+          </div>
+          <div class="flex gap-3 mt-6">
+            <button onclick="saveUnivSite()" class="btn btn-primary flex-1">저장</button>
+            <button onclick="closeUnivSiteModal()" class="btn btn-secondary flex-1">취소</button>
+          </div>
+        </div>
+      </div>
+
       <div id="section-popupads" class="hidden">
 
         <!-- 상단 액션 바 -->
@@ -1696,11 +1799,11 @@
     const TAB_LABELS = {
       consult:'신청 관리', student:'학생접수', news:'대학소식', programs:'대학활동',
       jobs:'채용공고', staffjobs:'직원채용공고', cnews:'기업소식', shorts:'유튜브쇼츠', stats:'통계',
-      blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고'
+      blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고', crawler:'대학활동 수집'
     };
 
     function switchTab(tab) {
-      ['consult', 'student', 'news', 'programs', 'jobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'blog', 'calendar', 'popupads'].forEach(t => {
+      ['consult', 'student', 'news', 'programs', 'jobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'blog', 'calendar', 'popupads', 'crawler'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (t === tab) btn.classList.add('active');
@@ -1724,6 +1827,7 @@
       if (tab === 'blog')     loadBlogDrafts();
       if (tab === 'calendar') loadCalendarAdmin();
       if (tab === 'popupads') loadPopupAds();
+      if (tab === 'crawler') loadUnivSites();
     }
 
     // ─── 학생접수 ───
@@ -4472,6 +4576,154 @@ ${d.hashtags}`;
       const { error } = await db.from('popup_ads').delete().eq('id', id);
       if (error) { alert('삭제 실패: ' + error.message); return; }
       loadPopupAds();
+    }
+
+    // ─── 대학활동 수집 대시보드 ───
+    let univSiteEditId = null;
+
+    async function loadUnivSites() {
+      const { data, error } = await db.from('university_sites').select('*').order('school_name');
+      if (error) { console.error('university_sites 로드 오류:', error); return; }
+      const rows = data || [];
+
+      document.getElementById('univ-sites-count').textContent = rows.length + '개';
+      document.getElementById('stat-sites').textContent = rows.length;
+
+      // 전체 게시글 수
+      const { count } = await db.from('school_programs').select('*', { count: 'exact', head: true });
+      document.getElementById('stat-total').textContent = (count || 0) + '개';
+
+      // 오늘 신규
+      const today = new Date(); today.setHours(0,0,0,0);
+      const { count: todayCount } = await db.from('school_programs')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', today.toISOString());
+      document.getElementById('stat-today').textContent = (todayCount || 0) + '개';
+
+      // 마지막 수집
+      const lastCrawled = rows.filter(r => r.last_crawled_at).sort((a,b) => new Date(b.last_crawled_at) - new Date(a.last_crawled_at))[0];
+      document.getElementById('stat-last').textContent = lastCrawled ? formatDate(lastCrawled.last_crawled_at) : '없음';
+
+      const tbody = document.getElementById('univ-sites-tbody');
+      const empty = document.getElementById('univ-sites-empty');
+
+      if (rows.length === 0) {
+        tbody.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+      tbody.innerHTML = rows.map(r => `
+        <tr class="border-b last:border-0 hover:bg-slate-50 transition-colors">
+          <td class="px-4 py-3 font-medium text-slate-800">${esc(r.school_name)}</td>
+          <td class="px-4 py-3 text-blue-500 text-xs hidden md:table-cell max-w-xs truncate">
+            <a href="${esc(r.url)}" target="_blank" class="hover:underline">${esc(r.url)}</a>
+          </td>
+          <td class="px-4 py-3">
+            <span class="${r.is_active ? 'badge-done' : 'badge-pending'}">${r.is_active ? '활성' : '비활성'}</span>
+          </td>
+          <td class="px-4 py-3 text-slate-400 text-xs hidden md:table-cell">${r.last_crawled_at ? formatDate(r.last_crawled_at) : '-'}</td>
+          <td class="px-4 py-3 flex gap-2">
+            <button onclick="openUnivSiteModal('${r.id}')" class="btn btn-secondary text-xs px-3 py-1.5">수정</button>
+            <button onclick="deleteUnivSite('${r.id}')" class="btn btn-danger text-xs px-3 py-1.5">삭제</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openUnivSiteModal(id) {
+      univSiteEditId = id || null;
+      document.getElementById('univ-site-modal-title').textContent = id ? '사이트 수정' : '대학 사이트 등록';
+      document.getElementById('usm-school').value = '';
+      document.getElementById('usm-url').value = '';
+      document.getElementById('usm-selector').value = '';
+      document.getElementById('usm-active').checked = true;
+
+      if (id) {
+        db.from('university_sites').select('*').eq('id', id).single().then(({ data }) => {
+          if (data) {
+            document.getElementById('usm-school').value = data.school_name || '';
+            document.getElementById('usm-url').value = data.url || '';
+            document.getElementById('usm-selector').value = data.selector || '';
+            document.getElementById('usm-active').checked = data.is_active !== false;
+          }
+        });
+      }
+      document.getElementById('univ-site-modal').style.display = 'flex';
+    }
+
+    function closeUnivSiteModal() {
+      document.getElementById('univ-site-modal').style.display = 'none';
+      univSiteEditId = null;
+    }
+
+    async function saveUnivSite() {
+      const school_name = document.getElementById('usm-school').value.trim();
+      const url         = document.getElementById('usm-url').value.trim();
+      const selector    = document.getElementById('usm-selector').value.trim() || null;
+      const is_active   = document.getElementById('usm-active').checked;
+
+      if (!school_name || !url) { alert('학교명과 URL은 필수입니다.'); return; }
+
+      if (univSiteEditId) {
+        const { error } = await db.from('university_sites').update({ school_name, url, selector, is_active }).eq('id', univSiteEditId);
+        if (error) { alert('수정 실패: ' + error.message); return; }
+      } else {
+        const { error } = await db.from('university_sites').insert({ school_name, url, selector, is_active });
+        if (error) { alert('등록 실패: ' + error.message); return; }
+      }
+      closeUnivSiteModal();
+      loadUnivSites();
+    }
+
+    async function deleteUnivSite(id) {
+      if (!confirm('이 사이트를 삭제하시겠습니까?')) return;
+      const { error } = await db.from('university_sites').delete().eq('id', id);
+      if (error) { alert('삭제 실패: ' + error.message); return; }
+      loadUnivSites();
+    }
+
+    async function startCrawler() {
+      const btn = document.getElementById('crawler-start-btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ 수집 중...';
+      addCrawlerLog('수집 시작 요청 전송 중...');
+
+      try {
+        // n8n webhook URL - 실제 URL로 교체 필요
+        const webhookUrl = 'http://localhost:5678/webhook/university-crawler';
+        const res = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ trigger: 'manual', timestamp: new Date().toISOString() })
+        });
+        if (res.ok) {
+          const data = await res.json().catch(() => ({}));
+          addCrawlerLog('✅ 수집 완료: ' + (data.message || JSON.stringify(data)));
+          loadUnivSites();
+        } else {
+          addCrawlerLog('⚠️ n8n 응답 오류: ' + res.status + ' — n8n이 실행 중인지 확인하세요');
+        }
+      } catch(e) {
+        addCrawlerLog('❌ 연결 실패: n8n이 실행되지 않았거나 Webhook URL을 확인하세요');
+        addCrawlerLog('   → ARCHITECTURE.md의 n8n 연동 섹션을 참고하세요');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '▶ 수집 시작';
+      }
+    }
+
+    function addCrawlerLog(msg) {
+      const log = document.getElementById('crawler-log');
+      const time = new Date().toLocaleTimeString('ko-KR');
+      const p = document.createElement('p');
+      p.textContent = `[${time}] ${msg}`;
+      p.className = 'text-slate-600';
+      log.appendChild(p);
+      log.scrollTop = log.scrollHeight;
+      // 초기 안내 메시지 제거
+      const placeholder = log.querySelector('.text-slate-300');
+      if (placeholder) placeholder.remove();
     }
 
     // Supabase 실시간 구독 (새 신청 자동 반영 — 로그인 후 자동 연결)
