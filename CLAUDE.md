@@ -878,3 +878,108 @@ https://ibtcc.kr/
 ❌ 한글 파일명 사용 금지 (Vercel 배포 시 이미지 깨짐)
 ✅ ASCII 파일명만 사용 (예: package-hero.png, logo.png)
 ```
+
+## 대학활동 자동 수집 파이프라인
+
+### 수집 실행 순서 (수동)
+
+```
+1. 바탕화면 수집시작.bat 더블클릭
+   → server.py 자동 시작 (port 8765)
+   → 로컬 관리자 페이지 자동 열림 (admin-k9x3.html)
+
+2. 관리자 페이지 → 크롤러 탭 → 🔍 1단계: 셀렉터 감지 클릭
+   → server.py /detect 엔드포인트 호출
+   → agent_selector.py가 각 사이트의 최적 셀렉터 자동 감지
+   → 감지 결과 카드 그리드로 표시 (방법/셀렉터/수집 예상 개수)
+   → 새로 감지된 셀렉터는 university_sites 테이블에 자동 저장
+   → 결과는 localStorage에 저장 → 탭 이동 후 돌아와도 유지
+
+3. 관리자 페이지 → 크롤러 탭 → ▶ 2단계: 수집 시작 클릭
+   → server.py /run 엔드포인트 호출
+   → agent_automation.py 파이프라인 실행:
+   Step 1. agent_collector.py   — university_sites 테이블에 등록된 URL 순차 수집
+                                   수집 우선순위: RSS → 정적(requests) → 동적(Playwright)
+   Step 2. agent_comparator.py  — 기존 school_programs DB와 비교, 중복 제거
+                                   (is_deleted=true 포함하여 비교 → 소프트삭제 글도 재수집 안 함)
+   Step 3. agent_publisher.py   — 새 글만 Supabase school_programs 테이블에 INSERT
+
+4. university-board.html에 자동 반영
+```
+
+### 수집 관련 파일 위치
+
+| 파일 | 경로 | 역할 |
+|------|------|------|
+| `수집시작.bat` | 바탕화면 | server.py 시작 + 관리자 페이지 오픈 |
+| `server.py` | research/agents/ | HTTP 서버 (port 8765), 엔드포인트: /run /detect /preview /health |
+| `agent_automation.py` | research/agents/ | 파이프라인 오케스트레이터 |
+| `agent_selector.py` | research/agents/ | 사이트별 최적 셀렉터 자동 감지, university_sites 테이블 자동 업데이트 |
+| `agent_collector.py` | research/agents/ | URL 수집 (RSS → 정적: requests → 동적: Playwright) |
+| `agent_comparator.py` | research/agents/ | 중복 제거 (소프트삭제 글 포함) |
+| `agent_publisher.py` | research/agents/ | Supabase INSERT |
+
+### server.py 엔드포인트
+
+| 엔드포인트 | 메서드 | 역할 |
+|-----------|--------|------|
+| `/health` | GET | 서버 상태 확인 |
+| `/run` | POST | 수집 파이프라인 실행 (백그라운드) |
+| `/detect` | POST | 전체 사이트 셀렉터 감지 (최대 2분 대기) |
+| `/preview` | POST | 사이트별 수집 미리보기 (최대 5개) |
+
+### agent_selector.py 감지 순서
+
+```
+1. RSS 감지 (<link type="rss"> 태그 또는 URL 패턴 /rss /feed .xml /atom rss.do)
+2. 기존 셀렉터 검증 (university_sites.selector 값으로 재확인)
+3. 후보 셀렉터 자동 탐색 (CANDIDATE_SELECTORS 13개 패턴)
+4. 날짜/작성자 패턴으로 자동 추출 (parse_board_rows fallback)
+→ 가장 많은 게시글을 추출하는 셀렉터 선택
+→ 새로 발견된 셀렉터는 university_sites 테이블에 자동 저장
+```
+
+### agent_collector.py 수집 우선순위
+
+```
+0차: RSS (feedparser) — URL이 RSS이거나 페이지 <link> 태그에서 감지
+1차: 정적 (requests + BeautifulSoup) — selector 있으면 셀렉터 기반, 없으면 날짜/작성자 패턴 자동 감지
+2차: 동적 (Playwright) — JS 렌더링 필요한 페이지
+```
+
+### 소프트 삭제 (Soft Delete)
+
+```
+- 관리자 페이지에서 게시글 삭제 시 실제 DELETE 대신 is_deleted=true 로 마킹
+- 이유: 소프트삭제된 글도 agent_comparator.py가 비교 시 인식 → 재수집 방지
+- university-board.html 및 관리자 페이지 목록 조회: is_deleted=false 조건으로 필터링
+```
+
+### 수집 사이트 관리
+
+```
+- Supabase: university_sites 테이블에 등록
+- 관리자 페이지 → 크롤러 탭 → + 사이트 등록
+- 필드: school_name, url, selector(선택), is_active
+- selector 미입력 시 agent_selector.py가 1단계 감지 실행 시 자동 채움
+```
+
+### 관리자 페이지 대학활동 탭 기능
+
+```
+- 학교명 검색 (실시간 필터)
+- 체크박스 선택 + 선택삭제 (소프트삭제)
+- 일괄삭제 버튼
+- 제목 35자 자동 truncate (title 속성으로 전체 제목 hover 확인 가능)
+```
+
+### 주의사항
+
+```
+- 수집 버튼은 로컬(file://)에서만 동작 (HTTPS → HTTP 혼합 콘텐츠 차단)
+- ibtcc.kr 배포 버전에서는 수집 불가, 게시글 관리만 가능
+- server.py는 컴퓨터 로그인 시 자동 시작 (Windows 시작프로그램 폴더에 bat 등록)
+- server.py 주소: 127.0.0.1:8765 (localhost 사용 금지 — IPv6 ::1 로 해석될 수 있음)
+- .env 파일은 git에서 제외 (SUPABASE_URL, SUPABASE_KEY, ANTHROPIC_API_KEY 포함)
+- requirements.txt: requests, beautifulsoup4, supabase, python-dotenv, feedparser, playwright
+```
