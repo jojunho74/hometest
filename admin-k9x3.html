@@ -4922,8 +4922,8 @@ ${d.hashtags}`;
             }).join('');
           }
 
-          // 카드 미리보기 로드
-          loadPreview();
+          // 감지 결과로 카드 미리보기 표시 (별도 서버 호출 없이)
+          showDetectPreview(results);
           loadUnivSites();
         } else {
           addCrawlerLog('⚠️ 감지 오류: ' + res.status);
@@ -4934,6 +4934,27 @@ ${d.hashtags}`;
         btn.disabled = false;
         btn.textContent = '🔍 1단계: 셀렉터 감지';
       }
+    }
+
+    function showDetectPreview(results) {
+      const section = document.getElementById('preview-section');
+      const grid = document.getElementById('preview-grid');
+      if (!section || !grid) return;
+      section.classList.remove('hidden');
+      const methodIcon = { 'RSS':'📡', '기존셀렉터':'✓', '자동감지':'🎯', '자동추출':'🔎', '감지실패':'❌', '실패':'❌' };
+      grid.innerHTML = results.map(r => {
+        const icon = methodIcon[r.method] || '?';
+        const countColor = r.count > 0 ? 'text-green-600' : 'text-red-400';
+        const method = r.method === 'RSS' ? '📡 RSS' : (r.selector ? r.selector : '자동추출');
+        return `
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-xs font-bold text-blue-600">${icon} ${esc(r.school_name)}</p>
+            <span class="text-xs font-bold ${countColor}">${r.count}개 예상</span>
+          </div>
+          <p class="text-xs text-slate-400 truncate">${esc(method)}</p>
+        </div>`;
+      }).join('');
     }
 
     async function loadPreview() {
