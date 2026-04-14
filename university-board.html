@@ -96,8 +96,14 @@
 
     /* 카드형 그리드 (토글 가능) */
     .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
-    .post-card{background:#fff;border-radius:12px;border:1px solid #E2E8F0;padding:18px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:box-shadow .2s,transform .2s;cursor:pointer;}
-    .post-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);transform:translateY(-2px);}
+    .post-card{border-radius:12px;border:1px solid transparent;padding:18px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 4px rgba(0,0,0,.04);transition:box-shadow .2s,transform .2s;cursor:pointer;}
+    .post-card:hover{box-shadow:0 4px 16px rgba(59,130,246,.15);transform:translateY(-2px);}
+    .post-card:nth-child(6n+1){background:#EFF6FF;border-color:#DBEAFE;}
+    .post-card:nth-child(6n+2){background:#F0F9FF;border-color:#E0F2FE;}
+    .post-card:nth-child(6n+3){background:#EFF6FF;border-color:#DBEAFE;}
+    .post-card:nth-child(6n+4){background:#F8FAFF;border-color:#E2E8F0;}
+    .post-card:nth-child(6n+5){background:#F0F9FF;border-color:#BAE6FD;}
+    .post-card:nth-child(6n+0){background:#EFF6FF;border-color:#BFDBFE;}
     .post-card-title{font-size:.88rem;font-weight:700;color:#1E293B;line-height:1.45;}
     .post-card-date{font-size:.72rem;color:#94A3B8;margin-top:auto;}
     .post-card-link{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;font-weight:700;color:#1E4D8C;text-decoration:none;margin-top:4px;}
