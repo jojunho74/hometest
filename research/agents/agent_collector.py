@@ -1,7 +1,8 @@
 """
 수집 에이전트 (agent_collector.py)
 역할: university_sites 테이블에 등록된 URL을 방문하여 게시글 목록을 수집
-- 작성자 또는 날짜가 있는 행만 수집 (네비게이션 링크 제외)
+- 수집 우선순위: RSS → 정적(HTML) → 동적(Playwright)
+- RSS: feedparser로 파싱 (가장 정확하고 안정적)
 - 정적 페이지: requests + BeautifulSoup
 - 동적 페이지(JS 렌더링): Playwright
 """
@@ -9,6 +10,7 @@
 import os
 import re
 import requests
+import feedparser
 from bs4 import BeautifulSoup
 from supabase import create_client
 from dotenv import load_dotenv
@@ -146,13 +148,62 @@ def collect_dynamic(url: str, selector: str = None) -> list[dict]:
 def make_absolute(href: str, base_url: str) -> str:
     return urljoin(base_url, href)
 
+def is_rss_url(url: str) -> bool:
+    """URL이 RSS/Atom 피드인지 판단"""
+    url_lower = url.lower().split('?')[0]
+    return any(kw in url_lower for kw in ['/rss', '/feed', '.xml', '/atom', 'rss.do', 'feed.do'])
+
+def collect_rss(url: str) -> list[dict]:
+    """RSS/Atom 피드 파싱으로 게시글 수집"""
+    feed = feedparser.parse(url)
+    if feed.bozo and not feed.entries:
+        raise ValueError(f"RSS 파싱 실패: {feed.bozo_exception}")
+    results = []
+    seen_links = set()
+    for entry in feed.entries:
+        title = (entry.get('title') or '').strip()
+        link  = (entry.get('link')  or '').strip()
+        if title and link and len(title) > 3 and link not in seen_links:
+            seen_links.add(link)
+            results.append({'title': title, 'link': link})
+    return results
+
+def detect_rss_from_page(url: str) -> str | None:
+    """HTML 페이지에서 RSS 링크 자동 감지"""
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        res = requests.get(url, headers=headers, timeout=10)
+        soup = BeautifulSoup(res.text, 'html.parser')
+        # <link rel="alternate" type="application/rss+xml">
+        tag = soup.find('link', type=lambda t: t and 'rss' in t.lower())
+        if tag and tag.get('href'):
+            return make_absolute(tag['href'], url)
+        tag = soup.find('link', type=lambda t: t and 'atom' in t.lower())
+        if tag and tag.get('href'):
+            return make_absolute(tag['href'], url)
+    except Exception:
+        pass
+    return None
+
 def collect_from_site(site: dict) -> list[dict]:
-    """단일 사이트 수집 — 정적 실패 시 동적으로 자동 전환"""
+    """단일 사이트 수집 — RSS → 정적 → 동적 순서로 시도"""
     school_name = site['school_name']
     url = site['url']
     selector = site.get('selector')
 
     log.info(f"수집 시작: {school_name} → {url}")
+
+    # 0차: RSS 수집 (URL이 RSS이거나 페이지에서 RSS 감지)
+    rss_url = url if is_rss_url(url) else detect_rss_from_page(url)
+    if rss_url:
+        try:
+            links = collect_rss(rss_url)
+            if links:
+                log.info(f"  → {len(links)}개 수집 완료 (RSS)")
+                return [{'school_name': school_name, **l} for l in links]
+            log.info(f"  RSS 수집 0개 → HTML 수집 전환")
+        except Exception as e:
+            log.warning(f"  RSS 수집 실패: {e} → HTML 수집 전환")
 
     # 1차: 정적 수집
     try:
