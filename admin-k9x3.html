@@ -1423,13 +1423,13 @@
           </div>
         </div>
 
-        <!-- 미리보기 카드 그리드 -->
-        <div id="preview-section" class="hidden mb-5">
-          <div class="flex items-center justify-between mb-3">
-            <p class="font-semibold text-slate-700 text-sm">📋 수집 미리보기 (학교별 최대 5개)</p>
+        <!-- 미리보기 텍스트 목록 -->
+        <div id="preview-section" class="hidden mb-5 bg-white rounded-xl shadow-sm">
+          <div class="flex items-center justify-between px-4 py-3 border-b">
+            <p class="font-semibold text-slate-700 text-sm">📋 셀렉터 감지 결과</p>
             <button onclick="document.getElementById('preview-section').classList.add('hidden')" class="text-xs text-slate-400 hover:text-slate-600">✕ 닫기</button>
           </div>
-          <div id="preview-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          <div id="preview-grid" class="px-4 py-2 text-xs font-mono divide-y divide-slate-50"></div>
         </div>
 
         <!-- 등록된 대학 사이트 목록 -->
@@ -4989,18 +4989,16 @@ ${d.hashtags}`;
         }).join('');
       }
 
-      // 카드 그리드 업데이트
+      // 텍스트 목록 업데이트
       grid.innerHTML = results.map(r => {
         const icon = methodIcon[r.method] || '?';
-        const countColor = r.count > 0 ? 'text-green-600' : 'text-red-400';
-        const method = r.method === 'RSS' ? '📡 RSS' : (r.selector ? r.selector : '자동추출');
-        return `
-        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-          <div class="flex items-center justify-between mb-2">
-            <p class="text-xs font-bold text-blue-600">${icon} ${esc(r.school_name)}</p>
-            <span class="text-xs font-bold ${countColor}">${r.count}개 예상</span>
-          </div>
-          <p class="text-xs text-slate-400 truncate">${esc(method)}</p>
+        const countColor = r.count > 0 ? 'text-green-600 font-bold' : 'text-red-400';
+        const method = r.method === 'RSS' ? 'RSS' : (r.selector || '자동추출');
+        return `<div class="flex items-center gap-2 py-1.5">
+          <span class="w-4 text-center">${icon}</span>
+          <span class="w-28 text-slate-700 truncate" title="${esc(r.school_name)}">${esc(r.school_name)}</span>
+          <span class="flex-1 text-slate-400 truncate">${esc(method)}</span>
+          <span class="${countColor}">${r.count}개</span>
         </div>`;
       }).join('');
     }
