@@ -269,7 +269,7 @@
 
       allData = Object.values(schoolMap).flat();
 
-      renderSchoolList(Object.keys(schoolMap));
+      renderSchoolList(Object.keys(schoolMap).sort((a,b) => a.localeCompare(b,'ko')));
     } catch(e) {
       console.error(e);
       document.getElementById('school-list').innerHTML = '<div class="empty-list">로드 실패</div>';
@@ -295,9 +295,9 @@
 
   // ── 대학 검색 필터 ──
   function filterSchools(q) {
-    const filtered = Object.keys(schoolMap).filter(s =>
-      s.toLowerCase().includes(q.toLowerCase())
-    );
+    const filtered = Object.keys(schoolMap)
+      .filter(s => s.toLowerCase().includes(q.toLowerCase()))
+      .sort((a,b) => a.localeCompare(b,'ko'));
     renderSchoolList(filtered);
   }
 
@@ -307,9 +307,9 @@
     const posts = schoolMap[name] || [];
 
     // 사이드바 active 업데이트
-    renderSchoolList(Object.keys(schoolMap).filter(s =>
-      s.toLowerCase().includes(document.getElementById('school-search').value.toLowerCase())
-    ));
+    renderSchoolList(Object.keys(schoolMap)
+      .filter(s => s.toLowerCase().includes(document.getElementById('school-search').value.toLowerCase()))
+      .sort((a,b) => a.localeCompare(b,'ko')));
 
     // 상단바
     document.getElementById('topbar-school').textContent = name;
