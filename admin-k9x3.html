@@ -28,29 +28,30 @@
 
     /* ── 사이드바 ── */
     #sidebar {
-      width:220px; flex-shrink:0;
+      width:200px; flex-shrink:0;
       background:linear-gradient(180deg,#0D1F3C 0%,#162848 100%);
       display:flex; flex-direction:column;
       overflow-y:auto; overflow-x:hidden;
       padding-bottom:env(safe-area-inset-bottom, 0px);
+      transition:width .2s;
     }
     .sb-logo {
-      padding:24px 20px 20px;
+      padding:16px 14px 14px;
       border-bottom:1px solid rgba(255,255,255,.07);
     }
-    .sb-logo-title { font-size:1rem; font-weight:800; color:#fff; letter-spacing:-.01em; }
-    .sb-logo-sub   { font-size:.68rem; color:rgba(255,255,255,.38); margin-top:2px; }
+    .sb-logo-title { font-size:.9rem; font-weight:800; color:#fff; letter-spacing:-.01em; }
+    .sb-logo-sub   { font-size:.62rem; color:rgba(255,255,255,.38); margin-top:2px; }
 
     .sb-section-label {
-      font-size:.6rem; font-weight:700; color:rgba(255,255,255,.3);
-      letter-spacing:.12em; text-transform:uppercase;
-      padding:18px 20px 6px;
+      font-size:.55rem; font-weight:700; color:rgba(255,255,255,.3);
+      letter-spacing:.1em; text-transform:uppercase;
+      padding:14px 14px 4px;
     }
     .sb-item {
-      display:flex; align-items:center; gap:10px;
-      padding:10px 20px; margin:1px 10px; border-radius:10px;
-      font-size:.82rem; font-weight:600; color:rgba(255,255,255,.5);
-      cursor:pointer; border:none; background:transparent; width:calc(100% - 20px);
+      display:flex; align-items:center; gap:8px;
+      padding:8px 14px; margin:1px 8px; border-radius:8px;
+      font-size:.78rem; font-weight:600; color:rgba(255,255,255,.5);
+      cursor:pointer; border:none; background:transparent; width:calc(100% - 16px);
       text-align:left; transition:background .15s, color .15s;
     }
     .sb-item:hover { background:rgba(255,255,255,.07); color:rgba(255,255,255,.85); }
@@ -59,35 +60,50 @@
       color:#fff;
       box-shadow:inset 3px 0 0 #4F7EF7;
     }
-    .sb-item .sb-icon { font-size:1rem; width:20px; text-align:center; flex-shrink:0; }
+    .sb-item .sb-icon { font-size:.9rem; width:18px; text-align:center; flex-shrink:0; }
     .sb-bottom {
-      margin-top:auto; padding:16px 10px 48px;
+      margin-top:auto; padding:12px 8px 48px;
       border-top:1px solid rgba(255,255,255,.07);
     }
     .sb-bottom-btn {
-      display:flex; align-items:center; gap:8px;
-      padding:9px 10px; border-radius:8px; width:100%;
-      font-size:.78rem; font-weight:600; color:rgba(255,255,255,.45);
+      display:flex; align-items:center; gap:7px;
+      padding:7px 8px; border-radius:8px; width:100%;
+      font-size:.73rem; font-weight:600; color:rgba(255,255,255,.45);
       background:transparent; border:none; cursor:pointer; text-align:left;
       transition:background .15s, color .15s;
     }
     .sb-bottom-btn:hover { background:rgba(255,255,255,.07); color:rgba(255,255,255,.8); }
+
+    /* ── 모바일: 사이드바 더 좁게 ── */
+    @media (max-width:640px) {
+      #sidebar { width:52px; }
+      .sb-logo { padding:12px 8px; text-align:center; }
+      .sb-logo-title { font-size:.65rem; white-space:nowrap; overflow:hidden; text-overflow:clip; letter-spacing:-.03em; }
+      .sb-logo-sub { display:none; }
+      .sb-section-label { display:none; }
+      .sb-item { padding:9px 0; margin:1px 4px; justify-content:center; width:calc(100% - 8px); }
+      .sb-item .sb-icon { width:auto; font-size:1.1rem; }
+      .sb-item .sb-label { display:none; }
+      .sb-bottom { padding:10px 4px 48px; }
+      .sb-bottom-btn { justify-content:center; padding:8px 0; }
+      .sb-bottom-btn span:last-child { display:none; }
+    }
 
     /* ── 우측 메인 ── */
     #main-content { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
 
     /* 상단 바 */
     #topbar {
-      background:#fff; height:56px; flex-shrink:0;
+      background:#fff; height:52px; flex-shrink:0;
       display:flex; align-items:center; justify-content:space-between;
-      padding:0 24px;
+      padding:0 16px;
       box-shadow:0 1px 0 rgba(0,0,0,.07);
     }
-    #topbar-title { font-size:.95rem; font-weight:700; color:#1E293B; }
-    #topbar-actions { display:flex; align-items:center; gap:8px; }
+    #topbar-title { font-size:.88rem; font-weight:700; color:#1E293B; }
+    #topbar-actions { display:flex; align-items:center; gap:6px; }
 
     /* 콘텐츠 스크롤 영역 */
-    #content-area { flex:1; overflow-y:auto; padding:24px; }
+    #content-area { flex:1; overflow-y:auto; padding:16px; }
 
     /* 섹션 카드 배경 통일 */
     .bg-white { background:#fff !important; }
@@ -180,30 +196,30 @@
       </div>
 
       <div class="sb-section-label">신청 관리</div>
-      <button onclick="switchTab('consult')"  id="tab-consult"  class="sb-item active"><span class="sb-icon">📋</span>신청 관리</button>
-      <button onclick="switchTab('student')"  id="tab-student"  class="sb-item"><span class="sb-icon">🎓</span>학생접수</button>
+      <button onclick="switchTab('consult')"  id="tab-consult"  class="sb-item active"><span class="sb-icon">📋</span><span class="sb-label">신청 관리</span></button>
+      <button onclick="switchTab('student')"  id="tab-student"  class="sb-item"><span class="sb-icon">🎓</span><span class="sb-label">학생접수</span></button>
 
       <div class="sb-section-label">콘텐츠</div>
-      <button onclick="switchTab('news')"     id="tab-news"     class="sb-item"><span class="sb-icon">📰</span>대학소식</button>
-      <button onclick="switchTab('programs')" id="tab-programs" class="sb-item"><span class="sb-icon">🏫</span>대학활동</button>
-      <button onclick="switchTab('jobs')"     id="tab-jobs"     class="sb-item"><span class="sb-icon">💼</span>채용공고</button>
-      <button onclick="switchTab('staffjobs')" id="tab-staffjobs" class="sb-item"><span class="sb-icon">👔</span>직원채용공고</button>
-      <button onclick="switchTab('cnews')"    id="tab-cnews"    class="sb-item"><span class="sb-icon">🏢</span>기업소식</button>
-      <button onclick="switchTab('shorts')"   id="tab-shorts"   class="sb-item"><span class="sb-icon">🎬</span>유튜브쇼츠</button>
-      <button onclick="switchTab('calendar')" id="tab-calendar" class="sb-item"><span class="sb-icon">📅</span>채용달력</button>
+      <button onclick="switchTab('news')"     id="tab-news"     class="sb-item"><span class="sb-icon">📰</span><span class="sb-label">대학소식</span></button>
+      <button onclick="switchTab('programs')" id="tab-programs" class="sb-item"><span class="sb-icon">🏫</span><span class="sb-label">대학활동</span></button>
+      <button onclick="switchTab('jobs')"     id="tab-jobs"     class="sb-item"><span class="sb-icon">💼</span><span class="sb-label">채용공고</span></button>
+      <button onclick="switchTab('staffjobs')" id="tab-staffjobs" class="sb-item"><span class="sb-icon">👔</span><span class="sb-label">직원채용공고</span></button>
+      <button onclick="switchTab('cnews')"    id="tab-cnews"    class="sb-item"><span class="sb-icon">🏢</span><span class="sb-label">기업소식</span></button>
+      <button onclick="switchTab('shorts')"   id="tab-shorts"   class="sb-item"><span class="sb-icon">🎬</span><span class="sb-label">유튜브쇼츠</span></button>
+      <button onclick="switchTab('calendar')" id="tab-calendar" class="sb-item"><span class="sb-icon">📅</span><span class="sb-label">채용달력</span></button>
 
       <div class="sb-section-label">자동화</div>
-      <button onclick="switchTab('crawler')" id="tab-crawler" class="sb-item"><span class="sb-icon">🤖</span>대학활동 수집</button>
+      <button onclick="switchTab('crawler')" id="tab-crawler" class="sb-item"><span class="sb-icon">🤖</span><span class="sb-label">대학활동 수집</span></button>
 
       <div class="sb-section-label">분석 · 운영</div>
-      <button onclick="switchTab('stats')"    id="tab-stats"    class="sb-item"><span class="sb-icon">📊</span>통계</button>
-      <button onclick="switchTab('blog')"     id="tab-blog"     class="sb-item"><span class="sb-icon">✍️</span>블로그 원고</button>
-      <button onclick="switchTab('popupads')" id="tab-popupads" class="sb-item"><span class="sb-icon">📢</span>팝업광고</button>
+      <button onclick="switchTab('stats')"    id="tab-stats"    class="sb-item"><span class="sb-icon">📊</span><span class="sb-label">통계</span></button>
+      <button onclick="switchTab('blog')"     id="tab-blog"     class="sb-item"><span class="sb-icon">✍️</span><span class="sb-label">블로그 원고</span></button>
+      <button onclick="switchTab('popupads')" id="tab-popupads" class="sb-item"><span class="sb-icon">📢</span><span class="sb-label">팝업광고</span></button>
 
       <div class="sb-bottom">
-        <button onclick="toggleNoTrack()" id="notrack-btn" class="sb-bottom-btn">🙈 <span id="notrack-label">내 방문 제외 OFF</span></button>
-        <a href="index.html" class="sb-bottom-btn" style="text-decoration:none;">🏠 메인으로</a>
-        <button onclick="logout()" class="sb-bottom-btn">🚪 로그아웃</button>
+        <button onclick="toggleNoTrack()" id="notrack-btn" class="sb-bottom-btn">🙈 <span class="sb-label" id="notrack-label">내 방문 제외 OFF</span></button>
+        <a href="index.html" class="sb-bottom-btn" style="text-decoration:none;">🏠 <span class="sb-label">메인으로</span></a>
+        <button onclick="logout()" class="sb-bottom-btn">🚪 <span class="sb-label">로그아웃</span></button>
       </div>
     </nav>
 
