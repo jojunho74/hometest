@@ -4816,8 +4816,8 @@ ${d.hashtags}`;
       addCrawlerLog('수집 시작 요청 전송 중...');
 
       try {
-        // n8n webhook URL - 실제 URL로 교체 필요
-        const webhookUrl = 'http://localhost:5678/webhook/university-crawler';
+        // server.py 직접 호출 (port 8765)
+        const webhookUrl = 'http://127.0.0.1:8765/run';
         const res = await fetch(webhookUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -4828,11 +4828,11 @@ ${d.hashtags}`;
           addCrawlerLog('✅ 수집 완료: ' + (data.message || JSON.stringify(data)));
           loadUnivSites();
         } else {
-          addCrawlerLog('⚠️ n8n 응답 오류: ' + res.status + ' — n8n이 실행 중인지 확인하세요');
+          addCrawlerLog('⚠️ 서버 응답 오류: ' + res.status + ' — server.py가 실행 중인지 확인하세요');
         }
       } catch(e) {
-        addCrawlerLog('❌ 연결 실패: n8n이 실행되지 않았거나 Webhook URL을 확인하세요');
-        addCrawlerLog('   → ARCHITECTURE.md의 n8n 연동 섹션을 참고하세요');
+        addCrawlerLog('❌ 연결 실패: server.py가 실행되지 않았습니다');
+        addCrawlerLog('   → PowerShell에서 python server.py 실행 후 다시 시도하세요');
       } finally {
         btn.disabled = false;
         btn.textContent = '▶ 수집 시작';
