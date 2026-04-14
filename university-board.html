@@ -335,8 +335,8 @@
                 <td class="post-num">${posts.length - i}</td>
                 <td>${typeBadge(r._type)}</td>
                 <td class="title-cell">${r.link
-                  ? `<a href="${esc(r.link)}" target="_blank">${esc(r.title)}</a>`
-                  : esc(r.title)}</td>
+                  ? `<a href="${esc(r.link)}" target="_blank" title="${esc(r.title)}">${esc(r.title&&r.title.length>15?r.title.slice(0,15)+'...':r.title)}</a>`
+                  : esc(r.title&&r.title.length>15?r.title.slice(0,15)+'...':r.title)}</td>
                 <td>${r.link ? `<a href="${esc(r.link)}" target="_blank" class="post-link-ico" title="바로가기">↗</a>` : '-'}</td>
                 <td class="post-date">${fmtDate(r.created_at)}</td>
               </tr>`).join('')}
@@ -347,7 +347,7 @@
         ${posts.map((r, i) => `
           <div class="post-card row-anim" style="animation-delay:${(i*0.05).toFixed(2)}s" ${r.link?`onclick="window.open('${esc(r.link)}','_blank')"`:''}>
             <div style="margin-bottom:6px;">${typeBadge(r._type)}</div>
-            <div class="post-card-title">${esc(r.title)}</div>
+            <div class="post-card-title" title="${esc(r.title)}">${esc(r.title&&r.title.length>15?r.title.slice(0,15)+'...':r.title)}</div>
             ${r.link ? `<a href="${esc(r.link)}" target="_blank" class="post-card-link" onclick="event.stopPropagation()">바로가기 ↗</a>` : ''}
             <div class="post-card-date">${fmtDate(r.created_at)}</div>
           </div>`).join('')}
