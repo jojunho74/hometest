@@ -1391,16 +1391,27 @@
               <p class="text-slate-300 italic">수집 시작 버튼을 눌러주세요</p>
             </div>
           </div>
-          <!-- 섹션 3 (추후 결정) -->
+          <!-- 섹션 3: 셀렉터 감지 결과 -->
           <div class="bg-white rounded-xl shadow-sm p-4">
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">섹션 3 (추후 결정)</p>
-            <p class="text-sm text-slate-300 italic">기능 준비 중</p>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">셀렉터 감지 결과</p>
+            <div id="detect-result" class="text-xs text-slate-500 space-y-1 h-28 overflow-y-auto">
+              <p class="text-slate-300 italic">1단계 감지 후 표시됩니다</p>
+            </div>
           </div>
           <!-- 섹션 4 (추후 결정) -->
           <div class="bg-white rounded-xl shadow-sm p-4">
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">섹션 4 (추후 결정)</p>
             <p class="text-sm text-slate-300 italic">기능 준비 중</p>
           </div>
+        </div>
+
+        <!-- 미리보기 카드 그리드 -->
+        <div id="preview-section" class="hidden mb-5">
+          <div class="flex items-center justify-between mb-3">
+            <p class="font-semibold text-slate-700 text-sm">📋 수집 미리보기 (학교별 최대 5개)</p>
+            <button onclick="document.getElementById('preview-section').classList.add('hidden')" class="text-xs text-slate-400 hover:text-slate-600">✕ 닫기</button>
+          </div>
+          <div id="preview-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
 
         <!-- 등록된 대학 사이트 목록 -->
@@ -4892,11 +4903,26 @@ ${d.hashtags}`;
           const methodIcon = { 'RSS':'📡', '기존셀렉터':'✓', '자동감지':'🎯', '자동추출':'🔎', '감지실패':'❌', '실패':'❌' };
           results.forEach(r => {
             const icon = methodIcon[r.method] || '?';
-            const sel = r.method === 'RSS' ? `RSS (${r.rss_url||''})` : (r.selector || '자동추출');
+            const sel = r.method === 'RSS' ? `RSS` : (r.selector || '자동추출');
             addCrawlerLog(`  ${icon} ${r.school_name}: [${r.method}] ${sel} → ${r.count}개 예상`);
           });
           addCrawlerLog('▶ 2단계 수집 시작 버튼을 눌러주세요');
-          // 자동 감지된 셀렉터 저장 후 목록 갱신
+
+          // 셀렉터 감지 결과 섹션에 표시
+          const detectEl = document.getElementById('detect-result');
+          if (detectEl) {
+            detectEl.innerHTML = results.map(r => {
+              const icon = methodIcon[r.method] || '?';
+              const color = r.count > 0 ? 'text-green-600' : 'text-red-400';
+              return `<div class="flex justify-between items-center py-0.5 border-b border-slate-50">
+                <span class="font-medium text-slate-700">${icon} ${esc(r.school_name)}</span>
+                <span class="${color} font-bold">${r.count}개</span>
+              </div>`;
+            }).join('');
+          }
+
+          // 카드 미리보기 로드
+          loadPreview();
           loadUnivSites();
         } else {
           addCrawlerLog('⚠️ 감지 오류: ' + res.status);
@@ -4906,6 +4932,37 @@ ${d.hashtags}`;
       } finally {
         btn.disabled = false;
         btn.textContent = '🔍 1단계: 셀렉터 감지';
+      }
+    }
+
+    async function loadPreview() {
+      const section = document.getElementById('preview-section');
+      const grid = document.getElementById('preview-grid');
+      if (!section || !grid) return;
+      grid.innerHTML = '<p class="text-sm text-slate-400 col-span-2">미리보기 로딩 중...</p>';
+      section.classList.remove('hidden');
+      try {
+        const res = await fetch('http://127.0.0.1:8765/preview', { method: 'POST' });
+        if (!res.ok) { grid.innerHTML = '<p class="text-sm text-red-400">미리보기 실패</p>'; return; }
+        const data = await res.json().catch(() => ({}));
+        const preview = data.preview || [];
+        if (preview.length === 0) { grid.innerHTML = '<p class="text-sm text-slate-400">수집된 데이터가 없습니다</p>'; return; }
+        grid.innerHTML = preview.map(school => `
+          <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
+            <p class="text-xs font-bold text-blue-600 mb-2">${esc(school.school_name)} · ${school.posts.length}개</p>
+            <div class="space-y-1">
+              ${school.posts.map(p => `
+                <div class="flex items-start gap-1.5 text-xs text-slate-600 hover:text-blue-600">
+                  <span class="mt-0.5 text-slate-300 flex-shrink-0">•</span>
+                  ${p.link
+                    ? `<a href="${esc(p.link)}" target="_blank" class="hover:underline line-clamp-1">${esc(p.title&&p.title.length>35?p.title.slice(0,35)+'...':p.title)}</a>`
+                    : `<span>${esc(p.title&&p.title.length>35?p.title.slice(0,35)+'...':p.title)}</span>`
+                  }
+                </div>`).join('')}
+            </div>
+          </div>`).join('');
+      } catch(e) {
+        grid.innerHTML = '<p class="text-sm text-red-400 col-span-2">server.py 연결 실패</p>';
       }
     }
 

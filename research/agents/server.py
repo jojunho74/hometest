@@ -14,6 +14,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import agent_automation
 import agent_selector
+import agent_collector
 
 class Handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
@@ -43,6 +44,25 @@ class Handler(BaseHTTPRequestHandler):
                 'status': 'started',
                 'message': '수집 파이프라인이 시작되었습니다'
             }, ensure_ascii=False).encode('utf-8'))
+        elif self.path == '/preview':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+
+            sites = agent_collector.get_active_sites()
+            preview = []
+            for site in sites:
+                posts = agent_collector.collect_from_site(site)
+                preview.append({
+                    'school_name': site['school_name'],
+                    'posts': posts[:5]  # 최대 5개만 미리보기
+                })
+            self.wfile.write(json.dumps({
+                'status': 'ok',
+                'preview': preview
+            }, ensure_ascii=False).encode('utf-8'))
+
         elif self.path == '/detect':
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
