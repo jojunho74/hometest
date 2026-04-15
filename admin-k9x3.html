@@ -1450,28 +1450,26 @@
 
         <!-- 등록된 대학 사이트 목록 -->
         <div class="bg-white rounded-xl shadow-sm">
-          <div class="px-5 py-4 border-b flex items-center justify-between">
-            <p class="font-semibold text-slate-700 text-sm">등록된 수집 대상 사이트</p>
+          <div class="px-4 py-2.5 border-b flex items-center justify-between">
+            <p class="font-semibold text-slate-700 text-xs">등록된 수집 대상 사이트</p>
             <span id="univ-sites-count" class="text-xs text-slate-400">0개</span>
           </div>
           <div class="table-wrap">
-            <table class="w-full text-sm">
+            <table class="w-full">
               <thead>
-                <tr class="text-left text-slate-400 text-xs border-b bg-slate-50">
-                  <th class="px-4 py-3 font-semibold">학교명</th>
-                  <th class="px-4 py-3 font-semibold hidden md:table-cell">URL</th>
-                  <th class="px-4 py-3 font-semibold">활성화</th>
-                  <th class="px-4 py-3 font-semibold hidden md:table-cell">마지막 수집</th>
-                  <th class="px-4 py-3 font-semibold">관리</th>
+                <tr class="text-left text-slate-400 border-b bg-slate-50" style="font-size:10px;">
+                  <th class="px-3 py-2 font-semibold">학교명</th>
+                  <th class="px-3 py-2 font-semibold hidden md:table-cell">URL</th>
+                  <th class="px-3 py-2 font-semibold">상태</th>
+                  <th class="px-3 py-2 font-semibold hidden md:table-cell">마지막 수집</th>
+                  <th class="px-3 py-2 font-semibold">관리</th>
                 </tr>
               </thead>
               <tbody id="univ-sites-tbody"></tbody>
             </table>
           </div>
-          <div id="univ-sites-empty" class="hidden text-center py-12 text-slate-300">
-            <p class="text-3xl mb-2">🏫</p>
+          <div id="univ-sites-empty" class="hidden text-center py-6 text-slate-300">
             <p class="text-sm">등록된 사이트가 없습니다</p>
-            <p class="text-xs mt-1">+ 사이트 등록 버튼으로 추가하세요</p>
           </div>
         </div>
 
@@ -4853,18 +4851,18 @@ ${d.hashtags}`;
       }
       empty.classList.add('hidden');
       tbody.innerHTML = rows.map(r => `
-        <tr class="border-b last:border-0 hover:bg-slate-50 transition-colors">
-          <td class="px-4 py-3 font-medium text-slate-800">${esc(r.school_name)}</td>
-          <td class="px-4 py-3 text-blue-500 text-xs hidden md:table-cell max-w-xs truncate">
-            <a href="${esc(r.url)}" target="_blank" class="hover:underline">${esc(r.url)}</a>
+        <tr class="border-b last:border-0 hover:bg-slate-50 transition-colors" style="font-size:11px;">
+          <td class="px-3 py-1.5 font-medium text-slate-800">${esc(r.school_name)}</td>
+          <td class="px-3 py-1.5 text-blue-500 hidden md:table-cell max-w-xs truncate">
+            <a href="${esc(r.url)}" target="_blank" class="hover:underline">${esc(r.url.length>40?r.url.slice(0,40)+'...':r.url)}</a>
           </td>
-          <td class="px-4 py-3">
-            <span class="${r.is_active ? 'badge-done' : 'badge-pending'}">${r.is_active ? '활성' : '비활성'}</span>
+          <td class="px-3 py-1.5">
+            <span style="font-size:9px;padding:1px 6px;border-radius:999px;font-weight:600;background:${r.is_active?'#DCFCE7':'#FEF9C3'};color:${r.is_active?'#166534':'#854D0E'};">${r.is_active?'활성':'비활성'}</span>
           </td>
-          <td class="px-4 py-3 text-slate-400 text-xs hidden md:table-cell">${r.last_crawled_at ? formatDate(r.last_crawled_at) : '-'}</td>
-          <td class="px-4 py-3 flex gap-2">
-            <button onclick="openUnivSiteModal('${r.id}')" class="btn btn-secondary text-xs px-3 py-1.5">수정</button>
-            <button onclick="deleteUnivSite('${r.id}')" class="btn btn-danger text-xs px-3 py-1.5">삭제</button>
+          <td class="px-3 py-1.5 text-slate-400 hidden md:table-cell">${r.last_crawled_at ? formatDate(r.last_crawled_at) : '-'}</td>
+          <td class="px-3 py-1.5 flex gap-1">
+            <button onclick="openUnivSiteModal('${r.id}')" class="btn btn-secondary" style="font-size:10px;padding:2px 8px;">수정</button>
+            <button onclick="deleteUnivSite('${r.id}')" class="btn btn-danger" style="font-size:10px;padding:2px 8px;">삭제</button>
           </td>
         </tr>
       `).join('');
