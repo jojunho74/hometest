@@ -161,8 +161,16 @@
     .ub-star.on{color:#FBBF24;}
     .ub-star:hover{transform:scale(1.18);}
     .ub-star-hint{font-size:11px;color:#94A3B8;text-align:center;height:16px;margin-bottom:20px;}
-    #ub-comment{width:100%;padding:10px 13px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:inherit;resize:none;min-height:64px;outline:none;transition:border-color .2s;margin-bottom:14px;color:#1E293B;}
-    #ub-comment:focus{border-color:#1E4D8C;}
+    /* 크라운 결과 패널 */
+    #ub-crown-panel{display:none;text-align:center;padding:32px 24px 28px;}
+    #ub-crown-panel.show{display:block;}
+    .ub-crown-emoji{font-size:5.5rem;line-height:1;animation:ubCrownPop .5s cubic-bezier(.34,1.56,.64,1) both;}
+    @keyframes ubCrownPop{from{opacity:0;transform:scale(.3) rotate(-15deg);}to{opacity:1;transform:scale(1) rotate(0deg);}}
+    .ub-crown-msg{margin-top:16px;font-size:1.1rem;font-weight:900;color:#1E293B;}
+    .ub-crown-sub{margin-top:6px;font-size:12px;color:#94A3B8;}
+    .ub-crown-bar{margin:20px auto 0;width:64%;height:5px;border-radius:3px;background:#E2E8F0;overflow:hidden;}
+    .ub-crown-bar-fill{height:100%;background:linear-gradient(90deg,#1D4ED8,#60A5FA);border-radius:3px;animation:ubBarFill 1.5s linear forwards;}
+    @keyframes ubBarFill{from{width:0%;}to{width:100%;}}
     .ub-popup-actions{display:flex;gap:10px;}
     .ub-popup-kakao{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:13px;border-radius:12px;background:#FEE500;color:#3C1E1E;font-weight:900;font-size:13px;border:none;cursor:pointer;transition:filter .15s,transform .15s;box-shadow:0 2px 8px rgba(254,229,0,.5);}
     .ub-popup-kakao:hover{filter:brightness(1.05);transform:scale(1.02);}
@@ -432,7 +440,6 @@
         <span class="ub-star" data-v="5">★</span>
       </div>
       <div class="ub-star-hint" id="ub-star-hint"></div>
-      <textarea id="ub-comment" placeholder="응원 한마디 남겨주세요 (선택) 🎉"></textarea>
       <div class="ub-popup-actions">
         <button class="ub-popup-kakao" onclick="ubShareKakao()">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
@@ -444,6 +451,13 @@
         </button>
       </div>
       <button class="ub-popup-skip" onclick="ubSkip()">별점 없이 바로가기</button>
+      <!-- 크라운 결과 패널 -->
+      <div id="ub-crown-panel">
+        <div class="ub-crown-emoji">👑</div>
+        <div class="ub-crown-msg">페이지로 이동합니다!</div>
+        <div class="ub-crown-sub">잠시 후 자동으로 열립니다</div>
+        <div class="ub-crown-bar"><div class="ub-crown-bar-fill"></div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -468,34 +482,54 @@
     s.addEventListener('mouseout', function(){ setStars(_rating); hint.textContent = _rating ? (HINTS[_rating]||'') : ''; });
   });
 
+  function showCrownAndGo() {
+    // 별점/버튼 숨기고 크라운 패널 표시
+    document.getElementById('ub-stars').style.display = 'none';
+    document.querySelector('.ub-star-label').style.display = 'none';
+    document.querySelector('.ub-star-hint').style.display = 'none';
+    document.querySelector('.ub-popup-actions').style.display = 'none';
+    document.querySelector('.ub-popup-skip').style.display = 'none';
+    const crown = document.getElementById('ub-crown-panel');
+    // 바 애니메이션 재시작을 위해 클론
+    const bar = crown.querySelector('.ub-crown-bar-fill');
+    const barClone = bar.cloneNode(true);
+    bar.parentNode.replaceChild(barClone, bar);
+    crown.classList.add('show');
+
+    // 별점 저장 (비동기)
+    if (_rating > 0) {
+      fetch(SB_URL + '/rest/v1/cheer_comments', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
+        body: JSON.stringify({comment: '', rating: _rating, file_name: _school + '|' + _title})
+      }).catch(function(){});
+    }
+
+    // 1.5초 뒤 링크 열기 + 팝업 닫기
+    setTimeout(function() {
+      if (_link) window.open(_link, '_blank');
+      closeUbPopup();
+    }, 1500);
+  }
+
   window.openUbPopup = function(link, school, title) {
     _link = link; _school = school; _title = title; _rating = 0;
     setStars(0); hint.textContent = '';
-    document.getElementById('ub-comment').value = '';
+    // 패널 초기화
+    document.getElementById('ub-stars').style.display = '';
+    document.querySelector('.ub-star-label').style.display = '';
+    document.querySelector('.ub-star-hint').style.display = '';
+    document.querySelector('.ub-popup-actions').style.display = '';
+    document.querySelector('.ub-popup-skip').style.display = '';
+    document.getElementById('ub-crown-panel').classList.remove('show');
     document.getElementById('ub-popup-sub').textContent = school + (title ? ' — ' + title : '');
     document.getElementById('ub-popup-bg').classList.add('open');
   };
 
   window.closeUbPopup = function(){ document.getElementById('ub-popup-bg').classList.remove('open'); };
 
-  async function saveAndGo() {
-    const comment = document.getElementById('ub-comment').value.trim();
-    if (_rating > 0 || comment) {
-      const fileKey = _school + '|' + _title;
-      try {
-        await fetch(SB_URL + '/rest/v1/cheer_comments', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
-          body: JSON.stringify({comment: comment||'', rating: _rating||5, file_name: fileKey})
-        });
-      } catch(e){}
-    }
-    if (_link) window.open(_link, '_blank');
-    closeUbPopup();
-  }
-
-  window.ubGoLink  = saveAndGo;
-  window.ubSkip    = function(){ if (_link) window.open(_link, '_blank'); closeUbPopup(); };
+  window.ubGoLink = showCrownAndGo;
+  window.ubSkip   = function(){ if (_link) window.open(_link, '_blank'); closeUbPopup(); };
 
   window.ubShareKakao = function() {
     const url = _link || 'https://ibtcc.kr/university-board.html';
