@@ -404,6 +404,18 @@
       wrap.innerHTML = '<div class="placeholder"><div class="ico">📭</div><p>등록된 소식이 없습니다</p></div>';
       return;
     }
+    // 별점 높은 순 → 별점 없는 것은 뒤로
+    posts = [...posts].sort((a, b) => {
+      const ra = _ratingMap[(a.school_name||'')+'|'+(a.title||'')];
+      const rb = _ratingMap[(b.school_name||'')+'|'+(b.title||'')];
+      const avgA = ra ? ra.sum / ra.count : 0;
+      const avgB = rb ? rb.sum / rb.count : 0;
+      if (avgB !== avgA) return avgB - avgA;
+      const cntA = ra ? ra.count : 0;
+      const cntB = rb ? rb.count : 0;
+      return cntB - cntA;
+    });
+
     const typeBadge = (type) => {
       if (type === '활동') return `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;background:#DBEAFE;color:#1D4ED8;margin-right:6px;">활동</span>`;
       if (type === '소식') return `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;background:#EFF6FF;color:#3B82F6;margin-right:6px;">소식</span>`;
@@ -567,10 +579,11 @@
       });
     }
 
-    // 1.5초 뒤 링크 열기 + 팝업 닫기
+    // 1.5초 뒤 링크 열기 + 팝업 닫기 + 카드 순서 재정렬
     setTimeout(function() {
       if (_link) window.open(_link, '_blank');
       closeUbPopup();
+      if (selectedSchool) renderPosts(schoolMap[selectedSchool] || []);
     }, 1500);
   }
 
