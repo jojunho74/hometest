@@ -318,20 +318,20 @@
     return '★'.repeat(full) + '☆'.repeat(5 - full);
   }
 
-  // ── 별점 로드 ──
+  // ── 별점 로드 (pdf_ratings 테이블 사용 — cheer_comments와 분리) ──
   async function loadRatings() {
     try {
-      const res = await fetch(SB_URL+'/rest/v1/cheer_comments?select=file_name,rating&rating=gt.0', {
+      const res = await fetch(SB_URL+'/rest/v1/pdf_ratings?select=file_key,rating', {
         headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer '+SB_KEY }
       });
       const rows = await res.json();
       _ratingMap = {};
       if (Array.isArray(rows)) {
         rows.forEach(r => {
-          if (!r.file_name || !r.rating) return;
-          if (!_ratingMap[r.file_name]) _ratingMap[r.file_name] = { sum: 0, count: 0 };
-          _ratingMap[r.file_name].sum   += r.rating;
-          _ratingMap[r.file_name].count += 1;
+          if (!r.file_key || !r.rating) return;
+          if (!_ratingMap[r.file_key]) _ratingMap[r.file_key] = { sum: 0, count: 0 };
+          _ratingMap[r.file_key].sum   += r.rating;
+          _ratingMap[r.file_key].count += 1;
         });
       }
     } catch(e) {}
@@ -589,10 +589,10 @@
     // 별점 저장 (비동기)
     if (_rating > 0) {
       const rkey = _school + '|' + _title;
-      fetch(SB_URL + '/rest/v1/cheer_comments', {
+      fetch(SB_URL + '/rest/v1/pdf_ratings', {
         method: 'POST',
         headers: {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
-        body: JSON.stringify({comment: '', rating: _rating, file_name: rkey})
+        body: JSON.stringify({file_key: rkey, rating: _rating})
       }).catch(function(){});
 
       // _ratingMap 즉시 업데이트 후 카드 배지 갱신

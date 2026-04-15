@@ -715,7 +715,7 @@
     // ── 응원 댓글 카드 섹션 ──
     async function loadCheerSection() {
       try {
-        const res  = await fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/cheer_comments?select=comment,rating,file_name,created_at&order=created_at.desc&limit=50', {
+        const res  = await fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/cheer_comments?select=comment,rating,file_name,created_at&comment=neq.&order=created_at.desc&limit=50', {
           headers: { 'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs' }
         });
         const data = await res.json();
@@ -748,7 +748,7 @@
     // ── 인라인 댓글 칩 (순위 바 아래) ──
     async function loadInlineCheer() {
       try {
-        const res  = await fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/cheer_comments?select=comment,rating,created_at&order=created_at.desc&limit=30', {
+        const res  = await fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/cheer_comments?select=comment,rating,created_at&comment=neq.&order=created_at.desc&limit=30', {
           headers: { 'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs' }
         });
         const data = await res.json();
@@ -776,7 +776,7 @@
     // ── 응원 메시지 로드 ──
     async function loadCheerMessages() {
       try {
-        const res = await fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/cheer_comments?select=comment,rating,created_at&order=created_at.desc&limit=30', {
+        const res = await fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/cheer_comments?select=comment,rating,created_at&comment=neq.&order=created_at.desc&limit=30', {
           headers: { 'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs' }
         });
         const data = await res.json();
