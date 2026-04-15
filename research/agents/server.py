@@ -95,6 +95,28 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             self.wfile.write(json.dumps({'status': 'ok'}).encode())
+        elif self.path.startswith('/proxy?url='):
+            import urllib.parse, urllib.request
+            try:
+                target_url = urllib.parse.unquote(self.path[len('/proxy?url='):])
+                req = urllib.request.Request(target_url, headers={
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    'Accept': 'text/html,application/xhtml+xml',
+                    'Accept-Language': 'ko-KR,ko;q=0.9',
+                })
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    html = resp.read()
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/html; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(html)
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps({'error': str(e)}).encode())
         else:
             self.send_response(404)
             self.end_headers()

@@ -669,6 +669,25 @@ async function submitCsv(){
 // ── ALIO URL 파싱 ──
 let _parsedRecords = [];
 
+// CORS 프록시 목록 (순서대로 시도)
+const PROXY_LIST = [
+  { name: 'server.py (로컬)',
+    fetch: u => fetch('http://127.0.0.1:8765/proxy?url=' + encodeURIComponent(u), {signal: AbortSignal.timeout(8000)})
+                  .then(r => r.ok ? r.text() : null).catch(()=>null) },
+  { name: 'allorigins',
+    fetch: u => fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(u), {signal: AbortSignal.timeout(12000)})
+                  .then(r => r.ok ? r.json().then(j=>j.contents) : null).catch(()=>null) },
+  { name: 'corsproxy.io',
+    fetch: u => fetch('https://corsproxy.io/?' + encodeURIComponent(u), {signal: AbortSignal.timeout(12000)})
+                  .then(r => r.ok ? r.text() : null).catch(()=>null) },
+  { name: 'codetabs',
+    fetch: u => fetch('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u), {signal: AbortSignal.timeout(12000)})
+                  .then(r => r.ok ? r.text() : null).catch(()=>null) },
+  { name: 'htmldriven',
+    fetch: u => fetch('https://cors.eu.org/' + u, {signal: AbortSignal.timeout(12000)})
+                  .then(r => r.ok ? r.text() : null).catch(()=>null) },
+];
+
 async function parseAlioUrl() {
   const url = document.getElementById('alio-url-input').value.trim();
   if (!url || !url.includes('alio.go.kr')) {
@@ -678,34 +697,26 @@ async function parseAlioUrl() {
   document.getElementById('parse-preview').classList.add('hidden');
   document.getElementById('parse-error').classList.add('hidden');
   document.getElementById('parse-status').classList.remove('hidden');
-  document.getElementById('parse-status-msg').textContent = '페이지를 가져오는 중...';
   document.getElementById('parse-btn').disabled = true;
 
   let html = null;
-  // CORS 프록시 1순위: allorigins
-  try {
-    document.getElementById('parse-status-msg').textContent = '프록시 연결 중 (1/2)...';
-    const res = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(url));
-    if (res.ok) {
-      const json = await res.json();
-      html = json.contents;
-    }
-  } catch(e) { html = null; }
-
-  // 2순위: corsproxy.io
-  if (!html) {
-    try {
-      document.getElementById('parse-status-msg').textContent = '프록시 연결 중 (2/2)...';
-      const res = await fetch('https://corsproxy.io/?' + encodeURIComponent(url));
-      if (res.ok) html = await res.text();
-    } catch(e) { html = null; }
+  for (let i = 0; i < PROXY_LIST.length; i++) {
+    const proxy = PROXY_LIST[i];
+    document.getElementById('parse-status-msg').textContent =
+      `[${i+1}/${PROXY_LIST.length}] ${proxy.name} 시도 중...`;
+    html = await proxy.fetch(url);
+    // 실제 stepTable이 포함된 응답인지 확인
+    if (html && html.includes('stepTable')) break;
+    html = null;
   }
 
   document.getElementById('parse-btn').disabled = false;
   document.getElementById('parse-status').classList.add('hidden');
 
   if (!html) {
-    showParseError('페이지를 가져올 수 없습니다. 네트워크를 확인하거나 잠시 후 다시 시도하세요.');
+    showParseError('모든 프록시 연결에 실패했습니다.\n' +
+      '로컬에서 사용 중이라면 server.py(수집시작.bat)가 실행 중인지 확인하세요.\n' +
+      '배포 환경이라면 잠시 후 다시 시도하세요.');
     return;
   }
 
