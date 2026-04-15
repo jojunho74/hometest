@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>채용AI DATA 관리</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;}
+body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F5F9;color:#1E293B;min-height:100vh;}
+
+/* 사이드바 */
+#sidebar{width:200px;flex-shrink:0;background:linear-gradient(180deg,#0D1F3C 0%,#162848 100%);display:flex;flex-direction:column;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-logo{padding:20px 16px 12px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sb-logo-title{font-size:.8rem;font-weight:800;color:#fff;letter-spacing:-.02em;}
+.sb-logo-sub{font-size:.65rem;color:rgba(255,255,255,.45);margin-top:2px;}
+.sb-section-label{font-size:.6rem;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;padding:14px 16px 4px;}
+.sb-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 16px;color:rgba(255,255,255,.6);font-size:.8rem;font-weight:500;background:none;border:none;cursor:pointer;text-align:left;transition:all .15s;}
+.sb-item:hover{background:rgba(255,255,255,.07);color:#fff;}
+.sb-item.active{background:rgba(59,130,246,.25);color:#93C5FD;border-left:3px solid #3B82F6;}
+.sb-icon{width:20px;text-align:center;font-size:1rem;flex-shrink:0;}
+.sb-bottom{margin-top:auto;padding:12px 8px;border-top:1px solid rgba(255,255,255,.08);}
+.sb-bottom-btn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 8px;color:rgba(255,255,255,.45);font-size:.75rem;background:none;border:none;cursor:pointer;border-radius:6px;text-align:left;}
+.sb-bottom-btn:hover{background:rgba(255,255,255,.07);color:#fff;}
+
+/* 상단 바 */
+#topbar{height:52px;background:#fff;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:20;}
+#topbar-title{font-size:.9rem;font-weight:700;color:#1E293B;}
+
+/* 버튼 */
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:all .15s;}
+.btn:hover{transform:scale(1.02);}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:#3B82F6;color:#fff;padding:8px 16px;}
+.btn-primary:hover{background:#2563EB;}
+.btn-secondary{background:#F1F5F9;color:#475569;padding:8px 16px;border:1px solid #E2E8F0;}
+.btn-secondary:hover{background:#E2E8F0;}
+.btn-success{background:#10B981;color:#fff;padding:8px 16px;}
+.btn-success:hover{background:#059669;}
+.btn-danger{background:#EF4444;color:#fff;padding:6px 12px;font-size:.75rem;}
+.btn-danger:hover{background:#DC2626;}
+
+/* 모달 */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;}
+.modal-box{background:#fff;border-radius:16px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between;}
+.modal-body{padding:20px 24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid #E2E8F0;display:flex;justify-content:flex-end;gap:8px;}
+
+/* 폼 */
+.form-group{margin-bottom:14px;}
+.form-label{display:block;font-size:.78rem;font-weight:600;color:#374151;margin-bottom:4px;}
+.form-input{width:100%;border:1px solid #D1D5DB;border-radius:8px;padding:8px 12px;font-size:.85rem;color:#1E293B;outline:none;transition:border-color .15s;}
+.form-input:focus{border-color:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,.12);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+/* 테이블 */
+.tbl-wrap{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.08);overflow:hidden;}
+.data-tbl{width:100%;border-collapse:collapse;font-size:.82rem;}
+.data-tbl thead tr{background:#F8FAFF;}
+.data-tbl th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
+.data-tbl th:not(:first-child){text-align:center;}
+.data-tbl td{padding:10px 12px;border-top:1px solid #F1F5F9;color:#374151;vertical-align:middle;}
+.data-tbl td:not(:first-child){text-align:center;}
+.data-tbl tbody tr:hover{background:#F8FAFF;}
+
+/* 칩 */
+.chip{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.chip-hot{background:#FEE2E2;color:#DC2626;}
+.chip-mid{background:#FEF9C3;color:#CA8A04;}
+.chip-low{background:#DCFCE7;color:#16A34A;}
+.grade-6{background:#DBEAFE;color:#1D4ED8;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;}
+.grade-7{background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;}
+.grade-b{background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;}
+
+/* 알림 토스트 */
+#toast{position:fixed;bottom:24px;right:24px;z-index:999;background:#1E293B;color:#fff;border-radius:10px;padding:12px 20px;font-size:.85rem;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;}
+#toast.show{opacity:1;transform:translateY(0);}
+
+@media(max-width:640px){
+  #sidebar{width:48px;}
+  .sb-logo-title,.sb-logo-sub,.sb-section-label,.sb-item span:last-child{display:none;}
+  .sb-item{justify-content:center;padding:10px;}
+}
+</style>
+</head>
+<body>
+
+<!-- 로그인 화면 -->
+<div id="login-screen" class="min-h-screen flex items-center justify-center" style="background:linear-gradient(135deg,#0D1F3C,#162848);">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm">
+    <div class="text-center mb-6">
+      <div class="text-3xl mb-2">📊</div>
+      <h1 class="text-xl font-black text-slate-800">채용AI DATA</h1>
+      <p class="text-sm text-slate-400 mt-1">관리자 로그인</p>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="text-xs font-semibold text-slate-500 block mb-1">이메일</label>
+        <input type="email" id="login-email" class="form-input" placeholder="관리자 이메일" autocomplete="email"/>
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-500 block mb-1">비밀번호</label>
+        <input type="password" id="login-pw" class="form-input" placeholder="비밀번호" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button onclick="doLogin()" class="btn btn-primary w-full justify-center py-3">로그인</button>
+      <div id="login-error" class="hidden text-center text-xs text-red-500 font-semibold mt-2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 메인 앱 -->
+<div id="main-app" class="hidden flex min-h-screen">
+
+  <!-- 사이드바 -->
+  <nav id="sidebar">
+    <div class="sb-logo">
+      <a href="../admin-k9x3.html" style="text-decoration:none;display:block;" title="메인 관리자로 이동">
+        <div class="sb-logo-title" style="cursor:pointer;transition:opacity .18s;" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">채용AI DATA</div>
+      </a>
+      <div class="sb-logo-sub">데이터 관리 시스템</div>
+    </div>
+
+    <div class="sb-section-label">데이터 관리</div>
+    <button onclick="switchTab('datasets')" id="tab-datasets" class="sb-item active"><span class="sb-icon">📁</span><span>데이터셋 목록</span></button>
+    <button onclick="switchTab('records')"  id="tab-records"  class="sb-item"><span class="sb-icon">📋</span><span>전체 레코드</span></button>
+    <button onclick="switchTab('add')"      id="tab-add"      class="sb-item"><span class="sb-icon">➕</span><span>데이터 추가</span></button>
+
+    <div class="sb-section-label">시각화</div>
+    <button onclick="switchTab('visual')"   id="tab-visual"   class="sb-item"><span class="sb-icon">📊</span><span>시각화 보기</span></button>
+
+    <div class="sb-section-label">도구</div>
+    <button onclick="switchTab('sql')"      id="tab-sql"      class="sb-item"><span class="sb-icon">🗄️</span><span>테이블 설정</span></button>
+
+    <div class="sb-bottom">
+      <a href="../admin-k9x3.html" class="sb-bottom-btn" style="text-decoration:none;">🏠 <span>메인 관리자</span></a>
+      <a href="alio-recruit.html" target="_blank" class="sb-bottom-btn" style="text-decoration:none;">👁️ <span>시각화 전체화면</span></a>
+      <button onclick="doLogout()" class="sb-bottom-btn">🚪 <span>로그아웃</span></button>
+    </div>
+  </nav>
+
+  <!-- 우측 메인 -->
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+    <!-- 상단 바 -->
+    <div id="topbar">
+      <span id="topbar-title">데이터셋 목록</span>
+      <div class="flex items-center gap-3">
+        <span id="topbar-user" class="text-xs text-slate-400"></span>
+      </div>
+    </div>
+
+    <!-- 콘텐츠 영역 -->
+    <div id="content-area" class="flex-1 overflow-y-auto p-5">
+
+      <!-- 데이터셋 목록 탭 -->
+      <div id="section-datasets">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">채용공고 데이터셋</h2>
+            <p class="text-xs text-slate-400 mt-0.5">공공기관별 채용공고 단위로 그룹핑된 데이터</p>
+          </div>
+          <button onclick="switchTab('add')" class="btn btn-primary">➕ 데이터 추가</button>
+        </div>
+
+        <!-- 요약 카드 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+          <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100">
+            <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">데이터셋</div>
+            <div id="ds-stat-datasets" class="text-2xl font-black text-blue-600">-</div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100">
+            <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">총 직종</div>
+            <div id="ds-stat-jobs" class="text-2xl font-black text-purple-600">-</div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100">
+            <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">총 채용인원</div>
+            <div id="ds-stat-hired" class="text-2xl font-black text-emerald-600">-</div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100">
+            <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">평균 경쟁률</div>
+            <div id="ds-stat-ratio" class="text-2xl font-black text-rose-600">-</div>
+          </div>
+        </div>
+
+        <div class="tbl-wrap">
+          <div class="px-4 py-3 border-b flex items-center justify-between bg-slate-50">
+            <span class="text-xs font-bold text-slate-500">📁 데이터셋 목록</span>
+            <span id="ds-count" class="text-xs text-slate-400">0개</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="data-tbl">
+              <thead><tr>
+                <th>공고명 (데이터셋)</th>
+                <th>직종 수</th>
+                <th>채용인원</th>
+                <th>평균 경쟁률</th>
+                <th>등록일</th>
+                <th>관리</th>
+              </tr></thead>
+              <tbody id="ds-tbody"><tr><td colspan="6" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 전체 레코드 탭 -->
+      <div id="section-records" class="hidden">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">전체 레코드</h2>
+            <p class="text-xs text-slate-400 mt-0.5">직종별 전형단계 상세 데이터</p>
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <select id="rec-filter-ds" onchange="loadRecords()" class="form-input" style="width:auto;font-size:.82rem;padding:6px 10px;">
+              <option value="">전체 데이터셋</option>
+            </select>
+            <button onclick="loadRecords()" class="btn btn-secondary">🔄 새로고침</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <div class="overflow-x-auto">
+            <table class="data-tbl">
+              <thead><tr>
+                <th>데이터셋</th>
+                <th>직급</th>
+                <th>직종</th>
+                <th>지역</th>
+                <th>1차 (합격/응시)</th>
+                <th>2차 (합격/응시)</th>
+                <th>최종 (합격/응시)</th>
+                <th>경쟁률</th>
+                <th>관리</th>
+              </tr></thead>
+              <tbody id="rec-tbody"><tr><td colspan="9" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 데이터 추가 탭 -->
+      <div id="section-add" class="hidden">
+        <div class="mb-4">
+          <h2 class="text-lg font-bold text-slate-800">데이터 추가</h2>
+          <p class="text-xs text-slate-400 mt-0.5">채용공고 데이터를 직종 단위로 입력합니다</p>
+        </div>
+
+        <!-- 단건 입력 폼 -->
+        <div class="bg-white rounded-xl shadow-sm p-5 mb-4">
+          <h3 class="text-sm font-bold text-slate-700 mb-4">📝 직종 단건 입력</h3>
+          <div class="form-group">
+            <label class="form-label">공고명 (데이터셋명) <span class="text-red-500">*</span></label>
+            <input type="text" id="f-dataset" class="form-input" placeholder="예: 2025년 한국수력원자력 채용"/>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">직급 <span class="text-red-500">*</span></label>
+              <select id="f-grade" class="form-input">
+                <option value="일반직 6급2">일반직 6급2</option>
+                <option value="일반직 7급">일반직 7급</option>
+                <option value="별정직">별정직</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">직종 <span class="text-red-500">*</span></label>
+              <input type="text" id="f-job" class="form-input" placeholder="예: 기계, 전기, 전산"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">지역</label>
+            <input type="text" id="f-region" class="form-input" placeholder="예: 전국, 대전, 전국·보훈"/>
+          </div>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">1차 합격</label>
+              <input type="number" id="f-s1p" class="form-input" placeholder="명"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">1차 응시</label>
+              <input type="number" id="f-s1t" class="form-input" placeholder="명"/>
+            </div>
+            <div></div>
+            <div class="form-group">
+              <label class="form-label">2차 합격</label>
+              <input type="number" id="f-s2p" class="form-input" placeholder="명 (없으면 공란)"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">2차 응시</label>
+              <input type="number" id="f-s2t" class="form-input" placeholder="명 (없으면 공란)"/>
+            </div>
+            <div></div>
+            <div class="form-group">
+              <label class="form-label">최종 합격 <span class="text-red-500">*</span></label>
+              <input type="number" id="f-s3p" class="form-input" placeholder="명"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">최종 응시</label>
+              <input type="number" id="f-s3t" class="form-input" placeholder="명"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">경쟁률 <span class="text-red-500">*</span></label>
+              <input type="number" id="f-ratio" class="form-input" placeholder="예: 73.0" step="0.01"/>
+            </div>
+          </div>
+          <div class="flex gap-2 mt-2">
+            <button onclick="submitRecord()" class="btn btn-primary">저장</button>
+            <button onclick="clearForm()" class="btn btn-secondary">초기화</button>
+          </div>
+        </div>
+
+        <!-- CSV 일괄 입력 -->
+        <div class="bg-white rounded-xl shadow-sm p-5">
+          <h3 class="text-sm font-bold text-slate-700 mb-2">📄 CSV 일괄 업로드</h3>
+          <p class="text-xs text-slate-400 mb-3">CSV 형식: dataset_name, grade, job, region, s1_pass, s1_total, s2_pass, s2_total, s3_pass, s3_total, ratio</p>
+          <textarea id="csv-input" rows="8" class="form-input" style="font-family:monospace;font-size:12px;resize:vertical;" placeholder="dataset_name,grade,job,region,s1_pass,s1_total,s2_pass,s2_total,s3_pass,s3_total,ratio&#10;2025 한국수력원자력,일반직 6급2,기계,전국,412,484,61,267,26,48,18.62&#10;2025 한국수력원자력,일반직 6급2,전기,전국,207,584,21,126,8,20,73"></textarea>
+          <div class="flex gap-2 mt-3">
+            <button onclick="submitCsv()" class="btn btn-primary">CSV 업로드</button>
+            <button onclick="document.getElementById('csv-input').value=''" class="btn btn-secondary">초기화</button>
+          </div>
+          <div id="csv-result" class="hidden mt-3 text-xs p-3 bg-slate-50 rounded-lg text-slate-600"></div>
+        </div>
+      </div>
+
+      <!-- 시각화 탭 -->
+      <div id="section-visual" class="hidden">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-bold text-slate-800">시각화 미리보기</h2>
+          <a href="alio-recruit.html" target="_blank" class="btn btn-primary">📊 전체화면으로 보기</a>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden" style="height:680px;">
+          <iframe src="alio-recruit.html" style="width:100%;height:100%;border:none;"></iframe>
+        </div>
+      </div>
+
+      <!-- SQL/테이블 설정 탭 -->
+      <div id="section-sql" class="hidden">
+        <div class="mb-4">
+          <h2 class="text-lg font-bold text-slate-800">테이블 설정</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Supabase에 alio_jobs 테이블이 없으면 아래 SQL을 실행하세요</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-5 mb-4">
+          <h3 class="text-sm font-bold text-slate-700 mb-3">📋 테이블 생성 SQL</h3>
+          <p class="text-xs text-slate-500 mb-3">
+            1. <a href="https://supabase.com" target="_blank" class="text-blue-500 underline">Supabase</a> → 프로젝트 → SQL Editor<br>
+            2. 아래 SQL을 복사해서 실행하세요 (최초 1회)
+          </p>
+          <pre id="create-sql-box" style="background:#0F172A;color:#93C5FD;padding:16px;border-radius:10px;font-size:12px;overflow-x:auto;line-height:1.7;white-space:pre-wrap;">CREATE TABLE IF NOT EXISTS alio_jobs (
+  id            UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  dataset_name  TEXT NOT NULL,
+  grade         TEXT,
+  grade_key     TEXT,
+  job           TEXT NOT NULL,
+  region        TEXT,
+  s1_pass       INTEGER,
+  s1_total      INTEGER,
+  s2_pass       INTEGER,
+  s2_total      INTEGER,
+  s3_pass       INTEGER NOT NULL,
+  s3_total      INTEGER,
+  ratio         DECIMAL(8,2) NOT NULL,
+  created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE alio_jobs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "anon read" ON alio_jobs
+  FOR SELECT USING (true);
+
+CREATE POLICY "auth insert" ON alio_jobs
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "auth delete" ON alio_jobs
+  FOR DELETE USING (true);
+
+CREATE POLICY "auth update" ON alio_jobs
+  FOR UPDATE USING (true);</pre>
+          <button onclick="copyCreateSql()" class="btn btn-secondary mt-3">📋 SQL 복사</button>
+          <div id="sql-copy-msg" class="hidden text-xs text-emerald-500 font-semibold mt-2">복사됨!</div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-5">
+          <h3 class="text-sm font-bold text-slate-700 mb-3">⚠️ 전체 데이터 삭제</h3>
+          <p class="text-xs text-slate-400 mb-3">모든 alio_jobs 데이터를 삭제합니다. 되돌릴 수 없습니다.</p>
+          <button onclick="deleteAllRecords()" class="btn btn-danger">전체 삭제</button>
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const { createClient } = supabase;
+const db = createClient(
+  'https://byzulmxcuhsrjdphmuym.supabase.co',
+  'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
+);
+
+const TAB_LABELS = {datasets:'데이터셋 목록',records:'전체 레코드',add:'데이터 추가',visual:'시각화 보기',sql:'테이블 설정'};
+
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'#1E293B':'#DC2626';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+// ── 인증 ──
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pw=document.getElementById('login-pw').value;
+  const errEl=document.getElementById('login-error');
+  errEl.classList.add('hidden');
+  const {data,error}=await db.auth.signInWithPassword({email,password:pw});
+  if(error){errEl.textContent=error.message;errEl.classList.remove('hidden');return;}
+  document.getElementById('topbar-user').textContent=data.user.email;
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('main-app').classList.remove('hidden');
+  loadDatasets();
+}
+
+async function doLogout(){
+  await db.auth.signOut();
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('main-app').classList.add('hidden');
+}
+
+db.auth.getSession().then(({data:{session}})=>{
+  if(session){
+    document.getElementById('topbar-user').textContent=session.user.email;
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('main-app').classList.remove('hidden');
+    loadDatasets();
+  }
+});
+
+// ── 탭 전환 ──
+function switchTab(tab){
+  ['datasets','records','add','visual','sql'].forEach(t=>{
+    document.getElementById('section-'+t).classList.toggle('hidden',t!==tab);
+    const b=document.getElementById('tab-'+t);
+    if(b){if(t===tab)b.classList.add('active');else b.classList.remove('active');}
+  });
+  const titleEl=document.getElementById('topbar-title');
+  if(titleEl)titleEl.textContent=TAB_LABELS[tab]||tab;
+  document.getElementById('content-area').scrollTop=0;
+  if(tab==='datasets')loadDatasets();
+  if(tab==='records')loadRecords();
+}
+
+// ── 데이터셋 목록 ──
+let _allRows=[];
+async function loadDatasets(){
+  const tbody=document.getElementById('ds-tbody');
+  tbody.innerHTML='<tr><td colspan="6" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr>';
+  const {data,error}=await db.from('alio_jobs').select('*').order('created_at',{ascending:false});
+  if(error){
+    tbody.innerHTML='<tr><td colspan="6" class="py-6 text-center text-sm text-red-400">테이블 오류: '+esc(error.message)+'<br><small>테이블 설정 탭에서 SQL을 실행하세요.</small></td></tr>';
+    return;
+  }
+  _allRows=data||[];
+  updateSummaryCards(_allRows);
+
+  // 데이터셋 그룹핑
+  const dsMap={};
+  _allRows.forEach(r=>{
+    const k=r.dataset_name||'미분류';
+    if(!dsMap[k])dsMap[k]={rows:[],created_at:r.created_at};
+    dsMap[k].rows.push(r);
+  });
+  const datasets=Object.entries(dsMap);
+  document.getElementById('ds-count').textContent=datasets.length+'개';
+
+  // 레코드 필터 셀렉트 채우기
+  const sel=document.getElementById('rec-filter-ds');
+  const prevVal=sel.value;
+  sel.innerHTML='<option value="">전체 데이터셋</option>';
+  datasets.forEach(([name])=>{
+    const opt=document.createElement('option');
+    opt.value=name;opt.textContent=name;
+    sel.appendChild(opt);
+  });
+  if(prevVal)sel.value=prevVal;
+
+  if(datasets.length===0){
+    tbody.innerHTML='<tr><td colspan="6" class="py-8 text-center text-sm text-slate-400">등록된 데이터가 없습니다.<br>데이터 추가 탭에서 입력하세요.</td></tr>';
+    return;
+  }
+  tbody.innerHTML=datasets.map(([name,ds])=>{
+    const cnt=ds.rows.length;
+    const hired=ds.rows.reduce((s,r)=>s+(r.s3_pass||0),0);
+    const avg=(ds.rows.reduce((s,r)=>s+(parseFloat(r.ratio)||0),0)/cnt).toFixed(1);
+    const dt=ds.created_at?ds.created_at.slice(0,10):'-';
+    const chipCls=avg>=80?'chip-hot':avg>=30?'chip-mid':'chip-low';
+    return `<tr>
+      <td class="font-semibold text-slate-800">${esc(name)}</td>
+      <td>${cnt}개</td>
+      <td class="text-emerald-600 font-bold">${hired}명</td>
+      <td><span class="chip ${chipCls}">${avg}:1</span></td>
+      <td class="text-xs text-slate-400">${dt}</td>
+      <td>
+        <button onclick="deleteDataset('${esc(name)}')" class="btn btn-danger">삭제</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function updateSummaryCards(rows){
+  const dsSet=new Set(rows.map(r=>r.dataset_name));
+  const hired=rows.reduce((s,r)=>s+(r.s3_pass||0),0);
+  const avg=rows.length?(rows.reduce((s,r)=>s+(parseFloat(r.ratio)||0),0)/rows.length).toFixed(1):0;
+  document.getElementById('ds-stat-datasets').textContent=dsSet.size;
+  document.getElementById('ds-stat-jobs').textContent=rows.length;
+  document.getElementById('ds-stat-hired').textContent=hired.toLocaleString();
+  document.getElementById('ds-stat-ratio').textContent=avg+':1';
+}
+
+async function deleteDataset(name){
+  if(!confirm(`"${name}" 데이터셋의 모든 레코드를 삭제하시겠습니까?`))return;
+  const {error}=await db.from('alio_jobs').delete().eq('dataset_name',name);
+  if(error){toast('삭제 실패: '+error.message,false);return;}
+  toast('삭제되었습니다.');
+  loadDatasets();
+}
+
+// ── 전체 레코드 ──
+async function loadRecords(){
+  const tbody=document.getElementById('rec-tbody');
+  tbody.innerHTML='<tr><td colspan="9" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr>';
+  const filter=document.getElementById('rec-filter-ds').value;
+  let q=db.from('alio_jobs').select('*').order('dataset_name').order('ratio',{ascending:false});
+  if(filter)q=q.eq('dataset_name',filter);
+  const {data,error}=await q;
+  if(error){tbody.innerHTML='<tr><td colspan="9" class="py-6 text-center text-sm text-red-400">'+esc(error.message)+'</td></tr>';return;}
+  const rows=data||[];
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="9" class="py-6 text-center text-sm text-slate-400">데이터가 없습니다.</td></tr>';return;}
+  tbody.innerHTML=rows.map(r=>{
+    const chipCls=r.ratio>=80?'chip-hot':r.ratio>=30?'chip-mid':'chip-low';
+    const gk=r.grade_key||'6';
+    const gradeCls=gk==='7'?'grade-7':gk==='b'?'grade-b':'grade-6';
+    const s2=r.s2_total?`<span class="text-blue-500 font-bold">${r.s2_pass}</span><span class="text-slate-400">/${r.s2_total}</span>`:'<span class="text-slate-300">—</span>';
+    return `<tr>
+      <td class="text-xs text-slate-500 max-w-[160px] truncate" title="${esc(r.dataset_name)}">${esc((r.dataset_name||'').slice(0,20))}${(r.dataset_name||'').length>20?'…':''}</td>
+      <td><span class="${gradeCls}">${esc(r.grade||'-')}</span></td>
+      <td class="font-semibold text-slate-800">${esc(r.job||'-')}</td>
+      <td class="text-xs text-slate-500">${esc(r.region||'-')}</td>
+      <td><span class="text-blue-500 font-bold">${r.s1_pass||0}</span><span class="text-slate-400">/${r.s1_total||0}</span></td>
+      <td>${s2}</td>
+      <td><span class="text-emerald-600 font-bold">${r.s3_pass||0}</span><span class="text-slate-400">/${r.s3_total||0}</span></td>
+      <td><span class="chip ${chipCls}">${r.ratio}:1</span></td>
+      <td><button onclick="deleteRecord('${r.id}')" class="btn btn-danger">삭제</button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function deleteRecord(id){
+  if(!confirm('이 레코드를 삭제하시겠습니까?'))return;
+  const {error}=await db.from('alio_jobs').delete().eq('id',id);
+  if(error){toast('삭제 실패',false);return;}
+  toast('삭제되었습니다.');
+  loadRecords();
+}
+
+// ── 단건 입력 ──
+async function submitRecord(){
+  const dataset=document.getElementById('f-dataset').value.trim();
+  const grade=document.getElementById('f-grade').value;
+  const job=document.getElementById('f-job').value.trim();
+  const region=document.getElementById('f-region').value.trim();
+  const s1p=parseInt(document.getElementById('f-s1p').value)||null;
+  const s1t=parseInt(document.getElementById('f-s1t').value)||null;
+  const s2p=parseInt(document.getElementById('f-s2p').value)||null;
+  const s2t=parseInt(document.getElementById('f-s2t').value)||null;
+  const s3p=parseInt(document.getElementById('f-s3p').value)||null;
+  const s3t=parseInt(document.getElementById('f-s3t').value)||null;
+  const ratio=parseFloat(document.getElementById('f-ratio').value)||null;
+  if(!dataset||!job||!s3p||!ratio){toast('필수 항목을 입력하세요 (공고명, 직종, 최종합격, 경쟁률)',false);return;}
+  const gradeKey=grade.includes('7급')?'7':grade.includes('별정')?'b':'6';
+  const {error}=await db.from('alio_jobs').insert({dataset_name:dataset,grade,grade_key:gradeKey,job,region,s1_pass:s1p,s1_total:s1t,s2_pass:s2p,s2_total:s2t,s3_pass:s3p,s3_total:s3t,ratio});
+  if(error){toast('저장 실패: '+error.message,false);return;}
+  toast('저장되었습니다!');
+  clearForm();
+  switchTab('datasets');
+}
+
+function clearForm(){
+  ['f-dataset','f-grade','f-job','f-region','f-s1p','f-s1t','f-s2p','f-s2t','f-s3p','f-s3t','f-ratio'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){if(el.tagName==='SELECT')el.selectedIndex=0;else el.value='';}
+  });
+}
+
+// ── CSV 업로드 ──
+async function submitCsv(){
+  const raw=document.getElementById('csv-input').value.trim();
+  const resultEl=document.getElementById('csv-result');
+  if(!raw){toast('CSV를 입력하세요',false);return;}
+  const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  // 헤더 행 자동 제거
+  const dataLines=lines[0].toLowerCase().includes('dataset')?lines.slice(1):lines;
+  if(!dataLines.length){toast('데이터가 없습니다',false);return;}
+  const records=[];
+  const errors=[];
+  dataLines.forEach((line,i)=>{
+    const cols=line.split(',').map(c=>c.trim());
+    if(cols.length<11){errors.push(`${i+2}행: 열 부족 (${cols.length}개)`);return;}
+    const [dataset_name,grade,job,region,s1p,s1t,s2p,s2t,s3p,s3t,ratio]=cols;
+    if(!dataset_name||!job||!s3p||!ratio){errors.push(`${i+2}행: 필수값 누락`);return;}
+    const gradeKey=grade.includes('7급')?'7':grade.includes('별정')?'b':'6';
+    records.push({
+      dataset_name,grade:grade||'일반직 6급2',grade_key:gradeKey,job,region:region||'전국',
+      s1_pass:parseInt(s1p)||null,s1_total:parseInt(s1t)||null,
+      s2_pass:parseInt(s2p)||null,s2_total:parseInt(s2t)||null,
+      s3_pass:parseInt(s3p)||null,s3_total:parseInt(s3t)||null,
+      ratio:parseFloat(ratio)||null
+    });
+  });
+  if(!records.length){toast('유효한 레코드가 없습니다',false);return;}
+  const {error}=await db.from('alio_jobs').insert(records);
+  if(error){toast('업로드 실패: '+error.message,false);return;}
+  toast(`${records.length}개 레코드 저장 완료!`);
+  resultEl.textContent=`✅ ${records.length}개 저장${errors.length?'\n⚠️ '+errors.join('\n'):''}`;
+  resultEl.classList.remove('hidden');
+  document.getElementById('csv-input').value='';
+  switchTab('datasets');
+}
+
+// ── 전체 삭제 ──
+async function deleteAllRecords(){
+  if(!confirm('모든 alio_jobs 데이터를 삭제합니다. 정말로 진행하시겠습니까?'))return;
+  const {error}=await db.from('alio_jobs').delete().neq('id','00000000-0000-0000-0000-000000000000');
+  if(error){toast('삭제 실패: '+error.message,false);return;}
+  toast('전체 삭제 완료');
+  loadDatasets();
+}
+
+// ── SQL 복사 ──
+function copyCreateSql(){
+  navigator.clipboard.writeText(document.getElementById('create-sql-box').textContent).then(()=>{
+    document.getElementById('sql-copy-msg').classList.remove('hidden');
+    setTimeout(()=>document.getElementById('sql-copy-msg').classList.add('hidden'),2000);
+  });
+}
+</script>
+</body>
+</html>

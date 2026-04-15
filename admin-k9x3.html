@@ -210,6 +210,7 @@
 
       <div class="sb-section-label">자동화</div>
       <button onclick="switchTab('crawler')" id="tab-crawler" class="sb-item"><span class="sb-icon">🤖</span><span class="sb-label">대학활동 수집</span></button>
+      <button onclick="switchTab('alio')" id="tab-alio" class="sb-item"><span class="sb-icon">📊</span><span class="sb-label">채용AI DATA</span></button>
 
       <div class="sb-section-label">분석 · 운영</div>
       <button onclick="switchTab('stats')"    id="tab-stats"    class="sb-item"><span class="sb-icon">📊</span><span class="sb-label">통계</span></button>
@@ -1429,6 +1430,80 @@
       </div>
 
       <!-- ── 팝업광고 탭 ── -->
+      <!-- ── 채용AI DATA 탭 ── -->
+      <div id="section-alio" class="hidden">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">채용AI DATA</h2>
+            <p class="text-xs text-slate-400 mt-0.5">공공기관 전형단계별 채용정보 시각화 및 데이터 관리</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="loadAlioData()" class="btn btn-secondary text-sm px-4 py-2">🔄 새로고침</button>
+            <a href="static/alio-recruit.html" target="_blank" class="btn btn-primary text-sm px-4 py-2" style="text-decoration:none;">📊 시각화 전체화면</a>
+            <a href="static/alio-admin.html" target="_blank" class="btn btn-success text-sm px-4 py-2" style="text-decoration:none;">⚙️ 채용DATA 관리</a>
+          </div>
+        </div>
+
+        <!-- 요약 카드 -->
+        <div id="alio-summary" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+          <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100">
+            <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">데이터셋</div>
+            <div id="alio-stat-datasets" class="text-2xl font-black text-blue-600">-</div>
+            <div class="text-xs text-slate-400 mt-1">등록된 채용공고 수</div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100">
+            <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">총 직종</div>
+            <div id="alio-stat-jobs" class="text-2xl font-black text-purple-600">-</div>
+            <div class="text-xs text-slate-400 mt-1">전체 직종 수</div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100">
+            <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">총 채용인원</div>
+            <div id="alio-stat-hired" class="text-2xl font-black text-emerald-600">-</div>
+            <div class="text-xs text-slate-400 mt-1">최종 합격자 합계</div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100">
+            <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">평균 경쟁률</div>
+            <div id="alio-stat-ratio" class="text-2xl font-black text-rose-600">-</div>
+            <div class="text-xs text-slate-400 mt-1">전체 직종 평균</div>
+          </div>
+        </div>
+
+        <!-- 데이터셋 목록 -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
+          <div class="px-4 py-3 border-b flex items-center justify-between" style="background:#F8FAFF;">
+            <span class="text-xs font-bold text-slate-600">📁 채용공고 데이터셋</span>
+            <span id="alio-dataset-count" class="text-xs text-slate-400">0개</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b">
+                  <th class="px-3 py-2 text-left text-xs font-semibold text-slate-500">공고명</th>
+                  <th class="px-3 py-2 text-center text-xs font-semibold text-slate-500">직종 수</th>
+                  <th class="px-3 py-2 text-center text-xs font-semibold text-slate-500">채용인원</th>
+                  <th class="px-3 py-2 text-center text-xs font-semibold text-slate-500">평균 경쟁률</th>
+                  <th class="px-3 py-2 text-center text-xs font-semibold text-slate-500">등록일</th>
+                  <th class="px-3 py-2 text-center text-xs font-semibold text-slate-500">관리</th>
+                </tr>
+              </thead>
+              <tbody id="alio-datasets-tbody">
+                <tr><td colspan="6" class="px-3 py-6 text-center text-sm text-slate-400">데이터를 불러오는 중...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 시각화 미리보기 iframe -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div class="px-4 py-3 border-b" style="background:#F8FAFF;">
+            <span class="text-xs font-bold text-slate-600">📊 최신 시각화 미리보기</span>
+          </div>
+          <div style="height:520px;overflow:hidden;">
+            <iframe src="static/alio-recruit.html" style="width:100%;height:100%;border:none;transform-origin:top left;" id="alio-iframe"></iframe>
+          </div>
+        </div>
+      </div>
+
       <!-- ── 대학활동 수집 대시보드 탭 ── -->
       <div id="section-crawler" class="hidden">
 
@@ -1969,11 +2044,11 @@
     const TAB_LABELS = {
       consult:'신청 관리', student:'학생접수', news:'대학소식', programs:'대학활동',
       jobs:'채용공고', staffjobs:'직원채용공고', cnews:'기업소식', shorts:'유튜브쇼츠', stats:'통계',
-      blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고', crawler:'대학활동 수집'
+      blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고', crawler:'대학활동 수집', alio:'채용AI DATA'
     };
 
     function switchTab(tab) {
-      ['consult', 'student', 'news', 'programs', 'jobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'blog', 'calendar', 'popupads', 'crawler'].forEach(t => {
+      ['consult', 'student', 'news', 'programs', 'jobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'blog', 'calendar', 'popupads', 'crawler', 'alio'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (t === tab) btn.classList.add('active');
@@ -1998,6 +2073,7 @@
       if (tab === 'calendar') loadCalendarAdmin();
       if (tab === 'popupads') loadPopupAds();
       if (tab === 'crawler') { loadUnivSites(); restoreDetectResults(); }
+      if (tab === 'alio') loadAlioData();
     }
 
     // ─── 학생접수 ───
@@ -4636,6 +4712,60 @@ ${d.hashtags}`;
       document.getElementById('txt-preview-wrap').style.display = 'none';
       _parsedCalRows = [];
       loadCalendarAdmin();
+    }
+
+    // ─── 채용AI DATA ───
+    async function loadAlioData() {
+      const tbody = document.getElementById('alio-datasets-tbody');
+      const cntEl = document.getElementById('alio-dataset-count');
+      if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="px-3 py-4 text-center text-xs text-slate-400">불러오는 중...</td></tr>';
+
+      const { data, error } = await db.from('alio_jobs').select('*').order('created_at', { ascending: false });
+      if (error) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="px-3 py-6 text-center text-xs text-slate-400">alio_jobs 테이블이 없거나 연결 오류입니다.<br><span class="text-blue-500">static/alio-admin.html</span>에서 테이블을 생성하세요.</td></tr>';
+        return;
+      }
+      const rows = data || [];
+
+      // 데이터셋별 그룹핑
+      const dsMap = {};
+      rows.forEach(r => {
+        const key = r.dataset_name || '미분류';
+        if (!dsMap[key]) dsMap[key] = { rows: [], created_at: r.created_at };
+        dsMap[key].rows.push(r);
+      });
+      const datasets = Object.entries(dsMap);
+
+      // 요약 카드 업데이트
+      const totalHired = rows.reduce((s, r) => s + (r.s3_pass || 0), 0);
+      const avgRatio = rows.length ? (rows.reduce((s, r) => s + (parseFloat(r.ratio) || 0), 0) / rows.length).toFixed(1) : 0;
+      document.getElementById('alio-stat-datasets').textContent = datasets.length;
+      document.getElementById('alio-stat-jobs').textContent = rows.length;
+      document.getElementById('alio-stat-hired').textContent = totalHired.toLocaleString();
+      document.getElementById('alio-stat-ratio').textContent = avgRatio + ':1';
+      if (cntEl) cntEl.textContent = datasets.length + '개';
+
+      if (datasets.length === 0) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="px-3 py-6 text-center text-sm text-slate-400">등록된 채용DATA가 없습니다.<br><a href="static/alio-admin.html" target="_blank" class="text-blue-500 underline">채용DATA 관리</a>에서 데이터를 추가하세요.</td></tr>';
+        return;
+      }
+
+      if (tbody) tbody.innerHTML = datasets.map(([name, ds]) => {
+        const jobCount = ds.rows.length;
+        const hired = ds.rows.reduce((s, r) => s + (r.s3_pass || 0), 0);
+        const avg = (ds.rows.reduce((s, r) => s + (parseFloat(r.ratio) || 0), 0) / jobCount).toFixed(1);
+        const dateStr = ds.created_at ? ds.created_at.slice(0, 10) : '-';
+        return `<tr class="border-b last:border-0 hover:bg-slate-50">
+          <td class="px-3 py-2.5 font-semibold text-slate-800">${esc(name)}</td>
+          <td class="px-3 py-2.5 text-center text-slate-600">${jobCount}개</td>
+          <td class="px-3 py-2.5 text-center text-emerald-600 font-bold">${hired}명</td>
+          <td class="px-3 py-2.5 text-center text-rose-600 font-bold">${avg}:1</td>
+          <td class="px-3 py-2.5 text-center text-slate-400 text-xs">${dateStr}</td>
+          <td class="px-3 py-2.5 text-center">
+            <a href="static/alio-admin.html" target="_blank" style="font-size:11px;padding:2px 8px;color:#3B82F6;border:1px solid #BFDBFE;background:#EFF6FF;border-radius:4px;text-decoration:none;">관리</a>
+          </td>
+        </tr>`;
+      }).join('');
     }
 
     async function loadCalendarAdmin() {
