@@ -142,6 +142,35 @@
     /* 애니메이션 */
     @keyframes rowIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
     .row-anim{animation:rowIn .25s ease both;}
+
+    /* ── 게시글 팝업 ── */
+    #ub-popup-bg{display:none;position:fixed;inset:0;background:rgba(11,29,58,.7);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:16px;}
+    #ub-popup-bg.open{display:flex;}
+    #ub-popup{background:#fff;border-radius:24px;width:100%;max-width:460px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.35);position:relative;animation:ubPopIn .22s cubic-bezier(.34,1.56,.64,1);}
+    @keyframes ubPopIn{from{opacity:0;transform:scale(.88) translateY(16px);}to{opacity:1;transform:scale(1) translateY(0);}}
+    .ub-popup-head{background:linear-gradient(135deg,#0B1D3A 0%,#1E3A8A 60%,#1D4ED8 100%);padding:24px 24px 20px;position:relative;}
+    .ub-popup-icon{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:12px;}
+    .ub-popup-head-title{font-size:1.05rem;font-weight:900;color:#fff;margin-bottom:4px;}
+    .ub-popup-head-sub{font-size:11px;color:rgba(255,255,255,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:92%;}
+    .ub-popup-close{position:absolute;top:14px;right:16px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:14px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+    .ub-popup-close:hover{background:rgba(255,255,255,.3);}
+    .ub-popup-body{padding:24px 24px 20px;}
+    .ub-star-label{font-size:13px;font-weight:700;color:#475569;text-align:center;margin-bottom:14px;}
+    .ub-stars{display:flex;gap:4px;justify-content:center;margin-bottom:6px;}
+    .ub-star{font-size:2.8rem;cursor:pointer;color:#E2E8F0;transition:color .12s,transform .12s;line-height:1;user-select:none;}
+    .ub-star.on{color:#FBBF24;}
+    .ub-star:hover{transform:scale(1.18);}
+    .ub-star-hint{font-size:11px;color:#94A3B8;text-align:center;height:16px;margin-bottom:20px;}
+    #ub-comment{width:100%;padding:10px 13px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:inherit;resize:none;min-height:64px;outline:none;transition:border-color .2s;margin-bottom:14px;color:#1E293B;}
+    #ub-comment:focus{border-color:#1E4D8C;}
+    .ub-popup-actions{display:flex;gap:10px;}
+    .ub-popup-kakao{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:13px;border-radius:12px;background:#FEE500;color:#3C1E1E;font-weight:900;font-size:13px;border:none;cursor:pointer;transition:filter .15s,transform .15s;box-shadow:0 2px 8px rgba(254,229,0,.5);}
+    .ub-popup-kakao:hover{filter:brightness(1.05);transform:scale(1.02);}
+    .ub-popup-go{flex:1.2;display:flex;align-items:center;justify-content:center;gap:7px;padding:13px;border-radius:12px;background:linear-gradient(135deg,#1E4D8C,#1D4ED8);color:#fff;font-weight:900;font-size:13px;border:none;cursor:pointer;text-decoration:none;transition:filter .15s,transform .15s;box-shadow:0 2px 12px rgba(30,77,140,.4);}
+    .ub-popup-go:hover{filter:brightness(1.1);transform:scale(1.02);}
+    .ub-popup-skip{display:block;text-align:center;font-size:11px;color:#94A3B8;margin-top:14px;cursor:pointer;background:none;border:none;width:100%;padding:4px;}
+    .ub-popup-skip:hover{color:#64748B;}
+    @media(max-width:480px){.ub-popup-head{padding:20px 16px 16px;}.ub-popup-body{padding:18px 16px 16px;}.ub-star{font-size:2.2rem;}}
   </style>
 </head>
 <body>
@@ -363,10 +392,10 @@
     } else {
       wrap.innerHTML = `<div class="card-grid">
         ${posts.map((r, i) => `
-          <div class="post-card row-anim" style="animation-delay:${(i*0.05).toFixed(2)}s" ${r.link?`onclick="window.open('${esc(r.link)}','_blank')"`:''}>
+          <div class="post-card row-anim" style="animation-delay:${(i*0.05).toFixed(2)}s" ${r.link?`onclick="openUbPopup('${esc(r.link)}','${esc(r.school_name||'')}','${esc(r.title||'')}')"`:''}>
             <div style="margin-bottom:6px;">${typeBadge(r._type)}</div>
             <div class="post-card-title" title="${esc(r.title)}">${esc(r.title&&r.title.length>35?r.title.slice(0,35)+'...':r.title)}</div>
-            ${r.link ? `<a href="${esc(r.link)}" target="_blank" class="post-card-link" onclick="event.stopPropagation()">바로가기 ↗</a>` : ''}
+            ${r.link ? `<span class="post-card-link" onclick="event.stopPropagation();openUbPopup('${esc(r.link)}','${esc(r.school_name||'')}','${esc(r.title||'')}')">바로가기 ↗</span>` : ''}
             <div class="post-card-date">${fmtDate(r.created_at)}</div>
           </div>`).join('')}
       </div>`;
@@ -382,6 +411,106 @@
   }
 
   loadData();
+</script>
+
+<!-- ── 게시글 팝업 ── -->
+<div id="ub-popup-bg" onclick="if(event.target===this)closeUbPopup()">
+  <div id="ub-popup">
+    <div class="ub-popup-head">
+      <div class="ub-popup-icon">🎓</div>
+      <div class="ub-popup-head-title">이 게시글이 도움이 됐나요?</div>
+      <div class="ub-popup-head-sub" id="ub-popup-sub"></div>
+      <button class="ub-popup-close" onclick="closeUbPopup()">✕</button>
+    </div>
+    <div class="ub-popup-body">
+      <div class="ub-star-label">만족도를 선택해 주세요</div>
+      <div class="ub-stars" id="ub-stars">
+        <span class="ub-star" data-v="1">★</span>
+        <span class="ub-star" data-v="2">★</span>
+        <span class="ub-star" data-v="3">★</span>
+        <span class="ub-star" data-v="4">★</span>
+        <span class="ub-star" data-v="5">★</span>
+      </div>
+      <div class="ub-star-hint" id="ub-star-hint"></div>
+      <textarea id="ub-comment" placeholder="응원 한마디 남겨주세요 (선택) 🎉"></textarea>
+      <div class="ub-popup-actions">
+        <button class="ub-popup-kakao" onclick="ubShareKakao()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
+          카카오 공유
+        </button>
+        <button class="ub-popup-go" onclick="ubGoLink()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          바로가기
+        </button>
+      </div>
+      <button class="ub-popup-skip" onclick="ubSkip()">별점 없이 바로가기</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+<script>
+(function(){
+  const SB_URL = 'https://byzulmxcuhsrjdphmuym.supabase.co';
+  const SB_KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
+  const HINTS  = ['','별로예요','아쉬워요','괜찮아요','좋아요!','최고예요! 🎉'];
+  let _link = '', _school = '', _title = '', _rating = 0;
+
+  const stars = document.querySelectorAll('.ub-star');
+  const hint  = document.getElementById('ub-star-hint');
+
+  function setStars(v){
+    stars.forEach(s => s.classList.toggle('on', parseInt(s.dataset.v) <= v));
+  }
+  stars.forEach(s => {
+    s.addEventListener('click', function(){ _rating = parseInt(this.dataset.v); setStars(_rating); hint.textContent = HINTS[_rating]||''; });
+    s.addEventListener('mouseover', function(){ setStars(parseInt(this.dataset.v)); hint.textContent = HINTS[parseInt(this.dataset.v)]||''; });
+    s.addEventListener('mouseout', function(){ setStars(_rating); hint.textContent = _rating ? (HINTS[_rating]||'') : ''; });
+  });
+
+  window.openUbPopup = function(link, school, title) {
+    _link = link; _school = school; _title = title; _rating = 0;
+    setStars(0); hint.textContent = '';
+    document.getElementById('ub-comment').value = '';
+    document.getElementById('ub-popup-sub').textContent = school + (title ? ' — ' + title : '');
+    document.getElementById('ub-popup-bg').classList.add('open');
+  };
+
+  window.closeUbPopup = function(){ document.getElementById('ub-popup-bg').classList.remove('open'); };
+
+  async function saveAndGo() {
+    const comment = document.getElementById('ub-comment').value.trim();
+    if (_rating > 0 || comment) {
+      const fileKey = _school + '|' + _title;
+      try {
+        await fetch(SB_URL + '/rest/v1/cheer_comments', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
+          body: JSON.stringify({comment: comment||'', rating: _rating||5, file_name: fileKey})
+        });
+      } catch(e){}
+    }
+    if (_link) window.open(_link, '_blank');
+    closeUbPopup();
+  }
+
+  window.ubGoLink  = saveAndGo;
+  window.ubSkip    = function(){ if (_link) window.open(_link, '_blank'); closeUbPopup(); };
+
+  window.ubShareKakao = function() {
+    const url = _link || 'https://ibtcc.kr/university-board.html';
+    const title = _school + ' — ' + _title;
+    if (window.Kakao) {
+      try {
+        if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
+        Kakao.Share.sendDefault({objectType:'feed',content:{title:title,description:'지텔프IBT 대학 활동 게시판',imageUrl:'https://ibtcc.kr/logo/logo-text.png',link:{mobileWebUrl:url,webUrl:url}},buttons:[{title:'게시글 보기',link:{mobileWebUrl:url,webUrl:url}}]});
+        return;
+      } catch(e){}
+    }
+    if (navigator.share) { navigator.share({title:title,url:url}).catch(function(){}); return; }
+    navigator.clipboard.writeText(url).catch(function(){});
+  };
+})();
 </script>
 </body>
 </html>
