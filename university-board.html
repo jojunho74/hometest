@@ -161,6 +161,17 @@
     .ub-star.on{color:#FBBF24;}
     .ub-star:hover{transform:scale(1.18);}
     .ub-star-hint{font-size:11px;color:#94A3B8;text-align:center;height:16px;margin-bottom:20px;}
+    /* 카드 별점 배지 */
+    .post-card-rating{display:flex;align-items:center;gap:4px;margin-top:2px;min-height:18px;}
+    .pcr-stars{color:#FBBF24;font-size:11px;letter-spacing:1px;}
+    .pcr-avg{font-size:11px;font-weight:700;color:#92400E;}
+    .pcr-cnt{font-size:10px;color:#94A3B8;}
+    .post-card:nth-child(6n+4) .pcr-avg,
+    .post-card:nth-child(6n+5) .pcr-avg{color:#FDE68A;}
+    .post-card:nth-child(6n+0) .pcr-avg{color:#FDE68A;}
+    .post-card:nth-child(6n+4) .pcr-cnt,
+    .post-card:nth-child(6n+5) .pcr-cnt,
+    .post-card:nth-child(6n+0) .pcr-cnt{color:rgba(255,255,255,.5);}
     /* 크라운 결과 패널 */
     #ub-crown-panel{display:none;text-align:center;padding:32px 24px 28px;}
     #ub-crown-panel.show{display:block;}
@@ -268,9 +279,35 @@
   let schoolMap = {};
   let selectedSchool = null;
   let currentView = 'card';
+  let _ratingMap = {};   // key: "school|title" → { sum, count }
 
   function esc(s){ return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
   function fmtDate(d){ if(!d) return '-'; const dt=new Date(d); return dt.getFullYear()+'.'+(dt.getMonth()+1).toString().padStart(2,'0')+'.'+dt.getDate().toString().padStart(2,'0'); }
+
+  // 평균 별점 → 채운별/빈별 문자열 (소수점 0.5 반올림)
+  function renderStarBar(avg) {
+    const full = Math.round(avg);
+    return '★'.repeat(full) + '☆'.repeat(5 - full);
+  }
+
+  // ── 별점 로드 ──
+  async function loadRatings() {
+    try {
+      const res = await fetch(SB_URL+'/rest/v1/cheer_comments?select=file_name,rating&rating=gt.0', {
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer '+SB_KEY }
+      });
+      const rows = await res.json();
+      _ratingMap = {};
+      if (Array.isArray(rows)) {
+        rows.forEach(r => {
+          if (!r.file_name || !r.rating) return;
+          if (!_ratingMap[r.file_name]) _ratingMap[r.file_name] = { sum: 0, count: 0 };
+          _ratingMap[r.file_name].sum   += r.rating;
+          _ratingMap[r.file_name].count += 1;
+        });
+      }
+    } catch(e) {}
+  }
 
   // ── 데이터 로드 (대학활동 + 대학소식 + 직원채용공고 병렬) ──
   async function loadData() {
@@ -282,6 +319,7 @@
         fetch(SB_URL+'/rest/v1/staff_job_postings?select=*&order=sort_order.asc,created_at.desc', { headers })
       ]);
       const [programs, news, staffJobs] = await Promise.all([r1.json(), r2.json(), r3.json()]);
+      await loadRatings();
 
       const prog = Array.isArray(programs)  ? programs.map(r => ({ ...r, _type:'활동' })) : [];
       const nws  = Array.isArray(news)      ? news.map(r => ({ ...r, _type:'소식' })) : [];
@@ -399,13 +437,25 @@
         </table>`;
     } else {
       wrap.innerHTML = `<div class="card-grid">
-        ${posts.map((r, i) => `
+        ${posts.map((r, i) => {
+          const rkey = (r.school_name||'') + '|' + (r.title||'');
+          const rd   = _ratingMap[rkey];
+          const rBadge = rd && rd.count > 0
+            ? `<div class="post-card-rating" data-rkey="${esc(rkey)}">
+                 <span class="pcr-stars">${renderStarBar(rd.sum / rd.count)}</span>
+                 <span class="pcr-avg">${(rd.sum/rd.count).toFixed(1)}</span>
+                 <span class="pcr-cnt">(${rd.count}명)</span>
+               </div>`
+            : `<div class="post-card-rating" data-rkey="${esc(rkey)}"></div>`;
+          return `
           <div class="post-card row-anim" style="animation-delay:${(i*0.05).toFixed(2)}s" ${r.link?`onclick="openUbPopup('${esc(r.link)}','${esc(r.school_name||'')}','${esc(r.title||'')}')"`:''}>
             <div style="margin-bottom:6px;">${typeBadge(r._type)}</div>
             <div class="post-card-title" title="${esc(r.title)}">${esc(r.title&&r.title.length>35?r.title.slice(0,35)+'...':r.title)}</div>
             ${r.link ? `<span class="post-card-link" onclick="event.stopPropagation();openUbPopup('${esc(r.link)}','${esc(r.school_name||'')}','${esc(r.title||'')}')">바로가기 ↗</span>` : ''}
             <div class="post-card-date">${fmtDate(r.created_at)}</div>
-          </div>`).join('')}
+            ${rBadge}
+          </div>`;
+        }).join('')}
       </div>`;
     }
   }
@@ -498,11 +548,23 @@
 
     // 별점 저장 (비동기)
     if (_rating > 0) {
+      const rkey = _school + '|' + _title;
       fetch(SB_URL + '/rest/v1/cheer_comments', {
         method: 'POST',
         headers: {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
-        body: JSON.stringify({comment: '', rating: _rating, file_name: _school + '|' + _title})
+        body: JSON.stringify({comment: '', rating: _rating, file_name: rkey})
       }).catch(function(){});
+
+      // _ratingMap 즉시 업데이트 후 카드 배지 갱신
+      if (!_ratingMap[rkey]) _ratingMap[rkey] = { sum: 0, count: 0 };
+      _ratingMap[rkey].sum   += _rating;
+      _ratingMap[rkey].count += 1;
+      const rd = _ratingMap[rkey];
+      document.querySelectorAll(`.post-card-rating[data-rkey="${rkey.replace(/"/g,'&quot;')}"]`).forEach(function(el) {
+        el.innerHTML = `<span class="pcr-stars">${renderStarBar(rd.sum / rd.count)}</span>
+          <span class="pcr-avg">${(rd.sum/rd.count).toFixed(1)}</span>
+          <span class="pcr-cnt">(${rd.count}명)</span>`;
+      });
     }
 
     // 1.5초 뒤 링크 열기 + 팝업 닫기
