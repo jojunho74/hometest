@@ -1473,37 +1473,68 @@
           </div>
         </div>
 
-        <!-- 수집된 게시글 목록 -->
-        <div class="bg-white rounded-xl shadow-sm mt-5">
-          <div class="px-5 py-4 border-b flex items-center justify-between flex-wrap gap-2">
-            <p class="font-semibold text-slate-700 text-sm">수집된 게시글</p>
-            <div class="flex items-center gap-2 flex-wrap">
+        <!-- 수집된 게시글 목록 (좌: 새 글 / 우: 기존 글) -->
+        <div class="mt-5">
+          <!-- 필터 헤더 -->
+          <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+            <div class="flex items-center gap-2">
               <select id="crawler-school-filter" onchange="loadCrawledPosts()" class="text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none">
                 <option value="">전체 학교</option>
               </select>
-              <span id="crawled-posts-count" class="text-xs text-slate-400">0개</span>
-              <button onclick="bulkDeleteCrawledPosts()" class="btn btn-danger text-xs px-3 py-1.5">선택 삭제</button>
-              <button onclick="deleteAllCrawledPosts()" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">전체 삭제</button>
+              <span id="crawled-posts-count" class="text-xs text-slate-400"></span>
+            </div>
+            <div class="flex gap-1">
+              <button onclick="bulkDeleteCrawledPosts()" class="btn btn-danger" style="font-size:11px;padding:3px 10px;">선택 삭제</button>
+              <button onclick="deleteAllCrawledPosts()" class="btn" style="font-size:11px;padding:3px 10px;color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:8px;">전체 삭제</button>
             </div>
           </div>
-          <div class="table-wrap">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="text-left text-slate-400 text-xs border-b bg-slate-50">
-                  <th class="px-4 py-3"><input type="checkbox" id="crawled-check-all" onchange="toggleAllCrawledChecks(this)" class="w-4 h-4 accent-blue-500"></th>
-                  <th class="px-4 py-3 font-semibold">학교명</th>
-                  <th class="px-4 py-3 font-semibold">제목</th>
-                  <th class="px-4 py-3 font-semibold hidden md:table-cell">링크</th>
-                  <th class="px-4 py-3 font-semibold hidden md:table-cell">수집일</th>
-                  <th class="px-4 py-3 font-semibold">삭제</th>
-                </tr>
-              </thead>
-              <tbody id="crawled-posts-tbody"></tbody>
-            </table>
+          <!-- 좌우 패널 -->
+          <div class="grid grid-cols-2 gap-3">
+            <!-- 새 글 패널 -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div class="px-3 py-2 border-b flex items-center justify-between" style="background:#EFF6FF;">
+                <span class="text-xs font-bold text-blue-700">🆕 새로 수집된 글</span>
+                <span id="new-posts-count" class="text-xs text-blue-400">0개</span>
+              </div>
+              <div class="overflow-y-auto" style="max-height:320px;">
+                <table class="w-full">
+                  <thead>
+                    <tr class="text-left border-b bg-slate-50" style="font-size:10px;color:#94A3B8;">
+                      <th class="px-2 py-1.5"><input type="checkbox" id="crawled-check-all" onchange="toggleAllCrawledChecks(this)" class="w-3 h-3 accent-blue-500"></th>
+                      <th class="px-2 py-1.5 font-semibold">학교</th>
+                      <th class="px-2 py-1.5 font-semibold">제목</th>
+                      <th class="px-2 py-1.5 font-semibold">삭제</th>
+                    </tr>
+                  </thead>
+                  <tbody id="new-posts-tbody"></tbody>
+                </table>
+                <div id="new-posts-empty" class="hidden text-center py-6 text-slate-300 text-xs">수집된 새 글이 없습니다</div>
+              </div>
+            </div>
+            <!-- 기존 글 패널 -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div class="px-3 py-2 border-b flex items-center justify-between" style="background:#F8FAFC;">
+                <span class="text-xs font-bold text-slate-500">📂 기존 글</span>
+                <span id="old-posts-count" class="text-xs text-slate-400">0개</span>
+              </div>
+              <div class="overflow-y-auto" style="max-height:320px;">
+                <table class="w-full">
+                  <thead>
+                    <tr class="text-left border-b bg-slate-50" style="font-size:10px;color:#94A3B8;">
+                      <th class="px-2 py-1.5"><input type="checkbox" id="old-check-all" onchange="toggleAllOldChecks(this)" class="w-3 h-3 accent-blue-500"></th>
+                      <th class="px-2 py-1.5 font-semibold">학교</th>
+                      <th class="px-2 py-1.5 font-semibold">제목</th>
+                      <th class="px-2 py-1.5 font-semibold">삭제</th>
+                    </tr>
+                  </thead>
+                  <tbody id="old-posts-tbody"></tbody>
+                </table>
+                <div id="old-posts-empty" class="hidden text-center py-6 text-slate-300 text-xs">기존 글이 없습니다</div>
+              </div>
+            </div>
           </div>
-          <div id="crawled-posts-empty" class="hidden text-center py-10 text-slate-300">
-            <p class="text-sm">수집된 게시글이 없습니다</p>
-          </div>
+          <!-- 숨겨진 기존 tbody (bulkDelete 호환용) -->
+          <table style="display:none"><tbody id="crawled-posts-tbody"></tbody></table>
         </div>
       </div>
 
@@ -4727,50 +4758,69 @@ ${d.hashtags}`;
     async function loadCrawledPosts() {
       const filter = document.getElementById('crawler-school-filter').value;
 
-      // university_sites에 등록된 학교명 목록 가져오기
       const { data: sites } = await db.from('university_sites').select('school_name');
       const registeredNames = (sites || []).map(s => s.school_name);
       if (registeredNames.length === 0) {
-        document.getElementById('crawled-posts-tbody').innerHTML = '';
-        document.getElementById('crawled-posts-empty').classList.remove('hidden');
+        document.getElementById('new-posts-tbody').innerHTML = '';
+        document.getElementById('old-posts-tbody').innerHTML = '';
+        document.getElementById('new-posts-empty').classList.remove('hidden');
+        document.getElementById('old-posts-empty').classList.remove('hidden');
         document.getElementById('crawled-posts-count').textContent = '0개';
         return;
       }
 
-      // 등록된 학교명만 필터링
       let query = db.from('school_programs').select('*')
         .in('school_name', registeredNames)
         .eq('is_deleted', false)
         .order('created_at', { ascending: false })
-        .limit(200);
+        .limit(500);
       if (filter) query = query.eq('school_name', filter);
 
       const { data, error } = await query;
       if (error) { console.error(error); return; }
       const rows = data || [];
 
-      document.getElementById('crawled-posts-count').textContent = rows.length + '개';
+      // 수집 시작 시각 기준으로 분리
+      const lastTime = localStorage.getItem('lastCollectionStartTime');
+      const newRows = lastTime ? rows.filter(r => new Date(r.created_at) >= new Date(lastTime)) : [];
+      const oldRows = lastTime ? rows.filter(r => new Date(r.created_at) < new Date(lastTime)) : rows;
 
-      const tbody = document.getElementById('crawled-posts-tbody');
-      const empty = document.getElementById('crawled-posts-empty');
-      if (rows.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
-      empty.classList.add('hidden');
+      document.getElementById('crawled-posts-count').textContent = `전체 ${rows.length}개`;
+      document.getElementById('new-posts-count').textContent = newRows.length + '개';
+      document.getElementById('old-posts-count').textContent = oldRows.length + '개';
 
-      tbody.innerHTML = rows.map(r => `
-        <tr class="border-b last:border-0 hover:bg-slate-50 transition-colors">
-          <td class="px-4 py-3"><input type="checkbox" class="crawled-check w-4 h-4 accent-blue-500" value="${r.id}"></td>
-          <td class="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">${esc(r.school_name || '-')}</td>
-          <td class="px-4 py-3 font-medium text-slate-800">${esc((r.title||'-').length > 15 ? (r.title).slice(0,15)+'...' : (r.title||'-'))}</td>
-          <td class="px-4 py-3 hidden md:table-cell">
-            ${r.link ? `<a href="${esc(r.link)}" target="_blank" class="text-blue-500 text-xs hover:underline truncate block max-w-xs">${esc(r.link)}</a>` : '-'}
+      const rowHtml = (r) => `
+        <tr class="border-b last:border-0 hover:bg-slate-50" style="font-size:11px;">
+          <td class="px-2 py-1.5"><input type="checkbox" class="crawled-check w-3 h-3 accent-blue-500" value="${r.id}"></td>
+          <td class="px-2 py-1.5 text-slate-500 whitespace-nowrap">${esc((r.school_name||'').slice(0,6))}</td>
+          <td class="px-2 py-1.5 text-slate-800 font-medium">
+            ${r.link
+              ? `<a href="${esc(r.link)}" target="_blank" class="hover:text-blue-500 hover:underline" title="${esc(r.title)}">${esc((r.title||'-').slice(0,18))}${(r.title||'').length>18?'…':''}</a>`
+              : `<span title="${esc(r.title)}">${esc((r.title||'-').slice(0,18))}${(r.title||'').length>18?'…':''}</span>`
+            }
           </td>
-          <td class="px-4 py-3 text-slate-400 text-xs hidden md:table-cell whitespace-nowrap">${r.created_at ? formatDate(r.created_at) : '-'}</td>
-          <td class="px-4 py-3">
-            <button onclick="deleteCrawledPost('${r.id}')" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">삭제</button>
+          <td class="px-2 py-1.5">
+            <button onclick="deleteCrawledPost('${r.id}')" style="font-size:10px;padding:1px 6px;color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:4px;">삭제</button>
           </td>
-        </tr>
-      `).join('');
+        </tr>`;
+
+      // 새 글 패널
+      const newTbody = document.getElementById('new-posts-tbody');
+      const newEmpty = document.getElementById('new-posts-empty');
+      if (newRows.length === 0) { newTbody.innerHTML = ''; newEmpty.classList.remove('hidden'); }
+      else { newEmpty.classList.add('hidden'); newTbody.innerHTML = newRows.map(rowHtml).join(''); }
+
+      // 기존 글 패널
+      const oldTbody = document.getElementById('old-posts-tbody');
+      const oldEmpty = document.getElementById('old-posts-empty');
+      if (oldRows.length === 0) { oldTbody.innerHTML = ''; oldEmpty.classList.remove('hidden'); }
+      else { oldEmpty.classList.add('hidden'); oldTbody.innerHTML = oldRows.map(rowHtml).join(''); }
+
       document.getElementById('crawled-check-all').checked = false;
+    }
+
+    function toggleAllOldChecks(el) {
+      document.querySelectorAll('#old-posts-tbody .crawled-check').forEach(cb => cb.checked = el.checked);
     }
 
     async function deleteCrawledPost(id) {
@@ -5071,6 +5121,8 @@ ${d.hashtags}`;
       const btn = document.getElementById('crawler-start-btn');
       btn.disabled = true;
       btn.textContent = '⏳ 수집 중...';
+      // 수집 시작 시각 저장 → 이후 새 글/기존 글 분리 기준
+      localStorage.setItem('lastCollectionStartTime', new Date().toISOString());
       showCrawlerOverlay('게시글 수집 중...', '등록된 사이트를 순차적으로 수집하고 있습니다');
       addCrawlerLog('수집 시작 요청 전송 중...');
 
