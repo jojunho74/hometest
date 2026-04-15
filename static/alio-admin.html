@@ -287,15 +287,20 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
           </div>
           <!-- 파싱 결과 미리보기 -->
           <div id="parse-preview" class="hidden">
+            <div class="mb-3 p-3 rounded-lg" style="background:#F0FDF4;border:1px solid #BBF7D0;">
+              <label class="text-xs font-bold text-emerald-700 block mb-1">📁 데이터셋명 (공고명) — 저장 시 이 이름으로 등록됩니다</label>
+              <div class="flex gap-2">
+                <input type="text" id="parse-ds-input" class="form-input flex-1" placeholder="예: 2025년 한국수력원자력 채용" style="font-size:.85rem;"/>
+                <button onclick="applyDatasetName()" class="btn btn-success" style="font-size:.8rem;padding:6px 14px;white-space:nowrap;">✅ 이 이름으로 저장</button>
+                <button onclick="cancelParse()" class="btn btn-secondary" style="font-size:.8rem;padding:6px 10px;">✕</button>
+              </div>
+              <p class="text-xs text-emerald-600 mt-1.5">이후 추가하는 데이터도 같은 데이터셋명으로 계속 등록됩니다.</p>
+            </div>
             <div class="flex items-center justify-between mb-2">
               <div>
                 <span class="text-xs font-bold text-slate-700">파싱 결과: </span>
                 <span id="parse-ds-name" class="text-xs text-blue-600 font-semibold"></span>
                 <span id="parse-count" class="ml-2 text-xs text-slate-400"></span>
-              </div>
-              <div class="flex gap-2">
-                <button onclick="saveParseResult()" class="btn btn-success" style="font-size:.8rem;padding:6px 14px;">✅ Supabase에 저장</button>
-                <button onclick="cancelParse()" class="btn btn-secondary" style="font-size:.8rem;padding:6px 10px;">✕</button>
               </div>
             </div>
             <div class="overflow-x-auto rounded-lg" style="border:1px solid #E2E8F0;max-height:320px;overflow-y:auto;">
@@ -315,10 +320,11 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
 
         <!-- 단건 입력 폼 -->
         <div class="bg-white rounded-xl shadow-sm p-5 mb-4">
-          <h3 class="text-sm font-bold text-slate-700 mb-4">📝 직종 단건 입력</h3>
+          <h3 class="text-sm font-bold text-slate-700 mb-3">📝 직종 단건 입력</h3>
+          <div id="current-ds-banner" class="hidden text-xs font-semibold text-emerald-700 px-3 py-2 rounded-lg mb-3" style="background:#F0FDF4;border:1px solid #BBF7D0;"></div>
           <div class="form-group">
             <label class="form-label">공고명 (데이터셋명) <span class="text-red-500">*</span></label>
-            <input type="text" id="f-dataset" class="form-input" placeholder="예: 2025년 한국수력원자력 채용"/>
+            <input type="text" id="f-dataset" class="form-input" placeholder="예: 2025년 한국수력원자력 채용" oninput="localStorage.setItem('alioCurrentDataset',this.value)"/>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -513,6 +519,16 @@ function switchTab(tab){
   document.getElementById('content-area').scrollTop=0;
   if(tab==='datasets')loadDatasets();
   if(tab==='records')loadRecords();
+  if(tab==='add'){
+    const saved=localStorage.getItem('alioCurrentDataset');
+    const el=document.getElementById('f-dataset');
+    if(el && saved && !el.value) el.value=saved;
+    const banner=document.getElementById('current-ds-banner');
+    if(banner){
+      if(saved){banner.textContent='📁 현재 데이터셋: '+saved;banner.classList.remove('hidden');}
+      else banner.classList.add('hidden');
+    }
+  }
 }
 
 // ── 데이터셋 목록 ──
@@ -932,6 +948,12 @@ function extractPassTotal(text) {
 }
 
 function showParsePreview(dsName, records, errors) {
+  // 데이터셋명 입력란에 자동감지 이름 채우기
+  const dsInput = document.getElementById('parse-ds-input');
+  if (dsInput) {
+    const saved = localStorage.getItem('alioCurrentDataset');
+    dsInput.value = saved || dsName;
+  }
   document.getElementById('parse-ds-name').textContent = dsName;
   document.getElementById('parse-count').textContent = `(${records.length}개 직종)`;
   const tbody = document.getElementById('parse-tbody');
@@ -969,18 +991,28 @@ function cancelParse() {
   document.getElementById('alio-url-input').value = '';
 }
 
-async function saveParseResult() {
+async function applyDatasetName() {
   if (!_parsedRecords.length) return;
-  const btn = document.querySelector('#parse-preview .btn-success');
-  btn.disabled = true;
-  btn.textContent = '저장 중...';
+  const dsInput = document.getElementById('parse-ds-input');
+  const dsName = dsInput ? dsInput.value.trim() : '';
+  if (!dsName) { toast('데이터셋명(공고명)을 입력하세요', false); dsInput && dsInput.focus(); return; }
+  // 모든 레코드에 데이터셋명 적용
+  _parsedRecords = _parsedRecords.map(r => ({ ...r, dataset_name: dsName }));
+  // localStorage에 저장 → 이후 단건 추가 폼에도 기본값으로 사용
+  localStorage.setItem('alioCurrentDataset', dsName);
+  const btn = document.getElementById('parse-save-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '저장 중...'; }
   const { error } = await db.from('alio_jobs').insert(_parsedRecords);
-  btn.disabled = false;
-  btn.textContent = '✅ Supabase에 저장';
+  if (btn) { btn.disabled = false; btn.textContent = '✅ 저장됨'; }
   if (error) { toast('저장 실패: ' + error.message, false); return; }
-  toast(`${_parsedRecords.length}개 직종 저장 완료!`);
+  toast(`"${dsName}" — ${_parsedRecords.length}개 직종 저장 완료!`);
   cancelParse();
   switchTab('datasets');
+}
+
+async function saveParseResult() {
+  // 하위 호환용 (applyDatasetName으로 대체됨)
+  await applyDatasetName();
 }
 
 // ── 전체 삭제 ──

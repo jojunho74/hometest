@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>공공기관 채용 경쟁률 — 지텔프IBT</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F5F9;color:#1E293B;height:100vh;display:flex;flex-direction:column;}
+
+    /* 헤더 */
+    header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #E2E8F0;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    .hinner{max-width:1200px;margin:0 auto;padding:0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+    .hlogo{font-size:1rem;font-weight:800;color:#1E4D8C;text-decoration:none;}
+    .hnav{display:none;align-items:center;gap:4px;font-size:.78rem;font-weight:600;}
+    .hnav a{color:#475569;text-decoration:none;transition:background .18s,color .18s;padding:5px 9px;border-radius:8px;}
+    .hnav a:hover,.hnav a.active{background:#1E4D8C;color:#fff;}
+    .hbtn{display:none;padding:8px 18px;border-radius:8px;font-size:.8rem;font-weight:700;background:#1E4D8C;color:#fff;text-decoration:none;transition:background .15s;}
+    .hbtn:hover{background:#163870;}
+    .hamburger{display:flex;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:#1E4D8C;border:none;padding:6px;border-radius:8px;}
+    .hamburger span{display:block;height:2px;background:#fff;border-radius:2px;transition:transform .25s,opacity .25s;}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+    .mobile-menu{display:none;flex-direction:column;background:#fff;border-top:1px solid #E2E8F0;padding:12px 16px 16px;}
+    .mobile-menu a{padding:12px 4px;font-size:.9rem;font-weight:600;color:#1E293B;text-decoration:none;border-bottom:1px solid #F1F5F9;}
+    .mobile-menu a:last-child{border-bottom:none;}
+    .mobile-menu .mbtn{margin-top:12px;display:block;text-align:center;padding:12px;border-radius:8px;background:#1E4D8C;color:#fff;font-weight:700;text-decoration:none;}
+    .mobile-menu.open{display:flex;}
+
+    /* 레이아웃 */
+    .layout{display:flex;flex:1;overflow:hidden;}
+
+    /* 사이드바 */
+    aside{width:240px;flex-shrink:0;background:#0D1F3C;display:flex;flex-direction:column;overflow:hidden;}
+    .aside-head{padding:16px 14px 12px;border-bottom:1px solid rgba(255,255,255,.07);}
+    .aside-head h2{font-size:.78rem;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;}
+    .search-wrap{position:relative;}
+    .search-wrap input{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:7px 30px 7px 10px;font-size:.78rem;color:#fff;outline:none;transition:border-color .2s;}
+    .search-wrap input::placeholder{color:rgba(255,255,255,.3);}
+    .search-wrap input:focus{border-color:rgba(255,255,255,.35);}
+    .search-wrap .ico{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:.7rem;color:rgba(255,255,255,.3);pointer-events:none;}
+    .ds-list{flex:1;overflow-y:auto;padding:8px 0;}
+    .ds-list::-webkit-scrollbar{width:4px;}
+    .ds-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px;}
+    .ds-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;transition:background .15s;gap:8px;}
+    .ds-item:hover{background:rgba(255,255,255,.07);}
+    .ds-item.active{background:linear-gradient(90deg,rgba(79,126,247,.35),rgba(79,126,247,.1));border-left:3px solid #4F7EF7;}
+    .ds-item.active .ds-name{color:#fff;font-weight:700;}
+    .ds-name{font-size:.78rem;color:rgba(255,255,255,.7);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+    .ds-cnt{font-size:.65rem;font-weight:700;padding:1px 7px;border-radius:999px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.45);flex-shrink:0;}
+    .ds-item.active .ds-cnt{background:rgba(79,126,247,.3);color:#93C5FD;}
+    .empty-list{padding:24px 14px;font-size:.78rem;color:rgba(255,255,255,.3);text-align:center;}
+
+    /* 본문 */
+    main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .topbar{height:52px;background:#fff;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0;}
+    .topbar-title{font-size:.95rem;font-weight:800;color:#0D1F3C;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .topbar-cnt{font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:999px;background:#EFF6FF;color:#1E4D8C;white-space:nowrap;}
+    .content-area{flex:1;overflow-y:auto;padding:20px;}
+    .content-area::-webkit-scrollbar{width:6px;}
+    .content-area::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:4px;}
+
+    /* 플레이스홀더 */
+    .placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:#94A3B8;}
+    .placeholder .ico{font-size:3rem;opacity:.4;}
+    .placeholder p{font-size:.9rem;font-weight:600;}
+    .placeholder small{font-size:.78rem;opacity:.7;}
+
+    /* 요약 카드 */
+    .sum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:20px;}
+    .sum-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    .sum-label{font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+    .sum-val{font-size:1.6rem;font-weight:900;line-height:1;}
+    .sum-sub{font-size:10px;color:#94A3B8;margin-top:3px;}
+    .c-blue{color:#3B82F6;} .c-green{color:#10B981;} .c-rose{color:#F43F5E;} .c-amber{color:#F59E0B;}
+
+    /* 차트 */
+    .chart-card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:20px;}
+    .chart-title{font-size:.82rem;font-weight:800;color:#1E293B;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+    .chart-title::before{content:'';width:3px;height:14px;background:linear-gradient(180deg,#3B82F6,#818CF8);border-radius:2px;display:inline-block;}
+    .chart-canvas-wrap{position:relative;height:300px;}
+
+    /* 퍼널 카드 */
+    .funnel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:20px;}
+    .funnel-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    .fc-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+    .fc-title{font-size:.82rem;font-weight:800;color:#1E293B;}
+    .grade-badge{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700;flex-shrink:0;}
+    .grade-6{background:#DBEAFE;color:#1D4ED8;} .grade-7{background:#D1FAE5;color:#065F46;} .grade-b{background:#FEF3C7;color:#92400E;}
+    .fc-region{font-size:11px;color:#94A3B8;margin-bottom:12px;}
+    .fc-ratio{font-size:1.3rem;font-weight:900;margin-bottom:12px;}
+    .stage-row{margin-bottom:8px;}
+    .stage-row-head{display:flex;justify-content:space-between;margin-bottom:3px;}
+    .stage-lbl{font-size:10px;font-weight:700;color:#94A3B8;}
+    .stage-nums{font-size:10px;color:#94A3B8;}
+    .stage-nums strong{color:#1E293B;}
+    .bar-bg{height:6px;background:#F1F5F9;border-radius:3px;overflow:hidden;}
+    .bar-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+    .bar-1{background:linear-gradient(90deg,#3B82F6,#60A5FA);}
+    .bar-2{background:linear-gradient(90deg,#8B5CF6,#A78BFA);}
+    .bar-3{background:linear-gradient(90deg,#10B981,#34D399);}
+    .pass-rate{display:flex;gap:4px;margin-top:10px;padding-top:10px;border-top:1px solid #F1F5F9;}
+    .pr-item{flex:1;text-align:center;background:#F8FAFF;border-radius:6px;padding:5px 2px;}
+    .pr-val{font-size:.9rem;font-weight:900;color:#3B82F6;}
+    .pr-lbl{font-size:9px;color:#94A3B8;margin-top:1px;}
+
+    /* 데이터 테이블 */
+    .tbl-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:20px;}
+    .tbl-scroll{overflow-x:auto;}
+    .data-tbl{width:100%;border-collapse:collapse;font-size:.8rem;}
+    .data-tbl thead tr{background:#F8FAFF;}
+    .data-tbl th{padding:10px 12px;text-align:left;font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;white-space:nowrap;}
+    .data-tbl th:not(:first-child){text-align:center;}
+    .data-tbl td{padding:9px 12px;border-top:1px solid #F8FAFF;color:#475569;vertical-align:middle;}
+    .data-tbl td:not(:first-child){text-align:center;}
+    .data-tbl tbody tr:hover{background:#F8FAFF;}
+    .chip{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;}
+    .chip-hot{background:#FEE2E2;color:#DC2626;} .chip-mid{background:#FEF9C3;color:#CA8A04;} .chip-low{background:#DCFCE7;color:#16A34A;}
+
+    /* 모바일 */
+    @media(max-width:640px){
+      aside{width:200px;}
+      .content-area{padding:12px;}
+    }
+    @media(max-width:480px){
+      aside{position:fixed;left:-200px;top:64px;height:calc(100vh - 64px);z-index:40;transition:left .25s;}
+      aside.open{left:0;}
+      main{width:100%;}
+      .sidebar-toggle{display:flex!important;}
+    }
+    .sidebar-toggle{display:none;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:#1E4D8C;background:#EFF6FF;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="hinner">
+    <a href="index.html" class="hlogo">지텔프IBT 대학컨설팅</a>
+    <nav class="hnav">
+      <a href="index.html#about">서비스 소개</a>
+      <a href="package.html">패키지</a>
+      <a href="schedule.html">정기시험 일정</a>
+      <a href="university-board.html">대학활동</a>
+      <a href="library-pdf.html">채용공고 자료실</a>
+      <a href="job-board.html">게시판</a>
+      <a href="gtelp-score.html">점수대비표</a>
+      <a href="competition.html" class="active">경쟁률</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <a href="index.html#consultation-form" class="hbtn">대학IBT무료신청</a>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="메뉴">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html#about">서비스 소개</a>
+    <a href="package.html">패키지</a>
+    <a href="schedule.html">정기시험 일정</a>
+    <a href="university-board.html">대학활동</a>
+    <a href="library-pdf.html">채용공고 자료실</a>
+    <a href="job-board.html">게시판</a>
+    <a href="gtelp-score.html">점수대비표</a>
+    <a href="competition.html">경쟁률</a>
+    <a href="index.html#consultation-form" class="mbtn">대학IBT무료신청</a>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- 사이드바 -->
+  <aside id="sidebar">
+    <div class="aside-head">
+      <h2>채용공고 목록</h2>
+      <div class="search-wrap">
+        <input id="ds-search" type="text" placeholder="공고명 검색..." oninput="filterDatasets(this.value)"/>
+        <span class="ico">🔍</span>
+      </div>
+    </div>
+    <div class="ds-list" id="ds-list">
+      <div class="empty-list">불러오는 중...</div>
+    </div>
+  </aside>
+
+  <!-- 본문 -->
+  <main>
+    <div class="topbar">
+      <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰ 목록</button>
+      <span class="topbar-title" id="topbar-title">공고를 선택하세요</span>
+      <span class="topbar-cnt hidden" id="topbar-cnt"></span>
+    </div>
+    <div class="content-area" id="content-area">
+      <div class="placeholder">
+        <div class="ico">📊</div>
+        <p>공공기관 채용 경쟁률</p>
+        <small>왼쪽에서 채용공고를 선택하세요</small>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const { createClient } = supabase;
+const db = createClient(
+  'https://byzulmxcuhsrjdphmuym.supabase.co',
+  'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
+);
+
+let _allDatasets = []; // [{name, count, rows}]
+let _chartInst = null;
+
+// ── 햄버거 메뉴 ──
+function toggleMenu() {
+  document.getElementById('hamburger').classList.toggle('open');
+  document.getElementById('mobile-menu').classList.toggle('open');
+}
+
+// ── 초기 로딩 ──
+async function init() {
+  const { data, error } = await db.from('alio_jobs')
+    .select('dataset_name, grade, grade_key, job, region, s1_pass, s1_total, s2_pass, s2_total, s3_pass, s3_total, ratio')
+    .order('dataset_name');
+  if (error || !data) {
+    document.getElementById('ds-list').innerHTML = '<div class="empty-list">데이터를 불러올 수 없습니다</div>';
+    return;
+  }
+
+  // 데이터셋별 그룹핑
+  const dsMap = {};
+  data.forEach(r => {
+    const k = r.dataset_name || '미분류';
+    if (!dsMap[k]) dsMap[k] = [];
+    dsMap[k].push(r);
+  });
+  _allDatasets = Object.entries(dsMap).map(([name, rows]) => ({ name, rows, count: rows.length }));
+  renderDatasetList(_allDatasets);
+}
+
+function renderDatasetList(list) {
+  const el = document.getElementById('ds-list');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-list">등록된 채용공고가 없습니다<br><small>관리자 페이지에서 데이터를 추가하세요</small></div>';
+    return;
+  }
+  el.innerHTML = list.map(ds => `
+    <div class="ds-item" onclick="selectDataset('${ds.name.replace(/'/g,"\\'")}')">
+      <span class="ds-name" title="${ds.name}">${ds.name}</span>
+      <span class="ds-cnt">${ds.count}개</span>
+    </div>`).join('');
+}
+
+function filterDatasets(q) {
+  const filtered = q ? _allDatasets.filter(ds => ds.name.includes(q)) : _allDatasets;
+  renderDatasetList(filtered);
+}
+
+function selectDataset(name) {
+  // 활성 표시
+  document.querySelectorAll('.ds-item').forEach(el => {
+    el.classList.toggle('active', el.querySelector('.ds-name')?.title === name);
+  });
+  const ds = _allDatasets.find(d => d.name === name);
+  if (!ds) return;
+
+  document.getElementById('topbar-title').textContent = ds.name;
+  const cntEl = document.getElementById('topbar-cnt');
+  cntEl.textContent = `직종 ${ds.count}개`;
+  cntEl.classList.remove('hidden');
+
+  // 모바일: 사이드바 닫기
+  document.getElementById('sidebar').classList.remove('open');
+
+  renderVisualization(ds.name, ds.rows);
+}
+
+// ── 시각화 렌더링 ──
+function renderVisualization(dsName, rows) {
+  const area = document.getElementById('content-area');
+
+  // 요약 계산
+  const totalHired = rows.reduce((s, r) => s + (r.s3_pass || 0), 0);
+  const totalApply = rows.reduce((s, r) => s + (r.s1_total || 0), 0);
+  const maxRatio = Math.max(...rows.map(r => parseFloat(r.ratio) || 0));
+  const minRatio = Math.min(...rows.filter(r => r.ratio).map(r => parseFloat(r.ratio)));
+  const maxRow = rows.find(r => parseFloat(r.ratio) === maxRatio);
+  const minRow = rows.find(r => parseFloat(r.ratio) === minRatio);
+  const avgRatio = rows.length ? (rows.reduce((s, r) => s + (parseFloat(r.ratio) || 0), 0) / rows.length).toFixed(1) : 0;
+
+  area.innerHTML = `
+    <!-- 요약 카드 -->
+    <div class="sum-grid">
+      <div class="sum-card"><div class="sum-label">총 채용인원</div><div class="sum-val c-blue">${totalHired}<span style="font-size:.9rem;">명</span></div><div class="sum-sub">최종 합격자 합계</div></div>
+      <div class="sum-card"><div class="sum-label">전체 지원자</div><div class="sum-val c-green">${totalApply.toLocaleString()}<span style="font-size:.9rem;">명</span></div><div class="sum-sub">1차 응시 합계</div></div>
+      <div class="sum-card"><div class="sum-label">최고 경쟁률</div><div class="sum-val c-rose">${maxRatio}<span style="font-size:.9rem;">:1</span></div><div class="sum-sub">${maxRow ? maxRow.job + '(' + maxRow.region + ')' : ''}</div></div>
+      <div class="sum-card"><div class="sum-label">최저 경쟁률</div><div class="sum-val c-amber">${minRatio}<span style="font-size:.9rem;">:1</span></div><div class="sum-sub">${minRow ? minRow.job + '(' + minRow.region + ')' : ''}</div></div>
+      <div class="sum-card"><div class="sum-label">직종 수</div><div class="sum-val c-blue">${rows.length}<span style="font-size:.9rem;">개</span></div><div class="sum-sub">평균 ${avgRatio}:1</div></div>
+    </div>
+
+    <!-- 경쟁률 차트 -->
+    <div class="chart-card">
+      <div class="chart-title">직종별 경쟁률</div>
+      <div class="chart-canvas-wrap"><canvas id="ratioChart"></canvas></div>
+    </div>
+
+    <!-- 퍼널 카드 -->
+    <div class="chart-title">직종별 전형 단계 현황</div>
+    <div class="funnel-grid" id="funnelGrid"></div>
+
+    <!-- 데이터 테이블 -->
+    <div class="chart-title">전체 상세 데이터</div>
+    <div class="tbl-card">
+      <div class="tbl-scroll">
+        <table class="data-tbl">
+          <thead><tr>
+            <th>직급 / 직종</th>
+            <th>1차 (합격/응시)</th>
+            <th>2차 (합격/응시)</th>
+            <th>최종 (합격/응시)</th>
+            <th>경쟁률</th>
+          </tr></thead>
+          <tbody id="dataTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  // 차트
+  if (_chartInst) { _chartInst.destroy(); _chartInst = null; }
+  const sorted = [...rows].sort((a, b) => (parseFloat(b.ratio) || 0) - (parseFloat(a.ratio) || 0));
+  const labels = sorted.map(d => `${d.job}(${d.region || ''})`);
+  const ratios = sorted.map(d => parseFloat(d.ratio) || 0);
+  const colors = ratios.map(r => r >= 80 ? '#FB7185' : r >= 30 ? '#FBBF24' : '#34D399');
+  _chartInst = new Chart(document.getElementById('ratioChart'), {
+    type: 'bar',
+    data: { labels, datasets: [{ label: '경쟁률', data: ratios, backgroundColor: colors, borderRadius: 5, borderSkipped: false }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x}:1` } } },
+      scales: {
+        x: { grid: { color: '#F1F5F9' }, ticks: { color: '#94A3B8', callback: v => v + ':1' } },
+        y: { grid: { display: false }, ticks: { color: '#475569', font: { size: 11 } } }
+      }
+    }
+  });
+
+  // 퍼널 카드
+  const grid = document.getElementById('funnelGrid');
+  const pct = (p, t) => t ? Math.round(p / t * 100) : 0;
+  rows.forEach(d => {
+    const gk = d.grade_key || '6';
+    const gCls = gk === '7' ? 'grade-7' : gk === 'b' ? 'grade-b' : 'grade-6';
+    const gLbl = gk === '7' ? '7급' : gk === 'b' ? '별정' : '6급2';
+    const ratioColor = (parseFloat(d.ratio) || 0) >= 80 ? '#F43F5E' : (parseFloat(d.ratio) || 0) >= 30 ? '#F59E0B' : '#10B981';
+    const maxT = d.s1_total || 1;
+    const r1 = pct(d.s1_pass, maxT), r2 = d.s2_total ? pct(d.s2_pass, maxT) : null, r3 = pct(d.s3_pass, maxT);
+    const pr1 = pct(d.s1_pass, d.s1_total), pr2 = d.s2_total ? pct(d.s2_pass, d.s2_total) : null, pr3 = pct(d.s3_pass, d.s3_total);
+    const stage2 = d.s2_total
+      ? `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">2차 전형</span><span class="stage-nums"><strong>${d.s2_pass||0}명</strong> / ${d.s2_total}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-2" style="width:${r2}%"></div></div></div>`
+      : `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">2차 전형</span><span class="stage-nums" style="color:#CBD5E1;">해당없음</span></div></div>`;
+    grid.insertAdjacentHTML('beforeend', `
+      <div class="funnel-card">
+        <div class="fc-head"><span class="grade-badge ${gCls}">${gLbl}</span><span class="fc-title">${d.job}</span></div>
+        <div class="fc-region">${d.region || ''} · 최종채용 ${d.s3_pass||0}명</div>
+        <div class="fc-ratio" style="color:${ratioColor};">${d.ratio}:1</div>
+        <div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">1차 전형</span><span class="stage-nums"><strong>${d.s1_pass||0}명</strong> / ${d.s1_total||0}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-1" style="width:100%"></div></div></div>
+        ${stage2}
+        <div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">최종 합격</span><span class="stage-nums"><strong>${d.s3_pass||0}명</strong> / ${d.s3_total||0}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-3" style="width:${r3}%"></div></div></div>
+        <div class="pass-rate">
+          <div class="pr-item"><div class="pr-val">${pr1}%</div><div class="pr-lbl">1차 합격률</div></div>
+          ${pr2 !== null ? `<div class="pr-item"><div class="pr-val">${pr2}%</div><div class="pr-lbl">2차 합격률</div></div>` : ''}
+          <div class="pr-item"><div class="pr-val">${pr3}%</div><div class="pr-lbl">최종 합격률</div></div>
+        </div>
+      </div>`);
+  });
+
+  // 데이터 테이블
+  const tbody = document.getElementById('dataTableBody');
+  rows.forEach(d => {
+    const ratio = parseFloat(d.ratio) || 0;
+    const chipCls = ratio >= 80 ? 'chip-hot' : ratio >= 20 ? 'chip-mid' : 'chip-low';
+    const gk = d.grade_key || '6';
+    const gCls = gk === '7' ? 'grade-7' : gk === 'b' ? 'grade-b' : 'grade-6';
+    const s2 = d.s2_total ? `<span style="color:#3B82F6;font-weight:700;">${d.s2_pass}</span><span style="color:#94A3B8;">/${d.s2_total}</span>` : '—';
+    tbody.insertAdjacentHTML('beforeend', `<tr>
+      <td><span class="grade-badge ${gCls}" style="font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700;margin-right:4px;">${d.grade||''}</span><strong>${d.job}</strong><span style="font-size:11px;color:#94A3B8;margin-left:4px;">(${d.region||''})</span></td>
+      <td><span style="color:#3B82F6;font-weight:700;">${d.s1_pass||0}</span><span style="color:#94A3B8;">/${d.s1_total||0}</span></td>
+      <td>${s2}</td>
+      <td><span style="color:#10B981;font-weight:700;">${d.s3_pass||0}</span><span style="color:#94A3B8;">/${d.s3_total||0}</span></td>
+      <td><span class="chip ${chipCls}">${d.ratio}:1</span></td>
+    </tr>`);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
