@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>전형단계별 채용정보 시각화</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#0F172A;color:#E2E8F0;min-height:100vh;}
+
+  .page-header{background:linear-gradient(135deg,#1E3A8A 0%,#1D4ED8 50%,#0891B2 100%);padding:40px 24px 32px;text-align:center;}
+  .page-header h1{font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:8px;}
+  .page-header p{font-size:0.85rem;color:rgba(255,255,255,.65);}
+  .badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:4px 14px;font-size:0.75rem;font-weight:700;color:#fff;margin-bottom:16px;}
+
+  .container{max-width:1100px;margin:0 auto;padding:28px 16px;}
+
+  /* 요약 카드 */
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:32px;}
+  .sum-card{background:#1E293B;border:1px solid #334155;border-radius:14px;padding:20px 18px;}
+  .sum-card-label{font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+  .sum-card-val{font-size:1.8rem;font-weight:900;line-height:1;}
+  .sum-card-sub{font-size:11px;color:#64748B;margin-top:5px;}
+  .c-blue{color:#60A5FA;} .c-green{color:#34D399;} .c-amber{color:#FBBF24;} .c-rose{color:#FB7185;}
+
+  /* 섹션 헤더 */
+  .sec-title{font-size:1rem;font-weight:800;color:#E2E8F0;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .sec-title::before{content:'';width:4px;height:18px;background:linear-gradient(180deg,#60A5FA,#818CF8);border-radius:2px;display:inline-block;flex-shrink:0;}
+
+  /* 경쟁률 차트 */
+  .chart-wrap{background:#1E293B;border:1px solid #334155;border-radius:16px;padding:24px;margin-bottom:32px;}
+  .chart-canvas-wrap{position:relative;height:320px;}
+
+  /* 전형 퍼널 카드 */
+  .funnel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-bottom:32px;}
+  .funnel-card{background:#1E293B;border:1px solid #334155;border-radius:16px;padding:20px;}
+  .funnel-card-title{font-size:0.82rem;font-weight:800;color:#E2E8F0;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .grade-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;flex-shrink:0;}
+  .grade-6{background:#1E40AF;color:#BFDBFE;}
+  .grade-7{background:#065F46;color:#A7F3D0;}
+  .grade-b{background:#78350F;color:#FDE68A;}
+  .funnel-region{font-size:11px;color:#64748B;margin-bottom:14px;}
+  .funnel-ratio-big{font-size:1.4rem;font-weight:900;margin-bottom:14px;}
+
+  /* 각 단계 바 */
+  .stage-row{margin-bottom:10px;}
+  .stage-row-head{display:flex;justify-content:space-between;margin-bottom:4px;}
+  .stage-label{font-size:11px;font-weight:700;color:#94A3B8;}
+  .stage-nums{font-size:11px;color:#94A3B8;}
+  .stage-nums strong{color:#E2E8F0;}
+  .bar-bg{height:8px;background:#0F172A;border-radius:4px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+  .bar-1{background:linear-gradient(90deg,#3B82F6,#60A5FA);}
+  .bar-2{background:linear-gradient(90deg,#8B5CF6,#A78BFA);}
+  .bar-3{background:linear-gradient(90deg,#10B981,#34D399);}
+
+  .pass-rate{display:flex;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid #1E3A5F;}
+  .pr-item{flex:1;text-align:center;background:#0F172A;border-radius:8px;padding:7px 4px;}
+  .pr-item-val{font-size:1rem;font-weight:900;color:#60A5FA;}
+  .pr-item-label{font-size:10px;color:#64748B;margin-top:2px;}
+
+  /* 상세 테이블 */
+  .table-wrap{background:#1E293B;border:1px solid #334155;border-radius:16px;overflow:hidden;margin-bottom:32px;}
+  .table-scroll{overflow-x:auto;}
+  .data-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+  .data-table thead tr{background:#0F172A;}
+  .data-table th{padding:12px 14px;text-align:left;font-size:10px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+  .data-table th:not(:first-child){text-align:center;}
+  .data-table td{padding:11px 14px;border-top:1px solid #1E293B;color:#CBD5E1;vertical-align:middle;}
+  .data-table td:not(:first-child){text-align:center;}
+  .data-table tbody tr:hover{background:#243347;}
+  .td-job{font-weight:700;color:#E2E8F0;}
+  .td-grade{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;display:inline-block;margin-bottom:3px;}
+  .ratio-chip{display:inline-block;padding:3px 10px;border-radius:20px;font-weight:900;font-size:11px;}
+  .ratio-hot{background:#7F1D1D;color:#FCA5A5;}
+  .ratio-mid{background:#1C1917;color:#FBBF24;}
+  .ratio-low{background:#052E16;color:#86EFAC;}
+  .stage-cell{font-size:11px;line-height:1.6;}
+  .sc-pass{color:#60A5FA;font-weight:700;}
+  .sc-total{color:#64748B;}
+  .arrow{color:#334155;margin:0 3px;}
+
+  footer{text-align:center;padding:24px;font-size:11px;color:#334155;}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="badge">ALIO 공공기관 경영정보 공개시스템</div>
+  <h1>전형단계별 채용정보 시각화</h1>
+  <p>일반직 6급2 · 7급 · 별정직 | 1차 → 2차 → 최종 합격 현황</p>
+</div>
+
+<div class="container">
+
+  <!-- 요약 카드 -->
+  <div class="summary-grid">
+    <div class="sum-card">
+      <div class="sum-card-label">총 채용인원</div>
+      <div class="sum-card-val c-blue">101<span style="font-size:.9rem;">명</span></div>
+      <div class="sum-card-sub">최종 합격자 합계</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-card-label">전체 지원자</div>
+      <div class="sum-card-val c-green">2,758<span style="font-size:.9rem;">명</span></div>
+      <div class="sum-card-sub">1차 응시 합계</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-card-label">최고 경쟁률</div>
+      <div class="sum-card-val c-rose">182<span style="font-size:.9rem;">:1</span></div>
+      <div class="sum-card-sub">전산(대전)</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-card-label">최저 경쟁률</div>
+      <div class="sum-card-val c-amber">3<span style="font-size:.9rem;">:1</span></div>
+      <div class="sum-card-sub">기계(전국, 보훈)</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-card-label">직종 수</div>
+      <div class="sum-card-val c-blue">13<span style="font-size:.9rem;">개</span></div>
+      <div class="sum-card-sub">일반직 6급2·7급·별정직</div>
+    </div>
+  </div>
+
+  <!-- 경쟁률 차트 -->
+  <div class="sec-title">직종별 경쟁률</div>
+  <div class="chart-wrap">
+    <div class="chart-canvas-wrap">
+      <canvas id="chartRatio"></canvas>
+    </div>
+  </div>
+
+  <!-- 전형 퍼널 카드 -->
+  <div class="sec-title">직종별 전형 단계 현황</div>
+  <div class="funnel-grid" id="funnelGrid"></div>
+
+  <!-- 상세 테이블 -->
+  <div class="sec-title">전체 상세 데이터</div>
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>직급 / 직종</th>
+            <th>1차 (합격/응시)</th>
+            <th>2차 (합격/응시)</th>
+            <th>최종 (합격/응시)</th>
+            <th>경쟁률</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+<footer>데이터 출처: ALIO 공공기관 경영정보 공개시스템 · 2025</footer>
+
+<script>
+const DATA = [
+  { grade:'일반직 6급2', gradeKey:'6', job:'기계', region:'전국',         s1p:412, s1t:484, s2p:61,  s2t:267, s3p:26, s3t:48,  ratio:18.62 },
+  { grade:'일반직 6급2', gradeKey:'6', job:'전기', region:'전국',         s1p:207, s1t:584, s2p:21,  s2t:126, s3p:8,  s3t:20,  ratio:73    },
+  { grade:'일반직 6급2', gradeKey:'6', job:'안전', region:'전국',         s1p:65,  s1t:258, s2p:10,  s2t:50,  s3p:3,  s3t:10,  ratio:86    },
+  { grade:'일반직 6급2', gradeKey:'6', job:'토목', region:'전국',         s1p:40,  s1t:166, s2p:6,   s2t:31,  s3p:2,  s3t:4,   ratio:83    },
+  { grade:'일반직 6급2', gradeKey:'6', job:'화공', region:'전국',         s1p:40,  s1t:187, s2p:6,   s2t:28,  s3p:2,  s3t:5,   ratio:93.5  },
+  { grade:'일반직 6급2', gradeKey:'6', job:'연구', region:'대전',         s1p:17,  s1t:17,  s2p:5,   s2t:10,  s3p:1,  s3t:5,   ratio:17    },
+  { grade:'일반직 6급2', gradeKey:'6', job:'전산', region:'대전',         s1p:21,  s1t:182, s2p:6,   s2t:8,   s3p:1,  s3t:4,   ratio:182   },
+  { grade:'일반직 6급2', gradeKey:'6', job:'기계', region:'전국·보훈',    s1p:14,  s1t:15,  s2p:7,   s2t:9,   s3p:5,  s3t:6,   ratio:3     },
+  { grade:'일반직 6급2', gradeKey:'6', job:'전기', region:'전국·보훈',    s1p:14,  s1t:14,  s2p:2,   s2t:8,   s3p:2,  s3t:2,   ratio:7     },
+  { grade:'일반직 6급2', gradeKey:'6', job:'사무', region:'전국·장애인',  s1p:60,  s1t:61,  s2p:7,   s2t:40,  s3p:5,  s3t:6,   ratio:12.2  },
+  { grade:'일반직 7급',  gradeKey:'7', job:'기계', region:'전국·고졸',    s1p:193, s1t:197, s2p:54,  s2t:130, s3p:27, s3t:51,  ratio:7.3   },
+  { grade:'일반직 7급',  gradeKey:'7', job:'전기', region:'전국·고졸',    s1p:245, s1t:248, s2p:34,  s2t:177, s3p:19, s3t:29,  ratio:13.05 },
+  { grade:'별정직',      gradeKey:'b', job:'미화', region:'대전·무기계약', s1p:11,  s1t:22,  s2p:null,s2t:null,s3p:1,  s3t:8,   ratio:22    },
+];
+
+/* ── 경쟁률 차트 ── */
+const sorted = [...DATA].sort((a,b) => b.ratio - a.ratio);
+const labels  = sorted.map(d => `${d.job}(${d.region})`);
+const ratios  = sorted.map(d => d.ratio);
+const colors  = ratios.map(r => r >= 80 ? '#FB7185' : r >= 30 ? '#FBBF24' : '#34D399');
+
+new Chart(document.getElementById('chartRatio'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [{
+      label: '경쟁률',
+      data: ratios,
+      backgroundColor: colors,
+      borderRadius: 6,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.parsed.x}:1`
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: '#1E293B' },
+        ticks: { color: '#64748B', callback: v => v + ':1' }
+      },
+      y: {
+        grid: { display: false },
+        ticks: { color: '#CBD5E1', font: { size: 11 } }
+      }
+    }
+  }
+});
+
+/* ── 퍼널 카드 ── */
+const gradeClass = { '6':'grade-6', '7':'grade-7', 'b':'grade-b' };
+const gradeLabel = { '6':'6급2', '7':'7급', 'b':'별정' };
+
+function pct(part, total) {
+  if (!total) return 0;
+  return Math.round(part / total * 100);
+}
+
+const grid = document.getElementById('funnelGrid');
+DATA.forEach(d => {
+  const maxTotal = d.s1t;
+  const r1 = pct(d.s1p, maxTotal);
+  const r2 = d.s2t ? pct(d.s2p, maxTotal) : null;
+  const r3 = pct(d.s3p, maxTotal);
+
+  const ratioColor = d.ratio >= 80 ? '#FB7185' : d.ratio >= 30 ? '#FBBF24' : '#34D399';
+
+  const stage2html = d.s2t
+    ? `<div class="stage-row">
+        <div class="stage-row-head">
+          <span class="stage-label">2차 전형</span>
+          <span class="stage-nums"><strong>${d.s2p}명</strong> <span class="sc-total">합격 / ${d.s2t}명 응시</span></span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill bar-2" style="width:${r2}%"></div></div>
+       </div>`
+    : `<div class="stage-row"><div class="stage-row-head"><span class="stage-label">2차 전형</span><span class="stage-nums" style="color:#334155;">해당없음</span></div></div>`;
+
+  const pr1 = d.s1t ? Math.round(d.s1p/d.s1t*100) : 0;
+  const pr2 = d.s2t ? Math.round(d.s2p/d.s2t*100) : null;
+  const pr3 = d.s3t ? Math.round(d.s3p/d.s3t*100) : 0;
+
+  grid.insertAdjacentHTML('beforeend', `
+    <div class="funnel-card">
+      <div class="funnel-card-title">
+        <span class="grade-badge ${gradeClass[d.gradeKey]}">${gradeLabel[d.gradeKey]}</span>
+        ${d.job}
+      </div>
+      <div class="funnel-region">${d.region} · 최종채용 ${d.s3p}명</div>
+      <div class="funnel-ratio-big" style="color:${ratioColor};">${d.ratio}:1</div>
+
+      <div class="stage-row">
+        <div class="stage-row-head">
+          <span class="stage-label">1차 전형</span>
+          <span class="stage-nums"><strong>${d.s1p}명</strong> <span class="sc-total">합격 / ${d.s1t}명 응시</span></span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill bar-1" style="width:100%"></div></div>
+      </div>
+      ${stage2html}
+      <div class="stage-row">
+        <div class="stage-row-head">
+          <span class="stage-label">최종 합격</span>
+          <span class="stage-nums"><strong>${d.s3p}명</strong> <span class="sc-total">합격 / ${d.s3t}명 응시</span></span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill bar-3" style="width:${r3}%"></div></div>
+      </div>
+
+      <div class="pass-rate">
+        <div class="pr-item"><div class="pr-item-val">${pr1}%</div><div class="pr-item-label">1차 합격률</div></div>
+        ${pr2 !== null ? `<div class="pr-item"><div class="pr-item-val">${pr2}%</div><div class="pr-item-label">2차 합격률</div></div>` : ''}
+        <div class="pr-item"><div class="pr-item-val">${pr3}%</div><div class="pr-item-label">최종 합격률</div></div>
+      </div>
+    </div>
+  `);
+});
+
+/* ── 상세 테이블 ── */
+const tbody = document.getElementById('tableBody');
+DATA.forEach(d => {
+  const ratioClass = d.ratio >= 80 ? 'ratio-hot' : d.ratio >= 20 ? 'ratio-mid' : 'ratio-low';
+  const s2cell = d.s2t
+    ? `<span class="sc-pass">${d.s2p}</span><span class="sc-total">/${d.s2t}</span>`
+    : `<span style="color:#334155;">—</span>`;
+  tbody.insertAdjacentHTML('beforeend', `
+    <tr>
+      <td>
+        <span class="td-grade grade-badge ${gradeClass[d.gradeKey]}">${gradeLabel[d.gradeKey]}</span><br>
+        <span class="td-job">${d.job}</span>
+        <span style="font-size:11px;color:#64748B;margin-left:4px;">(${d.region})</span>
+      </td>
+      <td class="stage-cell"><span class="sc-pass">${d.s1p}</span><span class="sc-total">/${d.s1t}</span></td>
+      <td class="stage-cell">${s2cell}</td>
+      <td class="stage-cell"><span class="sc-pass">${d.s3p}</span><span class="sc-total">/${d.s3t}</span></td>
+      <td><span class="ratio-chip ${ratioClass}">${d.ratio}:1</span></td>
+    </tr>
+  `);
+});
+</script>
+</body>
+</html>
