@@ -161,6 +161,12 @@
     .ub-star.on{color:#FBBF24;}
     .ub-star:hover{transform:scale(1.18);}
     .ub-star-hint{font-size:11px;color:#94A3B8;text-align:center;height:16px;margin-bottom:20px;}
+    /* 1위 카드 금색 빛나는 테두리 */
+    .post-card:first-child{border-color:#F59E0B!important;box-shadow:0 0 0 2px #F59E0B,0 0 16px 4px rgba(245,158,11,.45),0 0 32px 8px rgba(251,191,36,.2)!important;animation:goldGlow 2s ease-in-out infinite alternate;}
+    @keyframes goldGlow{
+      from{box-shadow:0 0 0 2px #F59E0B,0 0 12px 3px rgba(245,158,11,.4),0 0 24px 6px rgba(251,191,36,.15);}
+      to  {box-shadow:0 0 0 2px #FBBF24,0 0 22px 8px rgba(245,158,11,.65),0 0 44px 14px rgba(251,191,36,.3);}
+    }
     /* 카드 별점 배지 */
     .post-card-rating{display:flex;align-items:center;gap:4px;margin-top:2px;min-height:18px;}
     .pcr-stars{color:#FBBF24;font-size:11px;letter-spacing:1px;}
