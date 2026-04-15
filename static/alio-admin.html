@@ -244,8 +244,48 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
       <div id="section-add" class="hidden">
         <div class="mb-4">
           <h2 class="text-lg font-bold text-slate-800">데이터 추가</h2>
-          <p class="text-xs text-slate-400 mt-0.5">채용공고 데이터를 직종 단위로 입력합니다</p>
+          <p class="text-xs text-slate-400 mt-0.5">ALIO URL을 붙여넣으면 전형단계별 채용정보를 자동으로 파싱합니다</p>
         </div>
+
+        <!-- ALIO URL 자동 파싱 -->
+        <div class="bg-white rounded-xl shadow-sm p-5 mb-4" style="border:2px solid #DBEAFE;">
+          <h3 class="text-sm font-bold text-blue-700 mb-3">🔗 ALIO URL 자동 파싱</h3>
+          <div class="flex gap-2 mb-3">
+            <input type="url" id="alio-url-input" class="form-input flex-1" placeholder="https://www.alio.go.kr/item/itemBoardB1020.do?seq=..."/>
+            <button onclick="parseAlioUrl()" id="parse-btn" class="btn btn-primary" style="white-space:nowrap;">⚡ 파싱하기</button>
+          </div>
+          <!-- 파싱 진행 상태 -->
+          <div id="parse-status" class="hidden text-xs text-blue-600 font-semibold mb-3 flex items-center gap-2">
+            <span style="display:inline-block;width:14px;height:14px;border:2px solid #93C5FD;border-top-color:#2563EB;border-radius:50%;animation:spin .7s linear infinite;"></span>
+            <span id="parse-status-msg">페이지를 가져오는 중...</span>
+          </div>
+          <!-- 파싱 결과 미리보기 -->
+          <div id="parse-preview" class="hidden">
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <span class="text-xs font-bold text-slate-700">파싱 결과: </span>
+                <span id="parse-ds-name" class="text-xs text-blue-600 font-semibold"></span>
+                <span id="parse-count" class="ml-2 text-xs text-slate-400"></span>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="saveParseResult()" class="btn btn-success" style="font-size:.8rem;padding:6px 14px;">✅ Supabase에 저장</button>
+                <button onclick="cancelParse()" class="btn btn-secondary" style="font-size:.8rem;padding:6px 10px;">✕</button>
+              </div>
+            </div>
+            <div class="overflow-x-auto rounded-lg" style="border:1px solid #E2E8F0;max-height:320px;overflow-y:auto;">
+              <table class="data-tbl w-full" style="font-size:11px;">
+                <thead><tr style="position:sticky;top:0;background:#F8FAFF;z-index:1;">
+                  <th>직급</th><th>직종</th><th>지역</th>
+                  <th>1차합격/응시</th><th>2차합격/응시</th><th>최종합격/응시</th><th>경쟁률</th>
+                </tr></thead>
+                <tbody id="parse-tbody"></tbody>
+              </table>
+            </div>
+            <p id="parse-error-rows" class="hidden text-xs text-amber-600 mt-2"></p>
+          </div>
+          <div id="parse-error" class="hidden text-xs text-red-500 font-semibold mt-2"></div>
+        </div>
+        <style>@keyframes spin{to{transform:rotate(360deg);}}</style>
 
         <!-- 단건 입력 폼 -->
         <div class="bg-white rounded-xl shadow-sm p-5 mb-4">
@@ -623,6 +663,249 @@ async function submitCsv(){
   resultEl.textContent=`✅ ${records.length}개 저장${errors.length?'\n⚠️ '+errors.join('\n'):''}`;
   resultEl.classList.remove('hidden');
   document.getElementById('csv-input').value='';
+  switchTab('datasets');
+}
+
+// ── ALIO URL 파싱 ──
+let _parsedRecords = [];
+
+async function parseAlioUrl() {
+  const url = document.getElementById('alio-url-input').value.trim();
+  if (!url || !url.includes('alio.go.kr')) {
+    showParseError('유효한 ALIO URL을 입력하세요. (https://www.alio.go.kr/...)');
+    return;
+  }
+  document.getElementById('parse-preview').classList.add('hidden');
+  document.getElementById('parse-error').classList.add('hidden');
+  document.getElementById('parse-status').classList.remove('hidden');
+  document.getElementById('parse-status-msg').textContent = '페이지를 가져오는 중...';
+  document.getElementById('parse-btn').disabled = true;
+
+  let html = null;
+  // CORS 프록시 1순위: allorigins
+  try {
+    document.getElementById('parse-status-msg').textContent = '프록시 연결 중 (1/2)...';
+    const res = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(url));
+    if (res.ok) {
+      const json = await res.json();
+      html = json.contents;
+    }
+  } catch(e) { html = null; }
+
+  // 2순위: corsproxy.io
+  if (!html) {
+    try {
+      document.getElementById('parse-status-msg').textContent = '프록시 연결 중 (2/2)...';
+      const res = await fetch('https://corsproxy.io/?' + encodeURIComponent(url));
+      if (res.ok) html = await res.text();
+    } catch(e) { html = null; }
+  }
+
+  document.getElementById('parse-btn').disabled = false;
+  document.getElementById('parse-status').classList.add('hidden');
+
+  if (!html) {
+    showParseError('페이지를 가져올 수 없습니다. 네트워크를 확인하거나 잠시 후 다시 시도하세요.');
+    return;
+  }
+
+  document.getElementById('parse-status-msg').textContent = '데이터 파싱 중...';
+  document.getElementById('parse-status').classList.remove('hidden');
+
+  try {
+    const result = parseAlioHtml(html);
+    document.getElementById('parse-status').classList.add('hidden');
+    if (!result.records.length) {
+      showParseError('전형단계별 채용정보 테이블을 찾을 수 없습니다. URL을 다시 확인하세요.');
+      return;
+    }
+    _parsedRecords = result.records;
+    showParsePreview(result.datasetName, result.records, result.errors);
+  } catch(e) {
+    document.getElementById('parse-status').classList.add('hidden');
+    showParseError('파싱 오류: ' + e.message);
+  }
+}
+
+function parseAlioHtml(html) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  // 공고명 추출: 페이지 제목 또는 h2/h3
+  let datasetName = '';
+  const titleEl = doc.querySelector('h2.tit, .board_head h2, .view_tit, .board-tit h2, h2');
+  if (titleEl) {
+    datasetName = titleEl.textContent.trim().replace(/\s+/g,' ');
+  }
+  if (!datasetName) {
+    const titleTag = doc.querySelector('title');
+    if (titleTag) datasetName = titleTag.textContent.trim().split('|')[0].trim();
+  }
+  if (!datasetName) datasetName = '파싱된 채용공고 ' + new Date().toISOString().slice(0,10);
+  // 너무 길면 자르기
+  if (datasetName.length > 60) datasetName = datasetName.slice(0, 60);
+
+  // stepTable 찾기
+  const table = doc.getElementById('stepTable') || doc.querySelector('table[caption="전형단계별 채용정보"]') || doc.querySelector('caption');
+  let rows;
+  if (table && table.tagName === 'TABLE') {
+    rows = Array.from(table.querySelectorAll('tr'));
+  } else if (table && table.tagName === 'CAPTION') {
+    rows = Array.from(table.closest('table').querySelectorAll('tr'));
+  } else {
+    // fallback: 전형단계별 채용정보 캡션 검색
+    const caps = Array.from(doc.querySelectorAll('caption'));
+    const cap = caps.find(c => c.textContent.includes('전형단계별'));
+    if (cap) rows = Array.from(cap.closest('table').querySelectorAll('tr'));
+    else throw new Error('stepTable을 찾을 수 없음');
+  }
+
+  const records = [];
+  const errors = [];
+  let current = null; // 현재 직종 객체
+
+  for (const tr of rows) {
+    const ths = Array.from(tr.querySelectorAll('th'));
+    const tds = Array.from(tr.querySelectorAll('td'));
+    const allCells = Array.from(tr.querySelectorAll('th,td'));
+
+    // colspan=4 th → 직종 그룹 헤더
+    if (ths.length === 1 && parseInt(ths[0].getAttribute('colspan')) >= 3) {
+      if (current) records.push(current);
+      const headerText = ths[0].textContent.trim().replace(/\s+/g,' ');
+      current = parseGroupHeader(headerText, datasetName);
+      continue;
+    }
+
+    if (!current) continue;
+
+    // 단계 행: th(단계명) + td(선발/응시) ...
+    const stageCell = ths.find(th => /^(1차|2차|최종|경쟁률)/.test(th.textContent.trim()));
+    if (!stageCell) continue;
+    const stageName = stageCell.textContent.trim().replace(/\s+/g,' ');
+    const dataTd = tds[0]; // 첫번째 td가 데이터
+    if (!dataTd) continue;
+    const cellText = dataTd.textContent.trim().replace(/\s+/g,' ');
+
+    if (stageName.startsWith('1차')) {
+      const [pass, total] = extractPassTotal(cellText);
+      current.s1_pass = pass;
+      current.s1_total = total;
+    } else if (stageName.startsWith('2차')) {
+      const [pass, total] = extractPassTotal(cellText);
+      current.s2_pass = pass;
+      current.s2_total = total;
+    } else if (stageName.startsWith('최종')) {
+      const [pass, total] = extractPassTotal(cellText);
+      current.s3_pass = pass;
+      current.s3_total = total;
+    } else if (stageName.startsWith('경쟁률')) {
+      // "최종 경쟁률 18.62 대 1" 또는 "18.62 대 1" 또는 "18.62:1"
+      const m = cellText.match(/([\d.]+)\s*대\s*1/) || cellText.match(/([\d.]+)\s*:\s*1/) || cellText.match(/([\d.]+)/);
+      if (m) current.ratio = parseFloat(m[1]);
+    }
+  }
+  if (current) records.push(current);
+
+  // 유효성 검사: ratio, s3_pass 없으면 오류 처리
+  const valid = [];
+  records.forEach((r, i) => {
+    if (!r.s3_pass || !r.ratio) {
+      errors.push(`${r.job}(${r.region}): 최종합격 또는 경쟁률 누락`);
+    } else {
+      valid.push(r);
+    }
+  });
+  return { datasetName, records: valid, errors };
+}
+
+function parseGroupHeader(text, datasetName) {
+  // 형식: "신입직_일반직_6급2_전국_기계" 또는 "신입직_별정직_대전·무기계약_미화"
+  const parts = text.split('_');
+  let grade = '', gradeKey = '6', region = '', job = '';
+
+  if (parts.length >= 5 && parts[1] === '일반직') {
+    grade = '일반직 ' + parts[2];
+    gradeKey = parts[2].includes('7') ? '7' : '6';
+    region = parts[3];
+    job = parts.slice(4).join('_');
+  } else if (parts.length >= 4 && parts[1] === '별정직') {
+    grade = '별정직'; gradeKey = 'b';
+    region = parts[2];
+    job = parts.slice(3).join('_');
+  } else if (parts.length >= 4 && parts[1] === '계약직') {
+    grade = '계약직'; gradeKey = 'c';
+    region = parts[2];
+    job = parts.slice(3).join('_');
+  } else {
+    // fallback: 마지막이 job, 그 앞이 region
+    grade = parts.slice(1, parts.length - 2).join(' ') || parts[1] || '';
+    region = parts[parts.length - 2] || '';
+    job = parts[parts.length - 1] || text;
+    if (grade.includes('7급')) gradeKey = '7';
+    else if (grade.includes('별정')) gradeKey = 'b';
+  }
+
+  return { dataset_name: datasetName, grade, grade_key: gradeKey, job, region,
+    s1_pass: null, s1_total: null, s2_pass: null, s2_total: null, s3_pass: null, s3_total: null, ratio: null };
+}
+
+function extractPassTotal(text) {
+  // "선발인원 412명 / 응시인원 484명" 또는 "412명 / 484명" 또는 "412/484"
+  const nums = text.match(/\d+/g);
+  if (!nums || nums.length < 2) return [parseInt(nums?.[0])||null, null];
+  return [parseInt(nums[0]), parseInt(nums[1])];
+}
+
+function showParsePreview(dsName, records, errors) {
+  document.getElementById('parse-ds-name').textContent = dsName;
+  document.getElementById('parse-count').textContent = `(${records.length}개 직종)`;
+  const tbody = document.getElementById('parse-tbody');
+  tbody.innerHTML = records.map(r => {
+    const chipCls = (r.ratio||0) >= 80 ? 'chip-hot' : (r.ratio||0) >= 30 ? 'chip-mid' : 'chip-low';
+    const gCls = r.grade_key === '7' ? 'grade-7' : r.grade_key === 'b' ? 'grade-b' : 'grade-6';
+    const s2 = r.s2_total ? `${r.s2_pass}/${r.s2_total}` : '—';
+    return `<tr>
+      <td><span class="${gCls}">${esc(r.grade)}</span></td>
+      <td class="font-semibold text-slate-800">${esc(r.job)}</td>
+      <td class="text-xs text-slate-500">${esc(r.region)}</td>
+      <td>${r.s1_pass||0}/${r.s1_total||0}</td>
+      <td>${s2}</td>
+      <td class="text-emerald-600 font-bold">${r.s3_pass||0}/${r.s3_total||0}</td>
+      <td><span class="chip ${chipCls}">${r.ratio}:1</span></td>
+    </tr>`;
+  }).join('');
+  if (errors.length) {
+    document.getElementById('parse-error-rows').textContent = '⚠️ 누락 데이터: ' + errors.join(' / ');
+    document.getElementById('parse-error-rows').classList.remove('hidden');
+  } else {
+    document.getElementById('parse-error-rows').classList.add('hidden');
+  }
+  document.getElementById('parse-preview').classList.remove('hidden');
+}
+
+function showParseError(msg) {
+  document.getElementById('parse-error').textContent = msg;
+  document.getElementById('parse-error').classList.remove('hidden');
+}
+
+function cancelParse() {
+  _parsedRecords = [];
+  document.getElementById('parse-preview').classList.add('hidden');
+  document.getElementById('alio-url-input').value = '';
+}
+
+async function saveParseResult() {
+  if (!_parsedRecords.length) return;
+  const btn = document.querySelector('#parse-preview .btn-success');
+  btn.disabled = true;
+  btn.textContent = '저장 중...';
+  const { error } = await db.from('alio_jobs').insert(_parsedRecords);
+  btn.disabled = false;
+  btn.textContent = '✅ Supabase에 저장';
+  if (error) { toast('저장 실패: ' + error.message, false); return; }
+  toast(`${_parsedRecords.length}개 직종 저장 완료!`);
+  cancelParse();
   switchTab('datasets');
 }
 
