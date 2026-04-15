@@ -200,7 +200,7 @@
 
     /* ── 스텝 원 ── */
     .step-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; flex-shrink: 0; }
-    .hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; width: 36px; height: 36px; cursor: pointer; background: #1E4D8C; border: none; padding: 6px; border-radius: 8px; }
+    .hamburger { display: flex; flex-direction: column; justify-content: center; gap: 5px; width: 36px; height: 36px; cursor: pointer; background: #1E4D8C; border: none; padding: 6px; border-radius: 8px; }
     .hamburger span { display: block; height: 2px; background: #fff; border-radius: 2px; transition: transform .25s, opacity .25s; }
     .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
@@ -276,7 +276,7 @@
     <div class="header-accent-line"></div>
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <a href="index.html" class="font-display text-xl font-bold tracking-tight" style="background:linear-gradient(135deg,#1E3A8A,#0891B2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;flex-shrink:0;">지텔프IBT 대학컨설팅</a>
-      <nav class="hidden md:flex items-center gap-1 font-semibold">
+      <nav class="hidden items-center gap-1 font-semibold">
         <a href="#about" class="nav-link">서비스 소개</a>
         <a href="package.html" class="nav-link">패키지</a>
         <a href="schedule.html" class="nav-link">정기시험 일정</a>
@@ -287,8 +287,8 @@
         <a href="gtelp-score.html" class="nav-link">점수대비표</a>
       </nav>
       <div class="flex items-center gap-2">
-        <a href="#consultation-form" class="hidden md:inline-flex btn-primary text-sm px-4" style="min-height:40px;padding-top:.45rem;padding-bottom:.45rem;">대학IBT무료신청</a>
-        <a href="student.html" class="hidden md:inline-flex btn-primary text-sm px-4" style="min-height:40px;padding-top:.45rem;padding-bottom:.45rem;background:linear-gradient(135deg,#D97706,#F59E0B);">학생IBT무료신청</a>
+        <a href="#consultation-form" class="hidden btn-primary text-sm px-4" style="min-height:40px;padding-top:.45rem;padding-bottom:.45rem;">대학IBT무료신청</a>
+        <a href="student.html" class="hidden btn-primary text-sm px-4" style="min-height:40px;padding-top:.45rem;padding-bottom:.45rem;background:linear-gradient(135deg,#D97706,#F59E0B);">학생IBT무료신청</a>
         <a href="admin-k9x3.html" title="관리자" class="flex items-center justify-center rounded-lg transition-colors" style="width:36px;height:36px;background:#F1F5F9;color:var(--ink-soft);" onmouseover="this.style.background='#E2E8F0';this.style.color='var(--blue)';" onmouseout="this.style.background='#F1F5F9';this.style.color='var(--ink-soft)';">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </a>
