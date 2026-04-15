@@ -889,202 +889,269 @@
       <!-- ── 통계 탭 ── -->
       <div id="section-stats" class="hidden">
 
-        <!-- AI 인사이트 -->
-        <div id="insights-wrap" class="mb-6 hidden">
-          <!-- 인사이트 탭 -->
-          <div class="flex items-center gap-0 mb-4 border-b border-slate-200">
-            <button id="ins-tab-1" onclick="switchInsightTab(1)"
-              class="px-5 py-2 text-sm font-bold border-b-2 border-blue-700 text-blue-700 -mb-px bg-transparent cursor-pointer">
-              🔍 인사이트1 — 트래픽 분석
-            </button>
-            <button id="ins-tab-2" onclick="switchInsightTab(2)"
-              class="px-5 py-2 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px bg-transparent cursor-pointer hover:text-slate-600">
-              💡 인사이트2 — 블로그 유입 & 서비스 제안
-            </button>
+        <!-- 섹션 내비 -->
+        <div class="flex gap-2 mb-5 overflow-x-auto pb-1">
+          <a href="#stats-overview"  class="whitespace-nowrap px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 text-white shadow-sm">개요</a>
+          <a href="#stats-trends"    class="whitespace-nowrap px-3 py-1.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-500 hover:border-emerald-400 hover:text-emerald-600">트래픽 추이</a>
+          <a href="#stats-sources"   class="whitespace-nowrap px-3 py-1.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-500 hover:border-violet-400 hover:text-violet-600">유입 경로</a>
+          <a href="#stats-content"   class="whitespace-nowrap px-3 py-1.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-500 hover:border-amber-400 hover:text-amber-600">콘텐츠 성과</a>
+        </div>
+
+        <!-- ① 개요 ─────────────────────────────────────────── -->
+        <div id="stats-overview" class="mb-8">
+          <div class="flex items-center gap-2 mb-3">
+            <span style="width:4px;height:20px;border-radius:2px;background:#2563EB;display:inline-block;"></span>
+            <h2 class="font-bold text-slate-700 text-sm tracking-wide uppercase">개요</h2>
           </div>
-          <!-- 탭1: 기존 인사이트 -->
-          <div id="ins-panel-1">
-            <div id="insights-cards" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-          </div>
-          <!-- 탭2: 네이버블로그 유입 분석 -->
-          <div id="ins-panel-2" class="hidden">
-            <div class="flex items-center gap-3 mb-4">
-              <button onclick="generateInsights2(_statsRows)" id="btn-insights2"
-                class="btn btn-primary px-5 py-2 text-sm flex items-center gap-2">
-                🤖 AI 분석 실행
-              </button>
-              <span class="text-xs text-slate-400">최근 14일 방문 데이터 기반 · Claude AI 분석</span>
+
+          <!-- 요약 카드 4개 -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+            <div class="rounded-xl p-4" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border:1px solid #BFDBFE;">
+              <p class="text-xs font-semibold mb-1" style="color:#3B82F6;">전체 방문수</p>
+              <p id="stats-total-views" class="text-2xl font-bold" style="color:#1D4ED8;">-</p>
+              <p class="text-xs mt-1" style="color:#93C5FD;">누적</p>
             </div>
-            <div id="insights2-cards">
-              <div class="rounded-xl p-5 text-center text-slate-400 text-sm" style="background:#F8FAFF;border:1px solid #E2E8F0;">
-                위 버튼을 눌러 AI 분석을 시작하세요
+            <div class="rounded-xl p-4" style="background:linear-gradient(135deg,#F0F9FF,#E0F2FE);border:1px solid #BAE6FD;">
+              <p class="text-xs font-semibold mb-1" style="color:#0EA5E9;">이번달 방문</p>
+              <p id="stats-month-views" class="text-2xl font-bold" style="color:#0369A1;">-</p>
+              <p id="stats-month-label" class="text-xs mt-1" style="color:#7DD3FC;">-월</p>
+            </div>
+            <div class="rounded-xl p-4" style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border:1px solid #A7F3D0;">
+              <p class="text-xs font-semibold mb-1" style="color:#10B981;">오늘 방문</p>
+              <p id="stats-today-views" class="text-2xl font-bold" style="color:#065F46;">-</p>
+              <p class="text-xs mt-1" style="color:#6EE7B7;">오늘</p>
+            </div>
+            <div class="rounded-xl p-4" style="background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border:1px solid #DDD6FE;">
+              <p class="text-xs font-semibold mb-1" style="color:#8B5CF6;">어제 방문</p>
+              <p id="stats-yesterday-views" class="text-2xl font-bold" style="color:#4C1D95;">-</p>
+              <p class="text-xs mt-1" style="color:#C4B5FD;">어제</p>
+            </div>
+          </div>
+
+          <!-- AI 인사이트 (접이식) -->
+          <div id="insights-wrap" class="hidden">
+            <div class="rounded-xl overflow-hidden" style="border:1px solid #E2E8F0;">
+              <button onclick="toggleInsightsPanel()" class="w-full flex items-center justify-between px-5 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50" style="background:#F8FAFC;">
+                <span>🤖 AI 인사이트</span>
+                <span id="insights-chevron" class="text-slate-400 text-xs transition-transform">▼</span>
+              </button>
+              <div id="insights-body" class="hidden" style="border-top:1px solid #E2E8F0;">
+                <div class="flex items-center gap-0 border-b border-slate-200 px-4 pt-3">
+                  <button id="ins-tab-1" onclick="switchInsightTab(1)"
+                    class="px-4 py-2 text-sm font-bold border-b-2 border-blue-700 text-blue-700 -mb-px bg-transparent cursor-pointer">
+                    🔍 인사이트1 — 트래픽 분석
+                  </button>
+                  <button id="ins-tab-2" onclick="switchInsightTab(2)"
+                    class="px-4 py-2 text-sm font-semibold border-b-2 border-transparent text-slate-400 -mb-px bg-transparent cursor-pointer hover:text-slate-600">
+                    💡 인사이트2 — 블로그 유입 & 서비스 제안
+                  </button>
+                </div>
+                <div class="p-4">
+                  <div id="ins-panel-1">
+                    <div id="insights-cards" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                  </div>
+                  <div id="ins-panel-2" class="hidden">
+                    <div class="flex items-center gap-3 mb-4">
+                      <button onclick="generateInsights2(_statsRows)" id="btn-insights2"
+                        class="btn btn-primary px-5 py-2 text-sm flex items-center gap-2">
+                        🤖 AI 분석 실행
+                      </button>
+                      <span class="text-xs text-slate-400">최근 14일 방문 데이터 기반 · Claude AI 분석</span>
+                    </div>
+                    <div id="insights2-cards">
+                      <div class="rounded-xl p-5 text-center text-slate-400 text-sm" style="background:#F8FAFF;border:1px solid #E2E8F0;">
+                        위 버튼을 눌러 AI 분석을 시작하세요
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 요약 카드 -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div class="bg-white rounded-xl p-5 shadow-sm">
-            <p class="text-xs text-slate-400 mb-1">전체 방문수</p>
-            <p id="stats-total-views" class="text-3xl font-bold text-slate-800">-</p>
-            <p class="text-xs text-slate-400 mt-1">누적</p>
+        <!-- ② 트래픽 추이 ──────────────────────────────────── -->
+        <div id="stats-trends" class="mb-8">
+          <div class="flex items-center gap-2 mb-3">
+            <span style="width:4px;height:20px;border-radius:2px;background:#10B981;display:inline-block;"></span>
+            <h2 class="font-bold text-slate-700 text-sm tracking-wide uppercase">트래픽 추이</h2>
           </div>
-          <div class="bg-white rounded-xl p-5 shadow-sm">
-            <p class="text-xs text-slate-400 mb-1">이번달 방문</p>
-            <p id="stats-month-views" class="text-3xl font-bold text-blue-600">-</p>
-            <p id="stats-month-label" class="text-xs text-slate-400 mt-1">-월</p>
-          </div>
-          <div class="bg-white rounded-xl p-5 shadow-sm">
-            <p class="text-xs text-slate-400 mb-1">오늘 방문</p>
-            <p id="stats-today-views" class="text-3xl font-bold text-emerald-600">-</p>
-            <p class="text-xs text-slate-400 mt-1">오늘</p>
-          </div>
-          <div class="bg-white rounded-xl p-5 shadow-sm">
-            <p class="text-xs text-slate-400 mb-1">어제 방문</p>
-            <p id="stats-yesterday-views" class="text-3xl font-bold text-purple-600">-</p>
-            <p class="text-xs text-slate-400 mt-1">어제</p>
-          </div>
-        </div>
 
-        <!-- 일별 추이 -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h3 class="font-bold text-slate-700 mb-4">일별 방문 추이 <span class="text-xs font-normal text-slate-400">(최근 14일)</span></h3>
-          <canvas id="chart-daily" height="90"></canvas>
-        </div>
+          <!-- 일별 추이 -->
+          <div class="bg-white rounded-xl shadow-sm p-5 mb-3">
+            <h3 class="font-semibold text-slate-600 text-sm mb-3">일별 방문 추이 <span class="text-xs font-normal text-slate-400">(최근 14일)</span></h3>
+            <canvas id="chart-daily" height="90"></canvas>
+          </div>
 
-        <!-- 페이지별 + 요일별 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div class="bg-white rounded-xl shadow-sm p-6">
-            <h3 class="font-bold text-slate-700 mb-4">페이지별 방문수</h3>
-            <canvas id="chart-pages" height="200"></canvas>
+          <!-- 시간대별 -->
+          <div class="bg-white rounded-xl shadow-sm p-5 mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <h3 class="font-semibold text-slate-600 text-sm">시간대별 접속 현황 <span class="text-xs font-normal text-slate-400" id="hourly-range-label"></span></h3>
+              <div id="hourly-peak" class="text-xs font-semibold px-3 py-1 rounded-full bg-orange-50 text-orange-600"></div>
+            </div>
+            <div class="flex flex-wrap gap-1.5 mb-2" id="hourly-period-btns">
+              <button data-hkey="today"     onclick="renderHourlyChart('today')"     class="hourly-sel-btn px-3 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 bg-white hover:border-blue-400 hover:text-blue-600">오늘</button>
+              <button data-hkey="yesterday" onclick="renderHourlyChart('yesterday')" class="hourly-sel-btn px-3 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 bg-white hover:border-blue-400 hover:text-blue-600">어제</button>
+              <button data-hkey="7days"     onclick="renderHourlyChart('7days')"     class="hourly-sel-btn px-3 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 bg-white hover:border-blue-400 hover:text-blue-600">최근 7일</button>
+              <button data-hkey="14days"    onclick="renderHourlyChart('14days')"    class="hourly-sel-btn px-3 py-1 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">최근 14일</button>
+              <button data-hkey="month"     onclick="renderHourlyChart('month')"     class="hourly-sel-btn px-3 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 bg-white hover:border-blue-400 hover:text-blue-600">이번달</button>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+              <span class="text-xs text-slate-400 whitespace-nowrap">기간 직접 선택</span>
+              <input type="date" id="hourly-date-from" class="border border-slate-200 rounded-lg px-3 py-1 text-xs focus:outline-none focus:border-blue-500" style="font-size:13px;" />
+              <span class="text-xs text-slate-400">~</span>
+              <input type="date" id="hourly-date-to"   class="border border-slate-200 rounded-lg px-3 py-1 text-xs focus:outline-none focus:border-blue-500" style="font-size:13px;" />
+              <button onclick="onHourlyRangePick()" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-700 text-white hover:bg-slate-900">조회</button>
+            </div>
+            <canvas id="chart-hourly" height="90"></canvas>
           </div>
-          <div class="bg-white rounded-xl shadow-sm p-6">
-            <h3 class="font-bold text-slate-700 mb-4">요일별 방문 분포</h3>
-            <canvas id="chart-weekday" height="200"></canvas>
-          </div>
-        </div>
-        <!-- 시간대별 방문 분포 -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-            <h3 class="font-bold text-slate-700">시간대별 접속 현황 <span class="text-xs font-normal text-slate-400" id="hourly-range-label"></span></h3>
-            <div id="hourly-peak" class="text-xs font-semibold px-3 py-1 rounded-full bg-orange-50 text-orange-600"></div>
-          </div>
-          <!-- 기간 버튼 -->
-          <div class="flex flex-wrap gap-1.5 mb-3" id="hourly-period-btns">
-            <button data-hkey="today"     onclick="renderHourlyChart('today')"     class="hourly-sel-btn px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 bg-white hover:border-blue-400 hover:text-blue-600">오늘</button>
-            <button data-hkey="yesterday" onclick="renderHourlyChart('yesterday')" class="hourly-sel-btn px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 bg-white hover:border-blue-400 hover:text-blue-600">어제</button>
-            <button data-hkey="7days"     onclick="renderHourlyChart('7days')"     class="hourly-sel-btn px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 bg-white hover:border-blue-400 hover:text-blue-600">최근 7일</button>
-            <button data-hkey="14days"    onclick="renderHourlyChart('14days')"    class="hourly-sel-btn px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">최근 14일</button>
-            <button data-hkey="month"     onclick="renderHourlyChart('month')"     class="hourly-sel-btn px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 bg-white hover:border-blue-400 hover:text-blue-600">이번달</button>
-          </div>
-          <!-- 날짜 범위 선택 -->
-          <div class="flex flex-wrap items-center gap-2 mb-4">
-            <span class="text-xs text-slate-400 whitespace-nowrap">기간 직접 선택</span>
-            <input type="date" id="hourly-date-from"
-              class="border border-slate-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-blue-500"
-              style="font-size:13px;" />
-            <span class="text-xs text-slate-400">~</span>
-            <input type="date" id="hourly-date-to"
-              class="border border-slate-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-blue-500"
-              style="font-size:13px;" />
-            <button onclick="onHourlyRangePick()"
-              class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-slate-700 text-white hover:bg-slate-900">조회</button>
-          </div>
-          <canvas id="chart-hourly" height="90"></canvas>
-        </div>
 
-        <!-- 날짜별 페이지 방문수 -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h3 class="font-bold text-slate-700 mb-1">날짜별 페이지 방문수 <span class="text-xs font-normal text-slate-400">(최근 14일)</span></h3>
-          <canvas id="chart-weekday-pages" height="100"></canvas>
-        </div>
-
-        <!-- 유입 경로 테이블 -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <h3 class="font-bold text-slate-700">유입 경로 (어디서 접속했는지)</h3>
-            <div class="flex gap-1" id="ref-period-btns">
-              <button onclick="renderReferrerTable('daily')"   id="ref-btn-daily"   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">일일</button>
-              <button onclick="renderReferrerTable('weekly')"  id="ref-btn-weekly"  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">주간</button>
-              <button onclick="renderReferrerTable('monthly')" id="ref-btn-monthly" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">월간</button>
+          <!-- 페이지별 + 요일별 (2열) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+            <div class="bg-white rounded-xl shadow-sm p-5">
+              <h3 class="font-semibold text-slate-600 text-sm mb-3">페이지별 방문수</h3>
+              <canvas id="chart-pages" height="200"></canvas>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-5">
+              <h3 class="font-semibold text-slate-600 text-sm mb-3">요일별 방문 분포</h3>
+              <canvas id="chart-weekday" height="200"></canvas>
             </div>
           </div>
-          <p id="ref-period-label" class="text-xs text-slate-400 mb-3">이번달 기준</p>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="text-left text-xs text-slate-400 border-b">
-                  <th class="pb-2 font-semibold">유입 경로</th>
-                  <th class="pb-2 font-semibold text-right">방문수</th>
-                  <th class="pb-2 font-semibold pl-4">비율</th>
-                </tr>
-              </thead>
-              <tbody id="referrer-stats-body">
-                <tr><td colspan="3" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
-              </tbody>
-            </table>
+
+          <!-- 날짜별 페이지 방문수 -->
+          <div class="bg-white rounded-xl shadow-sm p-5">
+            <h3 class="font-semibold text-slate-600 text-sm mb-2">날짜별 페이지 방문수 <span class="text-xs font-normal text-slate-400">(최근 14일)</span></h3>
+            <canvas id="chart-weekday-pages" height="100"></canvas>
           </div>
         </div>
 
-        <!-- 내부 링크 상세 -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-1">
-            <h3 class="font-bold text-slate-700">🔗 내부 링크 상세 (어느 페이지에서 왔는지)</h3>
-            <div class="flex gap-1" id="intlink-period-btns">
-              <button onclick="renderInternalLinkTable('weekly')"  id="intlink-btn-weekly"  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">주간</button>
-              <button onclick="renderInternalLinkTable('monthly')" id="intlink-btn-monthly" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">월간</button>
-              <button onclick="renderInternalLinkTable('all')"     id="intlink-btn-all"     class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">전체</button>
-            </div>
+        <!-- ③ 유입 경로 ──────────────────────────────────────── -->
+        <div id="stats-sources" class="mb-8">
+          <div class="flex items-center gap-2 mb-3">
+            <span style="width:4px;height:20px;border-radius:2px;background:#8B5CF6;display:inline-block;"></span>
+            <h2 class="font-bold text-slate-700 text-sm tracking-wide uppercase">유입 경로</h2>
           </div>
-          <p id="intlink-period-label" class="text-xs text-slate-400 mb-4">이번달 기준</p>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="text-left text-xs text-slate-400 border-b">
-                  <th class="pb-2 font-semibold">출발 페이지</th>
-                  <th class="pb-2 font-semibold">→ 도착 페이지</th>
-                  <th class="pb-2 font-semibold text-right">방문수</th>
-                  <th class="pb-2 font-semibold pl-4">비율</th>
-                </tr>
-              </thead>
-              <tbody id="internal-link-body">
-                <tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
-              </tbody>
-            </table>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- 외부 유입 경로 -->
+            <div class="bg-white rounded-xl shadow-sm p-5">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <h3 class="font-semibold text-slate-600 text-sm">어디서 접속했는지</h3>
+                <div class="flex gap-1" id="ref-period-btns">
+                  <button onclick="renderReferrerTable('daily')"   id="ref-btn-daily"   class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">일일</button>
+                  <button onclick="renderReferrerTable('weekly')"  id="ref-btn-weekly"  class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">주간</button>
+                  <button onclick="renderReferrerTable('monthly')" id="ref-btn-monthly" class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">월간</button>
+                </div>
+              </div>
+              <p id="ref-period-label" class="text-xs text-slate-400 mb-3">이번달 기준</p>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="text-left text-xs text-slate-400 border-b">
+                      <th class="pb-2 font-semibold">유입 경로</th>
+                      <th class="pb-2 font-semibold text-right">방문수</th>
+                      <th class="pb-2 font-semibold pl-4">비율</th>
+                    </tr>
+                  </thead>
+                  <tbody id="referrer-stats-body">
+                    <tr><td colspan="3" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 내부 링크 상세 -->
+            <div class="bg-white rounded-xl shadow-sm p-5">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <h3 class="font-semibold text-slate-600 text-sm">🔗 어느 페이지에서 왔는지</h3>
+                <div class="flex gap-1" id="intlink-period-btns">
+                  <button onclick="renderInternalLinkTable('weekly')"  id="intlink-btn-weekly"  class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">주간</button>
+                  <button onclick="renderInternalLinkTable('monthly')" id="intlink-btn-monthly" class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">월간</button>
+                  <button onclick="renderInternalLinkTable('all')"     id="intlink-btn-all"     class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">전체</button>
+                </div>
+              </div>
+              <p id="intlink-period-label" class="text-xs text-slate-400 mb-3">이번달 기준</p>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="text-left text-xs text-slate-400 border-b">
+                      <th class="pb-2 font-semibold">출발 페이지</th>
+                      <th class="pb-2 font-semibold">→ 도착 페이지</th>
+                      <th class="pb-2 font-semibold text-right">방문수</th>
+                      <th class="pb-2 font-semibold pl-4">비율</th>
+                    </tr>
+                  </thead>
+                  <tbody id="internal-link-body">
+                    <tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- 채용공고 자료실 다운로드 전체 -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <h3 class="font-bold text-slate-700">📥 채용공고 자료실 다운로드 <span id="dl-total-badge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600"></span></h3>
-            <div class="flex gap-1" id="dl-period-btns">
-              <button onclick="renderDownloadTable('daily')"   id="dl-btn-daily"   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">일일</button>
-              <button onclick="renderDownloadTable('weekly')"  id="dl-btn-weekly"  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">주간</button>
-              <button onclick="renderDownloadTable('monthly')" id="dl-btn-monthly" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">월간</button>
-              <button onclick="renderDownloadTable('all')"     id="dl-btn-all"     class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">전체</button>
+        <!-- ④ 콘텐츠 성과 ─────────────────────────────────── -->
+        <div id="stats-content" class="mb-8">
+          <div class="flex items-center gap-2 mb-3">
+            <span style="width:4px;height:20px;border-radius:2px;background:#F59E0B;display:inline-block;"></span>
+            <h2 class="font-bold text-slate-700 text-sm tracking-wide uppercase">콘텐츠 성과</h2>
+          </div>
+
+          <!-- 채용공고 자료실 다운로드 -->
+          <div class="bg-white rounded-xl shadow-sm p-5 mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <h3 class="font-semibold text-slate-600 text-sm">📥 채용공고 자료실 다운로드 <span id="dl-total-badge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600"></span></h3>
+              <div class="flex gap-1" id="dl-period-btns">
+                <button onclick="renderDownloadTable('daily')"   id="dl-btn-daily"   class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">일일</button>
+                <button onclick="renderDownloadTable('weekly')"  id="dl-btn-weekly"  class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">주간</button>
+                <button onclick="renderDownloadTable('monthly')" id="dl-btn-monthly" class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">월간</button>
+                <button onclick="renderDownloadTable('all')"     id="dl-btn-all"     class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">전체</button>
+              </div>
+            </div>
+            <p id="dl-period-label" class="text-xs text-slate-400 mb-3">전체 누적 기준</p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left text-xs text-slate-400 border-b">
+                    <th class="pb-2 font-semibold w-8">순위</th>
+                    <th class="pb-2 font-semibold">기관명</th>
+                    <th class="pb-2 font-semibold hidden md:table-cell">공고명</th>
+                    <th class="pb-2 font-semibold hidden md:table-cell">분류</th>
+                    <th class="pb-2 font-semibold text-right">다운로드</th>
+                    <th class="pb-2 font-semibold text-right">💬 댓글</th>
+                  </tr>
+                </thead>
+                <tbody id="download-stats-body">
+                  <tr><td colspan="6" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="text-xs text-slate-300 mt-3">* 다운로드 버튼 클릭 시 집계됩니다. 이전 다운로드는 집계에 포함되지 않습니다.</p>
+          </div>
+
+          <!-- 페이지별 접속 현황 -->
+          <div class="bg-white rounded-xl shadow-sm p-5">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold text-slate-600 text-sm">페이지별 접속 현황</h3>
+              <span class="text-xs text-slate-400">전체 누적 기준</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left text-xs text-slate-400 border-b">
+                    <th class="pb-2 font-semibold">페이지</th>
+                    <th class="pb-2 font-semibold text-right">전체</th>
+                    <th class="pb-2 font-semibold text-right">이번달</th>
+                    <th class="pb-2 font-semibold text-right">오늘</th>
+                    <th class="pb-2 font-semibold pl-4">비율</th>
+                  </tr>
+                </thead>
+                <tbody id="page-stats-body">
+                  <tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
-          <p id="dl-period-label" class="text-xs text-slate-400 mb-3">전체 누적 기준</p>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="text-left text-xs text-slate-400 border-b">
-                  <th class="pb-2 font-semibold w-8">순위</th>
-                  <th class="pb-2 font-semibold">기관명</th>
-                  <th class="pb-2 font-semibold hidden md:table-cell">공고명</th>
-                  <th class="pb-2 font-semibold hidden md:table-cell">분류</th>
-                  <th class="pb-2 font-semibold text-right">다운로드</th>
-                  <th class="pb-2 font-semibold text-right">💬 댓글</th>
-                </tr>
-              </thead>
-              <tbody id="download-stats-body">
-                <tr><td colspan="6" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p class="text-xs text-slate-300 mt-3">* 다운로드 버튼 클릭 시 집계됩니다. 이전 다운로드는 집계에 포함되지 않습니다.</p>
         </div>
 
         <!-- 댓글 모달 -->
@@ -1098,30 +1165,6 @@
               <button onclick="closeDlCommentModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
             </div>
             <div id="dl-comment-modal-body" style="overflow-y:auto;padding:16px 24px;flex:1;"></div>
-          </div>
-        </div>
-
-        <!-- 페이지별 상세 수치 테이블 -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-bold text-slate-700">페이지별 접속 현황</h3>
-            <span class="text-xs text-slate-400">전체 누적 기준</span>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="text-left text-xs text-slate-400 border-b">
-                  <th class="pb-2 font-semibold">페이지</th>
-                  <th class="pb-2 font-semibold text-right">전체</th>
-                  <th class="pb-2 font-semibold text-right">이번달</th>
-                  <th class="pb-2 font-semibold text-right">오늘</th>
-                  <th class="pb-2 font-semibold pl-4">비율</th>
-                </tr>
-              </thead>
-              <tbody id="page-stats-body">
-                <tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
-              </tbody>
-            </table>
           </div>
         </div>
 
@@ -3354,6 +3397,14 @@
             <p class="text-xs text-slate-600 leading-relaxed">${ins.body}</p>
           </div>
         </div>`).join('');
+    }
+
+    // ─── AI 인사이트 패널 토글 ───
+    function toggleInsightsPanel() {
+      const body = document.getElementById('insights-body');
+      const chevron = document.getElementById('insights-chevron');
+      const hidden = body.classList.toggle('hidden');
+      chevron.style.transform = hidden ? '' : 'rotate(180deg)';
     }
 
     // ─── 인사이트 탭 전환 ───
