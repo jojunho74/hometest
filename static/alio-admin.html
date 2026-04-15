@@ -287,25 +287,38 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
           </div>
           <!-- 파싱 결과 미리보기 -->
           <div id="parse-preview" class="hidden">
-            <div class="mb-3 p-3 rounded-lg" style="background:#F0FDF4;border:1px solid #BBF7D0;">
-              <label class="text-xs font-bold text-emerald-700 block mb-1">📁 데이터셋명 (공고명) — 저장 시 이 이름으로 등록됩니다</label>
+            <!-- 공공기관/기업명 입력 + 저장 -->
+            <div class="mb-3 p-3 rounded-lg" style="background:#EFF6FF;border:2px solid #BFDBFE;">
+              <label class="text-xs font-bold text-blue-700 block mb-2">🏢 공공기관 / 기업명 <span class="text-red-500">*</span> — 입력 후 저장하세요</label>
               <div class="flex gap-2">
-                <input type="text" id="parse-ds-input" class="form-input flex-1" placeholder="예: 2025년 한국수력원자력 채용" style="font-size:.85rem;"/>
-                <button onclick="applyDatasetName()" class="btn btn-success" style="font-size:.8rem;padding:6px 14px;white-space:nowrap;">✅ 이 이름으로 저장</button>
-                <button onclick="cancelParse()" class="btn btn-secondary" style="font-size:.8rem;padding:6px 10px;">✕</button>
+                <input type="text" id="parse-ds-input" class="form-input flex-1"
+                  placeholder="예: 한국수력원자력, 한국가스공사 …"
+                  style="font-size:.9rem;font-weight:600;"
+                  oninput="updatePreviewCompany(this.value)"
+                  onkeydown="if(event.key==='Enter')applyDatasetName()"/>
+                <button onclick="applyDatasetName()" id="parse-save-btn"
+                  class="btn btn-success" style="font-size:.85rem;padding:8px 18px;white-space:nowrap;font-weight:700;">
+                  입력 ✅ Supabase에 저장
+                </button>
+                <button onclick="cancelParse()" class="btn btn-secondary" style="font-size:.8rem;padding:8px 10px;">✕</button>
               </div>
-              <p class="text-xs text-emerald-600 mt-1.5">이후 추가하는 데이터도 같은 데이터셋명으로 계속 등록됩니다.</p>
+              <p class="text-xs text-blue-500 mt-1.5">
+                입력한 기업명이 <strong>경쟁률 페이지(competition.html)</strong> 공고명으로 등록되어 검색됩니다.
+              </p>
             </div>
+            <!-- 파싱 결과 헤더 -->
             <div class="flex items-center justify-between mb-2">
-              <div>
-                <span class="text-xs font-bold text-slate-700">파싱 결과: </span>
-                <span id="parse-ds-name" class="text-xs text-blue-600 font-semibold"></span>
-                <span id="parse-count" class="ml-2 text-xs text-slate-400"></span>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-700">파싱 결과:</span>
+                <span id="parse-ds-name" class="text-xs text-slate-400"></span>
+                <span id="parse-count" class="text-xs text-slate-400"></span>
               </div>
             </div>
-            <div class="overflow-x-auto rounded-lg" style="border:1px solid #E2E8F0;max-height:320px;overflow-y:auto;">
+            <!-- 파싱 결과 테이블 (공공기관 컬럼 포함) -->
+            <div class="overflow-x-auto rounded-lg" style="border:1px solid #E2E8F0;max-height:340px;overflow-y:auto;">
               <table class="data-tbl w-full" style="font-size:11px;">
                 <thead><tr style="position:sticky;top:0;background:#F8FAFF;z-index:1;">
+                  <th style="background:#EFF6FF;color:#1D4ED8;">공공기관/기업명</th>
                   <th>직급</th><th>직종</th><th>지역</th>
                   <th>1차합격/응시</th><th>2차합격/응시</th><th>최종합격/응시</th><th>경쟁률</th>
                 </tr></thead>
@@ -708,6 +721,15 @@ async function submitCsv(){
   switchTab('datasets');
 }
 
+// ── 공공기관명 실시간 업데이트 ──
+function updatePreviewCompany(val) {
+  document.querySelectorAll('#parse-tbody .company-cell').forEach(td => {
+    td.innerHTML = val.trim()
+      ? `<span style="color:#1D4ED8;font-weight:700;">${val.trim()}</span>`
+      : '<span style="color:#CBD5E1;">미입력</span>';
+  });
+}
+
 // ── ALIO 파싱 모드 전환 ──
 function setParseModeUrl() {
   document.getElementById('parse-section-url').classList.remove('hidden');
@@ -957,11 +979,13 @@ function showParsePreview(dsName, records, errors) {
   document.getElementById('parse-ds-name').textContent = dsName;
   document.getElementById('parse-count').textContent = `(${records.length}개 직종)`;
   const tbody = document.getElementById('parse-tbody');
+  const companyName = document.getElementById('parse-ds-input')?.value.trim() || '';
   tbody.innerHTML = records.map(r => {
     const chipCls = (r.ratio||0) >= 80 ? 'chip-hot' : (r.ratio||0) >= 30 ? 'chip-mid' : 'chip-low';
     const gCls = r.grade_key === '7' ? 'grade-7' : r.grade_key === 'b' ? 'grade-b' : 'grade-6';
     const s2 = r.s2_total ? `${r.s2_pass}/${r.s2_total}` : '—';
     return `<tr>
+      <td class="company-cell font-semibold" style="color:#1D4ED8;white-space:nowrap;">${companyName ? esc(companyName) : '<span style="color:#CBD5E1;">미입력</span>'}</td>
       <td><span class="${gCls}">${esc(r.grade)}</span></td>
       <td class="font-semibold text-slate-800">${esc(r.job)}</td>
       <td class="text-xs text-slate-500">${esc(r.region)}</td>
@@ -995,7 +1019,7 @@ async function applyDatasetName() {
   if (!_parsedRecords.length) return;
   const dsInput = document.getElementById('parse-ds-input');
   const dsName = dsInput ? dsInput.value.trim() : '';
-  if (!dsName) { toast('데이터셋명(공고명)을 입력하세요', false); dsInput && dsInput.focus(); return; }
+  if (!dsName) { toast('공공기관/기업명을 입력하세요', false); dsInput && dsInput.focus(); return; }
   // 모든 레코드에 데이터셋명 적용
   _parsedRecords = _parsedRecords.map(r => ({ ...r, dataset_name: dsName }));
   // localStorage에 저장 → 이후 단건 추가 폼에도 기본값으로 사용
