@@ -1127,6 +1127,17 @@
               </table>
             </div>
             <p class="text-xs text-slate-300 mt-3">* 다운로드 버튼 클릭 시 집계됩니다. 이전 다운로드는 집계에 포함되지 않습니다.</p>
+            <!-- 페이지네이션 -->
+            <div id="dl-pagination" class="hidden flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
+              <span id="dl-page-info" class="text-xs text-slate-400"></span>
+              <div class="flex gap-1">
+                <button id="dl-prev-btn" onclick="changeDlPage(-1)"
+                  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 bg-white hover:border-blue-400 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed">◀ 이전</button>
+                <div id="dl-page-btns" class="flex gap-1"></div>
+                <button id="dl-next-btn" onclick="changeDlPage(1)"
+                  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-500 bg-white hover:border-blue-400 hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed">다음 ▶</button>
+              </div>
+            </div>
           </div>
 
           <!-- 페이지별 접속 현황 -->
@@ -3611,15 +3622,42 @@ ${internalSummary}
       const totalDownloads = data.length;
       const badgeEl = document.getElementById('dl-total-badge');
       if (badgeEl) badgeEl.textContent = `총 ${totalDownloads.toLocaleString()}건`;
+
+      // 페이지네이션 전역 상태 저장
+      window._dlSorted = sorted;
+      window._dlCommentMap = commentMap;
+      window._dlPage = 1;
+      renderDlPage(1);
+    }
+
+    const DL_PER_PAGE = 10;
+    function renderDlPage(page) {
+      const sorted     = window._dlSorted || [];
+      const commentMap = window._dlCommentMap || {};
+      const totalPages = Math.ceil(sorted.length / DL_PER_PAGE);
+      page = Math.max(1, Math.min(page, totalPages));
+      window._dlPage = page;
+
+      const tbody    = document.getElementById('download-stats-body');
+      const pagWrap  = document.getElementById('dl-pagination');
+      const pageInfo = document.getElementById('dl-page-info');
+      const prevBtn  = document.getElementById('dl-prev-btn');
+      const nextBtn  = document.getElementById('dl-next-btn');
+      const pageBtns = document.getElementById('dl-page-btns');
+
       const rankColors = ['#F59E0B','#94A3B8','#B45309','#6366F1','#3B82F6','#10B981','#EF4444','#8B5CF6','#06B6D4','#F97316'];
       const rankEmojis = ['🥇','🥈','🥉'];
 
-      tbody.innerHTML = sorted.map(([key, cnt], i) => {
+      const start = (page - 1) * DL_PER_PAGE;
+      const slice = sorted.slice(start, start + DL_PER_PAGE);
+
+      tbody.innerHTML = slice.map(([key, cnt], j) => {
+        const i = start + j;
         const [institution, title, category] = key.split('||');
-        const commentKey = `${institution}|${title}`;
-        const commentCnt = commentMap[commentKey] || 0;
-        const rankLabel = i < 3 ? rankEmojis[i] : `${i+1}위`;
-        const color = rankColors[i] || '#94A3B8';
+        const commentKey  = `${institution}|${title}`;
+        const commentCnt  = commentMap[commentKey] || 0;
+        const rankLabel   = i < 3 ? rankEmojis[i] : `${i+1}위`;
+        const color       = rankColors[Math.min(i, rankColors.length - 1)];
         const commentBadge = commentCnt > 0
           ? `<button class="dl-comment-btn inline-flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full cursor-pointer transition hover:opacity-80" data-fkey="${commentKey.replace(/"/g,'&quot;')}" style="background:#EFF6FF;color:#1D4ED8;border:none;">💬 ${commentCnt}</button>`
           : `<span class="text-xs text-slate-300">-</span>`;
@@ -3634,6 +3672,29 @@ ${internalSummary}
           <td class="py-2.5 text-right">${commentBadge}</td>
         </tr>`;
       }).join('');
+
+      // 페이지네이션 컨트롤
+      if (totalPages <= 1) {
+        pagWrap.classList.add('hidden');
+        return;
+      }
+      pagWrap.classList.remove('hidden');
+      pageInfo.textContent = `${start + 1}–${Math.min(start + DL_PER_PAGE, sorted.length)} / 전체 ${sorted.length}개`;
+      prevBtn.disabled = page === 1;
+      nextBtn.disabled = page === totalPages;
+
+      // 번호 버튼 (최대 5개 표시)
+      const range = [];
+      let s = Math.max(1, page - 2), e = Math.min(totalPages, s + 4);
+      s = Math.max(1, e - 4);
+      for (let p = s; p <= e; p++) range.push(p);
+      pageBtns.innerHTML = range.map(p =>
+        `<button onclick="renderDlPage(${p})" class="px-3 py-1.5 text-xs font-semibold rounded-lg border ${p === page ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-500 bg-white hover:border-blue-400 hover:text-blue-600'}">${p}</button>`
+      ).join('');
+    }
+
+    function changeDlPage(dir) {
+      renderDlPage((window._dlPage || 1) + dir);
     }
 
     // 댓글 뱃지 클릭 — 이벤트 위임
