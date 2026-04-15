@@ -671,6 +671,9 @@ let _parsedRecords = [];
 
 // CORS 프록시 목록 (순서대로 시도)
 const PROXY_LIST = [
+  { name: 'ibtcc.kr 서버',
+    fetch: u => fetch('/api/proxy?url=' + encodeURIComponent(u), {signal: AbortSignal.timeout(15000)})
+                  .then(r => r.ok ? r.text() : null).catch(()=>null) },
   { name: 'server.py (로컬)',
     fetch: u => fetch('http://127.0.0.1:8765/proxy?url=' + encodeURIComponent(u), {signal: AbortSignal.timeout(8000)})
                   .then(r => r.ok ? r.text() : null).catch(()=>null) },
@@ -682,9 +685,6 @@ const PROXY_LIST = [
                   .then(r => r.ok ? r.text() : null).catch(()=>null) },
   { name: 'codetabs',
     fetch: u => fetch('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u), {signal: AbortSignal.timeout(12000)})
-                  .then(r => r.ok ? r.text() : null).catch(()=>null) },
-  { name: 'htmldriven',
-    fetch: u => fetch('https://cors.eu.org/' + u, {signal: AbortSignal.timeout(12000)})
                   .then(r => r.ok ? r.text() : null).catch(()=>null) },
 ];
 
