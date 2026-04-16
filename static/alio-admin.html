@@ -594,7 +594,8 @@ async function loadDatasets(){
       <td class="text-emerald-600 font-bold">${hired}명</td>
       <td><span class="chip ${chipCls}">${avg}:1</span></td>
       <td class="text-xs text-slate-400">${dt}</td>
-      <td>
+      <td style="display:flex;gap:6px;align-items:center;">
+        <button onclick="renameDataset('${esc(name)}')" class="btn" style="background:#3B82F6;color:#fff;padding:4px 10px;font-size:12px;">수정</button>
         <button onclick="deleteDataset('${esc(name)}')" class="btn btn-danger">삭제</button>
       </td>
     </tr>`;
@@ -616,6 +617,19 @@ async function deleteDataset(name){
   const {error}=await db.from('alio_jobs').delete().eq('dataset_name',name);
   if(error){toast('삭제 실패: '+error.message,false);return;}
   toast('삭제되었습니다.');
+  loadDatasets();
+}
+
+async function renameDataset(oldName){
+  const newName=prompt('새 공고명을 입력하세요:', oldName);
+  if(!newName||newName.trim()===''||newName.trim()===oldName)return;
+  const trimmed=newName.trim();
+  const {error}=await db.from('alio_jobs').update({dataset_name:trimmed}).eq('dataset_name',oldName);
+  if(error){toast('수정 실패: '+error.message,false);return;}
+  // localStorage도 업데이트
+  if(localStorage.getItem('alioCurrentDataset')===oldName)
+    localStorage.setItem('alioCurrentDataset',trimmed);
+  toast(`"${trimmed}"으로 수정되었습니다.`);
   loadDatasets();
 }
 
