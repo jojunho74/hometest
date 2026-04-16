@@ -366,9 +366,6 @@ function renderVisualization(dsName, rows) {
   const grid = document.getElementById('funnelGrid');
   const pct = (p,t) => t ? Math.round(p/t*100) : 0;
   rows.forEach(d => {
-    const gk = d.grade_key||'6';
-    const gCls = gk==='7'?'grade-7':gk==='b'?'grade-b':'grade-6';
-    const gLbl = gk==='7'?'7급':gk==='b'?'별정':'6급2';
     const rv = parseFloat(d.ratio)||0;
     const ratioClr = rv>=80?'#FB7185':rv>=30?'#FBBF24':'#34D399';
     const maxT = d.s1_total||1;
@@ -379,7 +376,7 @@ function renderVisualization(dsName, rows) {
       : `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">2차 전형</span><span class="stage-nums" style="opacity:.3;">해당없음</span></div></div>`;
     grid.insertAdjacentHTML('beforeend', `
       <div class="funnel-card">
-        <div class="fc-head"><span class="grade-badge ${gCls}">${gLbl}</span><span class="fc-title">${d.job}</span></div>
+        <div class="fc-head"><span class="fc-title">${d.job}</span></div>
         <div class="fc-region">${d.region||''} &middot; 최종채용 ${d.s3_pass||0}명</div>
         <div class="fc-ratio" style="color:${ratioClr};">${d.ratio}<span style="font-size:.9rem;font-weight:600;">:1</span></div>
         <div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">1차 전형</span><span class="stage-nums"><strong>${d.s1_pass||0}명</strong> / ${d.s1_total||0}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-1" style="width:100%"></div></div></div>
@@ -398,14 +395,11 @@ function renderVisualization(dsName, rows) {
   rows.forEach(d => {
     const rv = parseFloat(d.ratio)||0;
     const chipCls = rv>=80?'chip-hot':rv>=20?'chip-mid':'chip-low';
-    const gk = d.grade_key||'6';
-    const gCls = gk==='7'?'grade-7':gk==='b'?'grade-b':'grade-6';
     const s2 = d.s2_total
       ? `<span style="color:#93C5FD;font-weight:700;">${d.s2_pass}</span><span style="color:rgba(255,255,255,.3);">/${d.s2_total}</span>`
       : '<span style="color:rgba(255,255,255,.2);">—</span>';
     tbody.insertAdjacentHTML('beforeend', `<tr>
       <td>
-        <span class="grade-badge ${gCls}" style="margin-right:6px;">${d.grade||''}</span>
         <strong style="color:#E2E8F0;">${d.job}</strong>
         <span style="font-size:11px;color:rgba(255,255,255,.3);margin-left:4px;">(${d.region||''})</span>
       </td>

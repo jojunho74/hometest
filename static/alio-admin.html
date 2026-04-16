@@ -225,8 +225,6 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
             <table class="data-tbl">
               <thead><tr>
                 <th>데이터셋</th>
-                <th>직급</th>
-                <th>직종</th>
                 <th>지역</th>
                 <th>1차 (합격/응시)</th>
                 <th>2차 (합격/응시)</th>
@@ -234,7 +232,7 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
                 <th>경쟁률</th>
                 <th>관리</th>
               </tr></thead>
-              <tbody id="rec-tbody"><tr><td colspan="9" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr></tbody>
+              <tbody id="rec-tbody"><tr><td colspan="7" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -319,7 +317,7 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
               <table class="data-tbl w-full" style="font-size:11px;">
                 <thead><tr style="position:sticky;top:0;background:#F8FAFF;z-index:1;">
                   <th style="background:#EFF6FF;color:#1D4ED8;">공공기관/기업명</th>
-                  <th>직급</th><th>직종</th><th>지역</th>
+                  <th>지역</th>
                   <th>1차합격/응시</th><th>2차합격/응시</th><th>최종합격/응시</th><th>경쟁률</th>
                 </tr></thead>
                 <tbody id="parse-tbody"></tbody>
@@ -338,21 +336,6 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
           <div class="form-group">
             <label class="form-label">공고명 (데이터셋명) <span class="text-red-500">*</span></label>
             <input type="text" id="f-dataset" class="form-input" placeholder="예: 2025년 한국수력원자력 채용" oninput="localStorage.setItem('alioCurrentDataset',this.value)"/>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">직급 <span class="text-red-500">*</span></label>
-              <select id="f-grade" class="form-input">
-                <option value="일반직 6급2">일반직 6급2</option>
-                <option value="일반직 7급">일반직 7급</option>
-                <option value="별정직">별정직</option>
-                <option value="기타">기타</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">직종 <span class="text-red-500">*</span></label>
-              <input type="text" id="f-job" class="form-input" placeholder="예: 기계, 전기, 전산"/>
-            </div>
           </div>
           <div class="form-group">
             <label class="form-label">지역</label>
@@ -646,13 +629,9 @@ async function loadRecords(){
   if(!rows.length){tbody.innerHTML='<tr><td colspan="9" class="py-6 text-center text-sm text-slate-400">데이터가 없습니다.</td></tr>';return;}
   tbody.innerHTML=rows.map(r=>{
     const chipCls=r.ratio>=80?'chip-hot':r.ratio>=30?'chip-mid':'chip-low';
-    const gk=r.grade_key||'6';
-    const gradeCls=gk==='7'?'grade-7':gk==='b'?'grade-b':'grade-6';
     const s2=r.s2_total?`<span class="text-blue-500 font-bold">${r.s2_pass}</span><span class="text-slate-400">/${r.s2_total}</span>`:'<span class="text-slate-300">—</span>';
     return `<tr>
       <td class="text-xs text-slate-500 max-w-[160px] truncate" title="${esc(r.dataset_name)}">${esc((r.dataset_name||'').slice(0,20))}${(r.dataset_name||'').length>20?'…':''}</td>
-      <td><span class="${gradeCls}">${esc(r.grade||'-')}</span></td>
-      <td class="font-semibold text-slate-800">${esc(r.job||'-')}</td>
       <td class="text-xs text-slate-500">${esc(r.region||'-')}</td>
       <td><span class="text-blue-500 font-bold">${r.s1_pass||0}</span><span class="text-slate-400">/${r.s1_total||0}</span></td>
       <td>${s2}</td>
@@ -674,8 +653,6 @@ async function deleteRecord(id){
 // ── 단건 입력 ──
 async function submitRecord(){
   const dataset=document.getElementById('f-dataset').value.trim();
-  const grade=document.getElementById('f-grade').value;
-  const job=document.getElementById('f-job').value.trim();
   const region=document.getElementById('f-region').value.trim();
   const s1p=parseInt(document.getElementById('f-s1p').value)||null;
   const s1t=parseInt(document.getElementById('f-s1t').value)||null;
@@ -684,9 +661,8 @@ async function submitRecord(){
   const s3p=parseInt(document.getElementById('f-s3p').value)||null;
   const s3t=parseInt(document.getElementById('f-s3t').value)||null;
   const ratio=parseFloat(document.getElementById('f-ratio').value)||null;
-  if(!dataset||!job||!s3p||!ratio){toast('필수 항목을 입력하세요 (공고명, 직종, 최종합격, 경쟁률)',false);return;}
-  const gradeKey=grade.includes('7급')?'7':grade.includes('별정')?'b':'6';
-  const {error}=await db.from('alio_jobs').insert({dataset_name:dataset,grade,grade_key:gradeKey,job,region,s1_pass:s1p,s1_total:s1t,s2_pass:s2p,s2_total:s2t,s3_pass:s3p,s3_total:s3t,ratio});
+  if(!dataset||!s3p||!ratio){toast('필수 항목을 입력하세요 (공고명, 최종합격, 경쟁률)',false);return;}
+  const {error}=await db.from('alio_jobs').insert({dataset_name:dataset,region,s1_pass:s1p,s1_total:s1t,s2_pass:s2p,s2_total:s2t,s3_pass:s3p,s3_total:s3t,ratio});
   if(error){toast('저장 실패: '+error.message,false);return;}
   toast('저장되었습니다!');
   clearForm();
@@ -694,9 +670,9 @@ async function submitRecord(){
 }
 
 function clearForm(){
-  ['f-dataset','f-grade','f-job','f-region','f-s1p','f-s1t','f-s2p','f-s2t','f-s3p','f-s3t','f-ratio'].forEach(id=>{
+  ['f-dataset','f-region','f-s1p','f-s1t','f-s2p','f-s2t','f-s3p','f-s3t','f-ratio'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el){if(el.tagName==='SELECT')el.selectedIndex=0;else el.value='';}
+    if(el)el.value='';
   });
 }
 
@@ -1032,12 +1008,9 @@ function showParsePreview(dsName, records, errors) {
   const companyName = document.getElementById('parse-ds-input')?.value.trim() || '';
   tbody.innerHTML = records.map(r => {
     const chipCls = (r.ratio||0) >= 80 ? 'chip-hot' : (r.ratio||0) >= 30 ? 'chip-mid' : 'chip-low';
-    const gCls = r.grade_key === '7' ? 'grade-7' : r.grade_key === 'b' ? 'grade-b' : 'grade-6';
     const s2 = r.s2_total ? `${r.s2_pass}/${r.s2_total}` : '—';
     return `<tr>
       <td class="company-cell font-semibold" style="color:#1D4ED8;white-space:nowrap;">${companyName ? esc(companyName) : '<span style="color:#CBD5E1;">미입력</span>'}</td>
-      <td><span class="${gCls}">${esc(r.grade)}</span></td>
-      <td class="font-semibold text-slate-800">${esc(r.job)}</td>
       <td class="text-xs text-slate-500">${esc(r.region)}</td>
       <td>${r.s1_pass||0}/${r.s1_total||0}</td>
       <td>${s2}</td>
