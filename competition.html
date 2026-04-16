@@ -56,6 +56,19 @@
     .ds-cnt{font-size:.62rem;font-weight:700;padding:1px 6px;border-radius:999px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.35);flex-shrink:0;}
     .ds-item.active .ds-cnt{background:rgba(96,165,250,.2);color:#93C5FD;}
     .empty-list{padding:28px 14px;font-size:.78rem;color:rgba(255,255,255,.25);text-align:center;line-height:1.8;}
+    /* 순위 배지 */
+    .rank-badge{font-size:10px;font-weight:800;min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border-radius:5px;flex-shrink:0;}
+    .rank-1{background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;}
+    .rank-2{background:linear-gradient(135deg,#94A3B8,#64748B);color:#fff;}
+    .rank-3{background:linear-gradient(135deg,#CD7C3A,#92400E);color:#fff;}
+    .rank-num{font-size:10px;color:rgba(255,255,255,.2);font-weight:700;min-width:20px;text-align:center;flex-shrink:0;}
+    /* 1~3위 아이템 배경 */
+    .ds-top1{background:rgba(245,158,11,.1);border-left:2px solid #F59E0B!important;}
+    .ds-top1 .ds-name{color:#FCD34D!important;font-weight:700;}
+    .ds-top2{background:rgba(148,163,184,.07);border-left:2px solid #94A3B8!important;}
+    .ds-top2 .ds-name{color:#CBD5E1!important;font-weight:700;}
+    .ds-top3{background:rgba(180,83,9,.09);border-left:2px solid #B45309!important;}
+    .ds-top3 .ds-name{color:#FDBA74!important;font-weight:700;}
 
     /* ── 본문 ── */
     main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
@@ -231,20 +244,37 @@ function toggleMenu() {
 }
 
 async function init() {
-  const { data, error } = await db.from('alio_jobs')
-    .select('dataset_name,grade,grade_key,job,region,s1_pass,s1_total,s2_pass,s2_total,s3_pass,s3_total,ratio')
-    .order('dataset_name');
-  if (error || !data) {
+  const [jobsRes, viewsRes] = await Promise.all([
+    db.from('alio_jobs')
+      .select('dataset_name,grade,grade_key,job,region,s1_pass,s1_total,s2_pass,s2_total,s3_pass,s3_total,ratio')
+      .order('dataset_name'),
+    db.from('page_views')
+      .select('page')
+      .like('page', 'competition-click:%')
+  ]);
+  if (jobsRes.error || !jobsRes.data) {
     document.getElementById('ds-list').innerHTML = '<div class="empty-list">데이터를 불러올 수 없습니다</div>';
     return;
   }
+  // 클릭 수 집계
+  const viewCounts = {};
+  (viewsRes.data || []).forEach(r => {
+    const name = r.page.slice('competition-click:'.length);
+    viewCounts[name] = (viewCounts[name] || 0) + 1;
+  });
   const dsMap = {};
-  data.forEach(r => {
+  jobsRes.data.forEach(r => {
     const k = r.dataset_name || '미분류';
     if (!dsMap[k]) dsMap[k] = [];
     dsMap[k].push(r);
   });
-  _allDatasets = Object.entries(dsMap).map(([name, rows]) => ({ name, rows, count: rows.length }));
+  _allDatasets = Object.entries(dsMap).map(([name, rows]) => ({
+    name, rows, count: rows.length, views: viewCounts[name] || 0
+  }));
+  // 조회수 많은 순 정렬
+  _allDatasets.sort((a, b) => b.views - a.views);
+  // 전체 순위 부여
+  _allDatasets.forEach((ds, i) => { ds.rank = i + 1; });
   renderDatasetList(_allDatasets);
 }
 
@@ -254,11 +284,19 @@ function renderDatasetList(list) {
     el.innerHTML = '<div class="empty-list">등록된 채용공고가 없습니다<br><small style="opacity:.6;">관리자 페이지에서<br>데이터를 추가하세요</small></div>';
     return;
   }
-  el.innerHTML = list.map(ds => `
-    <div class="ds-item" onclick="selectDataset('${ds.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
+  el.innerHTML = list.map(ds => {
+    const r = ds.rank;
+    const topCls = r === 1 ? ' ds-top1' : r === 2 ? ' ds-top2' : r === 3 ? ' ds-top3' : '';
+    const rankHtml = r <= 3
+      ? `<span class="rank-badge rank-${r}">${r}</span>`
+      : `<span class="rank-num">${r}</span>`;
+    return `
+    <div class="ds-item${topCls}" onclick="selectDataset('${ds.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
+      ${rankHtml}
       <span class="ds-name" title="${ds.name}">${ds.name}</span>
       <span class="ds-cnt">${ds.count}</span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function filterDatasets(q) {
