@@ -923,12 +923,12 @@ function parseAlioHtml(html) {
 
     // 인원 수 추출: "N명" 우선, 없으면 순수 숫자 셀
     let pass = null, total = null;
-    const명Nums = rowText.match(/(\d+)명/g);
-    if (명Nums && 명Nums.length >= 2) {
-      pass  = parseInt(명Nums[0]);
-      total = parseInt(명Nums[1]);
-    } else if (명Nums && 명Nums.length === 1) {
-      pass = parseInt(명Nums[0]);
+    const myeongnums = rowText.match(/(\d+)명/g);
+    if (myeongnums && myeongnums.length >= 2) {
+      pass  = parseInt(myeongnums[0]);
+      total = parseInt(myeongnums[1]);
+    } else if (myeongnums && myeongnums.length === 1) {
+      pass = parseInt(myeongnums[0]);
     } else {
       // 순수 숫자 td 탐색 (콤마 포함 숫자)
       const numTds = tds.filter(td => /^\s*[\d,]+\s*$/.test(td.textContent.trim()));
