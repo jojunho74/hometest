@@ -424,8 +424,6 @@ async function init() {
   // 전체 순위 부여
   _allDatasets.forEach((ds, i) => { ds.rank = i + 1; });
   renderDatasetList(_allDatasets);
-  // 1위 항목 자동 선택
-  if (_allDatasets.length) selectDataset(_allDatasets[0].name);
 }
 
 function renderDatasetList(list) {
