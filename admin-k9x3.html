@@ -3405,7 +3405,7 @@
         const [topPage, topCnt] = topPages[0];
         const totalAll = Object.values(pageMap).reduce((a,b)=>a+b,0) || 1;
         const topPct = Math.round((topCnt / totalAll) * 100);
-        const pageLabels = { 'index.html':'메인', 'student.html':'학생신청', 'schedule.html':'시험일정', 'library.html':'홍보자료', 'library-pdf.html':'채용공고', 'package.html':'패키지' };
+        const pageLabels = { 'index.html':'메인', 'student.html':'학생신청', 'schedule.html':'시험일정', 'library.html':'홍보자료', 'library-pdf.html':'채용공고', 'package.html':'패키지', 'competition.html':'경쟁률', 'university-board.html':'대학활동', 'job-board.html':'게시판', 'gtelp-score.html':'점수대비표' };
         const label = pageLabels[topPage] || topPage;
         const second = topPages[1] ? `다음으로 ${pageLabels[topPages[1][0]] || topPages[1][0]} (${topPages[1][1]}건)이 많아요.` : '';
         insights.push({
@@ -3515,7 +3515,8 @@
       const pageLabels = {
         'index.html':'메인페이지', 'student.html':'IBT 학생신청', 'schedule.html':'정기시험 일정',
         'library.html':'홍보자료', 'library-pdf.html':'채용공고 자료실',
-        'package.html':'패키지', 'gtelp-score.html':'점수대비표'
+        'package.html':'패키지', 'gtelp-score.html':'점수대비표',
+        'competition.html':'경쟁률', 'university-board.html':'대학활동', 'job-board.html':'게시판'
       };
 
       // ── 데이터 집계 ──
