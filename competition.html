@@ -569,7 +569,6 @@ function renderCommentItems(data, listEl, itemCls, textCls, footerCls, timeCls, 
       <div class="${textCls}">${text}</div>
       <div class="${footerCls}">
         <span class="${timeCls}">${time}</span>
-        <button class="${delCls}" onclick="deleteComment(${c.id})">삭제</button>
       </div>
     </div>`;
   }).join('');
