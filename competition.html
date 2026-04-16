@@ -162,7 +162,10 @@
     .cp-item{background:rgba(255,255,255,.05);border-radius:10px;padding:10px 12px;}
     .cp-nick{font-size:.7rem;font-weight:700;color:#60A5FA;margin-bottom:4px;}
     .cp-text{font-size:.8rem;color:#CBD5E1;line-height:1.55;word-break:break-word;}
-    .cp-time{font-size:.62rem;color:rgba(255,255,255,.2);margin-top:5px;}
+    .cp-footer{display:flex;align-items:center;justify-content:space-between;margin-top:5px;}
+    .cp-time{font-size:.62rem;color:rgba(255,255,255,.2);}
+    .cp-del{background:none;border:none;color:rgba(255,100,100,.35);font-size:.62rem;cursor:pointer;padding:0;line-height:1;}
+    .cp-del:hover{color:#FB7185;}
     .cp-form{padding:10px 14px 14px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0;}
     .cp-no-ds{font-size:.75rem;color:rgba(255,255,255,.25);text-align:center;padding:20px 0;}
     .cp-nick-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:7px 10px;font-size:.78rem;color:#E2E8F0;outline:none;margin-bottom:6px;}
@@ -517,7 +520,7 @@ async function loadComments(dsName) {
   const listEl = document.getElementById('cpList');
   listEl.innerHTML = '<div class="cp-empty" style="opacity:.5;">불러오는 중...</div>';
   const { data, error } = await db.from('cheer_comments')
-    .select('comment,created_at')
+    .select('id,comment,created_at')
     .eq('file_name', 'competition:' + dsName)
     .order('created_at', { ascending: false })
     .limit(50);
@@ -534,7 +537,13 @@ async function loadComments(dsName) {
     const dt = new Date(c.created_at);
     const time = `${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
     const text = (c.comment||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-    return `<div class="cp-item"><div class="cp-text">${text}</div><div class="cp-time">${time}</div></div>`;
+    return `<div class="cp-item" id="cmt-${c.id}">
+      <div class="cp-text">${text}</div>
+      <div class="cp-footer">
+        <span class="cp-time">${time}</span>
+        <button class="cp-del" onclick="deleteComment(${c.id})">삭제</button>
+      </div>
+    </div>`;
   }).join('');
 }
 
@@ -554,6 +563,20 @@ function onDatasetSelected(name) {
         else { fabCnt.classList.add('hidden'); }
       });
   }
+}
+
+async function deleteComment(id) {
+  if (!confirm('이 댓글을 삭제하시겠습니까?')) return;
+  const { error } = await db.from('cheer_comments').delete().eq('id', id);
+  if (error) { alert('삭제 실패: ' + error.message); return; }
+  const el = document.getElementById('cmt-' + id);
+  if (el) el.remove();
+  // 남은 댓글 수 업데이트
+  const remaining = document.querySelectorAll('#cpList .cp-item').length;
+  document.getElementById('cpTitle').textContent = `💬 댓글 ${remaining > 0 ? remaining + '개' : ''}`;
+  const fabCnt = document.getElementById('fabCnt');
+  if (remaining > 0) { fabCnt.textContent = remaining > 99 ? '99+' : remaining; }
+  else { fabCnt.classList.add('hidden'); document.getElementById('cpList').innerHTML = '<div class="cp-empty">아직 댓글이 없어요.<br>첫 번째 댓글을 남겨보세요!</div>'; }
 }
 
 async function submitComment() {
