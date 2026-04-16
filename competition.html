@@ -276,7 +276,6 @@
   <div class="cp-form" id="cpForm">
     <div class="cp-no-ds" id="cpNoDsMsg">기관을 먼저 선택하세요</div>
     <div id="cpInputArea" style="display:none;">
-      <input type="text" class="cp-nick-input" id="cpNick" placeholder="닉네임 (선택)" maxlength="20"/>
       <textarea class="cp-text-input" id="cpText" rows="3" placeholder="이 공고에 대한 의견을 남겨주세요..."></textarea>
       <button class="cp-submit" id="cpSubmit" onclick="submitComment()">댓글 남기기</button>
     </div>
@@ -518,8 +517,8 @@ async function loadComments(dsName) {
   const listEl = document.getElementById('cpList');
   listEl.innerHTML = '<div class="cp-empty" style="opacity:.5;">불러오는 중...</div>';
   const { data, error } = await db.from('cheer_comments')
-    .select('nickname,content,created_at')
-    .eq('page', 'competition:' + dsName)
+    .select('comment,created_at')
+    .eq('file_name', 'competition:' + dsName)
     .order('created_at', { ascending: false })
     .limit(50);
   if (error || !data) { listEl.innerHTML = '<div class="cp-empty">불러오기 실패</div>'; return; }
@@ -532,11 +531,10 @@ async function loadComments(dsName) {
   document.getElementById('cpTitle').textContent = `💬 댓글 ${cnt > 0 ? cnt + '개' : ''}`;
   if (!cnt) { listEl.innerHTML = '<div class="cp-empty">아직 댓글이 없어요.<br>첫 번째 댓글을 남겨보세요!</div>'; return; }
   listEl.innerHTML = data.map(c => {
-    const nick = c.nickname || '익명';
     const dt = new Date(c.created_at);
     const time = `${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
-    const text = c.content.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-    return `<div class="cp-item"><div class="cp-nick">${nick.replace(/</g,'&lt;')}</div><div class="cp-text">${text}</div><div class="cp-time">${time}</div></div>`;
+    const text = (c.comment||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    return `<div class="cp-item"><div class="cp-text">${text}</div><div class="cp-time">${time}</div></div>`;
   }).join('');
 }
 
@@ -549,7 +547,7 @@ function onDatasetSelected(name) {
   else {
     // 배지만 업데이트
     db.from('cheer_comments').select('id', { count: 'exact', head: true })
-      .eq('page', 'competition:' + name)
+      .eq('file_name', 'competition:' + name)
       .then(({ count }) => {
         const fabCnt = document.getElementById('fabCnt');
         if (count > 0) { fabCnt.textContent = count > 99 ? '99+' : count; fabCnt.classList.remove('hidden'); }
@@ -560,15 +558,13 @@ function onDatasetSelected(name) {
 
 async function submitComment() {
   if (!_currentDs) return;
-  const nick = document.getElementById('cpNick').value.trim();
   const text = document.getElementById('cpText').value.trim();
   if (!text) { alert('댓글 내용을 입력하세요'); return; }
   const btn = document.getElementById('cpSubmit');
   btn.disabled = true; btn.textContent = '저장 중...';
   const { error } = await db.from('cheer_comments').insert({
-    page: 'competition:' + _currentDs,
-    nickname: nick || null,
-    content: text
+    file_name: 'competition:' + _currentDs,
+    comment: text
   });
   btn.disabled = false; btn.textContent = '댓글 남기기';
   if (error) { alert('저장 실패: ' + error.message); return; }
