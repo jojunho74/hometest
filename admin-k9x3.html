@@ -1141,6 +1141,29 @@
             </div>
           </div>
 
+          <!-- 경쟁률 페이지 공공기관 클릭 통계 -->
+          <div class="bg-white rounded-xl shadow-sm p-5 mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <h3 class="font-semibold text-slate-600 text-sm">📊 경쟁률 페이지 — 공공기관 클릭 순위 <span id="cc-total-badge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600"></span></h3>
+              <span class="text-xs text-slate-400">전체 누적 기준</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left text-xs text-slate-400 border-b">
+                    <th class="pb-2 font-semibold w-8">순위</th>
+                    <th class="pb-2 font-semibold">공공기관 / 기업명</th>
+                    <th class="pb-2 font-semibold text-right">클릭수</th>
+                    <th class="pb-2 font-semibold pl-4">비율</th>
+                  </tr>
+                </thead>
+                <tbody id="competition-click-body">
+                  <tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           <!-- 페이지별 접속 현황 -->
           <div class="bg-white rounded-xl shadow-sm p-5">
             <div class="flex items-center justify-between mb-3">
@@ -3303,6 +3326,9 @@
       // ── 다운로드 TOP 10 (기본: 전체) ──
       renderDownloadTable('all');
 
+      // ── 경쟁률 클릭 통계 ──
+      loadCompetitionClicks();
+
       // ── 인사이트 분석 ──
       generateInsights({ rows, dailyCounts, dailyLabels, pageMap, totalCount, todayCount, yesterdayCount, monthCount, kstNow });
 
@@ -3632,6 +3658,55 @@ ${internalSummary}
       } catch(e) {
         container.innerHTML = `<div class="rounded-xl p-4 bg-red-50 border border-red-200 text-xs text-red-600">AI 분석 오류: ${e.message}</div>`;
       }
+    }
+
+    // ─── 경쟁률 페이지 클릭 통계 ───
+    async function loadCompetitionClicks() {
+      const tbody = document.getElementById('competition-click-body');
+      if (!tbody) return;
+      // page_views에서 competition-click: 접두사 행만 가져오기
+      let allRows = [], offset = 0;
+      while (true) {
+        const { data, error } = await db.from('page_views')
+          .select('page')
+          .like('page', 'competition-click:%')
+          .range(offset, offset + 999);
+        if (error || !data || data.length === 0) break;
+        allRows = allRows.concat(data);
+        if (data.length < 1000) break;
+        offset += 1000;
+      }
+      if (!allRows.length) {
+        tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">아직 클릭 데이터가 없습니다.</td></tr>';
+        document.getElementById('cc-total-badge').textContent = '총 0건';
+        return;
+      }
+      const map = {};
+      allRows.forEach(r => {
+        const name = r.page.replace('competition-click:', '');
+        map[name] = (map[name] || 0) + 1;
+      });
+      const total = allRows.length;
+      document.getElementById('cc-total-badge').textContent = `총 ${total.toLocaleString()}건`;
+      const sorted = Object.entries(map).sort((a,b) => b[1]-a[1]);
+      const MEDAL = ['🥇','🥈','🥉'];
+      tbody.innerHTML = sorted.map(([name, cnt], i) => {
+        const pct = Math.round(cnt / total * 100);
+        const rank = i < 3 ? `<span style="font-size:1.1em;">${MEDAL[i]}</span>` : `<span class="text-slate-400 text-xs font-semibold">${i+1}위</span>`;
+        return `<tr class="border-b border-slate-50 hover:bg-slate-50">
+          <td class="py-2 pr-3">${rank}</td>
+          <td class="py-2 font-semibold text-slate-700">${esc(name)}</td>
+          <td class="py-2 text-right font-bold text-indigo-600">${cnt.toLocaleString()}</td>
+          <td class="py-2 pl-4">
+            <div class="flex items-center gap-2">
+              <div style="flex:1;height:6px;background:#EEF2FF;border-radius:3px;">
+                <div style="width:${pct}%;height:100%;background:#6366F1;border-radius:3px;"></div>
+              </div>
+              <span class="text-xs text-slate-400 w-8 text-right">${pct}%</span>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
     }
 
     // ─── 다운로드 TOP 10 테이블 ───

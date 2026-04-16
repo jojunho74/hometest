@@ -275,6 +275,19 @@ function selectDataset(name) {
   c.textContent = `직종 ${ds.count}개`; c.classList.remove('hidden');
   document.getElementById('sidebar').classList.remove('open');
   renderVisualization(ds.name, ds.rows);
+  // 클릭 트래킹
+  if (localStorage.getItem('gtelp_notrack') !== '1') {
+    fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/page_views', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs',
+        'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ page: 'competition-click:' + name, referrer: document.referrer || null })
+    }).catch(function(){});
+  }
 }
 
 function renderVisualization(dsName, rows) {
