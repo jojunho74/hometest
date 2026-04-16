@@ -145,6 +145,36 @@
     .chip-mid{background:rgba(202,138,4,.2);color:#FDE68A;border:1px solid rgba(253,230,138,.2);}
     .chip-low{background:rgba(22,163,74,.2);color:#86EFAC;border:1px solid rgba(134,239,172,.2);}
 
+    /* ── 댓글 패널 ── */
+    .comment-fab{position:fixed;bottom:24px;right:24px;z-index:200;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff;font-size:1.3rem;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(37,99,235,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;}
+    .comment-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(37,99,235,.65);}
+    .comment-fab .fab-cnt{position:absolute;top:-4px;right:-4px;background:#EF4444;color:#fff;font-size:9px;font-weight:800;min-width:18px;height:18px;border-radius:999px;display:flex;align-items:center;justify-content:center;border:2px solid #0A1628;padding:0 3px;line-height:1;}
+    .comment-panel{position:fixed;bottom:86px;right:24px;z-index:199;width:340px;max-width:calc(100vw - 48px);background:#0D1F3C;border:1px solid rgba(96,165,250,.2);border-radius:16px;box-shadow:0 12px 48px rgba(0,0,0,.6);display:flex;flex-direction:column;transition:opacity .2s,transform .2s;transform-origin:bottom right;}
+    .comment-panel.hidden{opacity:0;pointer-events:none;transform:scale(.92) translateY(8px);}
+    .cp-head{padding:14px 16px 10px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+    .cp-title{font-size:.82rem;font-weight:800;color:#93C5FD;}
+    .cp-close{background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:1rem;line-height:1;padding:2px 4px;}
+    .cp-close:hover{color:#fff;}
+    .cp-list{flex:1;overflow-y:auto;max-height:320px;padding:10px 14px;display:flex;flex-direction:column;gap:8px;}
+    .cp-list::-webkit-scrollbar{width:3px;}
+    .cp-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
+    .cp-empty{font-size:.78rem;color:rgba(255,255,255,.25);text-align:center;padding:24px 0;}
+    .cp-item{background:rgba(255,255,255,.05);border-radius:10px;padding:10px 12px;}
+    .cp-nick{font-size:.7rem;font-weight:700;color:#60A5FA;margin-bottom:4px;}
+    .cp-text{font-size:.8rem;color:#CBD5E1;line-height:1.55;word-break:break-word;}
+    .cp-time{font-size:.62rem;color:rgba(255,255,255,.2);margin-top:5px;}
+    .cp-form{padding:10px 14px 14px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0;}
+    .cp-no-ds{font-size:.75rem;color:rgba(255,255,255,.25);text-align:center;padding:20px 0;}
+    .cp-nick-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:7px 10px;font-size:.78rem;color:#E2E8F0;outline:none;margin-bottom:6px;}
+    .cp-nick-input:focus{border-color:rgba(96,165,250,.5);}
+    .cp-nick-input::placeholder{color:rgba(255,255,255,.25);}
+    .cp-text-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px;font-size:.8rem;color:#E2E8F0;outline:none;resize:none;line-height:1.5;}
+    .cp-text-input:focus{border-color:rgba(96,165,250,.5);}
+    .cp-text-input::placeholder{color:rgba(255,255,255,.25);}
+    .cp-submit{margin-top:8px;width:100%;padding:9px;border-radius:8px;background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff;font-size:.8rem;font-weight:700;border:none;cursor:pointer;transition:opacity .15s;}
+    .cp-submit:hover{opacity:.88;}
+    .cp-submit:disabled{opacity:.4;cursor:not-allowed;}
+
     /* ── 모바일 ── */
     .sidebar-toggle{display:none;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:rgba(255,255,255,.6);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);padding:6px 12px;border-radius:8px;cursor:pointer;}
     @media(max-width:640px){
@@ -228,6 +258,31 @@
   </main>
 </div>
 
+<!-- 댓글 FAB -->
+<button class="comment-fab" id="commentFab" onclick="toggleCommentPanel()" title="댓글 보기/쓰기">
+  💬
+  <span class="fab-cnt hidden" id="fabCnt">0</span>
+</button>
+
+<!-- 댓글 패널 -->
+<div class="comment-panel hidden" id="commentPanel">
+  <div class="cp-head">
+    <span class="cp-title" id="cpTitle">💬 댓글</span>
+    <button class="cp-close" onclick="toggleCommentPanel()">✕</button>
+  </div>
+  <div class="cp-list" id="cpList">
+    <div class="cp-empty">기관을 선택하면 댓글을 볼 수 있어요</div>
+  </div>
+  <div class="cp-form" id="cpForm">
+    <div class="cp-no-ds" id="cpNoDsMsg">기관을 먼저 선택하세요</div>
+    <div id="cpInputArea" style="display:none;">
+      <input type="text" class="cp-nick-input" id="cpNick" placeholder="닉네임 (선택)" maxlength="20"/>
+      <textarea class="cp-text-input" id="cpText" rows="3" placeholder="이 공고에 대한 의견을 남겨주세요..."></textarea>
+      <button class="cp-submit" id="cpSubmit" onclick="submitComment()">댓글 남기기</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const { createClient } = supabase;
 const db = createClient(
@@ -237,6 +292,8 @@ const db = createClient(
 
 let _allDatasets = [];
 let _chartInst = null;
+let _currentDs = null;
+let _panelOpen = false;
 
 function toggleMenu() {
   document.getElementById('hamburger').classList.toggle('open');
@@ -313,6 +370,7 @@ function selectDataset(name) {
   c.textContent = `직종 ${ds.count}개`; c.classList.remove('hidden');
   document.getElementById('sidebar').classList.remove('open');
   renderVisualization(ds.name, ds.rows);
+  onDatasetSelected(ds.name);
   // 클릭 트래킹
   if (localStorage.getItem('gtelp_notrack') !== '1') {
     fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/page_views', {
@@ -447,6 +505,75 @@ function renderVisualization(dsName, rows) {
       <td><span class="chip ${chipCls}">${d.ratio}:1</span></td>
     </tr>`);
   });
+}
+
+// ── 댓글 ──
+function toggleCommentPanel() {
+  _panelOpen = !_panelOpen;
+  document.getElementById('commentPanel').classList.toggle('hidden', !_panelOpen);
+  if (_panelOpen && _currentDs) loadComments(_currentDs);
+}
+
+async function loadComments(dsName) {
+  const listEl = document.getElementById('cpList');
+  listEl.innerHTML = '<div class="cp-empty" style="opacity:.5;">불러오는 중...</div>';
+  const { data, error } = await db.from('cheer_comments')
+    .select('nickname,content,created_at')
+    .eq('page', 'competition:' + dsName)
+    .order('created_at', { ascending: false })
+    .limit(50);
+  if (error || !data) { listEl.innerHTML = '<div class="cp-empty">불러오기 실패</div>'; return; }
+  const cnt = data.length;
+  // FAB 배지
+  const fabCnt = document.getElementById('fabCnt');
+  if (cnt > 0) { fabCnt.textContent = cnt > 99 ? '99+' : cnt; fabCnt.classList.remove('hidden'); }
+  else { fabCnt.classList.add('hidden'); }
+  // 패널 타이틀
+  document.getElementById('cpTitle').textContent = `💬 댓글 ${cnt > 0 ? cnt + '개' : ''}`;
+  if (!cnt) { listEl.innerHTML = '<div class="cp-empty">아직 댓글이 없어요.<br>첫 번째 댓글을 남겨보세요!</div>'; return; }
+  listEl.innerHTML = data.map(c => {
+    const nick = c.nickname || '익명';
+    const dt = new Date(c.created_at);
+    const time = `${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+    const text = c.content.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    return `<div class="cp-item"><div class="cp-nick">${nick.replace(/</g,'&lt;')}</div><div class="cp-text">${text}</div><div class="cp-time">${time}</div></div>`;
+  }).join('');
+}
+
+function onDatasetSelected(name) {
+  _currentDs = name;
+  document.getElementById('cpTitle').textContent = '💬 댓글';
+  document.getElementById('cpNoDsMsg').style.display = 'none';
+  document.getElementById('cpInputArea').style.display = 'block';
+  if (_panelOpen) loadComments(name);
+  else {
+    // 배지만 업데이트
+    db.from('cheer_comments').select('id', { count: 'exact', head: true })
+      .eq('page', 'competition:' + name)
+      .then(({ count }) => {
+        const fabCnt = document.getElementById('fabCnt');
+        if (count > 0) { fabCnt.textContent = count > 99 ? '99+' : count; fabCnt.classList.remove('hidden'); }
+        else { fabCnt.classList.add('hidden'); }
+      });
+  }
+}
+
+async function submitComment() {
+  if (!_currentDs) return;
+  const nick = document.getElementById('cpNick').value.trim();
+  const text = document.getElementById('cpText').value.trim();
+  if (!text) { alert('댓글 내용을 입력하세요'); return; }
+  const btn = document.getElementById('cpSubmit');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  const { error } = await db.from('cheer_comments').insert({
+    page: 'competition:' + _currentDs,
+    nickname: nick || null,
+    content: text
+  });
+  btn.disabled = false; btn.textContent = '댓글 남기기';
+  if (error) { alert('저장 실패: ' + error.message); return; }
+  document.getElementById('cpText').value = '';
+  loadComments(_currentDs);
 }
 
 init();
