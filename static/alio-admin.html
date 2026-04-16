@@ -882,49 +882,57 @@ function parseAlioHtml(html) {
   const records = [];
   const errors = [];
   let current = null; // 현재 직종 객체
+  let stageIndex = 0; // 단계 순서 (이름 무관, 순서로 s1/s2/s3 매핑)
 
   for (const tr of rows) {
     const ths = Array.from(tr.querySelectorAll('th'));
     const tds = Array.from(tr.querySelectorAll('td'));
-    const allCells = Array.from(tr.querySelectorAll('th,td'));
 
-    // colspan≥3 th → 직종 그룹 헤더
-    const headerTh = ths.find(th => parseInt(th.getAttribute('colspan')) >= 3);
-    if (headerTh && ths.length <= 2) {
+    // 그룹 헤더: colspan≥3 th 이고 td 없음
+    const headerTh = ths.find(th => parseInt(th.getAttribute('colspan') || 0) >= 3);
+    if (headerTh && tds.length === 0) {
       if (current) records.push(current);
+      stageIndex = 0;
       const headerText = headerTh.textContent.trim().replace(/\s+/g,' ');
       current = parseGroupHeader(headerText, datasetName);
       continue;
     }
 
     if (!current) continue;
+    if (tds.length === 0) continue; // 컬럼 헤더 행(전형단계/선발인원...) 스킵
 
-    // 단계 행: th 또는 첫 번째 td에서 단계명 찾기
-    const allStageCells = allCells.filter(c => /^(1차|2차|최종|경쟁률)/.test(c.textContent.trim()));
-    if (!allStageCells.length) continue;
+    const rowText = tr.textContent.replace(/\s+/g,' ');
 
-    for (const stageCell of allStageCells) {
-      const stageName = stageCell.textContent.trim().replace(/\s+/g,' ');
-      // 단계셀 다음 td 또는 동일 tr의 나머지 td에서 숫자 데이터 추출
-      const siblingTds = tds.filter(td => td !== stageCell);
-      const dataTd = siblingTds[0];
-      if (!dataTd) continue;
-      const cellText = dataTd.textContent.trim().replace(/\s+/g,' ');
+    // 경쟁률 패턴 먼저 추출 (X대1, X:1)
+    const ratioM = rowText.match(/([\d.]+)\s*대\s*1/) || rowText.match(/([\d.]+)\s*:\s*1/);
+    if (ratioM) current.ratio = parseFloat(ratioM[1]);
 
-      if (stageName.startsWith('1차')) {
-        const [pass, total] = extractPassTotal(cellText);
-        current.s1_pass = pass; current.s1_total = total;
-      } else if (stageName.startsWith('2차')) {
-        const [pass, total] = extractPassTotal(cellText);
-        current.s2_pass = pass; current.s2_total = total;
-      } else if (stageName.startsWith('최종')) {
-        const [pass, total] = extractPassTotal(cellText);
-        current.s3_pass = pass; current.s3_total = total;
-      } else if (stageName.startsWith('경쟁률')) {
-        const m = cellText.match(/([\d.]+)\s*대\s*1/) || cellText.match(/([\d.]+)\s*:\s*1/) || cellText.match(/([\d.]+)/);
-        if (m) current.ratio = parseFloat(m[1]);
+    // 인원 수 추출: "N명" 우선, 없으면 순수 숫자 셀
+    let pass = null, total = null;
+    const명Nums = rowText.match(/(\d+)명/g);
+    if (명Nums && 명Nums.length >= 2) {
+      pass  = parseInt(명Nums[0]);
+      total = parseInt(명Nums[1]);
+    } else if (명Nums && 명Nums.length === 1) {
+      pass = parseInt(명Nums[0]);
+    } else {
+      // 순수 숫자 td 탐색 (콤마 포함 숫자)
+      const numTds = tds.filter(td => /^\s*[\d,]+\s*$/.test(td.textContent.trim()));
+      if (numTds.length >= 2) {
+        pass  = parseInt(numTds[0].textContent.replace(/[^\d]/g,''));
+        total = parseInt(numTds[1].textContent.replace(/[^\d]/g,''));
+      } else if (numTds.length === 1) {
+        pass = parseInt(numTds[0].textContent.replace(/[^\d]/g,''));
       }
     }
+
+    if (!pass) continue; // 숫자 없는 행 스킵
+
+    // 단계 순서대로 s1 → s2 → s3 (이후는 s3 덮어쓰기: 마지막 단계 = 최종)
+    if      (stageIndex === 0) { current.s1_pass = pass; current.s1_total = total; }
+    else if (stageIndex === 1) { current.s2_pass = pass; current.s2_total = total; }
+    current.s3_pass = pass; current.s3_total = total; // 항상 최신 단계를 s3에
+    stageIndex++;
   }
   if (current) records.push(current);
 
@@ -947,30 +955,43 @@ function parseAlioHtml(html) {
 }
 
 function parseGroupHeader(text, datasetName) {
-  // 형식: "신입직_일반직_6급2_전국_기계" 또는 "신입직_별정직_대전·무기계약_미화"
-  const parts = text.split('_');
   let grade = '', gradeKey = '6', region = '', job = '';
 
-  if (parts.length >= 5 && parts[1] === '일반직') {
-    grade = '일반직 ' + parts[2];
-    gradeKey = parts[2].includes('7') ? '7' : '6';
-    region = parts[3];
-    job = parts.slice(4).join('_');
-  } else if (parts.length >= 4 && parts[1] === '별정직') {
-    grade = '별정직'; gradeKey = 'b';
-    region = parts[2];
-    job = parts.slice(3).join('_');
-  } else if (parts.length >= 4 && parts[1] === '계약직') {
-    grade = '계약직'; gradeKey = 'c';
-    region = parts[2];
-    job = parts.slice(3).join('_');
+  if (text.includes('_')) {
+    // 형식 A: "신입직_일반직_6급2_전국_기계"
+    const parts = text.split('_');
+    if (parts.length >= 5 && parts[1] === '일반직') {
+      grade = '일반직 ' + parts[2];
+      gradeKey = parts[2].includes('7') ? '7' : '6';
+      region = parts[3];
+      job = parts.slice(4).join('_');
+    } else if (parts.length >= 4 && parts[1] === '별정직') {
+      grade = '별정직'; gradeKey = 'b';
+      region = parts[2]; job = parts.slice(3).join('_');
+    } else if (parts.length >= 4 && parts[1] === '계약직') {
+      grade = '계약직'; gradeKey = 'c';
+      region = parts[2]; job = parts.slice(3).join('_');
+    } else {
+      grade = parts.slice(1, parts.length - 2).join(' ') || parts[1] || '';
+      region = parts[parts.length - 2] || '-';
+      job = parts[parts.length - 1] || text;
+      if (grade.includes('7급')) gradeKey = '7';
+      else if (grade.includes('별정')) gradeKey = 'b';
+    }
   } else {
-    // fallback: 마지막이 job, 그 앞이 region
-    grade = parts.slice(1, parts.length - 2).join(' ') || parts[1] || '';
-    region = parts[parts.length - 2] || '';
-    job = parts[parts.length - 1] || text;
-    if (grade.includes('7급')) gradeKey = '7';
-    else if (grade.includes('별정')) gradeKey = 'b';
+    // 형식 B: "일반모집(사무)", "경력채용(연구원)", "원전(기계)" 등
+    const parenM = text.match(/^(.+?)\s*\((.+)\)$/);
+    if (parenM) {
+      grade = parenM[1].trim();
+      job   = parenM[2].trim();
+      region = '-';
+      if (/7급/.test(grade)) gradeKey = '7';
+      else if (/별정|계약|무기|임기/.test(grade)) gradeKey = 'b';
+      else if (/경력|전문/.test(grade)) gradeKey = 'e';
+    } else {
+      // 형식 C: 단순 텍스트 → 전체를 job으로
+      grade = '-'; region = '-'; job = text;
+    }
   }
 
   return { dataset_name: datasetName, grade, grade_key: gradeKey, job, region,
