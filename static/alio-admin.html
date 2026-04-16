@@ -757,7 +757,14 @@ function parseFromSource() {
   try {
     const result = parseAlioHtml(html);
     if (!result.records.length) {
-      showParseError('데이터를 파싱할 수 없습니다. 올바른 ALIO 채용공고 페이지인지 확인하세요.');
+      // 진단 정보 추가
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const tableFound = !!doc.getElementById('stepTable');
+      const thCount = doc.querySelectorAll('#stepTable th').length;
+      const tdCount = doc.querySelectorAll('#stepTable td').length;
+      const errDetail = result.errors.length ? '\n오류: ' + result.errors.slice(0,3).join(' / ') : '';
+      showParseError(`파싱 결과 0건. stepTable:${tableFound} th:${thCount} td:${tdCount}${errDetail}\n\n올바른 ALIO 전형단계별 채용정보 페이지인지 확인하세요.`);
       return;
     }
     _parsedRecords = result.records;
@@ -881,52 +888,60 @@ function parseAlioHtml(html) {
     const tds = Array.from(tr.querySelectorAll('td'));
     const allCells = Array.from(tr.querySelectorAll('th,td'));
 
-    // colspan=4 th → 직종 그룹 헤더
-    if (ths.length === 1 && parseInt(ths[0].getAttribute('colspan')) >= 3) {
+    // colspan≥3 th → 직종 그룹 헤더
+    const headerTh = ths.find(th => parseInt(th.getAttribute('colspan')) >= 3);
+    if (headerTh && ths.length <= 2) {
       if (current) records.push(current);
-      const headerText = ths[0].textContent.trim().replace(/\s+/g,' ');
+      const headerText = headerTh.textContent.trim().replace(/\s+/g,' ');
       current = parseGroupHeader(headerText, datasetName);
       continue;
     }
 
     if (!current) continue;
 
-    // 단계 행: th(단계명) + td(선발/응시) ...
-    const stageCell = ths.find(th => /^(1차|2차|최종|경쟁률)/.test(th.textContent.trim()));
-    if (!stageCell) continue;
-    const stageName = stageCell.textContent.trim().replace(/\s+/g,' ');
-    const dataTd = tds[0]; // 첫번째 td가 데이터
-    if (!dataTd) continue;
-    const cellText = dataTd.textContent.trim().replace(/\s+/g,' ');
+    // 단계 행: th 또는 첫 번째 td에서 단계명 찾기
+    const allStageCells = allCells.filter(c => /^(1차|2차|최종|경쟁률)/.test(c.textContent.trim()));
+    if (!allStageCells.length) continue;
 
-    if (stageName.startsWith('1차')) {
-      const [pass, total] = extractPassTotal(cellText);
-      current.s1_pass = pass;
-      current.s1_total = total;
-    } else if (stageName.startsWith('2차')) {
-      const [pass, total] = extractPassTotal(cellText);
-      current.s2_pass = pass;
-      current.s2_total = total;
-    } else if (stageName.startsWith('최종')) {
-      const [pass, total] = extractPassTotal(cellText);
-      current.s3_pass = pass;
-      current.s3_total = total;
-    } else if (stageName.startsWith('경쟁률')) {
-      // "최종 경쟁률 18.62 대 1" 또는 "18.62 대 1" 또는 "18.62:1"
-      const m = cellText.match(/([\d.]+)\s*대\s*1/) || cellText.match(/([\d.]+)\s*:\s*1/) || cellText.match(/([\d.]+)/);
-      if (m) current.ratio = parseFloat(m[1]);
+    for (const stageCell of allStageCells) {
+      const stageName = stageCell.textContent.trim().replace(/\s+/g,' ');
+      // 단계셀 다음 td 또는 동일 tr의 나머지 td에서 숫자 데이터 추출
+      const siblingTds = tds.filter(td => td !== stageCell);
+      const dataTd = siblingTds[0];
+      if (!dataTd) continue;
+      const cellText = dataTd.textContent.trim().replace(/\s+/g,' ');
+
+      if (stageName.startsWith('1차')) {
+        const [pass, total] = extractPassTotal(cellText);
+        current.s1_pass = pass; current.s1_total = total;
+      } else if (stageName.startsWith('2차')) {
+        const [pass, total] = extractPassTotal(cellText);
+        current.s2_pass = pass; current.s2_total = total;
+      } else if (stageName.startsWith('최종')) {
+        const [pass, total] = extractPassTotal(cellText);
+        current.s3_pass = pass; current.s3_total = total;
+      } else if (stageName.startsWith('경쟁률')) {
+        const m = cellText.match(/([\d.]+)\s*대\s*1/) || cellText.match(/([\d.]+)\s*:\s*1/) || cellText.match(/([\d.]+)/);
+        if (m) current.ratio = parseFloat(m[1]);
+      }
     }
   }
   if (current) records.push(current);
 
-  // 유효성 검사: ratio, s3_pass 없으면 오류 처리
+  // 유효성 검사: 최소 1차 데이터 있으면 유효, ratio는 s3에서 자동 계산
   const valid = [];
-  records.forEach((r, i) => {
-    if (!r.s3_pass || !r.ratio) {
-      errors.push(`${r.job}(${r.region}): 최종합격 또는 경쟁률 누락`);
-    } else {
-      valid.push(r);
+  records.forEach((r) => {
+    if (!r.s1_pass && !r.s2_pass && !r.s3_pass) {
+      errors.push(`${r.job || '?'}(${r.region || '?'}): 단계별 데이터 없음 — 스킵`);
+      return;
     }
+    // ratio 없으면 s3에서 계산, s3도 없으면 s1에서 계산
+    if (!r.ratio) {
+      if (r.s3_pass && r.s3_total) r.ratio = +(r.s3_total / r.s3_pass).toFixed(2);
+      else if (r.s1_pass && r.s1_total) r.ratio = +(r.s1_total / r.s1_pass).toFixed(2);
+    }
+    if (!r.ratio) errors.push(`${r.job}(${r.region}): 경쟁률 미확정 (데이터 포함)`);
+    valid.push(r);
   });
   return { datasetName, records: valid, errors };
 }
