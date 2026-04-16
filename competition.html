@@ -145,6 +145,32 @@
     .chip-mid{background:rgba(202,138,4,.2);color:#FDE68A;border:1px solid rgba(253,230,138,.2);}
     .chip-low{background:rgba(22,163,74,.2);color:#86EFAC;border:1px solid rgba(134,239,172,.2);}
 
+    /* ── 인라인 댓글 (차트 우측) ── */
+    .chart-comment-row{display:flex;gap:12px;margin-bottom:22px;align-items:stretch;}
+    .chart-col{flex:1;min-width:0;margin-bottom:0!important;}
+    .inline-comment-col{width:260px;flex-shrink:0;background:#112240;border:1px solid rgba(255,255,255,.07);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;}
+    .ic-head{padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+    .ic-title{font-size:.78rem;font-weight:800;color:#93C5FD;}
+    .ic-cnt{font-size:.65rem;font-weight:700;padding:1px 7px;border-radius:999px;background:rgba(96,165,250,.15);color:#93C5FD;border:1px solid rgba(96,165,250,.2);}
+    .ic-list{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:7px;min-height:120px;}
+    .ic-list::-webkit-scrollbar{width:3px;}
+    .ic-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
+    .ic-empty{font-size:.75rem;color:rgba(255,255,255,.22);text-align:center;padding:20px 0;line-height:1.7;}
+    .ic-item{background:rgba(255,255,255,.04);border-radius:8px;padding:8px 10px;}
+    .ic-text{font-size:.78rem;color:#CBD5E1;line-height:1.55;word-break:break-word;}
+    .ic-footer{display:flex;align-items:center;justify-content:space-between;margin-top:4px;}
+    .ic-time{font-size:.6rem;color:rgba(255,255,255,.2);}
+    .ic-del{background:none;border:none;color:rgba(255,100,100,.3);font-size:.6rem;cursor:pointer;padding:0;}
+    .ic-del:hover{color:#FB7185;}
+    .ic-form{padding:10px 12px 12px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0;}
+    .ic-textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:7px 9px;font-size:.78rem;color:#E2E8F0;outline:none;resize:none;line-height:1.5;font-family:inherit;}
+    .ic-textarea:focus{border-color:rgba(96,165,250,.5);}
+    .ic-textarea::placeholder{color:rgba(255,255,255,.22);}
+    .ic-submit{margin-top:6px;width:100%;padding:7px;border-radius:8px;background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff;font-size:.78rem;font-weight:700;border:none;cursor:pointer;transition:opacity .15s;}
+    .ic-submit:hover{opacity:.88;}
+    .ic-submit:disabled{opacity:.4;cursor:not-allowed;}
+    @media(max-width:768px){.chart-comment-row{flex-direction:column;}.inline-comment-col{width:100%;}}
+
     /* ── 댓글 패널 ── */
     .comment-fab{position:fixed;bottom:24px;right:24px;z-index:200;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff;font-size:1.3rem;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(37,99,235,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;}
     .comment-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(37,99,235,.65);}
@@ -408,8 +434,21 @@ function renderVisualization(dsName, rows) {
     </div>
 
     <div class="sec-title">직종별 경쟁률</div>
-    <div class="chart-card">
-      <div class="chart-canvas-wrap"><canvas id="ratioChart"></canvas></div>
+    <div class="chart-comment-row">
+      <div class="chart-card chart-col">
+        <div class="chart-canvas-wrap"><canvas id="ratioChart"></canvas></div>
+      </div>
+      <div class="inline-comment-col">
+        <div class="ic-head">
+          <span class="ic-title">💬 댓글</span>
+          <span class="ic-cnt" id="icCnt"></span>
+        </div>
+        <div class="ic-list" id="icList"><div class="ic-empty">불러오는 중...</div></div>
+        <div class="ic-form">
+          <textarea class="ic-textarea" id="icText" rows="2" placeholder="의견을 남겨보세요..."></textarea>
+          <button class="ic-submit" onclick="submitInlineComment()">등록</button>
+        </div>
+      </div>
     </div>
 
     <div class="sec-title">직종별 전형 단계 현황</div>
@@ -516,35 +555,56 @@ function toggleCommentPanel() {
   if (_panelOpen && _currentDs) loadComments(_currentDs);
 }
 
+function renderCommentItems(data, listEl, itemCls, textCls, footerCls, timeCls, delCls) {
+  const cnt = data.length;
+  const emptyMsg = itemCls === 'cp-item'
+    ? '<div class="cp-empty">아직 댓글이 없어요.<br>첫 번째 댓글을 남겨보세요!</div>'
+    : '<div class="ic-empty">아직 댓글이 없어요.<br>첫 번째 댓글을 남겨보세요!</div>';
+  if (!cnt) { listEl.innerHTML = emptyMsg; return; }
+  listEl.innerHTML = data.map(c => {
+    const dt = new Date(c.created_at);
+    const time = `${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+    const text = (c.comment||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    return `<div class="${itemCls}" id="cmt-${c.id}">
+      <div class="${textCls}">${text}</div>
+      <div class="${footerCls}">
+        <span class="${timeCls}">${time}</span>
+        <button class="${delCls}" onclick="deleteComment(${c.id})">삭제</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 async function loadComments(dsName) {
-  const listEl = document.getElementById('cpList');
-  listEl.innerHTML = '<div class="cp-empty" style="opacity:.5;">불러오는 중...</div>';
   const { data, error } = await db.from('cheer_comments')
     .select('id,comment,created_at')
     .eq('file_name', 'competition:' + dsName)
     .order('created_at', { ascending: false })
     .limit(50);
-  if (error || !data) { listEl.innerHTML = '<div class="cp-empty">불러오기 실패</div>'; return; }
+  if (error || !data) {
+    ['cpList','icList'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = `<div class="${id==='cpList'?'cp':'ic'}-empty">불러오기 실패</div>`;
+    });
+    return;
+  }
   const cnt = data.length;
   // FAB 배지
   const fabCnt = document.getElementById('fabCnt');
   if (cnt > 0) { fabCnt.textContent = cnt > 99 ? '99+' : cnt; fabCnt.classList.remove('hidden'); }
   else { fabCnt.classList.add('hidden'); }
-  // 패널 타이틀
-  document.getElementById('cpTitle').textContent = `💬 댓글 ${cnt > 0 ? cnt + '개' : ''}`;
-  if (!cnt) { listEl.innerHTML = '<div class="cp-empty">아직 댓글이 없어요.<br>첫 번째 댓글을 남겨보세요!</div>'; return; }
-  listEl.innerHTML = data.map(c => {
-    const dt = new Date(c.created_at);
-    const time = `${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
-    const text = (c.comment||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-    return `<div class="cp-item" id="cmt-${c.id}">
-      <div class="cp-text">${text}</div>
-      <div class="cp-footer">
-        <span class="cp-time">${time}</span>
-        <button class="cp-del" onclick="deleteComment(${c.id})">삭제</button>
-      </div>
-    </div>`;
-  }).join('');
+  // 인라인 카운트 배지
+  const icCnt = document.getElementById('icCnt');
+  if (icCnt) { if (cnt > 0) { icCnt.textContent = cnt + '개'; icCnt.style.display = ''; } else { icCnt.style.display = 'none'; } }
+  // FAB 패널
+  const cpList = document.getElementById('cpList');
+  if (cpList) {
+    document.getElementById('cpTitle').textContent = `💬 댓글 ${cnt > 0 ? cnt + '개' : ''}`;
+    renderCommentItems(data, cpList, 'cp-item','cp-text','cp-footer','cp-time','cp-del');
+  }
+  // 인라인 패널
+  const icList = document.getElementById('icList');
+  if (icList) renderCommentItems(data, icList, 'ic-item','ic-text','ic-footer','ic-time','ic-del');
 }
 
 function onDatasetSelected(name) {
@@ -552,31 +612,16 @@ function onDatasetSelected(name) {
   document.getElementById('cpTitle').textContent = '💬 댓글';
   document.getElementById('cpNoDsMsg').style.display = 'none';
   document.getElementById('cpInputArea').style.display = 'block';
-  if (_panelOpen) loadComments(name);
-  else {
-    // 배지만 업데이트
-    db.from('cheer_comments').select('id', { count: 'exact', head: true })
-      .eq('file_name', 'competition:' + name)
-      .then(({ count }) => {
-        const fabCnt = document.getElementById('fabCnt');
-        if (count > 0) { fabCnt.textContent = count > 99 ? '99+' : count; fabCnt.classList.remove('hidden'); }
-        else { fabCnt.classList.add('hidden'); }
-      });
-  }
+  loadComments(name);
 }
 
 async function deleteComment(id) {
   if (!confirm('이 댓글을 삭제하시겠습니까?')) return;
   const { error } = await db.from('cheer_comments').delete().eq('id', id);
   if (error) { alert('삭제 실패: ' + error.message); return; }
-  const el = document.getElementById('cmt-' + id);
-  if (el) el.remove();
-  // 남은 댓글 수 업데이트
-  const remaining = document.querySelectorAll('#cpList .cp-item').length;
-  document.getElementById('cpTitle').textContent = `💬 댓글 ${remaining > 0 ? remaining + '개' : ''}`;
-  const fabCnt = document.getElementById('fabCnt');
-  if (remaining > 0) { fabCnt.textContent = remaining > 99 ? '99+' : remaining; }
-  else { fabCnt.classList.add('hidden'); document.getElementById('cpList').innerHTML = '<div class="cp-empty">아직 댓글이 없어요.<br>첫 번째 댓글을 남겨보세요!</div>'; }
+  // 두 패널에서 모두 제거
+  document.querySelectorAll('#cmt-' + id).forEach(el => el.remove());
+  if (_currentDs) loadComments(_currentDs);
 }
 
 async function submitComment() {
@@ -585,13 +630,23 @@ async function submitComment() {
   if (!text) { alert('댓글 내용을 입력하세요'); return; }
   const btn = document.getElementById('cpSubmit');
   btn.disabled = true; btn.textContent = '저장 중...';
-  const { error } = await db.from('cheer_comments').insert({
-    file_name: 'competition:' + _currentDs,
-    comment: text
-  });
+  const { error } = await db.from('cheer_comments').insert({ file_name: 'competition:' + _currentDs, comment: text });
   btn.disabled = false; btn.textContent = '댓글 남기기';
   if (error) { alert('저장 실패: ' + error.message); return; }
   document.getElementById('cpText').value = '';
+  loadComments(_currentDs);
+}
+
+async function submitInlineComment() {
+  if (!_currentDs) return;
+  const text = document.getElementById('icText').value.trim();
+  if (!text) return;
+  const btn = document.querySelector('.ic-submit');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  const { error } = await db.from('cheer_comments').insert({ file_name: 'competition:' + _currentDs, comment: text });
+  btn.disabled = false; btn.textContent = '등록';
+  if (error) { alert('저장 실패: ' + error.message); return; }
+  document.getElementById('icText').value = '';
   loadComments(_currentDs);
 }
 
