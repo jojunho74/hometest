@@ -1169,24 +1169,23 @@
           <div class="bg-white rounded-xl shadow-sm p-5">
             <div class="flex items-center justify-between mb-3">
               <h3 class="font-semibold text-slate-600 text-sm">페이지별 접속 현황</h3>
-              <span class="text-xs text-slate-400">전체 누적 기준</span>
+              <span class="text-xs text-slate-400" id="pv-page-label">전체 누적 기준</span>
             </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead>
-                  <tr class="text-left text-xs text-slate-400 border-b">
-                    <th class="pb-2 font-semibold">페이지</th>
-                    <th class="pb-2 font-semibold text-right">전체</th>
-                    <th class="pb-2 font-semibold text-right">이번달</th>
-                    <th class="pb-2 font-semibold text-right">오늘</th>
-                    <th class="pb-2 font-semibold pl-4">비율</th>
-                  </tr>
-                </thead>
-                <tbody id="page-stats-body">
-                  <tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">불러오는 중...</td></tr>
-                </tbody>
-              </table>
+            <!-- 2열 헤더 -->
+            <div class="grid grid-cols-2 gap-x-4 mb-1 border-b pb-2">
+              <div class="grid text-xs text-slate-400 font-semibold" style="grid-template-columns:1fr 42px 42px 42px 90px;">
+                <span>페이지</span><span class="text-right">전체</span><span class="text-right">이번달</span><span class="text-right">오늘</span><span class="pl-2">비율</span>
+              </div>
+              <div class="grid text-xs text-slate-400 font-semibold" style="grid-template-columns:1fr 42px 42px 42px 90px;">
+                <span>페이지</span><span class="text-right">전체</span><span class="text-right">이번달</span><span class="text-right">오늘</span><span class="pl-2">비율</span>
+              </div>
             </div>
+            <!-- 2열 본문 -->
+            <div id="page-stats-body" class="grid grid-cols-2 gap-x-4">
+              <div class="col-span-2 py-6 text-center text-slate-400 text-xs">불러오는 중...</div>
+            </div>
+            <!-- 페이지네이션 -->
+            <div id="pv-pagination" class="flex items-center justify-center gap-2 mt-3 pt-3 border-t"></div>
           </div>
         </div>
 
@@ -3423,37 +3422,73 @@
       const sortedPages = Object.keys(pageMap).sort((a, b) => pageMap[b] - pageMap[a]);
       const pageColors8 = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4','#F97316','#EC4899'];
 
-      const tbody = document.getElementById('page-stats-body');
-      if (sortedPages.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">데이터가 없습니다.</td></tr>';
-      } else {
-        tbody.innerHTML = sortedPages.map((p, i) => {
-          const total  = pageMap[p] || 0;
-          const month  = pageStatMonth[p] || 0;
-          const todayCnt = pageStatToday[p] || 0;
-          const pct    = Math.round((total / totalAll) * 100);
-          const color  = pageColors8[i % pageColors8.length];
-          return `<tr class="border-b border-slate-50 hover:bg-slate-50">
-            <td class="py-2.5 pr-4">
-              <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${color};"></span>
-                <span class="font-medium text-slate-700">${p}</span>
-              </div>
-            </td>
-            <td class="py-2.5 text-right font-bold text-slate-800">${total.toLocaleString()}</td>
-            <td class="py-2.5 text-right text-blue-600 font-semibold">${month.toLocaleString()}</td>
-            <td class="py-2.5 text-right text-emerald-600 font-semibold">${todayCnt.toLocaleString()}</td>
-            <td class="py-2.5 pl-4">
-              <div class="flex items-center gap-2">
-                <div class="flex-1 bg-slate-100 rounded-full h-2" style="min-width:80px;">
-                  <div class="h-2 rounded-full" style="width:${pct}%;background:${color};"></div>
-                </div>
-                <span class="text-xs text-slate-400 w-8 text-right">${pct}%</span>
-              </div>
-            </td>
-          </tr>`;
-        }).join('');
+      // 페이지별 통계 데이터 저장 후 페이지네이션 렌더
+      window._pvData = sortedPages.map((p, i) => ({
+        p, i,
+        total: pageMap[p] || 0,
+        month: pageStatMonth[p] || 0,
+        todayCnt: pageStatToday[p] || 0,
+        pct: Math.round(((pageMap[p]||0) / totalAll) * 100),
+        color: pageColors8[i % pageColors8.length]
+      }));
+      window._pvPage = 0;
+      renderPageStats(0);
+    }
+
+    // ─── 페이지별 통계 렌더 (2열 × 5행 = 10개/페이지) ───
+    function renderPageStats(page) {
+      const data = window._pvData || [];
+      const PER_PAGE = 10;
+      const totalPages = Math.ceil(data.length / PER_PAGE);
+      window._pvPage = page;
+      const body = document.getElementById('page-stats-body');
+      const pager = document.getElementById('pv-pagination');
+      const label = document.getElementById('pv-page-label');
+      if (!data.length) {
+        body.innerHTML = '<div class="col-span-2 py-6 text-center text-slate-400 text-xs">데이터가 없습니다.</div>';
+        pager.innerHTML = ''; return;
       }
+      const slice = data.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
+      // 왼쪽 5개 / 오른쪽 5개
+      const left  = slice.slice(0, 5);
+      const right = slice.slice(5, 10);
+      const rowHtml = (d) => {
+        if (!d) return '<div class="py-2.5" style="grid-column:1/-1;"></div>';
+        return `<div class="grid items-center py-2 border-b border-slate-50" style="grid-template-columns:1fr 42px 42px 42px 90px;">
+          <div class="flex items-center gap-1.5 min-w-0 pr-1">
+            <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:${d.color};"></span>
+            <span class="text-xs font-medium text-slate-700 truncate" title="${d.p}">${d.p}</span>
+          </div>
+          <span class="text-xs text-right font-bold text-slate-800">${d.total.toLocaleString()}</span>
+          <span class="text-xs text-right text-blue-600 font-semibold">${d.month.toLocaleString()}</span>
+          <span class="text-xs text-right text-emerald-600 font-semibold">${d.todayCnt.toLocaleString()}</span>
+          <div class="pl-2 flex items-center gap-1">
+            <div class="flex-1 bg-slate-100 rounded-full h-1.5">
+              <div class="h-1.5 rounded-full" style="width:${d.pct}%;background:${d.color};"></div>
+            </div>
+            <span class="text-xs text-slate-400 w-7 text-right flex-shrink-0">${d.pct}%</span>
+          </div>
+        </div>`;
+      };
+      const maxRows = Math.max(left.length, right.length);
+      let leftHtml = '', rightHtml = '';
+      for (let i = 0; i < maxRows; i++) {
+        leftHtml  += rowHtml(left[i]  || null);
+        rightHtml += rowHtml(right[i] || null);
+      }
+      body.innerHTML = `<div>${leftHtml}</div><div>${rightHtml}</div>`;
+      // 레이블
+      if (label) label.textContent = `전체 누적 기준 — ${page*PER_PAGE+1}~${Math.min((page+1)*PER_PAGE, data.length)} / ${data.length}개`;
+      // 페이지네이션
+      const btnBase = 'px-3 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer';
+      const btnActive = 'bg-blue-600 text-white border-blue-600';
+      const btnInactive = 'bg-white text-slate-500 border-slate-200 hover:border-blue-400 hover:text-blue-600';
+      let pagerHtml = `<button onclick="renderPageStats(${page-1})" class="${btnBase} ${btnInactive}" ${page===0?'disabled style="opacity:.35;cursor:not-allowed;"':''}>‹ 이전</button>`;
+      for (let i = 0; i < totalPages; i++) {
+        pagerHtml += `<button onclick="renderPageStats(${i})" class="${btnBase} ${i===page?btnActive:btnInactive}">${i+1}</button>`;
+      }
+      pagerHtml += `<button onclick="renderPageStats(${page+1})" class="${btnBase} ${btnInactive}" ${page===totalPages-1?'disabled style="opacity:.35;cursor:not-allowed;"':''}>다음 ›</button>`;
+      pager.innerHTML = pagerHtml;
     }
 
     // ─── 인사이트 분석 ───
