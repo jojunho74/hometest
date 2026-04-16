@@ -3161,7 +3161,8 @@
 
     // ─── 방문 통계 ───
     let statsCharts = {};
-    let _statsRows = [];   // 유입경로 period 필터용 캐시
+    let _statsRows = [];      // 유입경로 period 필터용 캐시 (14일)
+    let _statsRowsAll = [];   // 전체 기간 캐시
     let _statsKstNow = null;
 
     // 페이지명 정규화: URL 디코딩 + 구 파일명 → 신 파일명 매핑
@@ -3224,6 +3225,14 @@
       if (error) { console.error(error); return; }
       const rows = views || [];
       _statsRows = rows;
+
+      // 내부이동 '전체' 탭용: 전체 기간 데이터 별도 로드
+      db.from('page_views')
+        .select('page, visited_at, referrer')
+        .not('referrer', 'is', null)
+        .order('visited_at', { ascending: false })
+        .limit(10000)
+        .then(({ data }) => { if (data) _statsRowsAll = data; });
       _statsKstNow = kstNow;
 
       // 요약 카드
@@ -3667,7 +3676,7 @@
             else if (host.includes('naver'))      src = 'Naver검색';
             else if (host.includes('kakao'))      src = '카카오';
             else if (host.includes('instagram'))  src = '인스타그램';
-            else if (host.includes('vercel.app')) src = '내부링크';
+            else if (host.includes('vercel.app') || host.includes('ibtcc.kr')) src = '내부링크';
             else src = host;
           } catch { src = '기타외부'; }
         }
@@ -3685,7 +3694,7 @@
         if (!r.referrer) return;
         try {
           const u = new URL(r.referrer);
-          if (!u.hostname.includes('vercel.app')) return;
+          if (!u.hostname.includes('vercel.app') && !u.hostname.includes('ibtcc.kr')) return;
           const from = normalizePage(u.pathname.replace(/^\//,'') || 'index.html');
           const to   = normalizePage(r.page||'');
           if (!to || from===to) return;
@@ -4239,7 +4248,7 @@ ${internalSummary}
             else if (host.includes('instagram'))      src = '📸 인스타그램';
             else if (host.includes('facebook'))       src = '📘 페이스북';
             else if (host.includes('youtube'))        src = '▶️ 유튜브';
-            else if (host.includes('vercel.app'))     src = '🔗 내부 링크';
+            else if (host.includes('vercel.app') || host.includes('ibtcc.kr')) src = '🔗 내부 링크';
             else src = `🌐 ${host}`;
           } catch { src = '🌐 기타 외부'; }
         }
@@ -4282,7 +4291,8 @@ ${internalSummary}
       const kstMonth = kstNow.toISOString().slice(0, 7);
       const since7  = new Date(kstNow.getTime() - 6 * 864e5).toISOString().slice(0, 10);
 
-      const filtered = _statsRows.filter(r => {
+      const sourceRows = period === 'all' ? (_statsRowsAll.length ? _statsRowsAll : _statsRows) : _statsRows;
+      const filtered = sourceRows.filter(r => {
         if (!r.visited_at) return false;
         const kst = new Date(new Date(r.visited_at).getTime() + 9 * 60 * 60 * 1000);
         const dayKey = kst.toISOString().slice(0, 10);
@@ -4320,7 +4330,7 @@ ${internalSummary}
         if (!r.referrer) return;
         try {
           const u = new URL(r.referrer);
-          if (!u.hostname.includes('vercel.app')) return;
+          if (!u.hostname.includes('vercel.app') && !u.hostname.includes('ibtcc.kr')) return;
           const from = normalizePage(u.pathname.replace(/^\//, '') || 'index.html');
           const to   = normalizePage(r.page || '');
           if (!to || from === to) return;
