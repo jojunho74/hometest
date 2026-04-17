@@ -449,22 +449,27 @@
   <div class="quick-modal" id="quickModal">
     <button class="qm-close" onclick="closeQuickApply()">✕</button>
     <div id="qmContent">
-      <div class="qm-badge">무료 · 30초</div>
-      <div class="qm-title">G-TELP 수준 진단 신청</div>
-      <div class="qm-sub">연락처만 남기시면 담당자가 직접 연락드립니다</div>
-      <div class="qm-company" id="qmCompanyRow" style="display:none;">
-        <span class="qm-company-label">관심 기관</span>
-        <span class="qm-company-name" id="qmCompanyName"></span>
-      </div>
+      <div class="qm-badge">무료 신청</div>
+      <div class="qm-title">지금 바로 신청하세요</div>
+      <div class="qm-sub">제출 후 취업센터 도입 절차가 진행됩니다</div>
       <div class="qm-field">
-        <label class="qm-label">이름</label>
+        <label class="qm-label">이름 <span style="color:#EF4444;">*</span></label>
         <input class="qm-input" id="qmName" type="text" placeholder="홍길동" autocomplete="name"/>
       </div>
       <div class="qm-field">
-        <label class="qm-label">연락처 (전화번호)</label>
-        <input class="qm-input" id="qmPhone" type="tel" placeholder="010-0000-0000" autocomplete="tel"/>
+        <label class="qm-label">이메일 <span style="color:#EF4444;">*</span> <span style="font-size:.65rem;color:rgba(255,255,255,.35);font-weight:400;">(이메일 형식을 지켜주세요.)</span></label>
+        <input class="qm-input" id="qmEmail" type="email" placeholder="example@university.ac.kr" autocomplete="email"/>
       </div>
-      <button class="qm-submit" id="qmSubmit" onclick="submitQuickApply()">무료 진단 신청하기 →</button>
+      <div class="qm-field">
+        <label class="qm-label">소속 대학교 <span style="color:#EF4444;">*</span></label>
+        <input class="qm-input" id="qmUniversity" type="text" placeholder="예) 한성대학교"/>
+      </div>
+      <div class="qm-field">
+        <label class="qm-label">학과 / 전공</label>
+        <input class="qm-input" id="qmDept" type="text" placeholder="예) 경영학과"/>
+      </div>
+      <button class="qm-submit" id="qmSubmit" onclick="submitQuickApply()">무료로 신청하기 →</button>
+      <p style="font-size:.68rem;color:rgba(255,255,255,.35);text-align:center;margin-top:10px;line-height:1.6;">개인정보는 IBT 프로그램 운영 목적으로만 사용되며<br>제3자에게 제공되지 않습니다.</p>
     </div>
     <div class="qm-success" id="qmSuccess" style="display:none;">
       <div class="qm-success-ico">✅</div>
@@ -890,19 +895,12 @@ setTimeout(() => showCtaBar(null), 3000);
 
 // ── 간이 신청 모달 ──
 function openQuickApply() {
-  const name = _currentDs || '';
-  const row = document.getElementById('qmCompanyRow');
-  const nameEl = document.getElementById('qmCompanyName');
-  if (name) {
-    nameEl.textContent = name;
-    row.style.display = 'flex';
-  } else {
-    row.style.display = 'none';
-  }
   document.getElementById('qmContent').style.display = 'block';
   document.getElementById('qmSuccess').style.display = 'none';
   document.getElementById('qmName').value = '';
-  document.getElementById('qmPhone').value = '';
+  document.getElementById('qmEmail').value = '';
+  document.getElementById('qmUniversity').value = '';
+  document.getElementById('qmDept').value = '';
   document.getElementById('quickOverlay').classList.add('open');
   setTimeout(() => document.getElementById('qmName').focus(), 250);
 }
@@ -913,18 +911,23 @@ function closeQuickApply(e) {
 }
 
 async function submitQuickApply() {
-  const name  = document.getElementById('qmName').value.trim();
-  const phone = document.getElementById('qmPhone').value.trim();
-  if (!name || !phone) { alert('이름과 연락처를 입력해주세요.'); return; }
+  const name       = document.getElementById('qmName').value.trim();
+  const email      = document.getElementById('qmEmail').value.trim();
+  const university = document.getElementById('qmUniversity').value.trim();
+  const dept       = document.getElementById('qmDept').value.trim();
+  if (!name) { alert('이름을 입력해주세요.'); return; }
+  if (!email || !email.includes('@')) { alert('올바른 이메일을 입력해주세요.'); return; }
+  if (!university) { alert('소속 대학교를 입력해주세요.'); return; }
   const btn = document.getElementById('qmSubmit');
   btn.disabled = true; btn.textContent = '신청 중...';
-  const company = _currentDs || '';
   const { error } = await db.from('consultations').insert({
-    name, phone,
-    message: company ? `[경쟁률 페이지] 관심 기관: ${company}` : '[경쟁률 페이지] 무료 진단 신청',
+    name, email,
+    situation: university,
+    goal: dept || null,
+    message: '[경쟁률 페이지] 지텔프IBT 시험응시 대학신청',
     status: 'pending'
   });
-  btn.disabled = false; btn.textContent = '무료 진단 신청하기 →';
+  btn.disabled = false; btn.textContent = '무료로 신청하기 →';
   if (error) { alert('오류가 발생했습니다. 다시 시도해주세요.'); return; }
   document.getElementById('qmContent').style.display = 'none';
   document.getElementById('qmSuccess').style.display = 'block';
