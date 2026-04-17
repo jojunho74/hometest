@@ -1084,8 +1084,7 @@
                 <table class="w-full text-sm">
                   <thead>
                     <tr class="text-left text-xs text-slate-400 border-b">
-                      <th class="pb-2 font-semibold">출발 페이지</th>
-                      <th class="pb-2 font-semibold">→ 도착 페이지</th>
+                      <th class="pb-2 font-semibold">이동 경로</th>
                       <th class="pb-2 font-semibold text-right">방문수</th>
                       <th class="pb-2 font-semibold pl-4">비율</th>
                     </tr>
@@ -4542,8 +4541,12 @@ ${internalSummary}
         labelEl.textContent = labels[period];
       }
 
-      const internalMap = {};
       const intColors = ['#6366F1','#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4','#F97316'];
+
+      // ── 1. 2단계 페어 맵 + 역방향 조회 맵 ──
+      const pairMap    = {}; // "A|||B" → count
+      const toFromMap  = {}; // B → { A: count } (B에 오기 전 어느 페이지인지)
+
       filtered.forEach(r => {
         if (!r.referrer) return;
         try {
@@ -4552,25 +4555,75 @@ ${internalSummary}
           const from = normalizePage(u.pathname.replace(/^\//, '') || 'index.html');
           const to   = normalizePage(r.page || '');
           if (!to || from === to) return;
-          const key = `${from} → ${to}`;
-          internalMap[key] = (internalMap[key] || 0) + 1;
+          const key = `${from}|||${to}`;
+          pairMap[key] = (pairMap[key] || 0) + 1;
+          if (!toFromMap[to]) toFromMap[to] = {};
+          toFromMap[to][from] = (toFromMap[to][from] || 0) + 1;
         } catch {}
       });
 
-      const internalTotal  = Object.values(internalMap).reduce((a, b) => a + b, 0) || 1;
-      const sortedInternal = Object.entries(internalMap).sort((a, b) => b[1] - a[1]);
-      const intBody = document.getElementById('internal-link-body');
-      if (sortedInternal.length === 0) {
-        intBody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">해당 기간 내부 이동 데이터가 없습니다.</td></tr>';
+      // ── 2. 3단계 체인 맵: prev→from→to ──
+      const chainMap = {}; // "prev|||from|||to" → count
+      Object.entries(pairMap).forEach(([key, cnt]) => {
+        const [from, to] = key.split('|||');
+        const predecessors = toFromMap[from] || {};
+        Object.entries(predecessors).forEach(([prev, prevCnt]) => {
+          if (prev === to) return; // 순환 방지
+          const ckey = `${prev}|||${from}|||${to}`;
+          chainMap[ckey] = (chainMap[ckey] || 0) + Math.min(cnt, prevCnt);
+        });
+      });
+
+      // ── 3. 통합 경로 목록 (3단계 + 2단계) ──
+      const allPaths = [];
+
+      // 3단계 체인
+      Object.entries(chainMap).forEach(([key, cnt]) => {
+        const [prev, mid, to] = key.split('|||');
+        allPaths.push({ steps: [prev, mid, to], cnt });
+      });
+
+      // 2단계 페어 (3단계 체인에 이미 포함된 middle 구간이라도 직접 이동도 별도 노출)
+      Object.entries(pairMap).forEach(([key, cnt]) => {
+        const [from, to] = key.split('|||');
+        allPaths.push({ steps: [from, to], cnt });
+      });
+
+      // count 내림차순 정렬
+      allPaths.sort((a, b) => b.cnt - a.cnt);
+
+      const totalCnt  = allPaths.reduce((s, p) => s + p.cnt, 0) || 1;
+      const intBody   = document.getElementById('internal-link-body');
+
+      if (!allPaths.length) {
+        intBody.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-slate-400 text-xs">해당 기간 내부 이동 데이터가 없습니다.</td></tr>';
       } else {
-        intBody.innerHTML = sortedInternal.map(([key, cnt], i) => {
-          const [from, to] = key.split(' → ');
-          const pct = Math.round((cnt / internalTotal) * 100);
+        intBody.innerHTML = allPaths.map(({ steps, cnt }, i) => {
+          const pct   = Math.round((cnt / totalCnt) * 100);
           const color = intColors[i % intColors.length];
+          const is3   = steps.length === 3;
+
+          // 경로 HTML: 출발(회색) → 중간(파랑, 3단계만) → 도착(진함)
+          const pathHtml = steps.map((s, idx) => {
+            const isLast = idx === steps.length - 1;
+            const isMid  = is3 && idx === 1;
+            const style  = isLast
+              ? 'font-semibold text-slate-800'
+              : isMid
+                ? 'text-blue-600 font-semibold'
+                : 'text-slate-400';
+            return `<span class="text-xs font-mono ${style}">${esc(s)}</span>${isLast ? '' : '<span class="text-slate-300 mx-1 font-bold">→</span>'}`;
+          }).join('');
+
+          const badge = is3
+            ? `<span class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-500 align-middle">3단계</span>`
+            : '';
+
           return `<tr class="border-b border-slate-50 hover:bg-slate-50">
-            <td class="py-2.5 pr-2 text-slate-500 text-xs font-mono">${from}</td>
-            <td class="py-2.5 pr-4 font-semibold text-slate-700 text-xs font-mono">${to}</td>
-            <td class="py-2.5 text-right font-bold text-slate-800">${cnt.toLocaleString()}</td>
+            <td class="py-2.5 pr-4">
+              <div class="flex flex-wrap items-center gap-0.5">${pathHtml}${badge}</div>
+            </td>
+            <td class="py-2.5 text-right font-bold text-slate-800 whitespace-nowrap">${cnt.toLocaleString()}</td>
             <td class="py-2.5 pl-4">
               <div class="flex items-center gap-2">
                 <div class="flex-1 bg-slate-100 rounded-full h-2" style="min-width:80px;">
