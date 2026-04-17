@@ -3260,10 +3260,9 @@
       const rows = views || [];
       _statsRows = rows;
 
-      // 내부이동 '주간/월간/전체' 탭용: referrer 있는 전체 데이터 로드
+      // 내부이동 '주간/월간/전체' 탭용: 전체 방문 데이터 로드 (직접접속 포함)
       const { data: allRefData } = await db.from('page_views')
         .select('page, visited_at, referrer')
-        .not('referrer', 'is', null)
         .order('visited_at', { ascending: false })
         .limit(10000);
       if (allRefData) _statsRowsAll = allRefData;
@@ -4562,18 +4561,26 @@ ${internalSummary}
       const toFromMap  = {}; // B → { A: count } (B에 오기 전 어느 페이지인지)
 
       filtered.forEach(r => {
-        if (!r.referrer) return;
-        try {
-          const u = new URL(r.referrer);
-          if (!u.hostname.includes('vercel.app') && !u.hostname.includes('ibtcc.kr')) return;
-          const from = normalizePage(u.pathname.replace(/^\//, '') || 'index.html');
-          const to   = normalizePage(r.page || '');
-          if (!to || from === to) return;
-          const key = `${from}|||${to}`;
-          pairMap[key] = (pairMap[key] || 0) + 1;
-          if (!toFromMap[to]) toFromMap[to] = {};
-          toFromMap[to][from] = (toFromMap[to][from] || 0) + 1;
-        } catch {}
+        const to = normalizePage(r.page || '');
+        if (!to) return;
+        let from;
+        if (!r.referrer) {
+          from = '직접접속';
+        } else {
+          try {
+            const u = new URL(r.referrer);
+            if (u.hostname.includes('vercel.app') || u.hostname.includes('ibtcc.kr')) {
+              from = normalizePage(u.pathname.replace(/^\//, '') || 'index.html');
+              if (from === to) return;
+            } else {
+              from = u.hostname.replace(/^www\./, '');
+            }
+          } catch { from = '직접접속'; }
+        }
+        const key = `${from}|||${to}`;
+        pairMap[key] = (pairMap[key] || 0) + 1;
+        if (!toFromMap[to]) toFromMap[to] = {};
+        toFromMap[to][from] = (toFromMap[to][from] || 0) + 1;
       });
 
       // ── 2. 3단계 체인 맵: prev→from→to ──
