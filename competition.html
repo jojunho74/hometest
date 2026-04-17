@@ -920,15 +920,13 @@ async function submitQuickApply() {
   if (!university) { alert('소속 대학교를 입력해주세요.'); return; }
   const btn = document.getElementById('qmSubmit');
   btn.disabled = true; btn.textContent = '신청 중...';
-  const { error } = await db.from('consultations').insert({
-    name, email,
-    situation: university,
-    goal: dept || null,
-    message: '[경쟁률 페이지] 지텔프IBT 시험응시 대학신청',
-    status: 'pending'
-  });
+  const { error } = await db.from('student_applications').insert([{
+    name, email, phone: null,
+    university,
+    department: dept || null
+  }]);
   btn.disabled = false; btn.textContent = '무료로 신청하기 →';
-  if (error) { alert('오류가 발생했습니다. 다시 시도해주세요.'); return; }
+  if (error) { alert('오류: ' + error.message); return; }
   document.getElementById('qmContent').style.display = 'none';
   document.getElementById('qmSuccess').style.display = 'block';
   setTimeout(() => document.getElementById('quickOverlay').classList.remove('open'), 3000);
