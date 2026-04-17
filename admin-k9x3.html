@@ -1072,9 +1072,11 @@
               <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                 <h3 class="font-semibold text-slate-600 text-sm">🔗 어느 페이지에서 왔는지</h3>
                 <div class="flex gap-1" id="intlink-period-btns">
-                  <button onclick="renderInternalLinkTable('weekly')"  id="intlink-btn-weekly"  class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">주간</button>
-                  <button onclick="renderInternalLinkTable('monthly')" id="intlink-btn-monthly" class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">월간</button>
-                  <button onclick="renderInternalLinkTable('all')"     id="intlink-btn-all"     class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">전체</button>
+                  <button onclick="renderInternalLinkTable('daily')"     id="intlink-btn-daily"     class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">오늘</button>
+                  <button onclick="renderInternalLinkTable('yesterday')" id="intlink-btn-yesterday" class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">어제</button>
+                  <button onclick="renderInternalLinkTable('weekly')"    id="intlink-btn-weekly"    class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">주간</button>
+                  <button onclick="renderInternalLinkTable('monthly')"   id="intlink-btn-monthly"   class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50">월간</button>
+                  <button onclick="renderInternalLinkTable('all')"       id="intlink-btn-all"       class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">전체</button>
                 </div>
               </div>
               <p id="intlink-period-label" class="text-xs text-slate-400 mb-3">이번달 기준</p>
@@ -4497,10 +4499,11 @@ ${internalSummary}
     // ─── 내부 링크 상세 테이블 렌더링 (period: 'weekly' | 'monthly' | 'all') ───
     function renderInternalLinkTable(period) {
       if (!_statsKstNow) return;
-      const kstNow  = _statsKstNow;
-      const today   = kstNow.toISOString().slice(0, 10);
+      const kstNow   = _statsKstNow;
+      const today    = kstNow.toISOString().slice(0, 10);
+      const yesterday = new Date(kstNow.getTime() - 864e5).toISOString().slice(0, 10);
       const kstMonth = kstNow.toISOString().slice(0, 7);
-      const since7  = new Date(kstNow.getTime() - 6 * 864e5).toISOString().slice(0, 10);
+      const since7   = new Date(kstNow.getTime() - 6 * 864e5).toISOString().slice(0, 10);
 
       const sourceRows = period === 'all' ? (_statsRowsAll.length ? _statsRowsAll : _statsRows) : _statsRows;
       const filtered = sourceRows.filter(r => {
@@ -4508,19 +4511,21 @@ ${internalSummary}
         const kst = new Date(new Date(r.visited_at).getTime() + 9 * 60 * 60 * 1000);
         const dayKey = kst.toISOString().slice(0, 10);
         const monKey = kst.toISOString().slice(0, 7);
-        if (period === 'weekly')  return dayKey >= since7 && dayKey <= today;
-        if (period === 'monthly') return monKey === kstMonth;
+        if (period === 'daily')     return dayKey === today;
+        if (period === 'yesterday') return dayKey === yesterday;
+        if (period === 'weekly')    return dayKey >= since7 && dayKey <= today;
+        if (period === 'monthly')   return monKey === kstMonth;
         return true; // 'all'
       });
 
       // 버튼 스타일 전환
-      ['weekly', 'monthly', 'all'].forEach(p => {
+      ['daily', 'yesterday', 'weekly', 'monthly', 'all'].forEach(p => {
         const btn = document.getElementById(`intlink-btn-${p}`);
         if (!btn) return;
         if (p === period) {
-          btn.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50';
+          btn.className = 'px-2.5 py-1 text-xs font-semibold rounded-lg border border-blue-600 text-blue-600 bg-blue-50';
         } else {
-          btn.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white';
+          btn.className = 'px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white';
         }
       });
 
@@ -4528,9 +4533,11 @@ ${internalSummary}
       const labelEl = document.getElementById('intlink-period-label');
       if (labelEl) {
         const labels = {
-          weekly:  `최근 7일 (${since7} ~ ${today}) 기준`,
-          monthly: `이번달 (${kstMonth}) 기준`,
-          all:     '전체 기간 기준'
+          daily:     `오늘 (${today}) 기준`,
+          yesterday: `어제 (${yesterday}) 기준`,
+          weekly:    `최근 7일 (${since7} ~ ${today}) 기준`,
+          monthly:   `이번달 (${kstMonth}) 기준`,
+          all:       '전체 기간 기준'
         };
         labelEl.textContent = labels[period];
       }
