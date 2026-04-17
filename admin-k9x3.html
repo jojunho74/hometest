@@ -1158,11 +1158,11 @@
             </div>
             <!-- 2열 헤더 -->
             <div class="grid grid-cols-2 gap-x-6 border-b pb-2 mb-1">
-              <div class="grid text-xs text-slate-400 font-semibold" style="grid-template-columns:28px 1fr 52px 80px;">
-                <span>순위</span><span>공공기관 / 기업명</span><span class="text-right">클릭수</span><span class="pl-2">비율</span>
+              <div class="grid text-xs text-slate-400 font-semibold" style="grid-template-columns:28px 1fr 36px 44px 80px;">
+                <span>순위</span><span>공공기관 / 기업명</span><span class="text-right text-emerald-500">오늘</span><span class="text-right">클릭수</span><span class="pl-2">비율</span>
               </div>
-              <div class="grid text-xs text-slate-400 font-semibold" style="grid-template-columns:28px 1fr 52px 80px;">
-                <span>순위</span><span>공공기관 / 기업명</span><span class="text-right">클릭수</span><span class="pl-2">비율</span>
+              <div class="grid text-xs text-slate-400 font-semibold" style="grid-template-columns:28px 1fr 36px 44px 80px;">
+                <span>순위</span><span>공공기관 / 기업명</span><span class="text-right text-emerald-500">오늘</span><span class="text-right">클릭수</span><span class="pl-2">비율</span>
               </div>
             </div>
             <!-- 2열 본문 -->
@@ -3868,11 +3868,10 @@ ${internalSummary}
     async function loadCompetitionClicks() {
       const tbody = document.getElementById('competition-click-body');
       if (!tbody) return;
-      // page_views에서 competition-click: 접두사 행만 가져오기
       let allRows = [], offset = 0;
       while (true) {
         const { data, error } = await db.from('page_views')
-          .select('page')
+          .select('page, visited_at')
           .like('page', 'competition-click:%')
           .range(offset, offset + 999);
         if (error || !data || data.length === 0) break;
@@ -3885,16 +3884,21 @@ ${internalSummary}
         document.getElementById('cc-total-badge').textContent = '총 0건';
         return;
       }
-      const map = {};
+      const kstNow = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
+      const todayKey = kstNow.toISOString().slice(0, 10);
+      const map = {}, todayMap = {};
       allRows.forEach(r => {
         const name = r.page.replace('competition-click:', '');
         map[name] = (map[name] || 0) + 1;
+        if (r.visited_at) {
+          const d = new Date(new Date(r.visited_at).getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
+          if (d === todayKey) todayMap[name] = (todayMap[name] || 0) + 1;
+        }
       });
       const total = allRows.length;
       document.getElementById('cc-total-badge').textContent = `총 ${total.toLocaleString()}건`;
       const sorted = Object.entries(map).sort((a,b) => b[1]-a[1]);
-      const MEDAL = ['🥇','🥈','🥉'];
-      window._ccData = sorted.map(([name, cnt], i) => ({ name, cnt, i, pct: Math.round(cnt/total*100) }));
+      window._ccData = sorted.map(([name, cnt], i) => ({ name, cnt, todayCnt: todayMap[name] || 0, i, pct: Math.round(cnt/total*100) }));
       window._ccPage = 0;
       renderCompetitionClicks(0);
     }
@@ -3920,9 +3924,13 @@ ${internalSummary}
         const rank = d.i < 3
           ? `<span style="font-size:1.05em;line-height:1;">${MEDAL[d.i]}</span>`
           : `<span class="text-slate-400 text-xs font-semibold">${d.i+1}위</span>`;
-        return `<div class="grid items-center py-1.5 border-b border-slate-50" style="grid-template-columns:28px 1fr 52px 80px;">
+        const todayHtml = d.todayCnt > 0
+          ? `<div class="text-right text-xs font-bold text-emerald-500">+${d.todayCnt}</div>`
+          : `<div class="text-right text-xs text-slate-200">—</div>`;
+        return `<div class="grid items-center py-1.5 border-b border-slate-50" style="grid-template-columns:28px 1fr 36px 44px 80px;">
           <div>${rank}</div>
           <div class="font-semibold text-slate-700 text-xs truncate pr-1" title="${esc(d.name)}">${esc(d.name)}</div>
+          ${todayHtml}
           <div class="text-right font-bold text-indigo-600 text-xs">${d.cnt.toLocaleString()}</div>
           <div class="pl-2 flex items-center gap-1">
             <div style="flex:1;height:5px;background:#EEF2FF;border-radius:3px;">
