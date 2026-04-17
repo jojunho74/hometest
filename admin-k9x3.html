@@ -1029,6 +1029,7 @@
           <div class="bg-white rounded-xl shadow-sm p-5">
             <h3 class="font-semibold text-slate-600 text-sm mb-2">날짜별 페이지 방문수 <span class="text-xs font-normal text-slate-400">(최근 14일)</span></h3>
             <canvas id="chart-weekday-pages" height="100"></canvas>
+            <div id="legend-weekday-pages" class="mt-2 overflow-x-auto text-xs text-slate-600" style="white-space:nowrap;scrollbar-width:thin"></div>
           </div>
         </div>
 
@@ -3259,13 +3260,13 @@
       const rows = views || [];
       _statsRows = rows;
 
-      // 내부이동 '전체' 탭용: 전체 기간 데이터 별도 로드
-      db.from('page_views')
+      // 내부이동 '주간/월간/전체' 탭용: referrer 있는 전체 데이터 로드
+      const { data: allRefData } = await db.from('page_views')
         .select('page, visited_at, referrer')
         .not('referrer', 'is', null)
         .order('visited_at', { ascending: false })
-        .limit(10000)
-        .then(({ data }) => { if (data) _statsRowsAll = data; });
+        .limit(10000);
+      if (allRefData) _statsRowsAll = allRefData;
       _statsKstNow = kstNow;
 
       // 요약 카드
@@ -3422,12 +3423,22 @@
         },
         options: {
           responsive: true,
-          plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+          plugins: { legend: { display: false } },
           scales: {
             x: { stacked: true },
             y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } }
           }
         }
+      });
+
+      // 날짜별 페이지 방문수 커스텀 1줄 범례
+      const legendEl = document.getElementById('legend-weekday-pages');
+      pageSet.forEach((p, i) => {
+        const color = pageColors[i % pageColors.length];
+        const item = document.createElement('span');
+        item.style.cssText = 'display:inline-flex;align-items:center;margin-right:12px';
+        item.innerHTML = `<span style="display:inline-block;width:10px;height:10px;background:${color};border-radius:2px;margin-right:4px;flex-shrink:0"></span>${p}`;
+        legendEl.appendChild(item);
       });
 
       // ── 유입 경로 테이블 (기본: 월간) ──
@@ -4504,7 +4515,10 @@ ${internalSummary}
       const kstMonth = kstNow.toISOString().slice(0, 7);
       const since7   = new Date(kstNow.getTime() - 6 * 864e5).toISOString().slice(0, 10);
 
-      const sourceRows = period === 'all' ? (_statsRowsAll.length ? _statsRowsAll : _statsRows) : _statsRows;
+      // 오늘/어제는 14일 캐시로 충분, 주간/월간/전체는 완전한 referrer 데이터 사용
+      const sourceRows = (period === 'daily' || period === 'yesterday')
+        ? _statsRows
+        : (_statsRowsAll.length ? _statsRowsAll : _statsRows);
       const filtered = sourceRows.filter(r => {
         if (!r.visited_at) return false;
         const kst = new Date(new Date(r.visited_at).getTime() + 9 * 60 * 60 * 1000);
