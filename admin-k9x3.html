@@ -1095,6 +1095,7 @@
                   </tbody>
                 </table>
               </div>
+              <div id="intlink-pagination" class="flex items-center justify-between mt-3 text-xs text-slate-500"></div>
             </div>
           </div>
         </div>
@@ -4615,47 +4616,61 @@ ${internalSummary}
 
       const totalCnt  = allPaths.reduce((s, p) => s + p.cnt, 0) || 1;
       const intBody   = document.getElementById('internal-link-body');
+      const paginEl   = document.getElementById('intlink-pagination');
+      const PAGE_SIZE = 15;
 
-      if (!allPaths.length) {
-        intBody.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-slate-400 text-xs">해당 기간 내부 이동 데이터가 없습니다.</td></tr>';
-      } else {
-        intBody.innerHTML = allPaths.map(({ steps, cnt }, i) => {
+      function renderIntlinkPage(page) {
+        if (!allPaths.length) {
+          intBody.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-slate-400 text-xs">해당 기간 데이터가 없습니다.</td></tr>';
+          if (paginEl) paginEl.innerHTML = '';
+          return;
+        }
+        const totalPages = Math.ceil(allPaths.length / PAGE_SIZE);
+        const slice = allPaths.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+        intBody.innerHTML = slice.map(({ steps, cnt }, i) => {
+          const globalIdx = (page - 1) * PAGE_SIZE + i;
           const pct   = Math.round((cnt / totalCnt) * 100);
-          const color = intColors[i % intColors.length];
+          const color = intColors[globalIdx % intColors.length];
           const is3   = steps.length === 3;
-
-          // 경로 HTML: 출발(회색) → 중간(파랑, 3단계만) → 도착(진함)
           const pathHtml = steps.map((s, idx) => {
             const isLast = idx === steps.length - 1;
             const isMid  = is3 && idx === 1;
-            const style  = isLast
-              ? 'font-semibold text-slate-800'
-              : isMid
-                ? 'text-blue-600 font-semibold'
-                : 'text-slate-400';
+            const style  = isLast ? 'font-semibold text-slate-800' : isMid ? 'text-blue-600 font-semibold' : 'text-slate-400';
             return `<span class="text-xs font-mono ${style}">${esc(s)}</span>${isLast ? '' : '<span class="text-slate-300 mx-1 font-bold">→</span>'}`;
           }).join('');
-
-          const badge = is3
-            ? `<span class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-500 align-middle">3단계</span>`
-            : '';
-
+          const badge = is3 ? `<span class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-500 align-middle">3단계</span>` : '';
           return `<tr class="border-b border-slate-50 hover:bg-slate-50">
-            <td class="py-2.5 pr-4">
-              <div class="flex flex-wrap items-center gap-0.5">${pathHtml}${badge}</div>
-            </td>
+            <td class="py-2.5 pr-4"><div class="flex flex-wrap items-center gap-0.5">${pathHtml}${badge}</div></td>
             <td class="py-2.5 text-right font-bold text-slate-800 whitespace-nowrap">${cnt.toLocaleString()}</td>
             <td class="py-2.5 pl-4">
               <div class="flex items-center gap-2">
-                <div class="flex-1 bg-slate-100 rounded-full h-2" style="min-width:80px;">
-                  <div class="h-2 rounded-full" style="width:${pct}%;background:${color};"></div>
-                </div>
+                <div class="flex-1 bg-slate-100 rounded-full h-2" style="min-width:80px;"><div class="h-2 rounded-full" style="width:${pct}%;background:${color};"></div></div>
                 <span class="text-xs text-slate-400 w-8 text-right">${pct}%</span>
               </div>
             </td>
           </tr>`;
         }).join('');
+
+        if (paginEl) {
+          const start = (page - 1) * PAGE_SIZE + 1;
+          const end   = Math.min(page * PAGE_SIZE, allPaths.length);
+          const btnClass = (active) => active
+            ? 'px-2.5 py-1 rounded-lg bg-blue-600 text-white font-semibold'
+            : 'px-2.5 py-1 rounded-lg border border-slate-200 text-slate-500 hover:border-blue-400 hover:text-blue-600 bg-white';
+
+          let pageButtons = '';
+          for (let p = 1; p <= totalPages; p++) {
+            pageButtons += `<button onclick="window._intlinkPage(${p})" class="${btnClass(p === page)}">${p}</button>`;
+          }
+          paginEl.innerHTML = `
+            <span>${start}–${end} / 총 ${allPaths.length}개</span>
+            <div class="flex gap-1">${pageButtons}</div>`;
+        }
       }
+
+      window._intlinkPage = renderIntlinkPage;
+      renderIntlinkPage(1);
     }
 
     // ─── 블로그 원고 생성 ───
