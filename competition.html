@@ -376,8 +376,8 @@
   <div class="cp-form" id="cpForm">
     <div class="cp-no-ds" id="cpNoDsMsg">기관을 먼저 선택하세요</div>
     <div id="cpInputArea" style="display:none;">
-      <textarea class="cp-text-input" id="cpText" rows="3" placeholder="이 공고에 대한 의견을 남겨주세요..."></textarea>
-      <button class="cp-submit" id="cpSubmit" onclick="submitComment()">댓글 남기기</button>
+      <textarea class="cp-text-input" id="cpText" rows="3" placeholder="의견을 남겨보세요..."></textarea>
+      <button class="cp-submit" id="cpSubmit" onclick="submitComment()">등록</button>
     </div>
     <button class="cp-kakao" onclick="shareKakaoCompetition()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
@@ -729,7 +729,7 @@ async function submitComment() {
   const btn = document.getElementById('cpSubmit');
   btn.disabled = true; btn.textContent = '저장 중...';
   const { error } = await db.from('cheer_comments').insert({ file_name: 'competition:' + _currentDs, comment: text });
-  btn.disabled = false; btn.textContent = '댓글 남기기';
+  btn.disabled = false; btn.textContent = '등록';
   if (error) { alert('저장 실패: ' + error.message); return; }
   document.getElementById('cpText').value = '';
   loadComments(_currentDs);
