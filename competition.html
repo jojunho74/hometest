@@ -226,11 +226,11 @@
     @media(max-width:768px){.chart-comment-row{flex-direction:column;}.inline-comment-col{width:100%;}}
 
     /* ── 댓글 패널 (FAB) ── */
-    .comment-fab{position:fixed;bottom:24px;right:24px;z-index:200;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#4F46E5);color:#fff;font-size:1.3rem;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,58,237,.6),0 0 0 0 rgba(124,58,237,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;animation:fabPulse 2.8s ease-in-out infinite;}
+    .comment-fab{position:fixed;bottom:88px;right:24px;z-index:200;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#4F46E5);color:#fff;font-size:1.3rem;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,58,237,.6),0 0 0 0 rgba(124,58,237,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;animation:fabPulse 2.8s ease-in-out infinite;}
     @keyframes fabPulse{0%,100%{box-shadow:0 4px 20px rgba(124,58,237,.6),0 0 0 0 rgba(124,58,237,.3);}50%{box-shadow:0 6px 28px rgba(124,58,237,.75),0 0 0 8px rgba(124,58,237,0);}}
     .comment-fab:hover{transform:scale(1.1);animation:none;box-shadow:0 8px 32px rgba(124,58,237,.8);}
     .comment-fab .fab-cnt{position:absolute;top:-4px;right:-4px;background:#EF4444;color:#fff;font-size:9px;font-weight:800;min-width:18px;height:18px;border-radius:999px;display:flex;align-items:center;justify-content:center;border:2px solid #0A1628;padding:0 3px;line-height:1;}
-    .comment-panel{position:fixed;bottom:90px;right:24px;z-index:199;width:340px;max-width:calc(100vw - 48px);background:linear-gradient(160deg,#1a1060 0%,#1e1b6b 40%,#16163d 100%);border:1px solid rgba(139,92,246,.4);border-radius:18px;box-shadow:0 16px 56px rgba(0,0,0,.7),0 0 0 1px rgba(139,92,246,.1);display:flex;flex-direction:column;transition:opacity .22s,transform .22s;transform-origin:bottom right;}
+    .comment-panel{position:fixed;bottom:154px;right:24px;z-index:199;width:340px;max-width:calc(100vw - 48px);background:linear-gradient(160deg,#1a1060 0%,#1e1b6b 40%,#16163d 100%);border:1px solid rgba(139,92,246,.4);border-radius:18px;box-shadow:0 16px 56px rgba(0,0,0,.7),0 0 0 1px rgba(139,92,246,.1);display:flex;flex-direction:column;transition:opacity .22s,transform .22s;transform-origin:bottom right;}
     .comment-panel.hidden{opacity:0;pointer-events:none;transform:scale(.9) translateY(10px);}
     .cp-head{padding:14px 16px 11px;border-bottom:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:rgba(139,92,246,.12);border-radius:18px 18px 0 0;}
     .cp-title{font-size:.84rem;font-weight:800;color:#C4B5FD;}
@@ -277,6 +277,83 @@
       main{width:100%;}
       .sidebar-toggle{display:flex!important;}
     }
+
+    /* ── 스티킹 CTA 바 ── */
+    .cta-bar{
+      position:fixed;bottom:0;left:0;right:0;z-index:150;
+      background:linear-gradient(90deg,#064e3b 0%,#065f46 40%,#047857 100%);
+      border-top:1px solid rgba(52,211,153,.3);
+      padding:12px 20px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      box-shadow:0 -4px 24px rgba(0,0,0,.5);
+      transform:translateY(100%);
+      transition:transform .35s cubic-bezier(.4,0,.2,1);
+    }
+    .cta-bar.visible{transform:translateY(0);}
+    .cta-bar-text{flex:1;min-width:0;}
+    .cta-bar-label{font-size:.65rem;font-weight:700;color:rgba(110,231,183,.7);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;}
+    .cta-bar-msg{font-size:.85rem;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .cta-bar-btn{
+      flex-shrink:0;
+      padding:10px 22px;border-radius:10px;
+      background:linear-gradient(135deg,#10b981,#059669);
+      color:#fff;font-size:.82rem;font-weight:800;
+      border:none;cursor:pointer;
+      box-shadow:0 4px 16px rgba(16,185,129,.5);
+      transition:transform .15s,box-shadow .15s;
+      animation:ctaPulse 2.5s ease-in-out infinite;
+      white-space:nowrap;
+    }
+    .cta-bar-btn:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(16,185,129,.7);animation:none;}
+    .cta-bar-btn:active{transform:scale(.97);}
+    @keyframes ctaPulse{0%,100%{box-shadow:0 4px 16px rgba(16,185,129,.5);}50%{box-shadow:0 4px 28px rgba(16,185,129,.8);}}
+    @media(max-width:480px){
+      .cta-bar{padding:10px 14px;gap:8px;}
+      .cta-bar-msg{font-size:.78rem;}
+      .cta-bar-btn{padding:9px 14px;font-size:.76rem;}
+    }
+
+    /* ── 간이 신청 모달 ── */
+    .quick-overlay{
+      position:fixed;inset:0;z-index:300;
+      background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
+      display:flex;align-items:center;justify-content:center;padding:20px;
+      opacity:0;pointer-events:none;transition:opacity .22s;
+    }
+    .quick-overlay.open{opacity:1;pointer-events:auto;}
+    .quick-modal{
+      width:100%;max-width:420px;
+      background:linear-gradient(160deg,#0d2137 0%,#0a1f38 60%,#071528 100%);
+      border:1px solid rgba(16,185,129,.3);
+      border-radius:20px;
+      padding:28px 24px 24px;
+      box-shadow:0 24px 64px rgba(0,0,0,.8),0 0 0 1px rgba(16,185,129,.1);
+      transform:scale(.93) translateY(10px);
+      transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+    }
+    .quick-overlay.open .quick-modal{transform:scale(1) translateY(0);}
+    .qm-badge{display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(16,185,129,.2);color:#6ee7b7;font-size:.68rem;font-weight:800;letter-spacing:.06em;margin-bottom:12px;border:1px solid rgba(16,185,129,.3);}
+    .qm-title{font-size:1.15rem;font-weight:900;color:#fff;margin-bottom:4px;line-height:1.3;}
+    .qm-sub{font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:20px;line-height:1.5;}
+    .qm-company{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:10px;padding:10px 14px;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+    .qm-company-label{font-size:.65rem;font-weight:700;color:rgba(110,231,183,.7);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
+    .qm-company-name{font-size:.82rem;font-weight:700;color:#6ee7b7;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .qm-field{margin-bottom:12px;}
+    .qm-label{font-size:.72rem;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:5px;display:block;}
+    .qm-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:11px 14px;font-size:.88rem;color:#E2E8F0;outline:none;transition:border-color .2s,background .2s;font-family:inherit;}
+    .qm-input:focus{border-color:rgba(16,185,129,.6);background:rgba(16,185,129,.08);}
+    .qm-input::placeholder{color:rgba(255,255,255,.25);}
+    .qm-submit{width:100%;padding:13px;border-radius:11px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:.92rem;font-weight:800;border:none;cursor:pointer;margin-top:6px;box-shadow:0 4px 18px rgba(16,185,129,.45);transition:transform .15s,box-shadow .15s;}
+    .qm-submit:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(16,185,129,.65);}
+    .qm-submit:active{transform:scale(.98);}
+    .qm-submit:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+    .qm-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:.85rem;padding:5px 9px;border-radius:7px;transition:background .15s;}
+    .qm-close:hover{background:rgba(255,255,255,.15);color:#fff;}
+    .qm-success{text-align:center;padding:10px 0 6px;}
+    .qm-success-ico{font-size:2.8rem;margin-bottom:10px;}
+    .qm-success-title{font-size:1.05rem;font-weight:800;color:#6ee7b7;margin-bottom:6px;}
+    .qm-success-msg{font-size:.82rem;color:rgba(255,255,255,.55);line-height:1.6;}
+    .quick-modal{position:relative;}
   </style>
 </head>
 <body>
@@ -356,6 +433,45 @@
       </div>
     </div>
   </main>
+</div>
+
+<!-- 스티킹 CTA 바 -->
+<div class="cta-bar" id="ctaBar">
+  <div class="cta-bar-text">
+    <div class="cta-bar-label">📝 G-TELP 무료 진단 신청</div>
+    <div class="cta-bar-msg" id="ctaBarMsg">이 회사 합격선이 궁금하다면? → 30초 진단으로 확인하세요</div>
+  </div>
+  <button class="cta-bar-btn" onclick="openQuickApply()">지금 무료 신청 →</button>
+</div>
+
+<!-- 간이 신청 모달 -->
+<div class="quick-overlay" id="quickOverlay" onclick="closeQuickApply(event)">
+  <div class="quick-modal" id="quickModal">
+    <button class="qm-close" onclick="closeQuickApply()">✕</button>
+    <div id="qmContent">
+      <div class="qm-badge">무료 · 30초</div>
+      <div class="qm-title">G-TELP 수준 진단 신청</div>
+      <div class="qm-sub">연락처만 남기시면 담당자가 직접 연락드립니다</div>
+      <div class="qm-company" id="qmCompanyRow" style="display:none;">
+        <span class="qm-company-label">관심 기관</span>
+        <span class="qm-company-name" id="qmCompanyName"></span>
+      </div>
+      <div class="qm-field">
+        <label class="qm-label">이름</label>
+        <input class="qm-input" id="qmName" type="text" placeholder="홍길동" autocomplete="name"/>
+      </div>
+      <div class="qm-field">
+        <label class="qm-label">연락처 (전화번호)</label>
+        <input class="qm-input" id="qmPhone" type="tel" placeholder="010-0000-0000" autocomplete="tel"/>
+      </div>
+      <button class="qm-submit" id="qmSubmit" onclick="submitQuickApply()">무료 진단 신청하기 →</button>
+    </div>
+    <div class="qm-success" id="qmSuccess" style="display:none;">
+      <div class="qm-success-ico">✅</div>
+      <div class="qm-success-title">신청이 완료되었습니다!</div>
+      <div class="qm-success-msg">담당자가 영업일 기준 1일 내로<br>연락드리겠습니다.</div>
+    </div>
+  </div>
 </div>
 
 <!-- 댓글 FAB -->
@@ -487,6 +603,7 @@ function selectDataset(name) {
       body: JSON.stringify({ page: 'competition-click:' + name, referrer: document.referrer || null })
     }).catch(function(){});
   }
+  showCtaBar(name);
 }
 
 function renderVisualization(dsName, rows) {
@@ -753,6 +870,66 @@ async function submitInlineComment() {
 }
 
 init();
+
+// ── 스티킹 CTA 바 ──
+let _ctaShown = false;
+function showCtaBar(companyName) {
+  const bar = document.getElementById('ctaBar');
+  const msg = document.getElementById('ctaBarMsg');
+  if (companyName) {
+    msg.textContent = `"${companyName}" 합격선이 궁금하다면? → G-TELP 30초 무료 진단`;
+  }
+  if (!_ctaShown) {
+    _ctaShown = true;
+    bar.classList.add('visible');
+  }
+}
+
+// 3초 후 기본 노출 (기관 미선택 상태에서도 보이도록)
+setTimeout(() => showCtaBar(null), 3000);
+
+// ── 간이 신청 모달 ──
+function openQuickApply() {
+  const name = _currentDs || '';
+  const row = document.getElementById('qmCompanyRow');
+  const nameEl = document.getElementById('qmCompanyName');
+  if (name) {
+    nameEl.textContent = name;
+    row.style.display = 'flex';
+  } else {
+    row.style.display = 'none';
+  }
+  document.getElementById('qmContent').style.display = 'block';
+  document.getElementById('qmSuccess').style.display = 'none';
+  document.getElementById('qmName').value = '';
+  document.getElementById('qmPhone').value = '';
+  document.getElementById('quickOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('qmName').focus(), 250);
+}
+
+function closeQuickApply(e) {
+  if (e && e.target !== document.getElementById('quickOverlay')) return;
+  document.getElementById('quickOverlay').classList.remove('open');
+}
+
+async function submitQuickApply() {
+  const name  = document.getElementById('qmName').value.trim();
+  const phone = document.getElementById('qmPhone').value.trim();
+  if (!name || !phone) { alert('이름과 연락처를 입력해주세요.'); return; }
+  const btn = document.getElementById('qmSubmit');
+  btn.disabled = true; btn.textContent = '신청 중...';
+  const company = _currentDs || '';
+  const { error } = await db.from('consultations').insert({
+    name, phone,
+    message: company ? `[경쟁률 페이지] 관심 기관: ${company}` : '[경쟁률 페이지] 무료 진단 신청',
+    status: 'pending'
+  });
+  btn.disabled = false; btn.textContent = '무료 진단 신청하기 →';
+  if (error) { alert('오류가 발생했습니다. 다시 시도해주세요.'); return; }
+  document.getElementById('qmContent').style.display = 'none';
+  document.getElementById('qmSuccess').style.display = 'block';
+  setTimeout(() => document.getElementById('quickOverlay').classList.remove('open'), 3000);
+}
 </script>
 
 <!-- 방문 트래킹 -->
