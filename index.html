@@ -465,6 +465,97 @@
 
   <div class="section-divider"></div>
 
+  <!-- ══════ 이번주 핫한 채용 TOP5 + 진단 CTA ══════ -->
+  <section id="hot-jobs" style="background:#F0F9FF;border-bottom:1px solid #BAE6FD;padding:40px 16px 48px;">
+    <div style="max-width:900px;margin:0 auto;">
+
+      <!-- 섹션 헤더 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:6px;background:#FEF3C7;border:1px solid #FDE68A;border-radius:999px;padding:4px 12px;margin-bottom:8px;">
+            <span style="font-size:.7rem;font-weight:800;color:#B45309;letter-spacing:.06em;">🔥 이번주 HOT</span>
+          </div>
+          <h2 style="font-size:clamp(1.2rem,3.5vw,1.65rem);font-weight:900;color:#0F172A;line-height:1.25;">가장 많이 본 공공기관 채용 경쟁률</h2>
+          <p style="font-size:.82rem;color:#64748B;margin-top:5px;">지난 7일간 방문자가 가장 많이 클릭한 기관입니다</p>
+        </div>
+        <a href="competition.html" style="display:inline-flex;align-items:center;gap:5px;padding:9px 18px;border-radius:50px;font-size:.8rem;font-weight:700;background:#fff;color:#1E4D8C;border:1.5px solid #93C5FD;text-decoration:none;transition:all .2s;white-space:nowrap;" onmouseover="this.style.background='#EFF6FF'" onmouseout="this.style.background='#fff'">전체 보기 →</a>
+      </div>
+
+      <!-- TOP5 카드 그리드 -->
+      <div id="hot-jobs-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:28px;">
+        <!-- JS로 채워짐 -->
+        <div style="grid-column:1/-1;text-align:center;padding:24px;color:#94A3B8;font-size:.82rem;">불러오는 중...</div>
+      </div>
+
+      <!-- CTA 배너 -->
+      <div style="background:linear-gradient(135deg,#1E3A8A 0%,#0891B2 100%);border-radius:20px;padding:28px 28px;display:flex;flex-wrap:wrap;align-items:center;gap:20px;box-shadow:0 8px 32px rgba(30,58,138,.25);">
+        <div style="flex:1;min-width:200px;">
+          <p style="font-size:.72rem;font-weight:800;color:rgba(255,255,255,.6);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">G-TELP 무료 진단</p>
+          <p style="font-size:clamp(1rem,2.5vw,1.2rem);font-weight:900;color:#fff;line-height:1.35;margin-bottom:6px;">이 회사들, 내 점수로 지원 가능할까요?</p>
+          <p style="font-size:.8rem;color:rgba(255,255,255,.65);">30초 무료 진단으로 목표 점수와 현재 수준을 확인하세요</p>
+        </div>
+        <a href="student.html" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 28px;border-radius:50px;font-size:.95rem;font-weight:800;background:#fff;color:#1E3A8A;text-decoration:none;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.2);transition:transform .15s,box-shadow .15s;flex-shrink:0;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 24px rgba(0,0,0,.3)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 18px rgba(0,0,0,.2)'">
+          무료 진단 신청하기 →
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <script>
+  (function() {
+    var RANK_COLORS = ['#F59E0B','#94A3B8','#B45309','#6366F1','#10B981'];
+    var RANK_LABELS = ['🥇','🥈','🥉','4위','5위'];
+    var since7 = new Date(Date.now() - 7 * 864e5).toISOString();
+
+    fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/page_views?select=page,visited_at&page=like.competition-click:*&visited_at=gte.' + since7 + '&limit=2000', {
+      headers: {
+        'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs',
+        'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
+      }
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(rows) {
+      if (!Array.isArray(rows) || !rows.length) {
+        document.getElementById('hot-jobs-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#94A3B8;font-size:.82rem;">아직 데이터가 없습니다</div>';
+        return;
+      }
+      var map = {};
+      rows.forEach(function(r) {
+        var name = r.page.replace('competition-click:', '');
+        map[name] = (map[name] || 0) + 1;
+      });
+      var sorted = Object.entries(map).sort(function(a,b){ return b[1]-a[1]; }).slice(0, 5);
+      var total = sorted.reduce(function(s,e){ return s+e[1]; }, 0);
+
+      var html = sorted.map(function(entry, i) {
+        var name = entry[0], cnt = entry[1];
+        var pct = Math.round(cnt / (rows.length || 1) * 100);
+        var color = RANK_COLORS[i];
+        var label = RANK_LABELS[i];
+        var shortName = name.length > 18 ? name.slice(0, 18) + '…' : name;
+        return '<a href="competition.html" style="display:block;background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:16px 14px;text-decoration:none;transition:all .18s;box-shadow:0 2px 8px rgba(0,0,0,.06);" onmouseover="this.style.borderColor=\'' + color + '\';this.style.transform=\'translateY(-3px)\';this.style.boxShadow=\'0 6px 20px rgba(0,0,0,.1)\'" onmouseout="this.style.borderColor=\'#E2E8F0\';this.style.transform=\'translateY(0)\';this.style.boxShadow=\'0 2px 8px rgba(0,0,0,.06)\'">'
+          + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">'
+          + '<span style="font-size:.85rem;font-weight:800;color:' + color + ';">' + label + '</span>'
+          + '<span style="font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:999px;background:' + color + '22;color:' + color + ';border:1px solid ' + color + '44;">' + cnt + '회</span>'
+          + '</div>'
+          + '<div style="font-size:.78rem;font-weight:700;color:#0F172A;line-height:1.4;margin-bottom:8px;" title="' + name + '">' + shortName + '</div>'
+          + '<div style="height:3px;background:#F1F5F9;border-radius:2px;overflow:hidden;">'
+          + '<div style="width:' + pct + '%;height:100%;background:' + color + ';border-radius:2px;"></div>'
+          + '</div>'
+          + '<div style="font-size:.65rem;color:#94A3B8;margin-top:4px;">경쟁률 보기 →</div>'
+          + '</a>';
+      }).join('');
+      document.getElementById('hot-jobs-grid').innerHTML = html;
+    })
+    .catch(function() {
+      document.getElementById('hot-jobs-grid').innerHTML = '';
+    });
+  })();
+  </script>
+
+  <div class="section-divider"></div>
+
   <!-- ══════ 패키지 핵심 요약 ══════ -->
   <section class="py-10 px-4" style="background:#EFF6FF;border-bottom:1px solid #BFDBFE;">
     <div class="max-w-5xl mx-auto">
