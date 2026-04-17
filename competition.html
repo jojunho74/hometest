@@ -438,8 +438,8 @@
 <!-- 스티킹 CTA 바 -->
 <div class="cta-bar" id="ctaBar">
   <div class="cta-bar-text">
-    <div class="cta-bar-label">📝 G-TELP 무료 진단 신청</div>
-    <div class="cta-bar-msg" id="ctaBarMsg">이 회사 합격선이 궁금하다면? → 30초 진단으로 확인하세요</div>
+    <div class="cta-bar-label">📝 지텔프IBT 시험응시 대학신청</div>
+    <div class="cta-bar-msg" id="ctaBarMsg">지텔프IBT 시험응시 대학신청</div>
   </div>
   <button class="cta-bar-btn" onclick="openQuickApply()">지금 무료 신청 →</button>
 </div>
@@ -877,7 +877,7 @@ function showCtaBar(companyName) {
   const bar = document.getElementById('ctaBar');
   const msg = document.getElementById('ctaBarMsg');
   if (companyName) {
-    msg.textContent = `"${companyName}" 합격선이 궁금하다면? → G-TELP 30초 무료 진단`;
+    msg.textContent = `지텔프IBT 시험응시 대학신청`;
   }
   if (!_ctaShown) {
     _ctaShown = true;
