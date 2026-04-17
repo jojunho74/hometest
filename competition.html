@@ -828,7 +828,7 @@ function shareKakaoCompetition() {
   const title = _currentDs ? _currentDs + ' — 경쟁률 정보' : 'G-TELP IBT 경쟁률 페이지';
   const desc  = _currentDs ? '직종별 경쟁률과 합격선을 확인해보세요!' : '공공기관 채용 경쟁률을 한눈에 확인하세요.';
   const url   = 'https://ibtcc.kr/competition.html';
-  const img   = 'https://ibtcc.kr/logo/logo-text.png';
+  const img   = 'https://ibtcc.kr/partner-logos.png';
   try {
     if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
     Kakao.Share.sendDefault({
@@ -842,10 +842,14 @@ function shareKakaoCompetition() {
       buttons: [{ title: '경쟁률 보러가기', link: { mobileWebUrl: url, webUrl: url } }]
     });
     return;
-  } catch(e) {}
-  // 카카오 SDK 실패 시 링크 복사 fallback
+  } catch(e) {
+    console.warn('[카카오공유 오류]', e);
+  }
+  // 카카오 SDK 실패 시 네이티브 공유 → 링크 복사 fallback
   if (navigator.share) { navigator.share({ title, url }).catch(() => {}); return; }
-  navigator.clipboard.writeText(url).then(() => alert('링크가 복사됐습니다!\n카카오톡에서 붙여넣기 해주세요 😊')).catch(() => {});
+  navigator.clipboard.writeText(url)
+    .then(() => alert('링크가 복사됐습니다!\n카카오톡에서 붙여넣기 해주세요 😊'))
+    .catch(() => alert('공유 링크: ' + url));
 }
 
 async function submitComment() {
