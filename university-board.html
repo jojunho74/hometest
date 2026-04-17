@@ -603,6 +603,19 @@
   window.openUbPopup = function(link, school, title) {
     _link = link; _school = school; _title = title; _rating = 0;
     setStars(0); hint.textContent = '';
+    // 클릭 트래킹
+    if (localStorage.getItem('gtelp_notrack') !== '1' && school) {
+      fetch(SB_URL + '/rest/v1/page_views', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SB_KEY,
+          'Authorization': 'Bearer ' + SB_KEY,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ page: 'university-click:' + school, referrer: document.referrer || null })
+      }).catch(function(){});
+    }
     // 패널 초기화
     document.getElementById('ub-stars').style.display = '';
     document.querySelector('.ub-star-label').style.display = '';
