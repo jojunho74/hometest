@@ -187,8 +187,15 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
         </div>
 
         <div class="tbl-wrap">
-          <div class="px-4 py-3 border-b flex items-center justify-between bg-slate-50">
+          <div class="px-4 py-3 border-b flex items-center justify-between bg-slate-50 gap-3 flex-wrap">
             <span class="text-xs font-bold text-slate-500">📁 데이터셋 목록</span>
+            <div class="flex items-center gap-2 flex-1" style="max-width:320px;">
+              <div style="position:relative;flex:1;">
+                <input id="ds-search" type="text" placeholder="기관명 검색..." oninput="filterDatasets(this.value)" oncompositionend="filterDatasets(this.value)"
+                  style="width:100%;border:1px solid #E2E8F0;border-radius:8px;padding:6px 30px 6px 10px;font-size:.8rem;color:#1E293B;outline:none;"/>
+                <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:.75rem;color:#94A3B8;pointer-events:none;">🔍</span>
+              </div>
+            </div>
             <span id="ds-count" class="text-xs text-slate-400">0개</span>
           </div>
           <div class="overflow-x-auto">
@@ -530,6 +537,20 @@ function switchTab(tab){
 
 // ── 데이터셋 목록 ──
 let _allRows=[];
+let _dsEntries=[];
+
+function filterDatasets(q){
+  const tbody=document.getElementById('ds-tbody');
+  const filtered=q.trim()
+    ? _dsEntries.filter(([name])=>(name||'').includes(q.trim()))
+    : _dsEntries;
+  document.getElementById('ds-count').textContent=filtered.length+'개';
+  if(!filtered.length){
+    tbody.innerHTML='<tr><td colspan="6" class="py-6 text-center text-sm text-slate-400">"'+esc(q)+'" 검색 결과가 없습니다</td></tr>';
+    return;
+  }
+  tbody.innerHTML=renderDsRows(filtered);
+}
 async function loadDatasets(){
   const tbody=document.getElementById('ds-tbody');
   tbody.innerHTML='<tr><td colspan="6" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr>';
@@ -548,25 +569,33 @@ async function loadDatasets(){
     if(!dsMap[k])dsMap[k]={rows:[],created_at:r.created_at};
     dsMap[k].rows.push(r);
   });
-  const datasets=Object.entries(dsMap);
-  document.getElementById('ds-count').textContent=datasets.length+'개';
+  _dsEntries=Object.entries(dsMap);
+  document.getElementById('ds-count').textContent=_dsEntries.length+'개';
+
+  // 검색창 초기화
+  const searchEl=document.getElementById('ds-search');
+  if(searchEl)searchEl.value='';
 
   // 레코드 필터 셀렉트 채우기
   const sel=document.getElementById('rec-filter-ds');
   const prevVal=sel.value;
   sel.innerHTML='<option value="">전체 데이터셋</option>';
-  datasets.forEach(([name])=>{
+  _dsEntries.forEach(([name])=>{
     const opt=document.createElement('option');
     opt.value=name;opt.textContent=name;
     sel.appendChild(opt);
   });
   if(prevVal)sel.value=prevVal;
 
-  if(datasets.length===0){
+  if(_dsEntries.length===0){
     tbody.innerHTML='<tr><td colspan="6" class="py-8 text-center text-sm text-slate-400">등록된 데이터가 없습니다.<br>데이터 추가 탭에서 입력하세요.</td></tr>';
     return;
   }
-  tbody.innerHTML=datasets.map(([name,ds])=>{
+  tbody.innerHTML=renderDsRows(_dsEntries);
+}
+
+function renderDsRows(entries){
+  return entries.map(([name,ds])=>{
     const cnt=ds.rows.length;
     const hired=ds.rows.reduce((s,r)=>s+(r.s3_pass||0),0);
     const avg=(ds.rows.reduce((s,r)=>s+(parseFloat(r.ratio)||0),0)/cnt).toFixed(1);
