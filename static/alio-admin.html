@@ -206,11 +206,12 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
                 <th>1차 합격/응시</th>
                 <th>2차 합격/응시</th>
                 <th>3차 합격/응시</th>
+                <th>4차 합격/응시</th>
                 <th>최종 합격/응시</th>
                 <th>경쟁률</th>
                 <th>관리</th>
               </tr></thead>
-              <tbody id="ds-tbody"><tr><td colspan="7" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr></tbody>
+              <tbody id="ds-tbody"><tr><td colspan="8" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -380,12 +381,21 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
             </div>
             <div></div>
             <div class="form-group">
+              <label class="form-label">4차 합격</label>
+              <input type="number" id="f-s4p" class="form-input" placeholder="명 (없으면 공란)"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">4차 응시</label>
+              <input type="number" id="f-s4t" class="form-input" placeholder="명 (없으면 공란)"/>
+            </div>
+            <div></div>
+            <div class="form-group">
               <label class="form-label">최종 합격 <span class="text-red-500">*</span></label>
-              <input type="number" id="f-s4p" class="form-input" placeholder="명"/>
+              <input type="number" id="f-s5p" class="form-input" placeholder="명"/>
             </div>
             <div class="form-group">
               <label class="form-label">최종 응시</label>
-              <input type="number" id="f-s4t" class="form-input" placeholder="명"/>
+              <input type="number" id="f-s5t" class="form-input" placeholder="명"/>
             </div>
             <div class="form-group">
               <label class="form-label">경쟁률 <span class="text-red-500">*</span></label>
@@ -588,14 +598,14 @@ function filterDatasets(q){
     : _dsEntries;
   document.getElementById('ds-count').textContent=filtered.length+'개';
   if(!filtered.length){
-    tbody.innerHTML='<tr><td colspan="7" class="py-6 text-center text-sm text-slate-400">"'+esc(q)+'" 검색 결과가 없습니다</td></tr>';
+    tbody.innerHTML='<tr><td colspan="8" class="py-6 text-center text-sm text-slate-400">"'+esc(q)+'" 검색 결과가 없습니다</td></tr>';
     return;
   }
   tbody.innerHTML=renderDsRows(filtered);
 }
 async function loadDatasets(){
   const tbody=document.getElementById('ds-tbody');
-  tbody.innerHTML='<tr><td colspan="7" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr>';
+  tbody.innerHTML='<tr><td colspan="8" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr>';
   // URL 캐시 로드
   const {data:urlData}=await db.from('alio_source_cache').select('dataset_name,url').not('url','is',null);
   _dsUrlMap={};
@@ -644,7 +654,7 @@ function renderDsRows(entries){
   return entries.map(([name,ds])=>{
     const dt=ds.created_at?ds.created_at.slice(0,10):'-';
     const headerRow=`<tr style="background:#EFF6FF;">
-      <td colspan="7" class="font-bold text-blue-700" style="font-size:.85rem;padding:8px 12px;">
+      <td colspan="8" class="font-bold text-blue-700" style="font-size:.85rem;padding:8px 12px;">
         📁 ${esc(name)} <span class="text-xs font-normal text-slate-400 ml-2">${ds.rows.length}개 직종 · ${dt}</span>
         ${_dsUrlMap[name]?`<a href="${esc(_dsUrlMap[name])}" target="_blank" rel="noopener" style="margin-left:8px;font-size:11px;color:#3B82F6;font-weight:500;text-decoration:none;">🔗 원본</a>`:''}
       </td>
@@ -661,7 +671,9 @@ function renderDsRows(entries){
       const s1=r.s1_total?`<span class="text-blue-600 font-bold">${r.s1_pass||0}</span><span class="text-slate-400">/${r.s1_total}</span>`:`<span class="text-slate-300">—</span>`;
       const s2=r.s2_total?`<span class="text-purple-600 font-bold">${r.s2_pass||0}</span><span class="text-slate-400">/${r.s2_total}</span>`:`<span class="text-slate-300">—</span>`;
       const s3=r.s3_total?`<span class="text-orange-500 font-bold">${r.s3_pass||0}</span><span class="text-slate-400">/${r.s3_total}</span>`:`<span class="text-slate-300">—</span>`;
-      const finalPass=r.s4_total?r.s4_pass:r.s3_pass; const finalTotal=r.s4_total?r.s4_total:r.s3_total;
+      const s4=r.s4_total?`<span class="text-pink-500 font-bold">${r.s4_pass||0}</span><span class="text-slate-400">/${r.s4_total}</span>`:`<span class="text-slate-300">—</span>`;
+      const finalPass=r.s5_total?r.s5_pass:r.s4_total?r.s4_pass:r.s3_pass;
+      const finalTotal=r.s5_total?r.s5_total:r.s4_total?r.s4_total:r.s3_total;
       const sf=finalTotal?`<span class="text-emerald-600 font-bold">${finalPass||0}</span><span class="text-slate-400">/${finalTotal}</span>`:`<span class="text-slate-300">—</span>`;
       return `<tr>
         <td class="text-slate-700 font-medium" style="padding-left:20px;">${esc(r.job||'-')} <span class="text-xs text-slate-400">${esc(r.grade||'')}</span></td>
@@ -669,6 +681,7 @@ function renderDsRows(entries){
         <td>${s1}</td>
         <td>${s2}</td>
         <td>${r.s4_total ? s3 : '<span class="text-slate-300">—</span>'}</td>
+        <td>${r.s5_total ? s4 : '<span class="text-slate-300">—</span>'}</td>
         <td>${sf}</td>
         <td><span class="chip ${chipCls}">${r.ratio||'-'}:1</span></td>
         <td></td>
@@ -755,11 +768,12 @@ async function submitRecord(){
   const s3t=parseInt(document.getElementById('f-s3t').value)||null;
   const s4p=parseInt(document.getElementById('f-s4p').value)||null;
   const s4t=parseInt(document.getElementById('f-s4t').value)||null;
+  const s5p=parseInt(document.getElementById('f-s5p').value)||null;
+  const s5t=parseInt(document.getElementById('f-s5t').value)||null;
   const ratio=parseFloat(document.getElementById('f-ratio').value)||null;
-  // 최종 = s4가 있으면 s4, 없으면 s3
-  const hasFinal = s4p || s3p;
+  const hasFinal = s5p || s4p || s3p;
   if(!dataset||!hasFinal||!ratio){toast('필수 항목을 입력하세요 (공고명, 최종합격, 경쟁률)',false);return;}
-  const {error}=await db.from('alio_jobs').insert({dataset_name:dataset,region,s1_pass:s1p,s1_total:s1t,s2_pass:s2p,s2_total:s2t,s3_pass:s3p,s3_total:s3t,s4_pass:s4p,s4_total:s4t,ratio});
+  const {error}=await db.from('alio_jobs').insert({dataset_name:dataset,region,s1_pass:s1p,s1_total:s1t,s2_pass:s2p,s2_total:s2t,s3_pass:s3p,s3_total:s3t,s4_pass:s4p,s4_total:s4t,s5_pass:s5p,s5_total:s5t,ratio});
   if(error){toast('저장 실패: '+error.message,false);return;}
   toast('저장되었습니다!');
   clearForm();
@@ -767,7 +781,7 @@ async function submitRecord(){
 }
 
 function clearForm(){
-  ['f-dataset','f-region','f-s1p','f-s1t','f-s2p','f-s2t','f-s3p','f-s3t','f-s4p','f-s4t','f-ratio'].forEach(id=>{
+  ['f-dataset','f-region','f-s1p','f-s1t','f-s2p','f-s2t','f-s3p','f-s3t','f-s4p','f-s4t','f-s5p','f-s5t','f-ratio'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.value='';
   });
@@ -1019,7 +1033,8 @@ function parseAlioHtml(html) {
     if      (stageIndex === 0) { current.s1_pass = pass; current.s1_total = total; }
     else if (stageIndex === 1) { current.s2_pass = pass; current.s2_total = total; }
     else if (stageIndex === 2) { current.s3_pass = pass; current.s3_total = total; }
-    else                       { current.s4_pass = pass; current.s4_total = total; }
+    else if (stageIndex === 3) { current.s4_pass = pass; current.s4_total = total; }
+    else                       { current.s5_pass = pass; current.s5_total = total; }
     stageIndex++;
   }
   if (current) records.push(current);
@@ -1083,7 +1098,7 @@ function parseGroupHeader(text, datasetName) {
   }
 
   return { dataset_name: datasetName, grade, grade_key: gradeKey, job, region,
-    s1_pass: null, s1_total: null, s2_pass: null, s2_total: null, s3_pass: null, s3_total: null, s4_pass: null, s4_total: null, ratio: null };
+    s1_pass: null, s1_total: null, s2_pass: null, s2_total: null, s3_pass: null, s3_total: null, s4_pass: null, s4_total: null, s5_pass: null, s5_total: null, ratio: null };
 }
 
 // ── 데이터셋 갱신 모달 ──
@@ -1198,7 +1213,8 @@ function alioParseHtmlLocal(html) {
     if      (stageIndex === 0) { current.s1_pass = pass; current.s1_total = total; }
     else if (stageIndex === 1) { current.s2_pass = pass; current.s2_total = total; }
     else if (stageIndex === 2) { current.s3_pass = pass; current.s3_total = total; }
-    else                       { current.s4_pass = pass; current.s4_total = total; }
+    else if (stageIndex === 3) { current.s4_pass = pass; current.s4_total = total; }
+    else                       { current.s5_pass = pass; current.s5_total = total; }
     stageIndex++;
   }
   if (current) records.push(current);

@@ -5396,12 +5396,13 @@ ${d.hashtags}`;
         if      (stageIndex === 0) { current.s1_pass = pass; current.s1_total = total; }
         else if (stageIndex === 1) { current.s2_pass = pass; current.s2_total = total; }
         else if (stageIndex === 2) { current.s3_pass = pass; current.s3_total = total; }
-        else                       { current.s4_pass = pass; current.s4_total = total; }
+        else if (stageIndex === 3) { current.s4_pass = pass; current.s4_total = total; }
+        else                       { current.s5_pass = pass; current.s5_total = total; }
         stageIndex++;
       }
       if (current) records.push(current);
       const valid = records.filter(r => r.s1_pass || r.s2_pass || r.s3_pass || r.s4_pass);
-      valid.forEach(r => { if (!r.ratio) { const fp=r.s4_pass||r.s3_pass||r.s1_pass; const ft=r.s4_total||r.s3_total||r.s1_total; if(fp&&ft) r.ratio=+(ft/fp).toFixed(2); } });
+      valid.forEach(r => { if (!r.ratio) { const fp=r.s5_pass||r.s4_pass||r.s3_pass||r.s1_pass; const ft=r.s5_total||r.s4_total||r.s3_total||r.s1_total; if(fp&&ft) r.ratio=+(ft/fp).toFixed(2); } });
       return { datasetName, records: valid };
     }
 
@@ -5417,7 +5418,7 @@ ${d.hashtags}`;
         const m=text.match(/^(.+?)\s*\((.+)\)$/);
         if(m){grade=m[1].trim();job=m[2].trim();region='-';if(/7급/.test(grade))gradeKey='7';else if(/별정|계약|무기|임기/.test(grade))gradeKey='b';else if(/경력|전문/.test(grade))gradeKey='e';}
       }
-      return {dataset_name:datasetName,grade,grade_key:gradeKey,job,region,s1_pass:null,s1_total:null,s2_pass:null,s2_total:null,s3_pass:null,s3_total:null,s4_pass:null,s4_total:null,ratio:null};
+      return {dataset_name:datasetName,grade,grade_key:gradeKey,job,region,s1_pass:null,s1_total:null,s2_pass:null,s2_total:null,s3_pass:null,s3_total:null,s4_pass:null,s4_total:null,s5_pass:null,s5_total:null,ratio:null};
     }
 
     async function loadCalendarAdmin() {
