@@ -779,13 +779,6 @@ function parseAlioHtml(html) {
     const ratioM = rowText.match(/([\d.]+)\s*대\s*1/) || rowText.match(/([\d.]+)\s*:\s*1/);
     if (ratioM) current.ratio = parseFloat(ratioM[1]);
 
-    // 단계 행(1차/2차/최종 등)마다 결과확정일 갱신 — 데이터 없는 행도 포함
-    const isStageRow = ths.some(th => /[1-9]차|최종|결과확정일/.test(th.textContent));
-    if (isStageRow) {
-      const sdM = rowText.match(/(\d{4})\.(\d{2})\.(\d{2})/);
-      current.s3_date = sdM ? `${sdM[1]}.${sdM[2]}.${sdM[3]}` : null;
-    }
-
     let pass = null, total = null;
     const myeongnums = rowText.match(/(\d+)명/g);
     if (myeongnums && myeongnums.length >= 2) {
@@ -860,7 +853,7 @@ function parseGroupHeader(text, datasetName) {
     }
   }
   return { dataset_name: datasetName, grade, grade_key: gradeKey, job, region,
-    s1_pass: null, s1_total: null, s2_pass: null, s2_total: null, s3_pass: null, s3_total: null, s3_date: null, ratio: null };
+    s1_pass: null, s1_total: null, s2_pass: null, s2_total: null, s3_pass: null, s3_total: null, ratio: null };
 }
 </script>
 </body>
