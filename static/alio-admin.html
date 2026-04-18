@@ -490,7 +490,11 @@ CREATE POLICY "auth update" ON alio_jobs
       <button onclick="closeRefreshModal()" style="background:none;border:none;font-size:1.2rem;color:#94A3B8;cursor:pointer;">✕</button>
     </div>
     <div class="modal-body">
-      <p style="font-size:.82rem;color:#64748B;margin-bottom:12px;">ALIO 채용공고 페이지 → <b>Ctrl+U</b> 또는 우클릭 → 소스보기 → <b>Ctrl+A → Ctrl+C</b> 복사 후 붙여넣기</p>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label class="form-label">ALIO 원본 URL <span style="color:#94A3B8;font-weight:400;">(선택)</span></label>
+        <input type="url" id="refresh-url-input" class="form-input" placeholder="https://www.alio.go.kr/recruit/..."/>
+      </div>
+      <p style="font-size:.82rem;color:#64748B;margin-bottom:8px;">HTML 소스: ALIO 페이지 → <b>Ctrl+U</b> → <b>Ctrl+A → Ctrl+C</b> 복사 후 붙여넣기</p>
       <textarea id="refresh-html-input" class="form-input" rows="8" placeholder="<!DOCTYPE html>... (페이지 소스를 여기에 붙여넣으세요)" style="font-family:monospace;font-size:.75rem;resize:vertical;"></textarea>
       <div id="refresh-preview" class="hidden" style="margin-top:12px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:12px;">
         <div style="font-size:.82rem;font-weight:700;color:#15803D;" id="refresh-preview-msg"></div>
@@ -592,6 +596,10 @@ function filterDatasets(q){
 async function loadDatasets(){
   const tbody=document.getElementById('ds-tbody');
   tbody.innerHTML='<tr><td colspan="7" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr>';
+  // URL 캐시 로드
+  const {data:urlData}=await db.from('alio_source_cache').select('dataset_name,url').not('url','is',null);
+  _dsUrlMap={};
+  (urlData||[]).forEach(r=>{ if(r.url) _dsUrlMap[r.dataset_name]=r.url; });
   const {data,error}=await db.from('alio_jobs').select('*').order('created_at',{ascending:false});
   if(error){
     tbody.innerHTML='<tr><td colspan="7" class="py-6 text-center text-sm text-red-400">테이블 오류: '+esc(error.message)+'<br><small>테이블 설정 탭에서 SQL을 실행하세요.</small></td></tr>';
@@ -638,6 +646,7 @@ function renderDsRows(entries){
     const headerRow=`<tr style="background:#EFF6FF;">
       <td colspan="7" class="font-bold text-blue-700" style="font-size:.85rem;padding:8px 12px;">
         📁 ${esc(name)} <span class="text-xs font-normal text-slate-400 ml-2">${ds.rows.length}개 직종 · ${dt}</span>
+        ${_dsUrlMap[name]?`<a href="${esc(_dsUrlMap[name])}" target="_blank" rel="noopener" style="margin-left:8px;font-size:11px;color:#3B82F6;font-weight:500;text-decoration:none;">🔗 원본</a>`:''}
       </td>
       <td style="padding:6px 12px;">
         <div style="display:flex;gap:4px;">
@@ -1080,12 +1089,14 @@ function parseGroupHeader(text, datasetName) {
 // ── 데이터셋 갱신 모달 ──
 let _refreshDsName = '';
 let _refreshParsed = [];
+let _dsUrlMap = {}; // dataset_name → url
 
 function openRefreshModal(name) {
   _refreshDsName = name;
   _refreshParsed = [];
   document.getElementById('refresh-modal-dsname').textContent = name;
   document.getElementById('refresh-html-input').value = '';
+  document.getElementById('refresh-url-input').value = _dsUrlMap[name] || '';
   document.getElementById('refresh-preview').classList.add('hidden');
   document.getElementById('refresh-error').classList.add('hidden');
   document.getElementById('refresh-save-btn').classList.add('hidden');
@@ -1135,7 +1146,9 @@ async function saveRefreshData() {
   if (insErr) { toast('저장 실패: ' + insErr.message, false); btn.disabled = false; btn.textContent = '✅ 갱신 저장'; return; }
   // 소스 캐시 저장
   const htmlSrc = document.getElementById('refresh-html-input').value.trim();
-  await db.from('alio_source_cache').insert({ dataset_name: _refreshDsName, html_source: htmlSrc, status: 'done' });
+  const urlVal = document.getElementById('refresh-url-input').value.trim();
+  await db.from('alio_source_cache').upsert({ dataset_name: _refreshDsName, html_source: htmlSrc, url: urlVal||null, status: 'done' }, { onConflict: 'dataset_name' });
+  if (urlVal) _dsUrlMap[_refreshDsName] = urlVal;
   btn.disabled = false; btn.textContent = '✅ 갱신 저장';
   toast(`"${_refreshDsName}" — ${_refreshParsed.length}개 직종 갱신 완료!`);
   closeRefreshModal();
