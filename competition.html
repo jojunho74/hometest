@@ -546,7 +546,7 @@ function toggleMenu() {
 async function init() {
   const [jobsRes, cacheRes, viewsRes] = await Promise.all([
     db.from('alio_jobs')
-      .select('dataset_name,grade,grade_key,job,region,s1_pass,s1_total,s2_pass,s2_total,s3_pass,s3_total,ratio')
+      .select('dataset_name,grade,grade_key,job,region,s1_pass,s1_total,s2_pass,s2_total,s3_pass,s3_total,s4_pass,s4_total,ratio')
       .order('dataset_name'),
     db.from('alio_source_cache')
       .select('dataset_name,upload_data')
@@ -694,6 +694,7 @@ function renderVisualization(dsName, rows) {
             <th>직급 / 직종</th>
             <th>1차 합격 / 응시</th>
             <th>2차 합격 / 응시</th>
+            <th>3차 합격 / 응시</th>
             <th>최종 합격 / 응시</th>
             <th>경쟁률</th>
           </tr></thead>
@@ -738,19 +739,23 @@ function renderVisualization(dsName, rows) {
     const rv = parseFloat(d.ratio)||0;
     const ratioClr = rv>=80?'#FB7185':rv>=30?'#FBBF24':'#34D399';
     const maxT = d.s1_total||1;
-    const r2pct = d.s2_total ? pct(d.s2_pass,maxT) : null;
-    const pr1=pct(d.s1_pass,d.s1_total), pr2=d.s2_total?pct(d.s2_pass,d.s2_total):null, pr3=pct(d.s3_pass,d.s3_total);
+    // 최종 = s4가 있으면 s4, 없으면 s3
+    const finalPass = d.s4_total ? d.s4_pass : d.s3_pass;
+    const finalTotal = d.s4_total ? d.s4_total : d.s3_total;
     const s2html = d.s2_total
-      ? `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">2차 전형</span><span class="stage-nums"><strong>${d.s2_pass||0}명</strong> / ${d.s2_total}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-2" style="width:${r2pct}%"></div></div></div>`
+      ? `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">2차 전형</span><span class="stage-nums"><strong>${d.s2_pass||0}명</strong> / ${d.s2_total}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-2" style="width:${pct(d.s2_pass,maxT)}%"></div></div></div>`
       : `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">2차 전형</span><span class="stage-nums" style="opacity:.3;">해당없음</span></div></div>`;
+    const s3html = (d.s3_total && d.s4_total)
+      ? `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">3차 전형</span><span class="stage-nums"><strong>${d.s3_pass||0}명</strong> / ${d.s3_total}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-2" style="width:${pct(d.s3_pass,maxT)}%"></div></div></div>`
+      : '';
     grid.insertAdjacentHTML('beforeend', `
       <div class="funnel-card">
         <div class="fc-head"><span class="fc-title">${d.job}</span></div>
-        <div class="fc-region">${d.region||''} &middot; 최종채용 ${d.s3_pass||0}명</div>
+        <div class="fc-region">${d.region||''} &middot; 최종채용 ${finalPass||0}명</div>
         <div class="fc-ratio" style="color:${ratioClr};">${d.ratio}<span style="font-size:.9rem;font-weight:600;">:1</span></div>
         <div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">1차 전형</span><span class="stage-nums"><strong>${d.s1_pass||0}명</strong> / ${d.s1_total||0}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-1" style="width:100%"></div></div></div>
-        ${s2html}
-        <div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">최종 합격<\/span><span class="stage-nums"><strong>${d.s3_pass||0}명<\/strong> \/ ${d.s3_total||0}명 응시<\/span><\/div><div class="bar-bg"><div class="bar-fill bar-3" style="width:${pct(d.s3_pass,maxT)}%"></div></div></div>
+        ${s2html}${s3html}
+        <div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">최종 합격<\/span><span class="stage-nums"><strong>${finalPass||0}명<\/strong> \/ ${finalTotal||0}명 응시<\/span><\/div><div class="bar-bg"><div class="bar-fill bar-3" style="width:${pct(finalPass,maxT)}%"></div></div></div>
       </div>`);
   });
 
@@ -759,9 +764,10 @@ function renderVisualization(dsName, rows) {
   rows.forEach(d => {
     const rv = parseFloat(d.ratio)||0;
     const chipCls = rv>=80?'chip-hot':rv>=20?'chip-mid':'chip-low';
-    const s2 = d.s2_total
-      ? `<span style="color:#93C5FD;font-weight:700;">${d.s2_pass}</span><span style="color:rgba(255,255,255,.3);">/${d.s2_total}</span>`
-      : '<span style="color:rgba(255,255,255,.2);">—</span>';
+    const s2 = d.s2_total ? `<span style="color:#93C5FD;font-weight:700;">${d.s2_pass}</span><span style="color:rgba(255,255,255,.3);">/${d.s2_total}</span>` : '<span style="color:rgba(255,255,255,.2);">—</span>';
+    const s3 = d.s3_total ? `<span style="color:#A78BFA;font-weight:700;">${d.s3_pass}</span><span style="color:rgba(255,255,255,.3);">/${d.s3_total}</span>` : '<span style="color:rgba(255,255,255,.2);">—</span>';
+    const tFinalPass = d.s4_total ? d.s4_pass : d.s3_pass;
+    const tFinalTotal = d.s4_total ? d.s4_total : d.s3_total;
     tbody.insertAdjacentHTML('beforeend', `<tr>
       <td>
         <strong style="color:#E2E8F0;">${d.job}</strong>
@@ -769,7 +775,8 @@ function renderVisualization(dsName, rows) {
       </td>
       <td><span style="color:#60A5FA;font-weight:700;">${d.s1_pass||0}</span><span style="color:rgba(255,255,255,.3);">/${d.s1_total||0}</span></td>
       <td>${s2}</td>
-      <td><span style="color:#34D399;font-weight:700;">${d.s3_pass||0}</span><span style="color:rgba(255,255,255,.3);">/${d.s3_total||0}</span></td>
+      <td>${d.s4_total ? s3 : '<span style="color:rgba(255,255,255,.2);">—</span>'}</td>
+      <td><span style="color:#34D399;font-weight:700;">${tFinalPass||0}</span><span style="color:rgba(255,255,255,.3);">/${tFinalTotal||0}</span></td>
       <td><span class="chip ${chipCls}">${d.ratio}:1</span></td>
     </tr>`);
   });
