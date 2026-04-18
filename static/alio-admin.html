@@ -622,7 +622,7 @@ function renderDsRows(entries){
         <td class="text-xs text-slate-400">${esc(r.region||'-')}</td>
         <td>${s1}</td>
         <td>${s2}</td>
-        <td>${s3}</td>
+        <td>${r.s4_total ? s3 : '<span class="text-slate-300">—</span>'}</td>
         <td>${sf}</td>
         <td><span class="chip ${chipCls}">${r.ratio||'-'}:1</span></td>
         <td></td>
@@ -965,10 +965,11 @@ function parseAlioHtml(html) {
 
     if (!pass) continue; // 숫자 없는 행 스킵
 
-    // 단계 순서대로 s1 → s2 → s3 (이후는 s3 덮어쓰기: 마지막 단계 = 최종)
+    // 4-슬롯: stageIndex 0=s1, 1=s2, 2=s3(3차), 3+=s4(최종)
     if      (stageIndex === 0) { current.s1_pass = pass; current.s1_total = total; }
     else if (stageIndex === 1) { current.s2_pass = pass; current.s2_total = total; }
-    current.s3_pass = pass; current.s3_total = total; // 항상 최신 단계를 s3에
+    else if (stageIndex === 2) { current.s3_pass = pass; current.s3_total = total; }
+    else                       { current.s4_pass = pass; current.s4_total = total; }
     stageIndex++;
   }
   if (current) records.push(current);
@@ -1032,7 +1033,7 @@ function parseGroupHeader(text, datasetName) {
   }
 
   return { dataset_name: datasetName, grade, grade_key: gradeKey, job, region,
-    s1_pass: null, s1_total: null, s2_pass: null, s2_total: null, s3_pass: null, s3_total: null, ratio: null };
+    s1_pass: null, s1_total: null, s2_pass: null, s2_total: null, s3_pass: null, s3_total: null, s4_pass: null, s4_total: null, ratio: null };
 }
 
 function extractPassTotal(text) {
