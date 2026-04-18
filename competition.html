@@ -433,7 +433,15 @@
           <div class="sum-card ac-amber"><div class="sum-label">미달 직종 수</div><div class="sum-val" id="md-job-cnt">-</div><div class="sum-sub">전체 직종 중</div></div>
           <div class="sum-card ac-blue"><div class="sum-label">전체 기관 수</div><div class="sum-val" id="md-total-cnt">-</div><div class="sum-sub">등록된 채용공고</div></div>
         </div>
-        <div class="sec-title">⚠️ 미달 현황 — 경쟁률 1:1 미만 직종</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px;flex-wrap:wrap;">
+          <div class="sec-title" style="margin-bottom:0;">⚠️ 미달 현황 — 경쟁률 1:1 미만 직종</div>
+          <div style="position:relative;flex-shrink:0;">
+            <input id="midal-search" type="text" placeholder="기관명 검색..." oninput="filterMidal(this.value)"
+              style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:7px 30px 7px 12px;font-size:.8rem;color:#E2E8F0;outline:none;width:220px;transition:border-color .2s;"
+              onfocus="this.style.borderColor='rgba(96,165,250,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.12)'"/>
+            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:.7rem;color:rgba(255,255,255,.25);pointer-events:none;">🔍</span>
+          </div>
+        </div>
         <div class="tbl-card">
           <div class="tbl-scroll">
             <table class="data-tbl">
@@ -593,6 +601,30 @@ async function init() {
   renderMidalDefault(allRows);
 }
 
+let _midalRows = [];
+
+function filterMidal(q) {
+  const tbody = document.getElementById('midal-tbody');
+  const filtered = q.trim()
+    ? _midalRows.filter(r => (r.dataset_name || '').includes(q.trim()))
+    : _midalRows;
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:rgba(255,255,255,.3);">"${q}" 검색 결과가 없습니다</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(r => midalRowHtml(r)).join('');
+}
+
+function midalRowHtml(r) {
+  return `<tr style="cursor:pointer;" onclick="selectDataset('${(r.dataset_name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}');document.getElementById('midal-default').classList.add('hidden');">
+    <td><strong style="color:#E2E8F0;">${r.dataset_name||'-'}</strong></td>
+    <td style="color:#CBD5E1;">${r.job||'-'}</td>
+    <td style="color:rgba(255,255,255,.4);font-size:.75rem;">${r.region||'-'}</td>
+    <td><span style="color:#34D399;font-weight:700;">${r.s3_pass||0}</span><span style="color:rgba(255,255,255,.3);">/${r.s3_total||0}</span></td>
+    <td><span class="chip chip-hot">${parseFloat(r.ratio)||0}:1</span></td>
+  </tr>`;
+}
+
 function renderMidalDefault(allRows) {
   // 미달 = 최종 응시인원(s3_total) > 최종 합격인원(s3_pass)
   const midalRows = allRows.filter(r => (r.s3_total != null && r.s3_pass != null) && Number(r.s3_total) > Number(r.s3_pass));
@@ -609,17 +641,8 @@ function renderMidalDefault(allRows) {
   }
   // 공공기관명 가나다 순 정렬
   midalRows.sort((a, b) => (a.dataset_name || '').localeCompare(b.dataset_name || '', 'ko'));
-  tbody.innerHTML = midalRows.map(r => {
-    const ratio = parseFloat(r.ratio) || 0;
-    const ratioClr = ratio === 0 ? '#FB7185' : '#FBBF24';
-    return `<tr style="cursor:pointer;" onclick="selectDataset('${(r.dataset_name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}');document.getElementById('midal-default').classList.add('hidden');">
-      <td><strong style="color:#E2E8F0;">${r.dataset_name||'-'}</strong></td>
-      <td style="color:#CBD5E1;">${r.job||'-'}</td>
-      <td style="color:rgba(255,255,255,.4);font-size:.75rem;">${r.region||'-'}</td>
-      <td><span style="color:#34D399;font-weight:700;">${r.s3_pass||0}</span><span style="color:rgba(255,255,255,.3);">/${r.s3_total||0}</span></td>
-      <td><span class="chip chip-hot" style="color:${ratioClr};">${ratio > 0 ? ratio + ':1' : '미달'}</span></td>
-    </tr>`;
-  }).join('');
+  _midalRows = midalRows;
+  tbody.innerHTML = midalRows.map(r => midalRowHtml(r)).join('');
 }
 
 function renderDatasetList(list) {
