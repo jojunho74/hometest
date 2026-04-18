@@ -371,12 +371,21 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
             </div>
             <div></div>
             <div class="form-group">
+              <label class="form-label">3차 합격</label>
+              <input type="number" id="f-s3p" class="form-input" placeholder="명 (없으면 공란)"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">3차 응시</label>
+              <input type="number" id="f-s3t" class="form-input" placeholder="명 (없으면 공란)"/>
+            </div>
+            <div></div>
+            <div class="form-group">
               <label class="form-label">최종 합격 <span class="text-red-500">*</span></label>
-              <input type="number" id="f-s3p" class="form-input" placeholder="명"/>
+              <input type="number" id="f-s4p" class="form-input" placeholder="명"/>
             </div>
             <div class="form-group">
               <label class="form-label">최종 응시</label>
-              <input type="number" id="f-s3t" class="form-input" placeholder="명"/>
+              <input type="number" id="f-s4t" class="form-input" placeholder="명"/>
             </div>
             <div class="form-group">
               <label class="form-label">경쟁률 <span class="text-red-500">*</span></label>
@@ -707,9 +716,13 @@ async function submitRecord(){
   const s2t=parseInt(document.getElementById('f-s2t').value)||null;
   const s3p=parseInt(document.getElementById('f-s3p').value)||null;
   const s3t=parseInt(document.getElementById('f-s3t').value)||null;
+  const s4p=parseInt(document.getElementById('f-s4p').value)||null;
+  const s4t=parseInt(document.getElementById('f-s4t').value)||null;
   const ratio=parseFloat(document.getElementById('f-ratio').value)||null;
-  if(!dataset||!s3p||!ratio){toast('필수 항목을 입력하세요 (공고명, 최종합격, 경쟁률)',false);return;}
-  const {error}=await db.from('alio_jobs').insert({dataset_name:dataset,region,s1_pass:s1p,s1_total:s1t,s2_pass:s2p,s2_total:s2t,s3_pass:s3p,s3_total:s3t,ratio});
+  // 최종 = s4가 있으면 s4, 없으면 s3
+  const hasFinal = s4p || s3p;
+  if(!dataset||!hasFinal||!ratio){toast('필수 항목을 입력하세요 (공고명, 최종합격, 경쟁률)',false);return;}
+  const {error}=await db.from('alio_jobs').insert({dataset_name:dataset,region,s1_pass:s1p,s1_total:s1t,s2_pass:s2p,s2_total:s2t,s3_pass:s3p,s3_total:s3t,s4_pass:s4p,s4_total:s4t,ratio});
   if(error){toast('저장 실패: '+error.message,false);return;}
   toast('저장되었습니다!');
   clearForm();
@@ -717,7 +730,7 @@ async function submitRecord(){
 }
 
 function clearForm(){
-  ['f-dataset','f-region','f-s1p','f-s1t','f-s2p','f-s2t','f-s3p','f-s3t','f-ratio'].forEach(id=>{
+  ['f-dataset','f-region','f-s1p','f-s1t','f-s2p','f-s2t','f-s3p','f-s3t','f-s4p','f-s4t','f-ratio'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.value='';
   });
