@@ -751,11 +751,6 @@ function renderVisualization(dsName, rows) {
         <div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">1차 전형</span><span class="stage-nums"><strong>${d.s1_pass||0}명</strong> / ${d.s1_total||0}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-1" style="width:100%"></div></div></div>
         ${s2html}
         <div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">최종 합격<\/span><span class="stage-nums"><strong>${d.s3_pass||0}명<\/strong> \/ ${d.s3_total||0}명 응시<\/span><\/div><div class="bar-bg"><div class="bar-fill bar-3" style="width:${pct(d.s3_pass,maxT)}%"></div></div></div>
-        <div class="pass-rate">
-          <div class="pr-item"><div class="pr-val">${pr1}%</div><div class="pr-lbl">1차 합격률</div></div>
-          ${pr2!==null?`<div class="pr-item"><div class="pr-val">${pr2}%</div><div class="pr-lbl">2차 합격률</div></div>`:''}
-          <div class="pr-item"><div class="pr-val" style="color:#34D399;">${pr3}%</div><div class="pr-lbl">최종 합격률</div></div>
-        </div>
       </div>`);
   });
 
