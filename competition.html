@@ -606,8 +606,8 @@ function renderMidalDefault(allRows) {
     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:rgba(255,255,255,.3);">미달 직종이 없습니다</td></tr>';
     return;
   }
-  // 경쟁률 낮은 순 정렬
-  midalRows.sort((a, b) => (parseFloat(a.ratio) || 0) - (parseFloat(b.ratio) || 0));
+  // 공공기관명 가나다 순 정렬
+  midalRows.sort((a, b) => (a.dataset_name || '').localeCompare(b.dataset_name || '', 'ko'));
   tbody.innerHTML = midalRows.map(r => {
     const ratio = parseFloat(r.ratio) || 0;
     const ratioClr = ratio === 0 ? '#FB7185' : '#FBBF24';
