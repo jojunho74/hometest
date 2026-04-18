@@ -554,7 +554,7 @@ function toggleMenu() {
 async function init() {
   const [jobsRes, cacheRes, viewsRes] = await Promise.all([
     db.from('alio_jobs')
-      .select('dataset_name,grade,grade_key,job,region,s1_pass,s1_total,s2_pass,s2_total,s3_pass,s3_total,ratio')
+      .select('dataset_name,grade,grade_key,job,region,s1_pass,s1_total,s2_pass,s2_total,s3_pass,s3_total,s3_date,ratio')
       .order('dataset_name'),
     db.from('alio_source_cache')
       .select('dataset_name,upload_data')
@@ -619,7 +619,7 @@ function midalRowHtml(r) {
     <td style="color:#CBD5E1;">${r.job||'-'}</td>
     <td style="color:rgba(255,255,255,.4);font-size:.75rem;">${r.region||'-'}</td>
     <td><span style="color:#34D399;font-weight:700;">${r.s3_pass||0}</span><span style="color:rgba(255,255,255,.3);">/${r.s3_total||0}</span></td>
-    <td><span class="chip chip-hot">${parseFloat(r.ratio)||0}:1</span></td>
+    <td>${r.s3_date ? `<span class="chip chip-hot">${parseFloat(r.ratio)||0}:1</span>` : `<span class="chip" style="background:rgba(100,116,139,.25);color:#94A3B8;border:1px solid rgba(148,163,184,.2);">집계중</span>`}</td>
   </tr>`;
 }
 
@@ -806,7 +806,7 @@ function renderVisualization(dsName, rows) {
       <div class="funnel-card">
         <div class="fc-head"><span class="fc-title">${d.job}</span></div>
         <div class="fc-region">${d.region||''} &middot; 최종채용 ${d.s3_pass||0}명</div>
-        <div class="fc-ratio" style="color:${ratioClr};">${d.ratio}<span style="font-size:.9rem;font-weight:600;">:1</span></div>
+        <div class="fc-ratio" style="color:${d.s3_date ? ratioClr : '#64748B'};">${d.s3_date ? `${d.ratio}<span style="font-size:.9rem;font-weight:600;">:1</span>` : `<span style="font-size:1rem;font-weight:700;color:#64748B;">집계중</span>`}</div>
         <div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">1차 전형</span><span class="stage-nums"><strong>${d.s1_pass||0}명</strong> / ${d.s1_total||0}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-1" style="width:100%"></div></div></div>
         ${s2html}
         <div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">최종 합격</span><span class="stage-nums"><strong>${d.s3_pass||0}명</strong> / ${d.s3_total||0}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-3" style="width:${pct(d.s3_pass,maxT)}%"></div></div></div>
@@ -834,7 +834,7 @@ function renderVisualization(dsName, rows) {
       <td><span style="color:#60A5FA;font-weight:700;">${d.s1_pass||0}</span><span style="color:rgba(255,255,255,.3);">/${d.s1_total||0}</span></td>
       <td>${s2}</td>
       <td><span style="color:#34D399;font-weight:700;">${d.s3_pass||0}</span><span style="color:rgba(255,255,255,.3);">/${d.s3_total||0}</span></td>
-      <td><span class="chip ${chipCls}">${d.ratio}:1</span></td>
+      <td>${d.s3_date ? `<span class="chip ${chipCls}">${d.ratio}:1</span>` : `<span class="chip" style="background:rgba(100,116,139,.25);color:#94A3B8;border:1px solid rgba(148,163,184,.2);">집계중</span>`}</td>
     </tr>`);
   });
 }
