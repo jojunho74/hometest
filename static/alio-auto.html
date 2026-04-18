@@ -808,8 +808,8 @@ function parseAlioHtml(html) {
     const dateM = rowText.match(/(\d{4})\.(\d{2})\.(\d{2})/);
     const dateStr = dateM ? `${dateM[1]}.${dateM[2]}.${dateM[3]}` : null;
 
-    if      (stageIndex === 0) { current.s1_pass = pass; current.s1_total = total; current.s1_date = dateStr; }
-    else if (stageIndex === 1) { current.s2_pass = pass; current.s2_total = total; current.s2_date = dateStr; }
+    if      (stageIndex === 0) { current.s1_pass = pass; current.s1_total = total; }
+    else if (stageIndex === 1) { current.s2_pass = pass; current.s2_total = total; }
     current.s3_pass = pass; current.s3_total = total;
     stageIndex++;
   }
@@ -860,7 +860,7 @@ function parseGroupHeader(text, datasetName) {
     }
   }
   return { dataset_name: datasetName, grade, grade_key: gradeKey, job, region,
-    s1_pass: null, s1_total: null, s1_date: null, s2_pass: null, s2_total: null, s2_date: null, s3_pass: null, s3_total: null, s3_date: null, ratio: null };
+    s1_pass: null, s1_total: null, s2_pass: null, s2_total: null, s3_pass: null, s3_total: null, s3_date: null, ratio: null };
 }
 </script>
 </body>
