@@ -779,6 +779,13 @@ function parseAlioHtml(html) {
     const ratioM = rowText.match(/([\d.]+)\s*대\s*1/) || rowText.match(/([\d.]+)\s*:\s*1/);
     if (ratioM) current.ratio = parseFloat(ratioM[1]);
 
+    // 단계 행(1차/2차/최종 등)마다 결과확정일 갱신 — 데이터 없는 행도 포함
+    const isStageRow = ths.some(th => /[1-9]차|최종|결과확정일/.test(th.textContent));
+    if (isStageRow) {
+      const sdM = rowText.match(/(\d{4})\.(\d{2})\.(\d{2})/);
+      current.s3_date = sdM ? `${sdM[1]}.${sdM[2]}.${sdM[3]}` : null;
+    }
+
     let pass = null, total = null;
     const myeongnums = rowText.match(/(\d+)명/g);
     if (myeongnums && myeongnums.length >= 2) {
@@ -803,7 +810,7 @@ function parseAlioHtml(html) {
 
     if      (stageIndex === 0) { current.s1_pass = pass; current.s1_total = total; current.s1_date = dateStr; }
     else if (stageIndex === 1) { current.s2_pass = pass; current.s2_total = total; current.s2_date = dateStr; }
-    current.s3_pass = pass; current.s3_total = total; current.s3_date = dateStr;
+    current.s3_pass = pass; current.s3_total = total;
     stageIndex++;
   }
   if (current) records.push(current);
