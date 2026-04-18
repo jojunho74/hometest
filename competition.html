@@ -427,17 +427,9 @@
       <span class="topbar-cnt hidden" id="topbar-cnt"></span>
     </div>
     <div class="content-area" id="content-area">
-      <div id="midal-default">
-        <div class="sum-grid" style="margin-bottom:18px;">
-          <div class="sum-card ac-rose"><div class="sum-label">미달 기관 수</div><div class="sum-val" id="md-org-cnt">-</div><div class="sum-sub">경쟁률 1:1 미만</div></div>
-          <div class="sum-card ac-amber"><div class="sum-label">미달 직종 수</div><div class="sum-val" id="md-job-cnt">-</div><div class="sum-sub">전체 직종 중</div></div>
-          <div class="sum-card ac-blue"><div class="sum-label">전체 기관 수</div><div class="sum-val" id="md-total-cnt">-</div><div class="sum-sub">등록된 채용공고</div></div>
-        </div>
-        <div class="sec-title">⚠️ 미달 현황 — 경쟁률 1:1 미만 직종</div>
-        <div style="position:relative;margin-bottom:14px;">
-          <input id="midal-search" type="text" placeholder="기관명 검색..." oninput="filterMidal(this.value)"
-            style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:11px 40px 11px 16px;font-size:.95rem;color:#E2E8F0;outline:none;width:100%;transition:border-color .2s;"
-            onfocus="this.style.borderColor='rgba(96,165,250,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.12)'"/>
+      <div id="midal-default" style="display:none;">
+        <div style="display:none;">
+          <input id="midal-search" type="text"/>
           <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:.85rem;color:rgba(255,255,255,.3);pointer-events:none;">🔍</span>
         </div>
         <div class="tbl-card">
@@ -596,55 +588,6 @@ async function init() {
   // 전체 순위 부여
   _allDatasets.forEach((ds, i) => { ds.rank = i + 1; });
   renderDatasetList(_allDatasets);
-  renderMidalDefault(allRows);
-}
-
-let _midalRows = [];
-
-function filterMidal(q) {
-  const tbody = document.getElementById('midal-tbody');
-  const filtered = q.trim()
-    ? _midalRows.filter(r => (r.dataset_name || '').includes(q.trim()))
-    : _midalRows;
-  if (!filtered.length) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:rgba(255,255,255,.3);">"${q}" 검색 결과가 없습니다</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = filtered.map(r => midalRowHtml(r)).join('');
-}
-
-function midalRowHtml(r) {
-  return `<tr style="cursor:pointer;" onclick="selectDataset('${(r.dataset_name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}');document.getElementById('midal-default').classList.add('hidden');">
-    <td><strong style="color:#E2E8F0;">${r.dataset_name||'-'}</strong></td>
-    <td style="color:#CBD5E1;">${r.job||'-'}</td>
-    <td style="color:rgba(255,255,255,.4);font-size:.75rem;">${r.region||'-'}</td>
-    <td><span style="color:#34D399;font-weight:700;">${r.s3_pass||0}</span><span style="color:rgba(255,255,255,.3);">/${r.s3_total||0}</span></td>
-    <td>${r.s3_date ? `<span class="chip chip-hot">${parseFloat(r.ratio)||0}:1</span>` : `<span class="chip" style="background:rgba(100,116,139,.25);color:#94A3B8;border:1px solid rgba(148,163,184,.2);">집계중</span>`}</td>
-  </tr>`;
-}
-
-function renderMidalDefault(allRows) {
-  // 미달 = 최종 응시인원(s3_total) > 최종 합격인원(s3_pass)
-  const midalRows = allRows.filter(r => (r.s3_total != null && r.s3_pass != null) && Number(r.s3_total) > Number(r.s3_pass));
-  const midalOrgs = new Set(midalRows.map(r => r.dataset_name));
-
-  document.getElementById('md-org-cnt').textContent = midalOrgs.size;
-  document.getElementById('md-job-cnt').textContent = midalRows.length;
-  document.getElementById('md-total-cnt').textContent = new Set(allRows.map(r => r.dataset_name)).size;
-
-  const tbody = document.getElementById('midal-tbody');
-  if (!midalRows.length) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:rgba(255,255,255,.3);">미달 직종이 없습니다</td></tr>';
-    return;
-  }
-  // 기관명에 '2026' 포함된 데이터 제외
-  const filteredMidal = midalRows.filter(r => !(r.dataset_name || '').includes('2026'));
-  // 공공기관명 가나다 순 정렬
-  filteredMidal.sort((a, b) => (a.dataset_name || '').localeCompare(b.dataset_name || '', 'ko'));
-  midalRows.length = 0;
-  filteredMidal.forEach(r => midalRows.push(r));
-  _midalRows = midalRows;
-  tbody.innerHTML = midalRows.map(r => midalRowHtml(r)).join('');
 }
 
 function renderDatasetList(list) {
@@ -700,8 +643,6 @@ function selectDataset(name) {
 }
 
 function renderVisualization(dsName, rows) {
-  const md = document.getElementById('midal-default');
-  if (md) md.classList.add('hidden');
   const area = document.getElementById('content-area');
   const totalHired = rows.reduce((s,r) => s+(r.s3_pass||0), 0);
   const totalApply = rows.reduce((s,r) => s+(r.s1_total||0), 0);
