@@ -525,10 +525,14 @@ function toggleMenu() {
 }
 
 async function init() {
-  const [jobsRes, viewsRes] = await Promise.all([
+  const [jobsRes, cacheRes, viewsRes] = await Promise.all([
     db.from('alio_jobs')
       .select('dataset_name,grade,grade_key,job,region,s1_pass,s1_total,s2_pass,s2_total,s3_pass,s3_total,ratio')
       .order('dataset_name'),
+    db.from('alio_source_cache')
+      .select('dataset_name,upload_data')
+      .eq('status','published')
+      .not('upload_data','is',null),
     db.from('page_views')
       .select('page')
       .like('page', 'competition-click:%')
@@ -537,6 +541,14 @@ async function init() {
     document.getElementById('ds-list').innerHTML = '<div class="empty-list">데이터를 불러올 수 없습니다</div>';
     return;
   }
+  // alio_jobs + alio_source_cache 병합 (중복 dataset_name은 alio_jobs 우선)
+  const allRows = [...jobsRes.data];
+  const jobDatasets = new Set(jobsRes.data.map(r => r.dataset_name));
+  (cacheRes.data || []).forEach(row => {
+    if (!jobDatasets.has(row.dataset_name) && Array.isArray(row.upload_data)) {
+      row.upload_data.forEach(r => allRows.push(r));
+    }
+  });
   // 클릭 수 집계
   const viewCounts = {};
   (viewsRes.data || []).forEach(r => {
@@ -544,7 +556,7 @@ async function init() {
     viewCounts[name] = (viewCounts[name] || 0) + 1;
   });
   const dsMap = {};
-  jobsRes.data.forEach(r => {
+  allRows.forEach(r => {
     const k = r.dataset_name || '미분류';
     if (!dsMap[k]) dsMap[k] = [];
     dsMap[k].push(r);

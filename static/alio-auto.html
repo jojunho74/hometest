@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>자동화 데이터 등록</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;}
+body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F5F9;color:#1E293B;min-height:100vh;}
+#sidebar{width:200px;flex-shrink:0;background:linear-gradient(180deg,#0D1F3C 0%,#162848 100%);display:flex;flex-direction:column;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sb-logo{padding:20px 16px 12px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sb-logo-title{font-size:.8rem;font-weight:800;color:#fff;letter-spacing:-.02em;}
+.sb-logo-sub{font-size:.65rem;color:rgba(255,255,255,.45);margin-top:2px;}
+.sb-section-label{font-size:.6rem;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;padding:14px 16px 4px;}
+.sb-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 16px;color:rgba(255,255,255,.6);font-size:.8rem;font-weight:500;background:none;border:none;cursor:pointer;text-align:left;transition:all .15s;}
+.sb-item:hover{background:rgba(255,255,255,.07);color:#fff;}
+.sb-item.active{background:rgba(59,130,246,.25);color:#93C5FD;border-left:3px solid #3B82F6;}
+.sb-icon{width:20px;text-align:center;font-size:1rem;flex-shrink:0;}
+.sb-bottom{margin-top:auto;padding:12px 8px;border-top:1px solid rgba(255,255,255,.08);}
+.sb-bottom-btn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 8px;color:rgba(255,255,255,.45);font-size:.75rem;background:none;border:none;cursor:pointer;border-radius:6px;text-align:left;text-decoration:none;}
+.sb-bottom-btn:hover{background:rgba(255,255,255,.07);color:#fff;}
+#topbar{height:52px;background:#fff;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:20;}
+#topbar-title{font-size:.9rem;font-weight:700;color:#1E293B;}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:all .15s;}
+.btn:hover{transform:scale(1.02);}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:#3B82F6;color:#fff;padding:8px 16px;}
+.btn-primary:hover{background:#2563EB;}
+.btn-secondary{background:#F1F5F9;color:#475569;padding:8px 16px;border:1px solid #E2E8F0;}
+.btn-secondary:hover{background:#E2E8F0;}
+.btn-success{background:#10B981;color:#fff;padding:8px 16px;}
+.btn-success:hover{background:#059669;}
+.btn-danger{background:#EF4444;color:#fff;padding:6px 12px;font-size:.75rem;}
+.btn-danger:hover{background:#DC2626;}
+.btn-purple{background:#7C3AED;color:#fff;padding:8px 16px;}
+.btn-purple:hover{background:#6D28D9;}
+.form-input{width:100%;border:1px solid #D1D5DB;border-radius:8px;padding:8px 12px;font-size:.85rem;color:#1E293B;outline:none;transition:border-color .15s;}
+.form-input:focus{border-color:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,.12);}
+.data-tbl{width:100%;border-collapse:collapse;font-size:.82rem;}
+.data-tbl thead tr{background:#F8FAFF;}
+.data-tbl th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
+.data-tbl td{padding:10px 12px;border-top:1px solid #F1F5F9;color:#374151;vertical-align:middle;}
+.data-tbl tbody tr:hover{background:#F8FAFF;}
+.chip{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.chip-hot{background:#FEE2E2;color:#DC2626;}
+.chip-mid{background:#FEF9C3;color:#CA8A04;}
+.chip-low{background:#DCFCE7;color:#16A34A;}
+#toast{position:fixed;bottom:24px;right:24px;z-index:999;background:#1E293B;color:#fff;border-radius:10px;padding:12px 20px;font-size:.85rem;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;}
+#toast.show{opacity:1;transform:translateY(0);}
+.step-badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#3B82F6;color:#fff;font-size:11px;font-weight:800;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@media(max-width:640px){
+  #sidebar{width:48px;}
+  .sb-logo-title,.sb-logo-sub,.sb-section-label,.sb-item span:last-child{display:none;}
+  .sb-item{justify-content:center;padding:10px;}
+}
+</style>
+</head>
+<body>
+
+<!-- 로그인 화면 -->
+<div id="login-screen" class="min-h-screen flex items-center justify-center" style="background:linear-gradient(135deg,#0D1F3C,#162848);">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm">
+    <div class="text-center mb-6">
+      <div class="text-3xl mb-2">⚡</div>
+      <h1 class="text-xl font-black text-slate-800">자동화 데이터 등록</h1>
+      <p class="text-sm text-slate-400 mt-1">관리자 로그인</p>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="text-xs font-semibold text-slate-500 block mb-1">이메일</label>
+        <input type="email" id="login-email" class="form-input" placeholder="관리자 이메일" autocomplete="email"/>
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-500 block mb-1">비밀번호</label>
+        <input type="password" id="login-pw" class="form-input" placeholder="비밀번호" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button onclick="doLogin()" class="btn btn-primary w-full justify-center py-3">로그인</button>
+      <div id="login-error" class="hidden text-center text-xs text-red-500 font-semibold mt-2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 메인 앱 -->
+<div id="main-app" class="hidden flex min-h-screen">
+
+  <!-- 사이드바 -->
+  <nav id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-title">채용AI DATA</div>
+      <div class="sb-logo-sub">자동화 데이터 등록</div>
+    </div>
+    <div class="sb-section-label">메뉴</div>
+    <a href="alio-admin.html" class="sb-item" style="text-decoration:none;"><span class="sb-icon">📁</span><span>데이터 관리</span></a>
+    <button class="sb-item active"><span class="sb-icon">⚡</span><span>데이터 자동</span></button>
+    <div class="sb-section-label">보관함</div>
+    <button onclick="loadSourceList()" class="sb-item" id="tab-sourcelist"><span class="sb-icon">🗂️</span><span>저장된 소스</span></button>
+    <div class="sb-section-label">도구</div>
+    <button onclick="showSqlGuide()" class="sb-item"><span class="sb-icon">🗄️</span><span>테이블 SQL</span></button>
+    <div class="sb-bottom">
+      <a href="../admin-k9x3.html" class="sb-bottom-btn">🏠 <span>메인 관리자</span></a>
+      <a href="alio-admin.html" class="sb-bottom-btn">📊 <span>데이터 관리</span></a>
+      <button onclick="doLogout()" class="sb-bottom-btn">🚪 <span>로그아웃</span></button>
+    </div>
+  </nav>
+
+  <!-- 우측 메인 -->
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+    <div id="topbar">
+      <span id="topbar-title">⚡ 자동화 데이터 등록</span>
+      <div class="flex items-center gap-3">
+        <span id="topbar-user" class="text-xs text-slate-400"></span>
+      </div>
+    </div>
+
+    <div id="content-area" class="flex-1 overflow-y-auto p-5">
+
+      <!-- ─── Step 1: URL 입력 & HTML 소스 가져오기 ─── -->
+      <div class="bg-white rounded-xl shadow-sm p-5 mb-4" style="border:2px solid #DBEAFE;">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="step-badge">1</span>
+          <h3 class="text-sm font-bold text-blue-700">ALIO URL 입력 → HTML 소스 자동 수집</h3>
+        </div>
+        <div class="flex gap-2 mb-2">
+          <input type="url" id="auto-url-input" class="form-input flex-1" placeholder="https://www.alio.go.kr/item/itemBoardB1020.do?seq=..."/>
+          <button onclick="fetchAndSaveHtml()" id="fetch-btn" class="btn btn-primary" style="white-space:nowrap;">⚡ 파싱하기</button>
+        </div>
+        <p class="text-xs text-slate-400">ALIO 채용공고 URL을 입력하면 HTML 소스를 자동으로 가져와 Supabase에 저장합니다.</p>
+
+        <!-- 진행 상태 -->
+        <div id="fetch-status" class="hidden text-xs text-blue-600 font-semibold mt-3 flex items-center gap-2">
+          <span style="display:inline-block;width:14px;height:14px;border:2px solid #93C5FD;border-top-color:#2563EB;border-radius:50%;animation:spin .7s linear infinite;"></span>
+          <span id="fetch-status-msg">페이지를 가져오는 중...</span>
+        </div>
+        <div id="fetch-error" class="hidden text-xs text-red-500 font-semibold mt-2 p-2 bg-red-50 rounded-lg whitespace-pre-line"></div>
+        <div id="fetch-success" class="hidden text-xs text-emerald-600 font-semibold mt-2 p-2 bg-emerald-50 rounded-lg"></div>
+      </div>
+
+      <!-- ─── Step 2: HTML 소스란 ─── -->
+      <div id="section-html-source" class="hidden bg-white rounded-xl shadow-sm p-5 mb-4" style="border:2px solid #E0E7FF;">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="step-badge" style="background:#7C3AED;">2</span>
+            <h3 class="text-sm font-bold text-purple-700">HTML 소스란</h3>
+            <span id="source-saved-badge" class="hidden text-xs text-emerald-600 font-bold px-2 py-0.5 rounded-full" style="background:#D1FAE5;">✅ Supabase 저장됨</span>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="copyHtmlSource()" class="btn btn-secondary" style="font-size:.75rem;padding:5px 10px;">📋 복사</button>
+            <button onclick="clearHtmlSource()" class="btn btn-secondary" style="font-size:.75rem;padding:5px 10px;">✕ 초기화</button>
+          </div>
+        </div>
+        <div class="text-xs text-slate-400 mb-2">수집된 HTML 소스입니다. 직접 수정하거나 아래 버튼으로 파싱할 수 있습니다.</div>
+        <textarea id="html-source-display" rows="8" class="form-input" style="font-family:monospace;font-size:11px;resize:vertical;" placeholder="HTML 소스가 여기에 표시됩니다..."></textarea>
+        <div class="mt-3 flex gap-2 flex-wrap">
+          <button onclick="parseFromAutoSource()" class="btn btn-purple">⚡ 소스로 파싱하기</button>
+          <button onclick="resaveHtmlSource()" class="btn btn-secondary">💾 소스 다시 저장</button>
+        </div>
+        <div id="parse-status-auto" class="hidden text-xs text-blue-600 font-semibold mt-2 flex items-center gap-2">
+          <span style="display:inline-block;width:14px;height:14px;border:2px solid #93C5FD;border-top-color:#2563EB;border-radius:50%;animation:spin .7s linear infinite;"></span>
+          <span>파싱 중...</span>
+        </div>
+        <div id="parse-error-auto" class="hidden text-xs text-red-500 font-semibold mt-2 whitespace-pre-line"></div>
+      </div>
+
+      <!-- ─── Step 3: 파싱 결과 & 업로드데이터 ─── -->
+      <div id="section-parse-result" class="hidden bg-white rounded-xl shadow-sm p-5 mb-4" style="border:2px solid #D1FAE5;">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="step-badge" style="background:#10B981;">3</span>
+          <h3 class="text-sm font-bold text-emerald-700">파싱 결과 → 업로드데이터로 저장</h3>
+        </div>
+
+        <!-- 기업명 입력 -->
+        <div class="mb-4 p-3 rounded-lg" style="background:#EFF6FF;border:2px solid #BFDBFE;">
+          <label class="text-xs font-bold text-blue-700 block mb-2">🏢 공공기관 / 기업명 <span class="text-red-500">*</span></label>
+          <div class="flex gap-2">
+            <input type="text" id="auto-ds-input" class="form-input flex-1"
+              placeholder="예: 한국수력원자력, 한국가스공사"
+              style="font-size:.9rem;font-weight:600;"
+              oninput="updateAutoCompany(this.value)"/>
+          </div>
+          <p class="text-xs text-blue-500 mt-1.5">입력한 기업명이 <strong>competition.html</strong> 공고명으로 등록됩니다.</p>
+        </div>
+
+        <!-- 파싱 결과 테이블 -->
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-700">파싱 결과:</span>
+            <span id="auto-parse-count" class="text-xs text-slate-400"></span>
+          </div>
+        </div>
+        <div class="overflow-x-auto rounded-lg mb-4" style="border:1px solid #E2E8F0;max-height:340px;overflow-y:auto;">
+          <table class="data-tbl w-full" style="font-size:11px;">
+            <thead><tr style="position:sticky;top:0;background:#F8FAFF;z-index:1;">
+              <th style="background:#EFF6FF;color:#1D4ED8;">공공기관/기업명</th>
+              <th>지역</th>
+              <th>1차합격/응시</th><th>2차합격/응시</th><th>최종합격/응시</th><th>경쟁률</th>
+            </tr></thead>
+            <tbody id="auto-parse-tbody"></tbody>
+          </table>
+        </div>
+        <p id="auto-parse-errors" class="hidden text-xs text-amber-600 mb-3"></p>
+
+        <!-- 업로드데이터 JSON 편집 -->
+        <div class="mb-4">
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-bold text-slate-700">📝 업로드데이터 (JSON 편집 가능)</label>
+            <button onclick="refreshUploadData()" class="btn btn-secondary" style="font-size:.72rem;padding:4px 8px;">🔄 파싱 결과에서 재생성</button>
+          </div>
+          <textarea id="upload-data-json" rows="10" class="form-input" style="font-family:monospace;font-size:11px;resize:vertical;" placeholder="파싱 결과가 여기에 JSON으로 표시됩니다..."></textarea>
+        </div>
+
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="saveUploadData()" class="btn btn-success">💾 업로드데이터 저장 (alio_jobs)</button>
+          <button onclick="saveSourceAndUpload()" class="btn btn-secondary">💾 소스 업로드데이터 함께 저장</button>
+          <button onclick="cancelAutoResult()" class="btn btn-secondary">✕ 취소</button>
+        </div>
+        <div id="save-result-msg" class="hidden text-xs font-semibold mt-2 p-2 rounded-lg"></div>
+      </div>
+
+      <!-- ─── 저장된 소스 목록 ─── -->
+      <div id="section-source-list" class="hidden bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b flex items-center justify-between bg-slate-50">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-500">🗂️ 저장된 HTML 소스 목록</span>
+            <span id="source-list-count" class="text-xs text-slate-400"></span>
+          </div>
+          <button onclick="loadSourceList()" class="btn btn-secondary" style="font-size:.72rem;padding:4px 8px;">🔄 새로고침</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="data-tbl">
+            <thead><tr>
+              <th>URL</th>
+              <th>기업명</th>
+              <th>상태</th>
+              <th>저장일</th>
+              <th>관리</th>
+            </tr></thead>
+            <tbody id="source-list-tbody"><tr><td colspan="5" class="py-6 text-center text-sm text-slate-400">새로고침을 클릭하세요</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SQL 가이드 모달 -->
+      <div id="sql-guide-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,.5);">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div class="p-5 border-b flex items-center justify-between">
+            <h3 class="font-bold text-slate-800">🗄️ Supabase 테이블 생성 SQL</h3>
+            <button onclick="closeSqlGuide()" class="text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
+          </div>
+          <div class="p-5">
+            <p class="text-xs text-slate-500 mb-3">Supabase → SQL Editor에서 아래 SQL을 실행하세요 (최초 1회).</p>
+            <pre id="sql-box" style="background:#0F172A;color:#93C5FD;padding:16px;border-radius:10px;font-size:11px;overflow-x:auto;line-height:1.7;white-space:pre-wrap;">CREATE TABLE IF NOT EXISTS alio_source_cache (
+  id            UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  url           TEXT NOT NULL,
+  html_source   TEXT,
+  dataset_name  TEXT,
+  upload_data   JSONB,
+  status        TEXT DEFAULT 'draft',
+  created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE alio_source_cache ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "anon read" ON alio_source_cache FOR SELECT USING (true);
+CREATE POLICY "auth insert" ON alio_source_cache FOR INSERT WITH CHECK (true);
+CREATE POLICY "auth update" ON alio_source_cache FOR UPDATE USING (true);
+CREATE POLICY "auth delete" ON alio_source_cache FOR DELETE USING (true);</pre>
+            <button onclick="copySql()" class="btn btn-secondary mt-3">📋 SQL 복사</button>
+            <span id="sql-copied" class="hidden ml-2 text-xs text-emerald-500 font-semibold">복사됨!</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const { createClient } = supabase;
+const db = createClient(
+  'https://byzulmxcuhsrjdphmuym.supabase.co',
+  'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
+);
+
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'#1E293B':'#DC2626';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+// ── 인증 ──
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pw=document.getElementById('login-pw').value;
+  const errEl=document.getElementById('login-error');
+  errEl.classList.add('hidden');
+  const {data,error}=await db.auth.signInWithPassword({email,password:pw});
+  if(error){errEl.textContent=error.message;errEl.classList.remove('hidden');return;}
+  document.getElementById('topbar-user').textContent=data.user.email;
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('main-app').classList.remove('hidden');
+}
+async function doLogout(){
+  await db.auth.signOut();
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('main-app').classList.add('hidden');
+}
+db.auth.getSession().then(({data:{session}})=>{
+  if(session){
+    document.getElementById('topbar-user').textContent=session.user.email;
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('main-app').classList.remove('hidden');
+  }
+});
+
+// ── 프록시 목록 (alio-admin.html 동일) ──
+const PROXY_LIST = [
+  { name: 'ibtcc.kr 서버',
+    fetch: u => fetch('/api/proxy?url=' + encodeURIComponent(u), {signal: AbortSignal.timeout(15000)})
+                  .then(r => r.ok ? r.text() : null).catch(()=>null) },
+  { name: 'server.py (로컬)',
+    fetch: u => fetch('http://127.0.0.1:8765/proxy?url=' + encodeURIComponent(u), {signal: AbortSignal.timeout(8000)})
+                  .then(r => r.ok ? r.text() : null).catch(()=>null) },
+  { name: 'allorigins',
+    fetch: u => fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(u), {signal: AbortSignal.timeout(12000)})
+                  .then(r => r.ok ? r.json().then(j=>j.contents) : null).catch(()=>null) },
+  { name: 'corsproxy.io',
+    fetch: u => fetch('https://corsproxy.io/?' + encodeURIComponent(u), {signal: AbortSignal.timeout(12000)})
+                  .then(r => r.ok ? r.text() : null).catch(()=>null) },
+  { name: 'codetabs',
+    fetch: u => fetch('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u), {signal: AbortSignal.timeout(12000)})
+                  .then(r => r.ok ? r.text() : null).catch(()=>null) },
+];
+
+// ── 현재 상태 ──
+let _currentSourceId = null;
+let _parsedRecords = [];
+
+// ── Step 1: URL → HTML 소스 fetch & Supabase 저장 ──
+async function fetchAndSaveHtml() {
+  const url = document.getElementById('auto-url-input').value.trim();
+  if (!url || !url.startsWith('http')) {
+    showFetchError('유효한 URL을 입력하세요.');
+    return;
+  }
+
+  document.getElementById('fetch-error').classList.add('hidden');
+  document.getElementById('fetch-success').classList.add('hidden');
+  document.getElementById('fetch-status').classList.remove('hidden');
+  document.getElementById('fetch-btn').disabled = true;
+
+  let html = null;
+  for (let i = 0; i < PROXY_LIST.length; i++) {
+    const proxy = PROXY_LIST[i];
+    document.getElementById('fetch-status-msg').textContent =
+      `[${i+1}/${PROXY_LIST.length}] ${proxy.name} 시도 중...`;
+    html = await proxy.fetch(url);
+    if (html && html.length > 500) break;
+    html = null;
+  }
+
+  document.getElementById('fetch-btn').disabled = false;
+  document.getElementById('fetch-status').classList.add('hidden');
+
+  if (!html) {
+    showFetchError('모든 프록시 연결에 실패했습니다.\nserver.py(수집시작.bat)가 실행 중인지 확인하거나\n아래 HTML 소스란에 직접 붙여넣기 후 "소스로 파싱하기"를 사용하세요.');
+    // 소스란은 빈 채로 표시
+    document.getElementById('html-source-display').value = '';
+    document.getElementById('section-html-source').classList.remove('hidden');
+    document.getElementById('source-saved-badge').classList.add('hidden');
+    return;
+  }
+
+  // Supabase에 HTML 소스 저장
+  document.getElementById('fetch-status-msg').textContent = 'Supabase에 저장 중...';
+  document.getElementById('fetch-status').classList.remove('hidden');
+
+  const { data: saved, error: saveErr } = await db.from('alio_source_cache').insert({
+    url,
+    html_source: html,
+    status: 'draft'
+  }).select().single();
+
+  document.getElementById('fetch-status').classList.add('hidden');
+
+  if (saveErr) {
+    // 테이블 없는 경우 안내
+    if (saveErr.message.includes('does not exist') || saveErr.code === '42P01') {
+      showFetchError('alio_source_cache 테이블이 없습니다.\n좌측 사이드바 "테이블 SQL"에서 SQL을 실행하세요.');
+    } else {
+      showFetchError('Supabase 저장 실패: ' + saveErr.message);
+    }
+    // HTML 소스는 일단 표시 (저장 실패해도 파싱은 가능)
+    document.getElementById('html-source-display').value = html;
+    document.getElementById('section-html-source').classList.remove('hidden');
+    document.getElementById('source-saved-badge').classList.add('hidden');
+    return;
+  }
+
+  _currentSourceId = saved.id;
+
+  // 성공: HTML 소스란에 표시
+  document.getElementById('html-source-display').value = html;
+  document.getElementById('section-html-source').classList.remove('hidden');
+  document.getElementById('source-saved-badge').classList.remove('hidden');
+  document.getElementById('fetch-success').textContent =
+    `✅ HTML 소스 저장 완료 (${(html.length/1024).toFixed(1)}KB) — ID: ${saved.id.slice(0,8)}...`;
+  document.getElementById('fetch-success').classList.remove('hidden');
+  document.getElementById('content-area').scrollTop = document.getElementById('section-html-source').offsetTop - 20;
+}
+
+function showFetchError(msg) {
+  document.getElementById('fetch-error').textContent = msg;
+  document.getElementById('fetch-error').classList.remove('hidden');
+}
+
+// ── HTML 소스 복사 / 초기화 ──
+function copyHtmlSource() {
+  const txt = document.getElementById('html-source-display').value;
+  if (!txt) { toast('소스가 없습니다', false); return; }
+  navigator.clipboard.writeText(txt).then(() => toast('HTML 소스 복사됨!'));
+}
+function clearHtmlSource() {
+  document.getElementById('html-source-display').value = '';
+  document.getElementById('source-saved-badge').classList.add('hidden');
+}
+
+// ── HTML 소스 다시 저장 ──
+async function resaveHtmlSource() {
+  const html = document.getElementById('html-source-display').value.trim();
+  const url = document.getElementById('auto-url-input').value.trim() || '(직접 입력)';
+  if (!html) { toast('소스를 입력하세요', false); return; }
+  if (_currentSourceId) {
+    const { error } = await db.from('alio_source_cache').update({ html_source: html }).eq('id', _currentSourceId);
+    if (error) { toast('업데이트 실패: ' + error.message, false); return; }
+    toast('소스 업데이트됨!');
+  } else {
+    const { data, error } = await db.from('alio_source_cache').insert({ url, html_source: html, status: 'draft' }).select().single();
+    if (error) { toast('저장 실패: ' + error.message, false); return; }
+    _currentSourceId = data.id;
+    document.getElementById('source-saved-badge').classList.remove('hidden');
+    toast('소스 저장됨!');
+  }
+}
+
+// ── Step 2: 소스로 파싱하기 ──
+function parseFromAutoSource() {
+  const html = document.getElementById('html-source-display').value.trim();
+  if (!html) {
+    document.getElementById('parse-error-auto').textContent = 'HTML 소스를 입력하거나 URL을 파싱하세요.';
+    document.getElementById('parse-error-auto').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('parse-error-auto').classList.add('hidden');
+  document.getElementById('parse-status-auto').classList.remove('hidden');
+
+  setTimeout(() => {
+    document.getElementById('parse-status-auto').classList.add('hidden');
+    try {
+      const result = parseAlioHtml(html);
+      if (!result.records.length) {
+        document.getElementById('parse-error-auto').textContent =
+          '전형단계별 채용정보 테이블을 찾을 수 없습니다.\nALIO 채용공고 페이지의 HTML 소스인지 확인하세요.';
+        document.getElementById('parse-error-auto').classList.remove('hidden');
+        return;
+      }
+      _parsedRecords = result.records;
+      showAutoParseResult(result);
+    } catch(e) {
+      document.getElementById('parse-error-auto').textContent = '파싱 오류: ' + e.message;
+      document.getElementById('parse-error-auto').classList.remove('hidden');
+    }
+  }, 100);
+}
+
+function showAutoParseResult(result) {
+  const dsInput = document.getElementById('auto-ds-input');
+  if (dsInput && !dsInput.value) {
+    const saved = localStorage.getItem('alioCurrentDataset');
+    dsInput.value = saved || result.datasetName || '';
+  }
+  document.getElementById('auto-parse-count').textContent = `(${result.records.length}개 직종)`;
+
+  const companyName = document.getElementById('auto-ds-input')?.value.trim() || '';
+  const tbody = document.getElementById('auto-parse-tbody');
+  tbody.innerHTML = result.records.map(r => {
+    const chipCls = (r.ratio||0) >= 80 ? 'chip-hot' : (r.ratio||0) >= 30 ? 'chip-mid' : 'chip-low';
+    const s2 = r.s2_total ? `${r.s2_pass}/${r.s2_total}` : '—';
+    return `<tr>
+      <td class="company-cell font-semibold" style="color:#1D4ED8;">${companyName ? esc(companyName) : '<span style="color:#CBD5E1;">미입력</span>'}</td>
+      <td class="text-xs text-slate-500">${esc(r.region)}</td>
+      <td>${r.s1_pass||0}/${r.s1_total||0}</td>
+      <td>${s2}</td>
+      <td class="text-emerald-600 font-bold">${r.s3_pass||0}/${r.s3_total||0}</td>
+      <td><span class="chip ${chipCls}">${r.ratio||'-'}:1</span></td>
+    </tr>`;
+  }).join('');
+
+  if (result.errors.length) {
+    document.getElementById('auto-parse-errors').textContent = '⚠️ 누락: ' + result.errors.join(' / ');
+    document.getElementById('auto-parse-errors').classList.remove('hidden');
+  } else {
+    document.getElementById('auto-parse-errors').classList.add('hidden');
+  }
+
+  // 업로드데이터 JSON 생성
+  refreshUploadData();
+
+  document.getElementById('section-parse-result').classList.remove('hidden');
+  document.getElementById('content-area').scrollTop = document.getElementById('section-parse-result').offsetTop - 20;
+}
+
+function updateAutoCompany(val) {
+  document.querySelectorAll('#auto-parse-tbody .company-cell').forEach(td => {
+    td.innerHTML = val.trim()
+      ? `<span style="color:#1D4ED8;font-weight:700;">${esc(val.trim())}</span>`
+      : '<span style="color:#CBD5E1;">미입력</span>';
+  });
+  refreshUploadData();
+}
+
+function refreshUploadData() {
+  if (!_parsedRecords.length) return;
+  const dsName = document.getElementById('auto-ds-input')?.value.trim() || '(미입력)';
+  const records = _parsedRecords.map(r => ({ ...r, dataset_name: dsName }));
+  document.getElementById('upload-data-json').value = JSON.stringify(records, null, 2);
+}
+
+// ── Step 3: 업로드데이터 저장 ──
+async function saveUploadData() {
+  const dsName = document.getElementById('auto-ds-input')?.value.trim();
+  if (!dsName) { toast('기업명을 입력하세요', false); return; }
+
+  let records;
+  try {
+    records = JSON.parse(document.getElementById('upload-data-json').value);
+  } catch(e) {
+    toast('JSON 형식 오류: ' + e.message, false); return;
+  }
+  if (!Array.isArray(records) || !records.length) { toast('저장할 데이터가 없습니다', false); return; }
+
+  const finalRecords = records.map(r => ({ ...r, dataset_name: dsName }));
+
+  const msgEl = document.getElementById('save-result-msg');
+  msgEl.textContent = '저장 중...';
+  msgEl.className = 'text-xs font-semibold mt-2 p-2 rounded-lg text-blue-600 bg-blue-50';
+  msgEl.classList.remove('hidden');
+
+  const { error } = await db.from('alio_jobs').insert(finalRecords);
+  if (error) {
+    msgEl.textContent = '❌ 저장 실패: ' + error.message;
+    msgEl.className = 'text-xs font-semibold mt-2 p-2 rounded-lg text-red-600 bg-red-50';
+    msgEl.classList.remove('hidden');
+    return;
+  }
+
+  localStorage.setItem('alioCurrentDataset', dsName);
+  msgEl.textContent = `✅ "${dsName}" — ${finalRecords.length}개 직종 alio_jobs에 저장 완료! competition.html에서 확인하세요.`;
+  msgEl.className = 'text-xs font-semibold mt-2 p-2 rounded-lg text-emerald-700 bg-emerald-50';
+  toast(`${finalRecords.length}개 저장 완료!`);
+
+  // 소스 캐시에도 업로드데이터 업데이트
+  if (_currentSourceId) {
+    await db.from('alio_source_cache').update({
+      dataset_name: dsName,
+      upload_data: finalRecords,
+      status: 'published'
+    }).eq('id', _currentSourceId);
+    document.getElementById('source-saved-badge').textContent = '✅ 업로드 완료';
+  }
+}
+
+async function saveSourceAndUpload() {
+  await resaveHtmlSource();
+  await saveUploadData();
+}
+
+function cancelAutoResult() {
+  _parsedRecords = [];
+  _currentSourceId = null;
+  document.getElementById('section-parse-result').classList.add('hidden');
+  document.getElementById('section-html-source').classList.add('hidden');
+  document.getElementById('fetch-success').classList.add('hidden');
+  document.getElementById('fetch-error').classList.add('hidden');
+  document.getElementById('auto-url-input').value = '';
+  document.getElementById('html-source-display').value = '';
+  document.getElementById('upload-data-json').value = '';
+  document.getElementById('auto-parse-tbody').innerHTML = '';
+}
+
+// ── 저장된 소스 목록 ──
+let _sourceMap = {};
+
+async function loadSourceList() {
+  document.getElementById('section-source-list').classList.remove('hidden');
+  const tbody = document.getElementById('source-list-tbody');
+  tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr>';
+
+  const { data, error } = await db.from('alio_source_cache').select('id,url,dataset_name,status,created_at').order('created_at', { ascending: false });
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-sm text-red-400">오류: ${esc(error.message)}<br><small>테이블 SQL 가이드에서 테이블을 먼저 생성하세요.</small></td></tr>`;
+    return;
+  }
+  const rows = data || [];
+  _sourceMap = {};
+  rows.forEach(r => { _sourceMap[r.id] = r.url; });
+
+  document.getElementById('source-list-count').textContent = rows.length + '개';
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-sm text-slate-400">저장된 소스가 없습니다.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => {
+    const statusChip = r.status === 'published'
+      ? '<span class="text-xs font-bold text-emerald-600 px-2 py-0.5 rounded-full" style="background:#D1FAE5;">게시됨</span>'
+      : '<span class="text-xs font-bold text-slate-400 px-2 py-0.5 rounded-full" style="background:#F1F5F9;">임시저장</span>';
+    const dt = r.created_at ? r.created_at.slice(0,16).replace('T',' ') : '-';
+    const shortUrl = (r.url||'').length > 40 ? (r.url||'').slice(0,40)+'…' : (r.url||'-');
+    return `<tr>
+      <td class="text-xs text-blue-600 max-w-[200px]" title="${esc(r.url)}"><a href="${esc(r.url)}" target="_blank" style="text-decoration:underline;">${esc(shortUrl)}</a></td>
+      <td class="text-xs font-semibold text-slate-700">${esc(r.dataset_name||'(미입력)')}</td>
+      <td>${statusChip}</td>
+      <td class="text-xs text-slate-400">${dt}</td>
+      <td style="display:flex;gap:6px;align-items:center;">
+        <button onclick="updateSource('${r.id}')" class="btn btn-success" style="font-size:11px;padding:4px 10px;" id="update-btn-${r.id}">🔄 업데이트</button>
+        <button onclick="loadSourceById('${r.id}')" class="btn btn-primary" style="font-size:11px;padding:4px 10px;">불러오기</button>
+        <button onclick="deleteSource('${r.id}')" class="btn btn-danger">삭제</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function loadSourceById(id) {
+  const { data, error } = await db.from('alio_source_cache').select('*').eq('id', id).single();
+  if (error) { toast('불러오기 실패: ' + error.message, false); return; }
+
+  _currentSourceId = data.id;
+  document.getElementById('auto-url-input').value = data.url || '';
+  document.getElementById('html-source-display').value = data.html_source || '';
+  document.getElementById('source-saved-badge').classList.remove('hidden');
+  document.getElementById('source-saved-badge').textContent = data.status === 'published' ? '✅ 게시됨' : '✅ Supabase 저장됨';
+  document.getElementById('section-html-source').classList.remove('hidden');
+
+  if (data.dataset_name) {
+    document.getElementById('auto-ds-input').value = data.dataset_name;
+  }
+
+  document.getElementById('section-parse-result').classList.add('hidden');
+  document.getElementById('content-area').scrollTop = 0;
+  toast('소스 불러오기 완료!');
+}
+
+async function updateSource(id) {
+  const url = _sourceMap[id];
+  if (!url || url === '(직접 입력)') { toast('URL이 없어 업데이트할 수 없습니다', false); return; }
+  const btn = document.getElementById('update-btn-' + id);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ 수집 중...'; }
+  await new Promise(resolve => requestAnimationFrame(resolve));
+
+  // 1. HTML 재수집
+  let html = null;
+  for (let i = 0; i < PROXY_LIST.length; i++) {
+    html = await PROXY_LIST[i].fetch(url);
+    if (html && html.length > 500) break;
+    html = null;
+  }
+
+  if (!html) {
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 업데이트'; }
+    toast('HTML 수집 실패: 프록시 모두 실패', false);
+    return;
+  }
+
+  // 2. 파싱
+  let parsedData = null;
+  let dsName = null;
+  try {
+    const result = parseAlioHtml(html);
+    if (result.records.length) {
+      // 기존 dataset_name 유지
+      const { data: existing } = await db.from('alio_source_cache').select('dataset_name').eq('id', id).single();
+      dsName = existing?.dataset_name || result.datasetName;
+      parsedData = result.records.map(r => ({ ...r, dataset_name: dsName }));
+    }
+  } catch(e) { /* 파싱 실패해도 HTML 업데이트는 진행 */ }
+
+  // 3. alio_source_cache 업데이트
+  const updatePayload = { html_source: html };
+  if (parsedData) updatePayload.upload_data = parsedData;
+
+  const { error } = await db.from('alio_source_cache').update(updatePayload).eq('id', id);
+  if (btn) { btn.disabled = false; btn.textContent = '🔄 업데이트'; }
+
+  if (error) { toast('업데이트 실패: ' + error.message, false); return; }
+
+  // 4. alio_jobs도 갱신 (기존 삭제 후 재삽입)
+  if (parsedData && dsName) {
+    await db.from('alio_jobs').delete().eq('dataset_name', dsName);
+    await db.from('alio_jobs').insert(parsedData);
+  }
+
+  toast(`업데이트 완료! ${parsedData ? parsedData.length + '개 직종 파싱 → alio_jobs 갱신됨' : 'HTML 소스만 갱신'}`);
+  loadSourceList();
+}
+
+async function deleteSource(id) {
+  if (!confirm('이 소스를 삭제하시겠습니까?')) return;
+  const { error } = await db.from('alio_source_cache').delete().eq('id', id);
+  if (error) { toast('삭제 실패: ' + error.message, false); return; }
+  toast('삭제됨');
+  loadSourceList();
+}
+
+// ── SQL 가이드 ──
+function showSqlGuide() {
+  document.getElementById('sql-guide-modal').classList.remove('hidden');
+}
+function closeSqlGuide() {
+  document.getElementById('sql-guide-modal').classList.add('hidden');
+}
+function copySql() {
+  navigator.clipboard.writeText(document.getElementById('sql-box').textContent).then(() => {
+    document.getElementById('sql-copied').classList.remove('hidden');
+    setTimeout(() => document.getElementById('sql-copied').classList.add('hidden'), 2000);
+  });
+}
+
+// ── ALIO HTML 파싱 (alio-admin.html과 동일 로직) ──
+function parseAlioHtml(html) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  let datasetName = '';
+  const titleEl = doc.querySelector('h2.tit, .board_head h2, .view_tit, .board-tit h2, h2');
+  if (titleEl) datasetName = titleEl.textContent.trim().replace(/\s+/g,' ');
+  if (!datasetName) {
+    const titleTag = doc.querySelector('title');
+    if (titleTag) datasetName = titleTag.textContent.trim().split('|')[0].trim();
+  }
+  if (!datasetName) datasetName = '파싱된 채용공고 ' + new Date().toISOString().slice(0,10);
+  if (datasetName.length > 60) datasetName = datasetName.slice(0, 60);
+
+  const table = doc.getElementById('stepTable') || doc.querySelector('table[caption="전형단계별 채용정보"]') || doc.querySelector('caption');
+  let rows;
+  if (table && table.tagName === 'TABLE') {
+    rows = Array.from(table.querySelectorAll('tr'));
+  } else if (table && table.tagName === 'CAPTION') {
+    rows = Array.from(table.closest('table').querySelectorAll('tr'));
+  } else {
+    const caps = Array.from(doc.querySelectorAll('caption'));
+    const cap = caps.find(c => c.textContent.includes('전형단계별'));
+    if (cap) rows = Array.from(cap.closest('table').querySelectorAll('tr'));
+    else throw new Error('stepTable을 찾을 수 없음');
+  }
+
+  const records = [];
+  const errors = [];
+  let current = null;
+  let stageIndex = 0;
+
+  for (const tr of rows) {
+    const ths = Array.from(tr.querySelectorAll('th'));
+    const tds = Array.from(tr.querySelectorAll('td'));
+
+    const headerTh = ths.find(th => parseInt(th.getAttribute('colspan') || 0) >= 3);
+    if (headerTh && tds.length === 0) {
+      if (current) records.push(current);
+      stageIndex = 0;
+      const headerText = headerTh.textContent.trim().replace(/\s+/g,' ');
+      current = parseGroupHeader(headerText, datasetName);
+      continue;
+    }
+
+    if (!current) continue;
+    if (tds.length === 0) continue;
+
+    const rowText = tr.textContent.replace(/\s+/g,' ');
+    const ratioM = rowText.match(/([\d.]+)\s*대\s*1/) || rowText.match(/([\d.]+)\s*:\s*1/);
+    if (ratioM) current.ratio = parseFloat(ratioM[1]);
+
+    let pass = null, total = null;
+    const myeongnums = rowText.match(/(\d+)명/g);
+    if (myeongnums && myeongnums.length >= 2) {
+      pass  = parseInt(myeongnums[0]);
+      total = parseInt(myeongnums[1]);
+    } else if (myeongnums && myeongnums.length === 1) {
+      pass = parseInt(myeongnums[0]);
+    } else {
+      const numTds = tds.filter(td => /^\s*[\d,]+\s*$/.test(td.textContent.trim()));
+      if (numTds.length >= 2) {
+        pass  = parseInt(numTds[0].textContent.replace(/[^\d]/g,''));
+        total = parseInt(numTds[1].textContent.replace(/[^\d]/g,''));
+      } else if (numTds.length === 1) {
+        pass = parseInt(numTds[0].textContent.replace(/[^\d]/g,''));
+      }
+    }
+
+    if (!pass) continue;
+
+    if      (stageIndex === 0) { current.s1_pass = pass; current.s1_total = total; }
+    else if (stageIndex === 1) { current.s2_pass = pass; current.s2_total = total; }
+    current.s3_pass = pass; current.s3_total = total;
+    stageIndex++;
+  }
+  if (current) records.push(current);
+
+  const valid = [];
+  records.forEach(r => {
+    if (!r.s1_pass && !r.s2_pass && !r.s3_pass) {
+      errors.push(`${r.job||'?'}(${r.region||'?'}): 단계별 데이터 없음`);
+      return;
+    }
+    if (!r.ratio) {
+      if (r.s3_pass && r.s3_total) r.ratio = +(r.s3_total / r.s3_pass).toFixed(2);
+      else if (r.s1_pass && r.s1_total) r.ratio = +(r.s1_total / r.s1_pass).toFixed(2);
+    }
+    if (!r.ratio) errors.push(`${r.job}(${r.region}): 경쟁률 미확정`);
+    valid.push(r);
+  });
+  return { datasetName, records: valid, errors };
+}
+
+function parseGroupHeader(text, datasetName) {
+  let grade = '', gradeKey = '6', region = '', job = '';
+  if (text.includes('_')) {
+    const parts = text.split('_');
+    if (parts.length >= 5 && parts[1] === '일반직') {
+      grade = '일반직 ' + parts[2]; gradeKey = parts[2].includes('7') ? '7' : '6';
+      region = parts[3]; job = parts.slice(4).join('_');
+    } else if (parts.length >= 4 && parts[1] === '별정직') {
+      grade = '별정직'; gradeKey = 'b'; region = parts[2]; job = parts.slice(3).join('_');
+    } else if (parts.length >= 4 && parts[1] === '계약직') {
+      grade = '계약직'; gradeKey = 'c'; region = parts[2]; job = parts.slice(3).join('_');
+    } else {
+      grade = parts.slice(1, parts.length - 2).join(' ') || parts[1] || '';
+      region = parts[parts.length - 2] || '-'; job = parts[parts.length - 1] || text;
+      if (grade.includes('7급')) gradeKey = '7';
+      else if (grade.includes('별정')) gradeKey = 'b';
+    }
+  } else {
+    const parenM = text.match(/^(.+?)\s*\((.+)\)$/);
+    if (parenM) {
+      grade = parenM[1].trim(); job = parenM[2].trim(); region = '-';
+      if (/7급/.test(grade)) gradeKey = '7';
+      else if (/별정|계약|무기|임기/.test(grade)) gradeKey = 'b';
+      else if (/경력|전문/.test(grade)) gradeKey = 'e';
+    } else {
+      grade = '-'; region = '-'; job = text;
+    }
+  }
+  return { dataset_name: datasetName, grade, grade_key: gradeKey, job, region,
+    s1_pass: null, s1_total: null, s2_pass: null, s2_total: null, s3_pass: null, s3_total: null, ratio: null };
+}
+</script>
+</body>
+</html>
