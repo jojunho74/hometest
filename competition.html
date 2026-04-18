@@ -593,7 +593,8 @@ async function init() {
 }
 
 function renderMidalDefault(allRows) {
-  const midalRows = allRows.filter(r => (parseFloat(r.ratio) || 0) < 1);
+  // 미달 = 최종 응시인원(s3_total) < 최종 합격인원(s3_pass)
+  const midalRows = allRows.filter(r => (r.s3_total != null && r.s3_pass != null) && r.s3_total < r.s3_pass);
   const midalOrgs = new Set(midalRows.map(r => r.dataset_name));
 
   document.getElementById('md-org-cnt').textContent = midalOrgs.size;
