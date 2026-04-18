@@ -614,9 +614,8 @@ function filterMidal(q) {
 }
 
 function midalRowHtml(r) {
-  const displayName = (r.dataset_name || '-').replace(/2026/g, '').replace(/\s+/g, ' ').trim();
   return `<tr style="cursor:pointer;" onclick="selectDataset('${(r.dataset_name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}');document.getElementById('midal-default').classList.add('hidden');">
-    <td><strong style="color:#E2E8F0;">${displayName}</strong></td>
+    <td><strong style="color:#E2E8F0;">${r.dataset_name||'-'}</strong></td>
     <td style="color:#CBD5E1;">${r.job||'-'}</td>
     <td style="color:rgba(255,255,255,.4);font-size:.75rem;">${r.region||'-'}</td>
     <td><span style="color:#34D399;font-weight:700;">${r.s3_pass||0}</span><span style="color:rgba(255,255,255,.3);">/${r.s3_total||0}</span></td>
@@ -638,8 +637,12 @@ function renderMidalDefault(allRows) {
     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:rgba(255,255,255,.3);">미달 직종이 없습니다</td></tr>';
     return;
   }
+  // 기관명에 '2026' 포함된 데이터 제외
+  const filteredMidal = midalRows.filter(r => !(r.dataset_name || '').includes('2026'));
   // 공공기관명 가나다 순 정렬
-  midalRows.sort((a, b) => (a.dataset_name || '').localeCompare(b.dataset_name || '', 'ko'));
+  filteredMidal.sort((a, b) => (a.dataset_name || '').localeCompare(b.dataset_name || '', 'ko'));
+  midalRows.length = 0;
+  filteredMidal.forEach(r => midalRows.push(r));
   _midalRows = midalRows;
   tbody.innerHTML = midalRows.map(r => midalRowHtml(r)).join('');
 }
