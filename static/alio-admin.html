@@ -201,14 +201,15 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
           <div class="overflow-x-auto">
             <table class="data-tbl">
               <thead><tr>
-                <th>공고명 (데이터셋)</th>
-                <th>직종 수</th>
-                <th>채용인원</th>
-                <th>평균 경쟁률</th>
-                <th>등록일</th>
+                <th>직종</th>
+                <th>지역</th>
+                <th>1차 합격/응시</th>
+                <th>2차 합격/응시</th>
+                <th>최종 합격/응시</th>
+                <th>경쟁률</th>
                 <th>관리</th>
               </tr></thead>
-              <tbody id="ds-tbody"><tr><td colspan="6" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr></tbody>
+              <tbody id="ds-tbody"><tr><td colspan="7" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -546,17 +547,17 @@ function filterDatasets(q){
     : _dsEntries;
   document.getElementById('ds-count').textContent=filtered.length+'개';
   if(!filtered.length){
-    tbody.innerHTML='<tr><td colspan="6" class="py-6 text-center text-sm text-slate-400">"'+esc(q)+'" 검색 결과가 없습니다</td></tr>';
+    tbody.innerHTML='<tr><td colspan="7" class="py-6 text-center text-sm text-slate-400">"'+esc(q)+'" 검색 결과가 없습니다</td></tr>';
     return;
   }
   tbody.innerHTML=renderDsRows(filtered);
 }
 async function loadDatasets(){
   const tbody=document.getElementById('ds-tbody');
-  tbody.innerHTML='<tr><td colspan="6" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr>';
+  tbody.innerHTML='<tr><td colspan="7" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr>';
   const {data,error}=await db.from('alio_jobs').select('*').order('created_at',{ascending:false});
   if(error){
-    tbody.innerHTML='<tr><td colspan="6" class="py-6 text-center text-sm text-red-400">테이블 오류: '+esc(error.message)+'<br><small>테이블 설정 탭에서 SQL을 실행하세요.</small></td></tr>';
+    tbody.innerHTML='<tr><td colspan="7" class="py-6 text-center text-sm text-red-400">테이블 오류: '+esc(error.message)+'<br><small>테이블 설정 탭에서 SQL을 실행하세요.</small></td></tr>';
     return;
   }
   _allRows=data||[];
@@ -588,7 +589,7 @@ async function loadDatasets(){
   if(prevVal)sel.value=prevVal;
 
   if(_dsEntries.length===0){
-    tbody.innerHTML='<tr><td colspan="6" class="py-8 text-center text-sm text-slate-400">등록된 데이터가 없습니다.<br>데이터 추가 탭에서 입력하세요.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="7" class="py-8 text-center text-sm text-slate-400">등록된 데이터가 없습니다.<br>데이터 추가 탭에서 입력하세요.</td></tr>';
     return;
   }
   tbody.innerHTML=renderDsRows(_dsEntries);
@@ -596,22 +597,34 @@ async function loadDatasets(){
 
 function renderDsRows(entries){
   return entries.map(([name,ds])=>{
-    const cnt=ds.rows.length;
-    const hired=ds.rows.reduce((s,r)=>s+(r.s3_pass||0),0);
-    const avg=(ds.rows.reduce((s,r)=>s+(parseFloat(r.ratio)||0),0)/cnt).toFixed(1);
     const dt=ds.created_at?ds.created_at.slice(0,10):'-';
-    const chipCls=avg>=80?'chip-hot':avg>=30?'chip-mid':'chip-low';
-    return `<tr>
-      <td class="font-semibold text-slate-800">${esc(name)}</td>
-      <td>${cnt}개</td>
-      <td class="text-emerald-600 font-bold">${hired}명</td>
-      <td><span class="chip ${chipCls}">${avg}:1</span></td>
-      <td class="text-xs text-slate-400">${dt}</td>
-      <td style="display:flex;gap:6px;align-items:center;">
-        <button onclick="renameDataset('${esc(name)}')" class="btn" style="background:#3B82F6;color:#fff;padding:4px 10px;font-size:12px;">수정</button>
-        <button onclick="deleteDataset('${esc(name)}')" class="btn btn-danger">삭제</button>
+    const headerRow=`<tr style="background:#EFF6FF;">
+      <td colspan="6" class="font-bold text-blue-700" style="font-size:.85rem;padding:8px 12px;">
+        📁 ${esc(name)} <span class="text-xs font-normal text-slate-400 ml-2">${ds.rows.length}개 직종 · ${dt}</span>
+      </td>
+      <td style="padding:6px 12px;">
+        <div style="display:flex;gap:4px;">
+          <button onclick="renameDataset('${esc(name)}')" class="btn" style="background:#3B82F6;color:#fff;padding:3px 8px;font-size:11px;">수정</button>
+          <button onclick="deleteDataset('${esc(name)}')" class="btn btn-danger" style="padding:3px 8px;font-size:11px;">삭제</button>
+        </div>
       </td>
     </tr>`;
+    const recordRows=ds.rows.map(r=>{
+      const chipCls=(parseFloat(r.ratio)||0)>=80?'chip-hot':(parseFloat(r.ratio)||0)>=30?'chip-mid':'chip-low';
+      const s1=r.s1_total?`<span class="text-blue-600 font-bold">${r.s1_pass||0}</span><span class="text-slate-400">/${r.s1_total}</span>`:`<span class="text-slate-300">—</span>`;
+      const s2=r.s2_total?`<span class="text-purple-600 font-bold">${r.s2_pass||0}</span><span class="text-slate-400">/${r.s2_total}</span>`:`<span class="text-slate-300">—</span>`;
+      const s3=r.s3_total?`<span class="text-emerald-600 font-bold">${r.s3_pass||0}</span><span class="text-slate-400">/${r.s3_total}</span>`:`<span class="text-slate-300">—</span>`;
+      return `<tr>
+        <td class="text-slate-700 font-medium" style="padding-left:20px;">${esc(r.job||'-')} <span class="text-xs text-slate-400">${esc(r.grade||'')}</span></td>
+        <td class="text-xs text-slate-400">${esc(r.region||'-')}</td>
+        <td>${s1}</td>
+        <td>${s2}</td>
+        <td>${s3}</td>
+        <td><span class="chip ${chipCls}">${r.ratio||'-'}:1</span></td>
+        <td></td>
+      </tr>`;
+    }).join('');
+    return headerRow+recordRows;
   }).join('');
 }
 
