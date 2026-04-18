@@ -745,7 +745,7 @@ function renderVisualization(dsName, rows) {
     const s2html = d.s2_total
       ? `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">2차 전형</span><span class="stage-nums"><strong>${d.s2_pass||0}명</strong> / ${d.s2_total}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-2" style="width:${pct(d.s2_pass,maxT)}%"></div></div></div>`
       : `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">2차 전형</span><span class="stage-nums" style="opacity:.3;">해당없음</span></div></div>`;
-    const s3html = (d.s3_total && d.s4_total)
+    const s3html = d.s3_total
       ? `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">3차 전형</span><span class="stage-nums"><strong>${d.s3_pass||0}명</strong> / ${d.s3_total}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-2" style="width:${pct(d.s3_pass,maxT)}%"></div></div></div>`
       : '';
     grid.insertAdjacentHTML('beforeend', `
@@ -775,7 +775,7 @@ function renderVisualization(dsName, rows) {
       </td>
       <td><span style="color:#60A5FA;font-weight:700;">${d.s1_pass||0}</span><span style="color:rgba(255,255,255,.3);">/${d.s1_total||0}</span></td>
       <td>${s2}</td>
-      <td>${d.s4_total ? s3 : '<span style="color:rgba(255,255,255,.2);">—</span>'}</td>
+      <td>${s3}</td>
       <td><span style="color:#34D399;font-weight:700;">${tFinalPass||0}</span><span style="color:rgba(255,255,255,.3);">/${tFinalTotal||0}</span></td>
       <td><span class="chip ${chipCls}">${d.ratio}:1</span></td>
     </tr>`);
