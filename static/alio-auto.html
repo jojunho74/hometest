@@ -488,7 +488,7 @@ function showAutoParseResult(result) {
   tbody.innerHTML = result.records.map(r => {
     const chipCls = (r.ratio||0) >= 80 ? 'chip-hot' : (r.ratio||0) >= 30 ? 'chip-mid' : 'chip-low';
     const s2 = r.s2_total ? `${r.s2_pass}/${r.s2_total}` : '—';
-    const s3 = r.s3_total ? (r.s4_total ? `${r.s3_pass}/${r.s3_total}` : '—') : '—';
+    const s3 = r.s3_total ? `${r.s3_pass}/${r.s3_total}` : '—';
     const s4 = r.s4_total ? (r.s5_total ? `${r.s4_pass}/${r.s4_total}` : '—') : '—';
     const fp = r.s5_total ? r.s5_pass : r.s4_total ? r.s4_pass : r.s3_pass;
     const ft = r.s5_total ? r.s5_total : r.s4_total ? r.s4_total : r.s3_total;
