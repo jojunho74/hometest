@@ -195,7 +195,7 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
             <thead><tr style="position:sticky;top:0;background:#F8FAFF;z-index:1;">
               <th style="background:#EFF6FF;color:#1D4ED8;">공공기관/기업명</th>
               <th>지역</th>
-              <th>1차합격/응시</th><th>2차합격/응시</th><th>최종합격/응시</th><th>경쟁률</th>
+              <th>1차합격/응시</th><th>2차합격/응시</th><th>3차합격/응시</th><th>4차합격/응시</th><th>최종합격/응시</th><th>경쟁률</th>
             </tr></thead>
             <tbody id="auto-parse-tbody"></tbody>
           </table>
@@ -488,12 +488,18 @@ function showAutoParseResult(result) {
   tbody.innerHTML = result.records.map(r => {
     const chipCls = (r.ratio||0) >= 80 ? 'chip-hot' : (r.ratio||0) >= 30 ? 'chip-mid' : 'chip-low';
     const s2 = r.s2_total ? `${r.s2_pass}/${r.s2_total}` : '—';
+    const s3 = r.s3_total ? (r.s4_total ? `${r.s3_pass}/${r.s3_total}` : '—') : '—';
+    const s4 = r.s4_total ? (r.s5_total ? `${r.s4_pass}/${r.s4_total}` : '—') : '—';
+    const fp = r.s5_total ? r.s5_pass : r.s4_total ? r.s4_pass : r.s3_pass;
+    const ft = r.s5_total ? r.s5_total : r.s4_total ? r.s4_total : r.s3_total;
     return `<tr>
       <td class="company-cell font-semibold" style="color:#1D4ED8;">${companyName ? esc(companyName) : '<span style="color:#CBD5E1;">미입력</span>'}</td>
       <td class="text-xs text-slate-500">${esc(r.region)}</td>
       <td>${r.s1_pass||0}/${r.s1_total||0}</td>
       <td>${s2}</td>
-      <td class="text-emerald-600 font-bold">${r.s3_pass||0}/${r.s3_total||0}</td>
+      <td>${s3}</td>
+      <td>${s4}</td>
+      <td class="text-emerald-600 font-bold">${fp||0}/${ft||0}</td>
       <td><span class="chip ${chipCls}">${r.ratio||'-'}:1</span></td>
     </tr>`;
   }).join('');
