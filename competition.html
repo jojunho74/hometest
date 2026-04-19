@@ -546,7 +546,7 @@ function toggleMenu() {
 async function init() {
   const [jobsRes, cacheRes, viewsRes] = await Promise.all([
     db.from('alio_jobs')
-      .select('dataset_name,grade,grade_key,job,region,s1_pass,s1_total,s2_pass,s2_total,s3_pass,s3_total,s4_pass,s4_total,s5_pass,s5_total,ratio')
+      .select('dataset_name,grade,grade_key,job,region,s1_pass,s1_total,s2_pass,s2_total,s3_pass,s3_total,s4_pass,s4_total,s5_pass,s5_total,ratio,stage_count')
       .order('dataset_name'),
     db.from('alio_source_cache')
       .select('dataset_name,upload_data')
@@ -746,10 +746,10 @@ function renderVisualization(dsName, rows) {
     const s2html = d.s2_total
       ? `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">2차 전형</span><span class="stage-nums"><strong>${d.s2_pass||0}명</strong> / ${d.s2_total}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-2" style="width:${pct(d.s2_pass,maxT)}%"></div></div></div>`
       : `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">2차 전형</span><span class="stage-nums" style="opacity:.3;">해당없음</span></div></div>`;
-    const s3html = (d.s3_total && d.s4_total)
+    const s3html = (d.s3_total && (d.stage_count||3) >= 4)
       ? `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">3차 전형</span><span class="stage-nums"><strong>${d.s3_pass||0}명</strong> / ${d.s3_total}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-2" style="width:${pct(d.s3_pass,maxT)}%"></div></div></div>`
       : '';
-    const s4html = (d.s4_total && d.s5_total)
+    const s4html = (d.s4_total && (d.stage_count||3) >= 5)
       ? `<div class="stage-row"><div class="stage-row-head"><span class="stage-lbl">4차 전형</span><span class="stage-nums"><strong>${d.s4_pass||0}명</strong> / ${d.s4_total}명 응시</span></div><div class="bar-bg"><div class="bar-fill bar-2" style="width:${pct(d.s4_pass,maxT)}%"></div></div></div>`
       : '';
     grid.insertAdjacentHTML('beforeend', `
@@ -780,8 +780,8 @@ function renderVisualization(dsName, rows) {
       </td>
       <td><span style="color:#60A5FA;font-weight:700;">${d.s1_pass||0}</span><span style="color:rgba(255,255,255,.3);">/${d.s1_total||0}</span></td>
       <td>${s2}</td>
-      <td>${d.s3_total ? s3 : '<span style="color:rgba(255,255,255,.2);">—</span>'}</td>
-      <td>${d.s5_total ? s4 : '<span style="color:rgba(255,255,255,.2);">—</span>'}</td>
+      <td>${(d.stage_count||3) >= 4 && d.s3_total ? s3 : '<span style="color:rgba(255,255,255,.2);">—</span>'}</td>
+      <td>${(d.stage_count||3) >= 5 && d.s4_total ? s4 : '<span style="color:rgba(255,255,255,.2);">—</span>'}</td>
       <td><span style="color:#34D399;font-weight:700;">${tFinalPass||0}</span><span style="color:rgba(255,255,255,.3);">/${tFinalTotal||0}</span></td>
       <td><span class="chip ${chipCls}">${d.ratio}:1</span></td>
     </tr>`);

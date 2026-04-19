@@ -680,8 +680,8 @@ function renderDsRows(entries){
         <td class="text-xs text-slate-400">${esc(r.region||'-')}</td>
         <td>${s1}</td>
         <td>${s2}</td>
-        <td>${s3}</td>
-        <td>${r.s5_total ? s4 : '<span class="text-slate-300">—</span>'}</td>
+        <td>${(r.stage_count||3) >= 4 ? s3 : '<span class="text-slate-300">—</span>'}</td>
+        <td>${(r.stage_count||3) >= 5 ? s4 : '<span class="text-slate-300">—</span>'}</td>
         <td>${sf}</td>
         <td><span class="chip ${chipCls}">${r.ratio||'-'}:1</span></td>
         <td></td>
@@ -773,7 +773,7 @@ async function submitRecord(){
   const ratio=parseFloat(document.getElementById('f-ratio').value)||null;
   const hasFinal = s5p || s4p || s3p;
   if(!dataset||!hasFinal||!ratio){toast('필수 항목을 입력하세요 (공고명, 최종합격, 경쟁률)',false);return;}
-  const {error}=await db.from('alio_jobs').insert({dataset_name:dataset,region,s1_pass:s1p,s1_total:s1t,s2_pass:s2p,s2_total:s2t,s3_pass:s3p,s3_total:s3t,s4_pass:s4p,s4_total:s4t,s5_pass:s5p,s5_total:s5t,ratio});
+  const {error}=await db.from('alio_jobs').insert({dataset_name:dataset,region,s1_pass:s1p,s1_total:s1t,s2_pass:s2p,s2_total:s2t,s3_pass:s3p,s3_total:s3t,s4_pass:s4p,s4_total:s4t,s5_pass:s5p,s5_total:s5t,ratio,stage_count:s4p?4:s3p?3:2});
   if(error){toast('저장 실패: '+error.message,false);return;}
   toast('저장되었습니다!');
   clearForm();
@@ -984,6 +984,7 @@ function parseAlioHtml(html) {
   const errors = [];
   let current = null; // 현재 직종 객체
   let stageIndex = 0; // 단계 순서 (이름 무관, 순서로 s1/s2/s3 매핑)
+  let rowCount = 0;   // 전형 행 수 (최종 빈 행 포함)
 
   for (const tr of rows) {
     const ths = Array.from(tr.querySelectorAll('th'));
@@ -992,8 +993,9 @@ function parseAlioHtml(html) {
     // 그룹 헤더: colspan≥3 th 이고 td 없음
     const headerTh = ths.find(th => parseInt(th.getAttribute('colspan') || 0) >= 3);
     if (headerTh && tds.length === 0) {
-      if (current) records.push(current);
+      if (current) { current.stage_count = rowCount; records.push(current); }
       stageIndex = 0;
+      rowCount = 0;
       const headerText = headerTh.textContent.trim().replace(/\s+/g,' ');
       current = parseGroupHeader(headerText, datasetName);
       continue;
@@ -1001,6 +1003,9 @@ function parseAlioHtml(html) {
 
     if (!current) continue;
     if (tds.length === 0) continue; // 컬럼 헤더 행(전형단계/선발인원...) 스킵
+
+    // 전형 행 수 카운트 (1차~5차, 최종 — 숫자 없는 행 포함)
+    if (ths.some(th => /^[1-5]차$|^최종$/.test(th.textContent.trim()))) rowCount++;
 
     const rowText = tr.textContent.replace(/\s+/g,' ');
 
@@ -1027,9 +1032,9 @@ function parseAlioHtml(html) {
       }
     }
 
-    if (!pass) continue; // 숫자 없는 행 스킵
+    if (!pass) continue; // 숫자 없는 행 스킵 (슬롯 미배정, rowCount는 이미 증가)
 
-    // 4-슬롯: stageIndex 0=s1, 1=s2, 2=s3(3차), 3+=s4(최종)
+    // 5-슬롯: stageIndex 0=s1, 1=s2, 2=s3(3차), 3=s4(4차), 4+=s5(최종)
     if      (stageIndex === 0) { current.s1_pass = pass; current.s1_total = total; }
     else if (stageIndex === 1) { current.s2_pass = pass; current.s2_total = total; }
     else if (stageIndex === 2) { current.s3_pass = pass; current.s3_total = total; }
@@ -1037,7 +1042,7 @@ function parseAlioHtml(html) {
     else                       { current.s5_pass = pass; current.s5_total = total; }
     stageIndex++;
   }
-  if (current) records.push(current);
+  if (current) { current.stage_count = rowCount; records.push(current); }
 
   // 유효성 검사: 최소 1차 데이터 있으면 유효, ratio는 s3에서 자동 계산
   const valid = [];
@@ -1098,7 +1103,7 @@ function parseGroupHeader(text, datasetName) {
   }
 
   return { dataset_name: datasetName, grade, grade_key: gradeKey, job, region,
-    s1_pass: null, s1_total: null, s2_pass: null, s2_total: null, s3_pass: null, s3_total: null, s4_pass: null, s4_total: null, s5_pass: null, s5_total: null, ratio: null };
+    s1_pass: null, s1_total: null, s2_pass: null, s2_total: null, s3_pass: null, s3_total: null, s4_pass: null, s4_total: null, s5_pass: null, s5_total: null, ratio: null, stage_count: 3 };
 }
 
 // ── 데이터셋 갱신 모달 ──
@@ -1136,7 +1141,7 @@ function parseRefreshHtml() {
     _refreshParsed = result.records.map(r => ({ ...r, dataset_name: _refreshDsName }));
     document.getElementById('refresh-preview-msg').textContent = `✅ ${_refreshParsed.length}개 직종 파싱 완료 — 저장하면 기존 데이터가 교체됩니다`;
     const tbl = _refreshParsed.map(r => {
-      const s3disp = r.s3_total ? `${r.s3_pass||0}/${r.s3_total}` : '—';
+      const s3disp = (r.stage_count||3) >= 4 && r.s3_total ? `${r.s3_pass||0}/${r.s3_total}` : '—';
       const fp = r.s5_total ? r.s5_pass : r.s4_total ? r.s4_pass : r.s3_pass;
       const ft = r.s5_total ? r.s5_total : r.s4_total ? r.s4_total : r.s3_total;
       return `<div style="font-size:.78rem;color:#374151;padding:3px 0;border-bottom:1px solid #D1FAE5;">${r.job||'-'} (${r.region||'-'}) | 1차:${r.s1_pass||0}/${r.s1_total||0} | 2차:${r.s2_pass||'—'}/${r.s2_total||'—'} | 3차:${s3disp} | 최종:${fp||0}/${ft||0} | ${r.ratio}:1</div>`;
@@ -1249,8 +1254,8 @@ function showParsePreview(dsName, records, errors) {
   tbody.innerHTML = records.map(r => {
     const chipCls = (r.ratio||0) >= 80 ? 'chip-hot' : (r.ratio||0) >= 30 ? 'chip-mid' : 'chip-low';
     const s2 = r.s2_total ? `${r.s2_pass}/${r.s2_total}` : '—';
-    const s3 = r.s3_total ? `${r.s3_pass}/${r.s3_total}` : '—';
-    const s4 = r.s4_total ? (r.s5_total ? `${r.s4_pass}/${r.s4_total}` : '—') : '—';
+    const s3 = (r.stage_count||3) >= 4 && r.s3_total ? `${r.s3_pass}/${r.s3_total}` : '—';
+    const s4 = (r.stage_count||3) >= 5 && r.s4_total ? `${r.s4_pass}/${r.s4_total}` : '—';
     const fp = r.s5_total ? r.s5_pass : r.s4_total ? r.s4_pass : r.s3_pass;
     const ft = r.s5_total ? r.s5_total : r.s4_total ? r.s4_total : r.s3_total;
     return `<tr>
