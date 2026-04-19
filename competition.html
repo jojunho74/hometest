@@ -546,7 +546,7 @@ function toggleMenu() {
 async function init() {
   const [jobsRes, cacheRes, viewsRes] = await Promise.all([
     db.from('alio_jobs')
-      .select('dataset_name,grade,grade_key,job,region,s1_pass,s1_total,s2_pass,s2_total,s3_pass,s3_total,s4_pass,s4_total,ratio')
+      .select('dataset_name,grade,grade_key,job,region,s1_pass,s1_total,s2_pass,s2_total,s3_pass,s3_total,s4_pass,s4_total,s5_pass,s5_total,ratio')
       .order('dataset_name'),
     db.from('alio_source_cache')
       .select('dataset_name,upload_data')
