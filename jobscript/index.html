@@ -191,6 +191,12 @@
           <span class="ico">🔍</span>
           <div class="autocomplete" id="ac-list" style="display:none;"></div>
         </div>
+        <!-- 전체선택 바 -->
+        <label id="select-all-bar" style="display:none;align-items:center;gap:10px;margin-top:10px;padding:10px 14px;background:rgba(59,130,246,.1);border:1px solid rgba(96,165,250,.3);border-radius:10px;cursor:pointer;user-select:none;">
+          <input type="checkbox" id="select-all-cb" style="width:16px;height:16px;accent-color:#3B82F6;cursor:pointer;" onchange="onSelectAllChange()">
+          <span style="font-size:.8rem;color:#60A5FA;font-weight:700;" id="select-all-label">검색된 직종 전체 선택</span>
+          <span style="font-size:.7rem;color:rgba(255,255,255,.35);margin-left:auto;" id="select-all-meta"></span>
+        </label>
       </div>
 
     </div>
@@ -343,6 +349,7 @@ function showAll() {
   selectedJob = null;
   lastSearchJobs = null;
   displayData = [];
+  hideSelectAllBar();
   document.querySelectorAll('.job-tag').forEach(el => {
     el.classList.toggle('active', el.classList.contains('all-tag'));
   });
@@ -358,7 +365,7 @@ function showAll() {
 function onSearchInput() {
   const q = document.getElementById('search-input').value.trim();
   acIdx = -1;
-  if (!q) { closeAC(); return; }
+  if (!q) { closeAC(); hideSelectAllBar(); return; }
 
   // job 기준 매칭
   const jobMap = {};
@@ -379,15 +386,18 @@ function onSearchInput() {
 
   const totalCnt = matches.reduce((s,[,c])=>s+c, 0);
   const allJobs = matches.map(([job])=>job);
-  const isChecked = lastSearchJobs && JSON.stringify(lastSearchJobs) === JSON.stringify(allJobs);
-  const allItem = `<div class="ac-item" data-idx="all" onclick="selectAllJobs(${JSON.stringify(allJobs)})"
-    style="border-bottom:1px solid rgba(96,165,250,.25);background:rgba(59,130,246,.1);">
-    <span class="cb-box${isChecked?' checked':''}" id="cb-all">${isChecked?'✓':''}</span>
-    <span class="ac-name" style="color:#60A5FA;font-weight:700;">검색된 직종 전체 선택 (${matches.length}개 직종)</span>
-    <span class="ac-count">${totalCnt}개 레코드</span>
-  </div>`;
 
-  document.getElementById('ac-list').innerHTML = allItem + matches.map(([job, cnt], i) =>
+  // 전체선택 바 표시
+  const bar = document.getElementById('select-all-bar');
+  const cb = document.getElementById('select-all-cb');
+  const isChecked = lastSearchJobs && JSON.stringify(lastSearchJobs) === JSON.stringify(allJobs);
+  document.getElementById('select-all-label').textContent = `검색된 직종 전체 선택 (${matches.length}개 직종)`;
+  document.getElementById('select-all-meta').textContent = `${totalCnt}개 레코드`;
+  bar._jobs = allJobs;
+  cb.checked = !!isChecked;
+  bar.style.display = 'flex';
+
+  document.getElementById('ac-list').innerHTML = matches.map(([job, cnt], i) =>
     `<div class="ac-item" data-idx="${i}" onclick="selectJobBySearch('${job.replace(/'/g,"\\'")}')">
       <span class="ac-name">${highlight(job, q)}</span>
       <span class="ac-count">${cnt}개 레코드</span>
@@ -423,34 +433,39 @@ document.addEventListener('click', e => {
   if (!e.target.closest('.search-right')) closeAC();
 });
 
-// ── 검색된 직종 전체 선택 ──
-function selectAllJobs(jobs) {
+// ── 전체선택 바 숨기기 ──
+function hideSelectAllBar() {
+  const bar = document.getElementById('select-all-bar');
+  bar.style.display = 'none';
+  bar._jobs = null;
+  document.getElementById('select-all-cb').checked = false;
+  lastSearchJobs = null;
+}
+
+// ── 전체선택 체크박스 변경 ──
+function onSelectAllChange() {
+  const cb = document.getElementById('select-all-cb');
+  const bar = document.getElementById('select-all-bar');
+  const jobs = bar._jobs || [];
   selectedJob = null;
   document.querySelectorAll('.job-tag').forEach(el => el.classList.remove('active'));
 
-  const isSame = lastSearchJobs && JSON.stringify(lastSearchJobs) === JSON.stringify(jobs);
-  const cb = document.getElementById('cb-all');
-
-  if (isSame) {
+  if (cb.checked) {
+    lastSearchJobs = jobs;
+    displayData = allData.filter(r => jobs.includes(r.job));
+    document.getElementById('result-title').textContent = `직종 검색 전체 (${jobs.length}개 직종)`;
+    document.querySelector('.sec-title').innerHTML = `직종별 평균 경쟁률 <small>검색 결과 (${jobs.length}개 직종) · 막대 클릭 → 필터</small>`;
+    renderChart(displayData);
+    renderTable();
+  } else {
     lastSearchJobs = null;
     displayData = [];
-    if (cb) { cb.classList.remove('checked'); cb.textContent = ''; }
     document.getElementById('result-title').textContent = '검색 결과';
     document.getElementById('result-count').textContent = '';
     document.getElementById('tbl-body').innerHTML = `<tr><td colspan="10" class="placeholder-msg"><span class="ico">🔎</span>직종을 선택하거나 검색하세요</td></tr>`;
     document.querySelector('.sec-title').innerHTML = `직종별 평균 경쟁률 <small>막대 클릭 → 해당 직종 필터</small>`;
     renderChart();
-    return;
   }
-
-  lastSearchJobs = jobs;
-  displayData = allData.filter(r => jobs.includes(r.job));
-  if (cb) { cb.classList.add('checked'); cb.textContent = '✓'; }
-
-  document.getElementById('result-title').textContent = `직종 검색 전체 (${jobs.length}개 직종)`;
-  document.querySelector('.sec-title').innerHTML = `직종별 평균 경쟁률 <small>검색 결과 (${jobs.length}개 직종) · 막대 클릭 → 필터</small>`;
-  renderChart(displayData);
-  renderTable();
 }
 
 // ── 직종 검색 선택 ──
