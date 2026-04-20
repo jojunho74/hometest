@@ -423,10 +423,171 @@
     <div class="topbar">
       <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰ 목록</button>
       <span class="topbar-title" id="topbar-title">공고를 선택하세요</span>
-      <span style="font-size:.72rem;color:rgba(255,255,255,.35);font-weight:400;white-space:nowrap;">본 자료는 공공기관 경영정보 공개시스템의 자료를 근거로 작성되었습니다.</span>
+      <button id="btn-back-chart" onclick="location.href='competition.html'" style="display:none;padding:5px 13px;border-radius:8px;font-size:.73rem;font-weight:700;background:rgba(96,165,250,.15);color:#60A5FA;border:1px solid rgba(96,165,250,.3);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='rgba(96,165,250,.25)'" onmouseout="this.style.background='rgba(96,165,250,.15)'">← 직종별 경쟁률</button>
+      <span style="font-size:.72rem;color:rgba(255,255,255,.35);font-weight:400;white-space:nowrap;margin-left:auto;">본 자료는 공공기관 경영정보 공개시스템의 자료를 근거로 작성되었습니다.</span>
       <span class="topbar-cnt hidden" id="topbar-cnt"></span>
     </div>
     <div class="content-area" id="content-area">
+
+      <!-- 공고 미선택 기본 차트 뷰 (jobscript_a 내장) -->
+      <div id="default-chart-view">
+        <style>
+          #default-chart-view{padding-bottom:24px;}
+          .jv-sp{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px 20px;margin-bottom:12px;}
+          .jv-sp-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start;}
+          .jv-left{display:flex;flex-direction:column;gap:8px;}
+          .jv-search{position:relative;}
+          .jv-search input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:11px;color:#E2E8F0;padding:10px 40px 10px 16px;font-size:.85rem;outline:none;transition:border-color .2s;}
+          .jv-search input:focus{border-color:#3B82F6;background:rgba(59,130,246,.07);}
+          .jv-search input::placeholder{color:rgba(255,255,255,.2);}
+          .jv-s-ico{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.25);pointer-events:none;}
+          .jv-s-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.3);font-size:.8rem;cursor:pointer;background:none;border:none;display:none;}
+          .jv-search input:not(:placeholder-shown)~.jv-s-ico{display:none;}
+          .jv-search input:not(:placeholder-shown)~.jv-s-clear{display:block;}
+          .jv-sa-bar{display:none;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(135deg,rgba(37,99,235,.55),rgba(59,130,246,.4));border:1.5px solid rgba(96,165,250,.7);border-radius:10px;box-shadow:0 0 16px rgba(59,130,246,.35),inset 0 1px 0 rgba(255,255,255,.1);}
+          .jv-sa-bar label{display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;}
+          .jv-sa-bar input[type=checkbox]{width:16px;height:16px;accent-color:#3B82F6;cursor:pointer;}
+          .jv-sa-text{font-size:.75rem;color:#fff;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.4);}
+          .jv-sa-meta{font-size:.67rem;color:#fff;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:20px;white-space:nowrap;font-weight:600;}
+          .jv-btn-reset{padding:9px 0;border-radius:11px;font-size:.78rem;font-weight:700;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.1);cursor:pointer;width:100%;transition:all .15s;}
+          .jv-btn-reset:hover{background:rgba(255,255,255,.1);color:#E2E8F0;}
+          .jv-ac{position:absolute;top:calc(100% + 5px);left:0;right:0;background:#0B1E3A;border:1.5px solid rgba(96,165,250,.25);border-radius:11px;max-height:220px;overflow-y:auto;z-index:500;box-shadow:0 12px 32px rgba(0,0,0,.5);}
+          .jv-ac-item{padding:9px 14px;font-size:.78rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);color:#CBD5E1;display:flex;align-items:center;justify-content:space-between;}
+          .jv-ac-item:last-child{border-bottom:none;}
+          .jv-ac-item:hover,.jv-ac-item.sel{background:rgba(59,130,246,.18);color:#93C5FD;}
+          .jv-ac-cnt{font-size:.67rem;color:rgba(255,255,255,.3);background:rgba(255,255,255,.06);padding:2px 7px;border-radius:20px;}
+          .jv-ac-empty{padding:14px;text-align:center;font-size:.78rem;color:rgba(255,255,255,.25);}
+          .jv-right{border-left:1px solid rgba(255,255,255,.06);padding-left:16px;}
+          .jv-right-lbl{font-size:.67rem;color:rgba(255,255,255,.25);margin-bottom:6px;}
+          .jv-tag-box{height:130px;overflow-y:auto;overflow-x:hidden;}
+          .jv-tag-box::-webkit-scrollbar{width:3px;}
+          .jv-tag-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+          .jv-tags{display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;}
+          .jv-tag{padding:3px 10px;border-radius:20px;font-size:.67rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.09);background:transparent;color:rgba(255,255,255,.4);transition:all .15s;white-space:nowrap;}
+          .jv-tag:hover{border-color:rgba(96,165,250,.5);color:#93C5FD;}
+          .jv-tag.on{border-color:#3B82F6;color:#60A5FA;background:rgba(59,130,246,.18);}
+          .jv-filter-bar{display:none;align-items:center;gap:8px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:11px;padding:8px 14px;margin-bottom:10px;}
+          .jv-filter-bar .lbl{font-size:.76rem;color:rgba(52,211,153,.7);font-weight:600;}
+          .jv-filter-bar .val{font-size:.78rem;color:#34D399;font-weight:700;flex:1;}
+          .jv-filter-bar .cnt{font-size:.7rem;color:rgba(255,255,255,.3);}
+          .jv-filter-bar .clr{background:none;border:1px solid rgba(52,211,153,.3);color:rgba(52,211,153,.7);border-radius:7px;padding:3px 9px;font-size:.7rem;cursor:pointer;}
+          .jv-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;}
+          .jv-scard{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:13px 12px;text-align:center;}
+          .jv-scard .val{font-size:1.35rem;font-weight:800;color:#60A5FA;letter-spacing:-.02em;}
+          .jv-scard .lbl{font-size:.65rem;color:rgba(255,255,255,.3);margin-top:3px;}
+          .jv-chart-card{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:18px 22px;margin-bottom:12px;}
+          .jv-chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+          .jv-chart-title{font-size:.85rem;font-weight:700;color:#93C5FD;}
+          .jv-chart-hint{font-size:.68rem;color:rgba(255,255,255,.25);}
+          .jv-chart-wrap{position:relative;height:320px;}
+          .jv-result-card{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:18px 22px;}
+          .jv-result-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+          .jv-result-title{font-size:.85rem;font-weight:700;color:#93C5FD;}
+          .jv-result-cnt{font-size:.7rem;color:rgba(255,255,255,.3);background:rgba(255,255,255,.06);padding:2px 9px;border-radius:20px;}
+          .jv-sort{margin-left:auto;font-size:.7rem;color:rgba(255,255,255,.3);}
+          .jv-sort select{background:#0A1628;border:1px solid rgba(255,255,255,.1);color:#E2E8F0;border-radius:7px;padding:4px 8px;font-size:.7rem;outline:none;cursor:pointer;margin-left:4px;}
+          .jv-tbl-wrap{overflow-x:auto;}
+          .jv-tbl{width:100%;border-collapse:collapse;font-size:.76rem;}
+          .jv-tbl th{background:#081629;color:rgba(255,255,255,.4);font-weight:600;padding:9px 11px;text-align:left;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;}
+          .jv-tbl th.r{text-align:right;}
+          .jv-tbl td{padding:9px 11px;border-bottom:1px solid rgba(255,255,255,.04);color:#CBD5E1;white-space:nowrap;}
+          .jv-tbl tbody tr:hover td{background:rgba(59,130,246,.05);}
+          .jv-tbl tbody tr:nth-child(even) td{background:rgba(255,255,255,.01);}
+          .jv-tbl td.r{text-align:right;font-variant-numeric:tabular-nums;}
+          .jv-td-name{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#93C5FD;font-weight:600;text-decoration:none;display:block;}
+          .jv-td-name:hover{color:#60A5FA;text-decoration:underline;}
+          .jv-chip{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.69rem;font-weight:700;}
+          .jv-hot{background:rgba(251,113,133,.15);color:#FB7185;border:1px solid rgba(251,113,133,.25);}
+          .jv-mid{background:rgba(251,191,36,.1);color:#FBBF24;border:1px solid rgba(251,191,36,.2);}
+          .jv-low{background:rgba(52,211,153,.1);color:#34D399;border:1px solid rgba(52,211,153,.18);}
+          .jv-placeholder{text-align:center;padding:48px 20px;color:rgba(255,255,255,.2);font-size:.83rem;line-height:2;}
+          @media(max-width:900px){.jv-sp-grid{grid-template-columns:1fr;}.jv-right{border-left:none;border-top:1px solid rgba(255,255,255,.06);padding-left:0;padding-top:12px;}.jv-summary{grid-template-columns:repeat(3,1fr);}.jv-tag-box{height:90px;}}
+          @media(max-width:600px){.jv-summary{grid-template-columns:repeat(2,1fr);}}
+        </style>
+
+        <!-- 검색 패널 -->
+        <div class="jv-sp">
+          <div class="jv-sp-grid">
+            <div class="jv-left">
+              <div class="jv-search">
+                <input type="text" id="jv-input" placeholder="직종 검색 (예: 전기, 기계, 사무…)"
+                  oninput="jvOnInput()" onkeydown="jvOnKey(event)" autocomplete="off"/>
+                <span class="jv-s-ico">🔍</span>
+                <button class="jv-s-clear" onclick="jvClearSearch()">✕</button>
+                <div class="jv-ac" id="jv-ac" style="display:none;"></div>
+              </div>
+              <div class="jv-sa-bar" id="jv-sa-bar">
+                <label>
+                  <input type="checkbox" id="jv-sa-cb" onchange="jvOnSaChange()">
+                  <span class="jv-sa-text" id="jv-sa-text">검색된 직종 전체 선택</span>
+                </label>
+                <span class="jv-sa-meta" id="jv-sa-meta"></span>
+              </div>
+              <button class="jv-btn-reset" onclick="jvResetAll()">↺ 필터 초기화</button>
+            </div>
+            <div class="jv-right">
+              <div class="jv-right-lbl">직종 필터 (클릭으로 선택)</div>
+              <div class="jv-tag-box"><div class="jv-tags" id="jv-tags"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 활성 필터 -->
+        <div class="jv-filter-bar" id="jv-filter-bar">
+          <span class="lbl">필터</span>
+          <span class="val" id="jv-fb-val"></span>
+          <span class="cnt" id="jv-fb-cnt"></span>
+          <button class="clr" onclick="jvResetAll()">✕ 해제</button>
+        </div>
+
+        <!-- 요약 카드 -->
+        <div class="jv-summary">
+          <div class="jv-scard"><div class="val" id="jv-s-total">—</div><div class="lbl">전체 레코드</div></div>
+          <div class="jv-scard"><div class="val" id="jv-s-ds">—</div><div class="lbl">공고 수</div></div>
+          <div class="jv-scard"><div class="val" id="jv-s-jobs">—</div><div class="lbl">직종 수</div></div>
+          <div class="jv-scard"><div class="val" id="jv-s-avg">—</div><div class="lbl">평균 경쟁률</div></div>
+          <div class="jv-scard"><div class="val" id="jv-s-max">—</div><div class="lbl">최고 경쟁률</div></div>
+        </div>
+
+        <!-- 차트 -->
+        <div class="jv-chart-card">
+          <div class="jv-chart-head">
+            <div class="jv-chart-title" id="jv-chart-title">직종별 평균 경쟁률</div>
+            <div class="jv-chart-hint">막대 클릭 → 해당 직종 필터</div>
+          </div>
+          <div class="jv-chart-wrap"><canvas id="jv-chart"></canvas></div>
+        </div>
+
+        <!-- 결과 테이블 -->
+        <div class="jv-result-card">
+          <div class="jv-result-head">
+            <div class="jv-result-title" id="jv-result-title">검색 결과</div>
+            <span class="jv-result-cnt" id="jv-result-cnt" style="display:none;"></span>
+            <div class="jv-sort">정렬
+              <select id="jv-sort-sel" onchange="jvRenderTable()">
+                <option value="ratio_desc">경쟁률 높은순</option>
+                <option value="ratio_asc">경쟁률 낮은순</option>
+                <option value="name_asc">공고명순</option>
+                <option value="s1_total_desc">응시인원 많은순</option>
+                <option value="job_asc">직종명순</option>
+              </select>
+            </div>
+          </div>
+          <div class="jv-tbl-wrap">
+            <table class="jv-tbl">
+              <thead><tr>
+                <th>공고명</th><th>직종</th><th>지역</th><th>직급</th>
+                <th class="r">1차응시</th><th class="r">1차합격</th>
+                <th class="r">최종합격</th><th class="r">경쟁률</th>
+              </tr></thead>
+              <tbody id="jv-tbody">
+                <tr><td colspan="8" class="jv-placeholder">🔎<br>직종을 검색하거나 태그를 클릭하세요</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <div id="midal-default" style="display:none;">
         <div style="display:none;">
           <input id="midal-search" type="text"/>
@@ -588,6 +749,7 @@ async function init() {
   // 전체 순위 부여
   _allDatasets.forEach((ds, i) => { ds.rank = i + 1; });
   renderDatasetList(_allDatasets);
+  renderDefaultChart(allRows);
 
   // URL ?ds=공고명 파라미터로 자동 선택
   const dsParam = new URLSearchParams(window.location.search).get('ds');
@@ -597,6 +759,253 @@ async function init() {
       setTimeout(() => selectDataset(matched.name), 100);
     }
   }
+}
+
+// ── jobscript 내장 뷰 ──
+let _jvAllData = [], _jvDisplayData = [], _jvSelectedJob = null;
+let _jvSaJobs = null, _jvAcIdx = -1, _jvChart = null;
+
+function renderDefaultChart(allRows) {
+  _jvAllData = allRows;
+  jvRenderSummary();
+  jvRenderChart();
+  jvRenderTags();
+}
+
+function jvGetStats(src) {
+  const map = {};
+  (src || _jvAllData).forEach(r => {
+    const j = r.job || '기타';
+    if (!map[j]) map[j] = { ratios:[], count:0, datasets: new Set() };
+    const v = parseFloat(r.ratio);
+    if (v > 0) map[j].ratios.push(v);
+    map[j].count++;
+    if (r.dataset_name) map[j].datasets.add(r.dataset_name);
+  });
+  return Object.entries(map).map(([job,v]) => ({
+    job, count: v.count,
+    avg: v.ratios.length ? +(v.ratios.reduce((a,b)=>a+b,0)/v.ratios.length).toFixed(1) : 0,
+    max: v.ratios.length ? +Math.max(...v.ratios).toFixed(1) : 0,
+    datasets: [...v.datasets]
+  })).sort((a,b) => b.avg - a.avg);
+}
+
+function jvRenderSummary() {
+  const src = _jvDisplayData.length ? _jvDisplayData : _jvAllData;
+  const ds = new Set(src.map(r=>r.dataset_name)).size;
+  const jobs = new Set(src.map(r=>r.job).filter(Boolean)).size;
+  const ratios = src.map(r=>parseFloat(r.ratio)).filter(v=>v>0);
+  const avg = ratios.length ? (ratios.reduce((a,b)=>a+b,0)/ratios.length).toFixed(1) : '—';
+  const max = ratios.length ? Math.max(...ratios).toFixed(1) : '—';
+  document.getElementById('jv-s-total').textContent = src.length.toLocaleString();
+  document.getElementById('jv-s-ds').textContent = ds;
+  document.getElementById('jv-s-jobs').textContent = jobs;
+  document.getElementById('jv-s-avg').textContent = avg+':1';
+  document.getElementById('jv-s-max').textContent = max+':1';
+}
+
+function jvRenderChart(src) {
+  const stats = jvGetStats(src);
+  const labels = stats.map(s=>s.job);
+  const avgs   = stats.map(s=>s.avg);
+  const colors = avgs.map(v=>v>=80?'rgba(251,113,133,.85)':v>=30?'rgba(251,191,36,.85)':'rgba(52,211,153,.85)');
+  const bords  = avgs.map(v=>v>=80?'rgba(251,113,133,1)':v>=30?'rgba(251,191,36,1)':'rgba(52,211,153,1)');
+  if (_jvChart) { _jvChart.destroy(); _jvChart = null; }
+  document.querySelector('#default-chart-view .jv-chart-wrap').innerHTML = '<canvas id="jv-chart"></canvas>';
+  _jvChart = new Chart(document.getElementById('jv-chart').getContext('2d'), {
+    type:'bar',
+    data:{ labels, datasets:[{ data:avgs, backgroundColor:colors, borderColor:bords, borderWidth:1, borderRadius:6, borderSkipped:false }] },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      onClick:(e,els)=>{ if(!els.length)return; jvSelectJob(labels[els[0].index]===_jvSelectedJob?null:labels[els[0].index]); },
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'rgba(6,15,30,.95)',borderColor:'rgba(96,165,250,.3)',borderWidth:1,
+          titleColor:'#93C5FD',bodyColor:'rgba(255,255,255,.7)',padding:12,
+          callbacks:{
+            title:items=>items[0].label,
+            label:ctx=>`  평균 경쟁률: ${ctx.parsed.y}:1`,
+            afterBody:items=>{
+              const s=stats[items[0].dataIndex];
+              const lines=[`  응시 레코드: ${s.count}개`,`  최고 경쟁률: ${s.max}:1`];
+              if(s.datasets.length){lines.push('');lines.push('  📋 공고명');s.datasets.slice(0,5).forEach(d=>lines.push(`  · ${d}`));if(s.datasets.length>5)lines.push(`  · 외 ${s.datasets.length-5}개`);}
+              return lines;
+            }
+          }
+        }
+      },
+      scales:{
+        x:{ticks:{color:'rgba(255,255,255,.45)',font:{size:11},maxRotation:45},grid:{color:'rgba(255,255,255,.03)'}},
+        y:{ticks:{color:'rgba(255,255,255,.35)',callback:v=>v+':1'},grid:{color:'rgba(255,255,255,.05)'}}
+      }
+    }
+  });
+}
+
+function jvRenderTags() {
+  const stats = jvGetStats();
+  let html = `<span class="jv-tag on" data-job="" onclick="jvSelectJob(null)">전체 <small style="opacity:.5">${_jvAllData.length}</small></span>`;
+  stats.forEach(s => {
+    html += `<span class="jv-tag" data-job="${jvEsc(s.job)}" onclick="jvSelectJob('${s.job.replace(/'/g,"\\'")}')">${jvEsc(s.job)} <small style="opacity:.4">${s.count}</small></span>`;
+  });
+  document.getElementById('jv-tags').innerHTML = html;
+}
+
+function jvSelectJob(job) {
+  _jvSelectedJob = job;
+  document.querySelectorAll('.jv-tag').forEach(el=>el.classList.toggle('on',el.dataset.job===(job||'')));
+  if (job) {
+    _jvDisplayData = _jvAllData.filter(r=>r.job===job);
+    jvSetFilter(`직종: ${job}`, _jvDisplayData.length);
+    document.getElementById('jv-chart-title').textContent = `직종별 평균 경쟁률 — ${job} 선택`;
+    jvRenderChart(_jvDisplayData);
+    jvRenderTable();
+  } else {
+    _jvDisplayData = [];
+    jvClearFilter();
+    document.getElementById('jv-chart-title').textContent = '직종별 평균 경쟁률';
+    jvRenderChart();
+    jvClearTable();
+  }
+  jvRenderSummary();
+}
+
+function jvSetFilter(label, cnt) {
+  document.getElementById('jv-fb-val').textContent = label;
+  document.getElementById('jv-fb-cnt').textContent = cnt+'개 레코드';
+  document.getElementById('jv-filter-bar').style.display='flex';
+}
+function jvClearFilter() { document.getElementById('jv-filter-bar').style.display='none'; }
+
+function jvResetAll() {
+  _jvSelectedJob=null; _jvSaJobs=null; _jvDisplayData=[];
+  document.getElementById('jv-input').value='';
+  jvCloseAC(); jvHideSaBar(); jvClearFilter();
+  document.querySelectorAll('.jv-tag').forEach(el=>el.classList.toggle('on',el.dataset.job===''));
+  document.getElementById('jv-chart-title').textContent='직종별 평균 경쟁률';
+  jvRenderChart(); jvRenderSummary(); jvClearTable();
+}
+
+function jvOnInput() {
+  const q = document.getElementById('jv-input').value.trim();
+  _jvAcIdx=-1;
+  if (!q) { jvCloseAC(); jvHideSaBar(); return; }
+  const jobMap={};
+  _jvAllData.forEach(r=>{ const j=r.job||''; if(j.toLowerCase().includes(q.toLowerCase())) jobMap[j]=(jobMap[j]||0)+1; });
+  const matches=Object.entries(jobMap).sort((a,b)=>a[0].localeCompare(b[0])).slice(0,20);
+  if (!matches.length) {
+    document.getElementById('jv-ac').innerHTML='<div class="jv-ac-empty">검색 결과 없음</div>';
+    document.getElementById('jv-ac').style.display='block'; jvHideSaBar(); return;
+  }
+  const totalCnt=matches.reduce((s,[,c])=>s+c,0);
+  jvShowSaBar(matches.map(([j])=>j), totalCnt);
+  document.getElementById('jv-ac').innerHTML=matches.map(([job,cnt],i)=>
+    `<div class="jv-ac-item" data-i="${i}" onclick="jvPickJob('${job.replace(/'/g,"\\'")}')">`+
+    `<span>${jvHl(job,q)}</span><span class="jv-ac-cnt">${cnt}개</span></div>`
+  ).join('');
+  document.getElementById('jv-ac').style.display='block';
+}
+
+function jvHl(text,q){const i=text.toLowerCase().indexOf(q.toLowerCase());if(i<0)return jvEsc(text);return jvEsc(text.slice(0,i))+`<mark style="background:rgba(96,165,250,.3);color:#93C5FD;border-radius:2px;padding:0 1px;">${jvEsc(text.slice(i,i+q.length))}</mark>`+jvEsc(text.slice(i+q.length));}
+function jvClearSearch(){document.getElementById('jv-input').value='';jvCloseAC();jvHideSaBar();}
+function jvOnKey(e){const items=document.querySelectorAll('.jv-ac-item');if(!items.length)return;if(e.key==='ArrowDown'){_jvAcIdx=Math.min(_jvAcIdx+1,items.length-1);jvHlAC(items);e.preventDefault();}else if(e.key==='ArrowUp'){_jvAcIdx=Math.max(_jvAcIdx-1,0);jvHlAC(items);e.preventDefault();}else if(e.key==='Enter'&&_jvAcIdx>=0)items[_jvAcIdx].click();else if(e.key==='Escape')jvCloseAC();}
+function jvHlAC(items){items.forEach((el,i)=>el.classList.toggle('sel',i===_jvAcIdx));}
+function jvCloseAC(){document.getElementById('jv-ac').style.display='none';}
+
+document.addEventListener('click',e=>{ if(!e.target.closest('.jv-search'))jvCloseAC(); });
+
+function jvPickJob(job) {
+  document.getElementById('jv-input').value=job;
+  jvCloseAC();
+  _jvSelectedJob=job;
+  document.querySelectorAll('.jv-tag').forEach(el=>el.classList.toggle('on',el.dataset.job===job));
+  _jvDisplayData=_jvAllData.filter(r=>r.job===job);
+  jvSetFilter(`직종: ${job}`, _jvDisplayData.length);
+  document.getElementById('jv-chart-title').textContent=`직종별 평균 경쟁률 — ${job}`;
+  jvRenderChart(_jvDisplayData); jvRenderSummary(); jvRenderTable();
+}
+
+function jvShowSaBar(jobs,totalCnt){
+  const bar=document.getElementById('jv-sa-bar'),cb=document.getElementById('jv-sa-cb');
+  _jvSaJobs=jobs;
+  document.getElementById('jv-sa-text').textContent=`검색된 직종 전체 선택 (${jobs.length}개 직종)`;
+  document.getElementById('jv-sa-meta').textContent=`${totalCnt}개 레코드`;
+  cb.checked=false; bar.style.display='flex';
+}
+function jvHideSaBar(){document.getElementById('jv-sa-bar').style.display='none';document.getElementById('jv-sa-cb').checked=false;_jvSaJobs=null;}
+
+function jvOnSaChange() {
+  const checked=document.getElementById('jv-sa-cb').checked,jobs=_jvSaJobs||[];
+  _jvSelectedJob=null; document.querySelectorAll('.jv-tag').forEach(el=>el.classList.remove('on'));
+  if (checked) {
+    _jvDisplayData=_jvAllData.filter(r=>jobs.includes(r.job));
+    jvSetFilter(`직종 전체 선택 (${jobs.length}개)`,_jvDisplayData.length);
+    document.getElementById('jv-chart-title').textContent=`직종별 평균 경쟁률 — ${jobs.length}개 직종 선택`;
+    jvRenderChart(_jvDisplayData); jvRenderTable();
+  } else {
+    _jvDisplayData=[]; jvClearFilter();
+    document.getElementById('jv-chart-title').textContent='직종별 평균 경쟁률';
+    jvRenderChart(); jvClearTable();
+  }
+  jvRenderSummary();
+}
+
+function jvClearTable() {
+  document.getElementById('jv-result-title').textContent='검색 결과';
+  document.getElementById('jv-result-cnt').style.display='none';
+  document.getElementById('jv-tbody').innerHTML='<tr><td colspan="8" class="jv-placeholder">🔎<br>직종을 검색하거나 태그를 클릭하세요</td></tr>';
+}
+
+function jvRenderTable() {
+  const sortVal=document.getElementById('jv-sort-sel').value;
+  const sorted=[..._jvDisplayData].sort((a,b)=>{
+    if(sortVal==='name_asc')return(a.dataset_name||'').localeCompare(b.dataset_name||'');
+    if(sortVal==='ratio_asc')return(parseFloat(a.ratio)||0)-(parseFloat(b.ratio)||0);
+    if(sortVal==='ratio_desc')return(parseFloat(b.ratio)||0)-(parseFloat(a.ratio)||0);
+    if(sortVal==='s1_total_desc')return(b.s1_total||0)-(a.s1_total||0);
+    if(sortVal==='job_asc')return(a.job||'').localeCompare(b.job||'');
+    return 0;
+  });
+  const cnt=document.getElementById('jv-result-cnt');
+  cnt.textContent=sorted.length+'개'; cnt.style.display='';
+  if(!sorted.length){document.getElementById('jv-tbody').innerHTML='<tr><td colspan="8" class="jv-placeholder">결과가 없습니다</td></tr>';return;}
+  const dash='<span style="color:rgba(255,255,255,.15)">—</span>';
+  const fp=r=>r.s5_total?r.s5_pass:r.s4_total?r.s4_pass:r.s3_pass;
+  const ft=r=>r.s5_total?r.s5_total:r.s4_total?r.s4_total:r.s3_total;
+  document.getElementById('jv-tbody').innerHTML=sorted.map(r=>{
+    const rv=parseFloat(r.ratio)||0;
+    const cls=rv>=80?'jv-hot':rv>=30?'jv-mid':'jv-low';
+    return `<tr>
+      <td><a class="jv-td-name" href="https://ibtcc.kr/competition.html?ds=${encodeURIComponent(r.dataset_name)}" target="_blank" title="${jvEsc(r.dataset_name)}">${jvEsc(r.dataset_name)}</a></td>
+      <td style="font-weight:600;color:#E2E8F0;">${jvEsc(r.job||'—')}</td>
+      <td style="color:rgba(255,255,255,.4);font-size:.73rem;">${jvEsc(r.region||'—')}</td>
+      <td style="color:rgba(255,255,255,.3);font-size:.7rem;">${jvEsc(r.grade||'—')}</td>
+      <td class="r">${r.s1_total?.toLocaleString()||dash}</td>
+      <td class="r">${r.s1_pass?.toLocaleString()||dash}</td>
+      <td class="r">${fp(r)!=null?fp(r)+'<span style="color:rgba(255,255,255,.2)">/</span>'+(ft(r)||''):dash}</td>
+      <td class="r"><span class="jv-chip ${cls}">${r.ratio||'—'}:1</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function jvEsc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function jvShowDefault() {
+  // 기본 차트 뷰 다시 표시
+  document.getElementById('default-chart-view').style.display = '';
+  // 뒤로가기 버튼 숨기기
+  document.getElementById('btn-back-chart').style.display = 'none';
+  // 공고 선택 해제
+  document.querySelectorAll('.ds-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('topbar-title').textContent = '공고를 선택하세요';
+  const cnt = document.getElementById('topbar-cnt');
+  cnt.textContent = ''; cnt.classList.add('hidden');
+  // content-area 내 공고 상세 내용 제거
+  const area = document.getElementById('content-area');
+  Array.from(area.children).forEach(el => {
+    if (el.id !== 'default-chart-view' && el.id !== 'midal-default') el.remove();
+  });
 }
 
 function renderDatasetList(list) {
@@ -629,6 +1038,11 @@ function selectDataset(name) {
     el.classList.toggle('active', el.querySelector('.ds-name')?.title === name));
   const ds = _allDatasets.find(d => d.name === name);
   if (!ds) return;
+  // 기본 차트 뷰 숨기고 뒤로가기 버튼 표시
+  const dcv = document.getElementById('default-chart-view');
+  if (dcv) dcv.style.display = 'none';
+  const btn = document.getElementById('btn-back-chart');
+  if (btn) btn.style.display = '';
   document.getElementById('topbar-title').textContent = ds.name;
   const c = document.getElementById('topbar-cnt');
   c.textContent = `직종 ${ds.count}개`; c.classList.remove('hidden');
