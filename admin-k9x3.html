@@ -215,6 +215,7 @@
       <div class="sb-section-label">분석 · 운영</div>
       <button onclick="switchTab('comments')" id="tab-comments" class="sb-item"><span class="sb-icon">💬</span><span class="sb-label">댓글 관리</span></button>
       <button onclick="switchTab('stats')"    id="tab-stats"    class="sb-item"><span class="sb-icon">📊</span><span class="sb-label">통계</span></button>
+      <button onclick="switchTab('tracking')" id="tab-tracking" class="sb-item"><span class="sb-icon">📡</span><span class="sb-label">추적</span></button>
       <button onclick="switchTab('blog')"     id="tab-blog"     class="sb-item"><span class="sb-icon">✍️</span><span class="sb-label">블로그 원고</span></button>
       <button onclick="switchTab('popupads')" id="tab-popupads" class="sb-item"><span class="sb-icon">📢</span><span class="sb-label">팝업광고</span></button>
 
@@ -1240,6 +1241,11 @@
 
       </div>
 
+      <!-- ── 추적 탭 ── -->
+      <div id="section-tracking" class="hidden" style="height:calc(100vh - 54px);padding:0;">
+        <iframe id="tracking-iframe" src="" style="width:100%;height:100%;border:none;display:block;" allowfullscreen></iframe>
+      </div>
+
       <!-- ── 채용달력 탭 ── -->
       <div id="section-calendar" class="hidden">
 
@@ -2130,12 +2136,12 @@
     const TAB_LABELS = {
       consult:'신청 관리', student:'학생접수', news:'대학소식', programs:'대학활동',
       jobs:'채용공고', staffjobs:'직원채용공고', cnews:'기업소식', shorts:'유튜브쇼츠', stats:'통계',
-      blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고', crawler:'대학활동 수집', alio:'채용AI DATA',
+      tracking:'추적', blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고', crawler:'대학활동 수집', alio:'채용AI DATA',
       comments:'댓글 관리'
     };
 
     function switchTab(tab) {
-      ['consult', 'student', 'news', 'programs', 'jobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'blog', 'calendar', 'popupads', 'crawler', 'alio', 'comments'].forEach(t => {
+      ['consult', 'student', 'news', 'programs', 'jobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'tracking', 'blog', 'calendar', 'popupads', 'crawler', 'alio', 'comments'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (t === tab) btn.classList.add('active');
@@ -2156,6 +2162,10 @@
       if (tab === 'cnews') loadCNews();
       if (tab === 'shorts') loadShorts();
       if (tab === 'stats')  requestAnimationFrame(() => loadStats());
+      if (tab === 'tracking') {
+        const iframe = document.getElementById('tracking-iframe');
+        if (!iframe.src || iframe.src === window.location.href) iframe.src = '/admin/analy.html';
+      }
       if (tab === 'blog')     loadBlogDrafts();
       if (tab === 'calendar') loadCalendarAdmin();
       if (tab === 'popupads') loadPopupAds();
