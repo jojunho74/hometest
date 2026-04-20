@@ -24,9 +24,12 @@
 
     /* ── 검색 패널 (최상단) ── */
     .search-panel{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:20px 24px;margin-bottom:16px;}
-    .sp-top{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;margin-bottom:16px;}
+    .sp-grid{display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:start;}
+
+    /* 좌: 검색 영역 */
+    .sp-left{display:flex;flex-direction:column;gap:10px;}
     .sp-search{position:relative;}
-    .sp-search input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:12px;color:#E2E8F0;padding:12px 44px 12px 18px;font-size:.92rem;outline:none;transition:border-color .2s,background .2s;}
+    .sp-search input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:12px;color:#E2E8F0;padding:12px 44px 12px 18px;font-size:.88rem;outline:none;transition:border-color .2s,background .2s;}
     .sp-search input:focus{border-color:#3B82F6;background:rgba(59,130,246,.07);}
     .sp-search input::placeholder{color:rgba(255,255,255,.2);}
     .sp-search .s-ico{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.25);font-size:1rem;pointer-events:none;}
@@ -34,15 +37,15 @@
     .sp-search input:not(:placeholder-shown) ~ .s-ico{display:none;}
     .sp-search input:not(:placeholder-shown) ~ .s-clear{display:block;}
 
-    .btn-reset{padding:12px 20px;border-radius:12px;font-size:.8rem;font-weight:700;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.1);cursor:pointer;white-space:nowrap;transition:all .15s;}
+    .btn-reset{padding:10px 0;border-radius:12px;font-size:.8rem;font-weight:700;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.1);cursor:pointer;width:100%;transition:all .15s;}
     .btn-reset:hover{background:rgba(255,255,255,.1);color:#E2E8F0;border-color:rgba(255,255,255,.2);}
 
     /* 전체선택 바 */
-    .select-all-bar{display:none;align-items:center;gap:12px;padding:11px 16px;background:rgba(59,130,246,.12);border:1.5px solid rgba(96,165,250,.35);border-radius:11px;margin-bottom:14px;cursor:pointer;}
-    .select-all-bar label{display:flex;align-items:center;gap:12px;cursor:pointer;flex:1;}
-    .select-all-bar input[type=checkbox]{width:18px;height:18px;accent-color:#3B82F6;cursor:pointer;flex-shrink:0;}
-    .sa-text{font-size:.83rem;color:#93C5FD;font-weight:700;}
-    .sa-meta{font-size:.72rem;color:rgba(255,255,255,.3);margin-left:auto;background:rgba(255,255,255,.07);padding:3px 10px;border-radius:20px;}
+    .select-all-bar{display:none;align-items:center;gap:10px;padding:10px 14px;background:rgba(59,130,246,.12);border:1.5px solid rgba(96,165,250,.35);border-radius:11px;}
+    .select-all-bar label{display:flex;align-items:center;gap:10px;cursor:pointer;flex:1;}
+    .select-all-bar input[type=checkbox]{width:17px;height:17px;accent-color:#3B82F6;cursor:pointer;flex-shrink:0;}
+    .sa-text{font-size:.78rem;color:#93C5FD;font-weight:700;line-height:1.3;}
+    .sa-meta{font-size:.68rem;color:rgba(255,255,255,.3);background:rgba(255,255,255,.07);padding:2px 8px;border-radius:20px;white-space:nowrap;}
 
     /* 자동완성 */
     .ac-wrap{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#0B1E3A;border:1.5px solid rgba(96,165,250,.25);border-radius:12px;max-height:240px;overflow-y:auto;z-index:300;box-shadow:0 12px 32px rgba(0,0,0,.5);}
@@ -52,11 +55,19 @@
     .ac-cnt{font-size:.68rem;color:rgba(255,255,255,.3);background:rgba(255,255,255,.06);padding:2px 8px;border-radius:20px;flex-shrink:0;margin-left:8px;}
     .ac-empty{padding:16px;text-align:center;font-size:.8rem;color:rgba(255,255,255,.25);}
 
-    /* 직종 태그 */
-    .tag-bar{display:flex;flex-wrap:wrap;gap:6px;}
-    .tag{padding:5px 13px;border-radius:20px;font-size:.72rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.09);background:transparent;color:rgba(255,255,255,.45);transition:all .15s;}
+    /* 우: 직종 태그 영역 */
+    .sp-right{border-left:1px solid rgba(255,255,255,.06);padding-left:20px;}
+    .sp-right-label{font-size:.68rem;color:rgba(255,255,255,.25);margin-bottom:8px;letter-spacing:.04em;}
+    .tag-box{height:160px;overflow-y:auto;overflow-x:hidden;}
+    .tag-box::-webkit-scrollbar{width:4px;}
+    .tag-box::-webkit-scrollbar-track{background:transparent;}
+    .tag-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
+    .tag-bar{display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;}
+    .tag{padding:4px 11px;border-radius:20px;font-size:.69rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.09);background:transparent;color:rgba(255,255,255,.45);transition:all .15s;white-space:nowrap;}
     .tag:hover{border-color:rgba(96,165,250,.5);color:#93C5FD;background:rgba(59,130,246,.08);}
     .tag.on{border-color:#3B82F6;color:#60A5FA;background:rgba(59,130,246,.18);}
+
+    @media(max-width:900px){.sp-grid{grid-template-columns:1fr;}.sp-right{border-left:none;border-top:1px solid rgba(255,255,255,.06);padding-left:0;padding-top:14px;margin-top:4px;}.tag-box{height:120px;}}
 
     /* ── 활성 필터 표시 ── */
     .filter-bar{display:none;align-items:center;gap:10px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:12px;padding:10px 16px;margin-bottom:16px;}
@@ -139,28 +150,39 @@
 
   <!-- 검색 패널 -->
   <div class="search-panel">
-    <div class="sp-top">
-      <div class="sp-search">
-        <input type="text" id="search-input" placeholder="직종 검색 (예: 전기, 기계, 사무직…)"
-          oninput="onInput()" onkeydown="onKey(event)" autocomplete="off"/>
-        <span class="s-ico">🔍</span>
-        <button class="s-clear" onclick="clearSearch()">✕</button>
-        <div class="ac-wrap" id="ac-list" style="display:none;"></div>
+    <div class="sp-grid">
+
+      <!-- 좌: 검색 -->
+      <div class="sp-left">
+        <div class="sp-search">
+          <input type="text" id="search-input" placeholder="직종 검색 (예: 전기, 기계, 사무…)"
+            oninput="onInput()" onkeydown="onKey(event)" autocomplete="off"/>
+          <span class="s-ico">🔍</span>
+          <button class="s-clear" onclick="clearSearch()">✕</button>
+          <div class="ac-wrap" id="ac-list" style="display:none;"></div>
+        </div>
+
+        <!-- 전체선택 바 -->
+        <div class="select-all-bar" id="sa-bar">
+          <label>
+            <input type="checkbox" id="sa-cb" onchange="onSaChange()">
+            <span class="sa-text" id="sa-text">검색된 직종 전체 선택</span>
+          </label>
+          <span class="sa-meta" id="sa-meta"></span>
+        </div>
+
+        <button class="btn-reset" onclick="resetAll()">↺ 필터 초기화</button>
       </div>
-      <button class="btn-reset" onclick="resetAll()">↺ 초기화</button>
-    </div>
 
-    <!-- 전체선택 바 -->
-    <div class="select-all-bar" id="sa-bar">
-      <label>
-        <input type="checkbox" id="sa-cb" onchange="onSaChange()">
-        <span class="sa-text" id="sa-text">검색된 직종 전체 선택</span>
-      </label>
-      <span class="sa-meta" id="sa-meta"></span>
-    </div>
+      <!-- 우: 직종 태그 -->
+      <div class="sp-right">
+        <div class="sp-right-label">직종 필터 (클릭으로 선택)</div>
+        <div class="tag-box">
+          <div class="tag-bar" id="tagBar"></div>
+        </div>
+      </div>
 
-    <!-- 직종 태그 -->
-    <div class="tag-bar" id="tagBar"></div>
+    </div>
   </div>
 
   <!-- 활성 필터 표시 -->
