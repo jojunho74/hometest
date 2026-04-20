@@ -3349,31 +3349,37 @@
         return d.toISOString().slice(0, 7);
       })();
 
-      // 전체 방문수 (count only — 1000행 제한 우회)
+      const tomorrow  = new Date(kstNow.getTime() + 864e5).toISOString().slice(0, 10);
+
+      // 전체 방문수 (competition-click: 이벤트 제외)
       const { count: totalCount } = await db
         .from('page_views')
-        .select('*', { count: 'exact', head: true });
+        .select('*', { count: 'exact', head: true })
+        .not('page', 'like', 'competition-click:%');
 
       // 이번달 방문수
       const { count: monthCount } = await db
         .from('page_views')
         .select('*', { count: 'exact', head: true })
+        .not('page', 'like', 'competition-click:%')
         .gte('visited_at', thisMonth + '-01T00:00:00+09:00')
         .lt('visited_at', nextMonth + '-01T00:00:00+09:00');
 
-      // 오늘 방문수
+      // 오늘 방문수 (자정까지 정확히, competition-click: 제외)
       const { count: todayCount } = await db
         .from('page_views')
         .select('*', { count: 'exact', head: true })
-        .gte('visited_at', today + 'T00:00:00+09:00')
-        .lt('visited_at', today + 'T23:59:59+09:00');
+        .not('page', 'like', 'competition-click:%')
+        .gte('visited_at', today     + 'T00:00:00+09:00')
+        .lt('visited_at',  tomorrow  + 'T00:00:00+09:00');
 
       // 어제 방문수
       const { count: yesterdayCount } = await db
         .from('page_views')
         .select('*', { count: 'exact', head: true })
+        .not('page', 'like', 'competition-click:%')
         .gte('visited_at', yesterday + 'T00:00:00+09:00')
-        .lt('visited_at', yesterday + 'T23:59:59+09:00');
+        .lt('visited_at', today      + 'T00:00:00+09:00');
 
       // 차트용 데이터 (최근 14일, 충분한 행)
       const since14 = new Date(kstNow.getTime() - 13 * 864e5).toISOString().slice(0, 10);
