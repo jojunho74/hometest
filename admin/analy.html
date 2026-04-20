@@ -40,7 +40,7 @@
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
     .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
 
-    .card{background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.05);}
+    .card{background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.05);min-width:0;overflow:hidden;}
     .card-title{font-size:.78rem;font-weight:700;color:#475569;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
     .chart-wrap{position:relative;}
 
@@ -54,11 +54,12 @@
     .mini-tbl .pct{text-align:right;color:#94A3B8;}
 
     /* 바 */
-    .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-    .bar-label{font-size:.72rem;color:#475569;width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .bar-track{flex:1;height:8px;background:#F1F5F9;border-radius:4px;overflow:hidden;}
+    #page-bars{min-width:0;}
+    .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;min-width:0;}
+    .bar-label{font-size:.72rem;color:#475569;width:110px;min-width:0;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .bar-track{flex:1;min-width:0;height:8px;background:#F1F5F9;border-radius:4px;overflow:hidden;}
     .bar-fill{height:100%;border-radius:4px;transition:width .4s ease;}
-    .bar-val{font-size:.7rem;font-weight:700;color:#1E3A5F;width:40px;text-align:right;flex-shrink:0;}
+    .bar-val{font-size:.7rem;font-weight:700;color:#1E3A5F;width:36px;text-align:right;flex-shrink:0;}
 
     /* 흐름 테이블 */
     .flow-arrow{color:#CBD5E1;font-size:.8rem;margin:0 4px;}
@@ -130,7 +131,7 @@
       </div>
       <div class="card">
         <div class="card-title">📄 페이지별 방문수 TOP 10</div>
-        <div id="page-bars" class="loading"><div class="spin"></div> 집계 중…</div>
+        <div id="page-bars"><div class="loading"><div class="spin"></div> 집계 중…</div></div>
       </div>
     </div>
   </div>
