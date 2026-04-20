@@ -50,6 +50,7 @@
       pointer-events:none;
     }
     @keyframes qnav-blink{0%,100%{opacity:1}50%{opacity:.3}}
+    @keyframes jv-shimmer-txt{0%{background-position:200% center}100%{background-position:-200% center}}
     .qnav-inner{
       position:relative;z-index:1;
       display:flex;align-items:center;justify-content:center;
@@ -515,7 +516,7 @@
         <div class="jv-sp">
           <div class="jv-sp-grid">
             <div class="jv-left">
-              <p style="margin:0 0 8px;font-size:.78rem;color:rgba(148,163,184,.75);line-height:1.4;">관련 직무를 입력하시면, 기관별 경쟁률을 비교할 수 있습니다.</p>
+              <p style="margin:0 0 8px;font-size:.78rem;line-height:1.4;background:linear-gradient(90deg,#93c5fd,#e2e8f0,#fbbf24,#e2e8f0,#93c5fd);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:jv-shimmer-txt 2.8s linear infinite;">✦ 관련 직무를 입력하시면, 기관별 경쟁률을 비교할 수 있습니다.</p>
               <div class="jv-search">
                 <input type="text" id="jv-input" placeholder="직종 검색 (예: 전기, 기계, 사무…)"
                   oninput="jvOnInput()" onkeydown="jvOnKey(event)" autocomplete="off"/>
