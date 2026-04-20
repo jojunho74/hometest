@@ -6,7 +6,7 @@
   <title>공공기관 채용 경쟁률 — 지텔프IBT</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" crossorigin="anonymous"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#0A1628;color:#E2E8F0;height:100vh;display:flex;flex-direction:column;}
@@ -1299,27 +1299,31 @@ function shareKakaoCompetition() {
   const desc  = _currentDs ? '직종별 경쟁률과 합격선을 확인해보세요!' : '공공기관 채용 경쟁률을 한눈에 확인하세요.';
   const url   = 'https://ibtcc.kr/competition.html';
   const img   = 'https://ibtcc.kr/partner-logos.png';
-  try {
-    if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
-    Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title: title,
-        description: desc,
-        imageUrl: img,
-        link: { mobileWebUrl: url, webUrl: url }
-      },
-      buttons: [{ title: '경쟁률 보러가기', link: { mobileWebUrl: url, webUrl: url } }]
-    });
-    return;
-  } catch(e) {
-    console.warn('[카카오공유 오류]', e);
+
+  function _fallback() {
+    if (navigator.share) { navigator.share({ title, url }).catch(() => {}); return; }
+    navigator.clipboard.writeText(url)
+      .then(() => alert('링크가 복사됐습니다!\n카카오톡에서 붙여넣기 해주세요 😊'))
+      .catch(() => alert('공유 링크: ' + url));
   }
-  // 카카오 SDK 실패 시 네이티브 공유 → 링크 복사 fallback
-  if (navigator.share) { navigator.share({ title, url }).catch(() => {}); return; }
-  navigator.clipboard.writeText(url)
-    .then(() => alert('링크가 복사됐습니다!\n카카오톡에서 붙여넣기 해주세요 😊'))
-    .catch(() => alert('공유 링크: ' + url));
+
+  if (typeof Kakao === 'undefined' || !Kakao.Share) { _fallback(); return; }
+  if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
+
+  const result = Kakao.Share.sendDefault({
+    objectType: 'feed',
+    content: {
+      title: title,
+      description: desc,
+      imageUrl: img,
+      link: { mobileWebUrl: url, webUrl: url }
+    },
+    buttons: [{ title: '경쟁률 보러가기', link: { mobileWebUrl: url, webUrl: url } }]
+  });
+
+  if (result && typeof result.catch === 'function') {
+    result.catch(e => { console.warn('[카카오공유 오류]', e); _fallback(); });
+  }
 }
 
 async function submitComment() {
