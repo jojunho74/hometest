@@ -8,109 +8,170 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#0A1628;color:#E2E8F0;min-height:100vh;}
+    body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#060F1E;color:#E2E8F0;min-height:100vh;}
 
-    header{background:rgba(10,22,40,.97);border-bottom:1px solid rgba(255,255,255,.08);padding:0 24px;height:60px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
-    header h1{font-size:1.05rem;font-weight:800;color:#60A5FA;}
-    header .meta{font-size:.75rem;color:rgba(255,255,255,.3);margin-left:auto;}
+    /* ── 헤더 ── */
+    header{background:rgba(6,15,30,.98);border-bottom:1px solid rgba(255,255,255,.07);padding:0 28px;height:56px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:200;backdrop-filter:blur(8px);}
+    .h-logo{font-size:1rem;font-weight:800;color:#60A5FA;white-space:nowrap;}
+    .h-logo span{color:rgba(255,255,255,.35);font-weight:400;font-size:.8rem;margin-left:6px;}
+    .h-meta{font-size:.72rem;color:rgba(255,255,255,.25);margin-left:auto;white-space:nowrap;}
+    .h-dot{width:7px;height:7px;border-radius:50%;background:#22C55E;flex-shrink:0;box-shadow:0 0 6px #22C55E;}
+    .h-dot.loading{background:#FBBF24;box-shadow:0 0 6px #FBBF24;animation:pulse 1s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 
-    .wrap{max-width:1280px;margin:0 auto;padding:24px 16px;display:flex;flex-direction:column;gap:20px;}
+    /* ── 전체 wrap ── */
+    .wrap{max-width:1360px;margin:0 auto;padding:20px 20px 40px;}
 
-    /* 요약 카드 */
-    .summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
-    .scard{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px;text-align:center;}
-    .scard .val{font-size:1.6rem;font-weight:800;color:#60A5FA;}
-    .scard .lbl{font-size:.7rem;color:rgba(255,255,255,.35);margin-top:3px;}
+    /* ── 검색 패널 (최상단) ── */
+    .search-panel{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:20px 24px;margin-bottom:16px;}
+    .sp-top{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;margin-bottom:16px;}
+    .sp-search{position:relative;}
+    .sp-search input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:12px;color:#E2E8F0;padding:12px 44px 12px 18px;font-size:.92rem;outline:none;transition:border-color .2s,background .2s;}
+    .sp-search input:focus{border-color:#3B82F6;background:rgba(59,130,246,.07);}
+    .sp-search input::placeholder{color:rgba(255,255,255,.2);}
+    .sp-search .s-ico{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.25);font-size:1rem;pointer-events:none;}
+    .sp-search .s-clear{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.3);font-size:.85rem;cursor:pointer;display:none;background:none;border:none;padding:2px;}
+    .sp-search input:not(:placeholder-shown) ~ .s-ico{display:none;}
+    .sp-search input:not(:placeholder-shown) ~ .s-clear{display:block;}
 
-    /* ① 그래프 */
-    .section{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px;}
-    .sec-title{font-size:.88rem;font-weight:700;color:#93C5FD;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-    .sec-title small{font-weight:400;color:rgba(255,255,255,.3);font-size:.72rem;}
-    .chart-wrap{position:relative;height:380px;}
+    .btn-reset{padding:12px 20px;border-radius:12px;font-size:.8rem;font-weight:700;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.1);cursor:pointer;white-space:nowrap;transition:all .15s;}
+    .btn-reset:hover{background:rgba(255,255,255,.1);color:#E2E8F0;border-color:rgba(255,255,255,.2);}
 
-    /* ② 검색 */
-    .search-section{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px;}
-    .search-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+    /* 전체선택 바 */
+    .select-all-bar{display:none;align-items:center;gap:12px;padding:11px 16px;background:rgba(59,130,246,.12);border:1.5px solid rgba(96,165,250,.35);border-radius:11px;margin-bottom:14px;cursor:pointer;}
+    .select-all-bar label{display:flex;align-items:center;gap:12px;cursor:pointer;flex:1;}
+    .select-all-bar input[type=checkbox]{width:18px;height:18px;accent-color:#3B82F6;cursor:pointer;flex-shrink:0;}
+    .sa-text{font-size:.83rem;color:#93C5FD;font-weight:700;}
+    .sa-meta{font-size:.72rem;color:rgba(255,255,255,.3);margin-left:auto;background:rgba(255,255,255,.07);padding:3px 10px;border-radius:20px;}
 
-    /* 전체검색 */
-    .search-left{display:flex;flex-direction:column;gap:10px;}
-    .search-left .desc{font-size:.75rem;color:rgba(255,255,255,.4);}
-    .btn-all{padding:12px 0;border-radius:10px;font-size:.88rem;font-weight:700;background:linear-gradient(135deg,#1D4ED8,#3B82F6);color:#fff;border:none;cursor:pointer;width:100%;transition:opacity .15s;}
-    .btn-all:hover{opacity:.85;}
-
-    /* 관련검색어 */
-    .search-right{display:flex;flex-direction:column;gap:8px;position:relative;}
-    .search-right .desc{font-size:.75rem;color:rgba(255,255,255,.4);}
-    .search-input-wrap{position:relative;}
-    .search-input-wrap input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#E2E8F0;padding:10px 36px 10px 14px;font-size:.85rem;outline:none;transition:border-color .15s;}
-    .search-input-wrap input:focus{border-color:#3B82F6;background:rgba(59,130,246,.06);}
-    .search-input-wrap input::placeholder{color:rgba(255,255,255,.25);}
-    .search-input-wrap .ico{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.3);font-size:.9rem;pointer-events:none;}
-
-    /* 자동완성 드롭다운 */
-    .autocomplete{position:absolute;top:100%;left:0;right:0;background:#0D2547;border:1px solid rgba(96,165,250,.3);border-radius:10px;margin-top:4px;max-height:220px;overflow-y:auto;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.4);}
-    .ac-item{padding:9px 14px;font-size:.78rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);color:#CBD5E1;display:flex;justify-content:space-between;align-items:center;}
+    /* 자동완성 */
+    .ac-wrap{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#0B1E3A;border:1.5px solid rgba(96,165,250,.25);border-radius:12px;max-height:240px;overflow-y:auto;z-index:300;box-shadow:0 12px 32px rgba(0,0,0,.5);}
+    .ac-item{padding:10px 16px;font-size:.8rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);color:#CBD5E1;display:flex;align-items:center;justify-content:space-between;transition:background .1s;}
     .ac-item:last-child{border-bottom:none;}
-    .ac-item:hover,.ac-item.selected{background:rgba(59,130,246,.15);color:#93C5FD;}
-    .ac-item .ac-count{font-size:.68rem;color:rgba(255,255,255,.3);background:rgba(255,255,255,.07);padding:2px 7px;border-radius:10px;}
-    .ac-item .ac-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px;}
-    .ac-empty{padding:14px;font-size:.78rem;color:rgba(255,255,255,.3);text-align:center;}
-    .cb-box{width:16px;height:16px;border:2px solid rgba(96,165,250,.6);border-radius:3px;display:inline-flex;align-items:center;justify-content:center;margin-right:10px;flex-shrink:0;font-size:.7rem;color:#60A5FA;transition:all .15s;}
-    .cb-box.checked{background:#3B82F6;border-color:#3B82F6;color:#fff;}
+    .ac-item:hover,.ac-item.sel{background:rgba(59,130,246,.18);color:#93C5FD;}
+    .ac-cnt{font-size:.68rem;color:rgba(255,255,255,.3);background:rgba(255,255,255,.06);padding:2px 8px;border-radius:20px;flex-shrink:0;margin-left:8px;}
+    .ac-empty{padding:16px;text-align:center;font-size:.8rem;color:rgba(255,255,255,.25);}
 
     /* 직종 태그 */
-    .job-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;}
-    .job-tag{padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);transition:all .15s;}
-    .job-tag:hover{background:rgba(96,165,250,.12);border-color:#60A5FA;color:#93C5FD;}
-    .job-tag.active{background:rgba(96,165,250,.22);border-color:#60A5FA;color:#60A5FA;}
-    .job-tag.all-tag{border-color:rgba(52,211,153,.4);color:#34D399;}
-    .job-tag.all-tag.active{background:rgba(52,211,153,.18);}
+    .tag-bar{display:flex;flex-wrap:wrap;gap:6px;}
+    .tag{padding:5px 13px;border-radius:20px;font-size:.72rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.09);background:transparent;color:rgba(255,255,255,.45);transition:all .15s;}
+    .tag:hover{border-color:rgba(96,165,250,.5);color:#93C5FD;background:rgba(59,130,246,.08);}
+    .tag.on{border-color:#3B82F6;color:#60A5FA;background:rgba(59,130,246,.18);}
 
-    /* ③ 결과 테이블 */
-    .result-section{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px;}
-    .result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+    /* ── 활성 필터 표시 ── */
+    .filter-bar{display:none;align-items:center;gap:10px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:12px;padding:10px 16px;margin-bottom:16px;}
+    .filter-bar .fb-label{font-size:.78rem;color:rgba(52,211,153,.7);font-weight:600;}
+    .filter-bar .fb-val{font-size:.8rem;color:#34D399;font-weight:700;flex:1;}
+    .filter-bar .fb-cnt{font-size:.72rem;color:rgba(255,255,255,.35);}
+    .filter-bar .fb-clear{background:none;border:1px solid rgba(52,211,153,.3);color:rgba(52,211,153,.7);border-radius:8px;padding:4px 10px;font-size:.72rem;cursor:pointer;transition:all .15s;}
+    .filter-bar .fb-clear:hover{background:rgba(52,211,153,.15);color:#34D399;}
+
+    /* ── 요약 카드 ── */
+    .summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;}
+    .scard{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:16px 14px;text-align:center;transition:border-color .2s;}
+    .scard:hover{border-color:rgba(96,165,250,.2);}
+    .scard .val{font-size:1.55rem;font-weight:800;color:#60A5FA;letter-spacing:-.02em;}
+    .scard .lbl{font-size:.68rem;color:rgba(255,255,255,.3);margin-top:4px;letter-spacing:.02em;}
+
+    /* ── 차트 ── */
+    .chart-card{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:20px 24px;margin-bottom:16px;}
+    .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px;}
+    .card-title{font-size:.88rem;font-weight:700;color:#93C5FD;}
+    .card-hint{font-size:.7rem;color:rgba(255,255,255,.25);}
+    .chart-wrap{position:relative;height:360px;}
+
+    /* ── 결과 테이블 ── */
+    .result-card{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:20px 24px;}
+    .result-head{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
     .result-title{font-size:.88rem;font-weight:700;color:#93C5FD;}
-    .result-count{font-size:.72rem;color:rgba(255,255,255,.3);}
-    .result-sort{font-size:.72rem;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:6px;}
-    .result-sort select{background:#0A1628;border:1px solid rgba(255,255,255,.1);color:#E2E8F0;border-radius:6px;padding:4px 8px;font-size:.72rem;outline:none;}
+    .result-cnt{font-size:.72rem;color:rgba(255,255,255,.3);background:rgba(255,255,255,.06);padding:3px 10px;border-radius:20px;}
+    .sort-wrap{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:.72rem;color:rgba(255,255,255,.3);}
+    .sort-wrap select{background:#0A1628;border:1px solid rgba(255,255,255,.1);color:#E2E8F0;border-radius:8px;padding:5px 10px;font-size:.72rem;outline:none;cursor:pointer;}
 
     .tbl-wrap{overflow-x:auto;}
     table{width:100%;border-collapse:collapse;font-size:.77rem;}
-    th{background:#0A1628;color:rgba(255,255,255,.45);font-weight:600;padding:9px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;cursor:pointer;user-select:none;}
-    th:hover{color:#93C5FD;}
-    th.sorted{color:#60A5FA;}
-    td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:#CBD5E1;white-space:nowrap;}
-    tr:hover td{background:rgba(255,255,255,.025);}
+    thead{position:sticky;top:56px;z-index:10;}
+    th{background:#081629;color:rgba(255,255,255,.4);font-weight:600;padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;}
+    th.num{text-align:right;}
+    td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:#CBD5E1;white-space:nowrap;}
+    tbody tr:hover td{background:rgba(59,130,246,.05);}
+    tbody tr:nth-child(even) td{background:rgba(255,255,255,.01);}
     td.num{text-align:right;font-variant-numeric:tabular-nums;}
-    .ds-name{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#93C5FD;font-weight:600;}
-    .job-name{color:#E2E8F0;font-weight:600;}
-    .chip{display:inline-block;padding:2px 9px;border-radius:10px;font-size:.7rem;font-weight:700;}
-    .chip-hot{background:rgba(251,113,133,.15);color:#FB7185;border:1px solid rgba(251,113,133,.3);}
-    .chip-mid{background:rgba(251,191,36,.12);color:#FBBF24;border:1px solid rgba(251,191,36,.25);}
-    .chip-low{background:rgba(52,211,153,.1);color:#34D399;border:1px solid rgba(52,211,153,.2);}
-    .dash{color:rgba(255,255,255,.18);}
+    .td-name{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#93C5FD;font-weight:600;cursor:default;}
+    .td-job{color:#E2E8F0;font-weight:600;}
+    .chip{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;}
+    .hot{background:rgba(251,113,133,.15);color:#FB7185;border:1px solid rgba(251,113,133,.25);}
+    .mid{background:rgba(251,191,36,.1);color:#FBBF24;border:1px solid rgba(251,191,36,.2);}
+    .low{background:rgba(52,211,153,.1);color:#34D399;border:1px solid rgba(52,211,153,.18);}
+    .dash{color:rgba(255,255,255,.15);}
+    .pass-num{color:#93C5FD;}.slash{color:rgba(255,255,255,.2);}
 
-    .placeholder-msg{text-align:center;padding:50px 20px;color:rgba(255,255,255,.25);font-size:.85rem;line-height:1.8;}
-    .placeholder-msg .ico{font-size:2rem;display:block;margin-bottom:10px;}
+    .placeholder{text-align:center;padding:60px 20px;color:rgba(255,255,255,.2);font-size:.85rem;line-height:2;}
+    .placeholder .pi{font-size:2.4rem;display:block;margin-bottom:8px;}
 
-    @media(max-width:768px){
+    /* 스켈레톤 */
+    .skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px;}
+    @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+    @media(max-width:900px){
       .summary{grid-template-columns:repeat(3,1fr);}
-      .search-row{grid-template-columns:1fr;}
-      .chart-wrap{height:260px;}
-      .ds-name{max-width:130px;}
+      .sp-top{grid-template-columns:1fr;}
+      .chart-wrap{height:240px;}
+      .td-name{max-width:140px;}
+      header{padding:0 16px;}
+      .wrap{padding:14px 14px 32px;}
+    }
+    @media(max-width:600px){
+      .summary{grid-template-columns:repeat(2,1fr);}
+      .scard .val{font-size:1.3rem;}
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>📊 직종별 채용 경쟁률 분석</h1>
-  <span class="meta" id="meta-txt">불러오는 중…</span>
+  <div class="h-logo">📊 채용 경쟁률 분석 <span>공공기관 직종별</span></div>
+  <div class="h-dot loading" id="h-dot"></div>
+  <div class="h-meta" id="h-meta">불러오는 중…</div>
 </header>
 
 <div class="wrap">
 
-  <!-- 요약 -->
+  <!-- 검색 패널 -->
+  <div class="search-panel">
+    <div class="sp-top">
+      <div class="sp-search">
+        <input type="text" id="search-input" placeholder="직종 검색 (예: 전기, 기계, 사무직…)"
+          oninput="onInput()" onkeydown="onKey(event)" autocomplete="off"/>
+        <span class="s-ico">🔍</span>
+        <button class="s-clear" onclick="clearSearch()">✕</button>
+        <div class="ac-wrap" id="ac-list" style="display:none;"></div>
+      </div>
+      <button class="btn-reset" onclick="resetAll()">↺ 초기화</button>
+    </div>
+
+    <!-- 전체선택 바 -->
+    <div class="select-all-bar" id="sa-bar">
+      <label>
+        <input type="checkbox" id="sa-cb" onchange="onSaChange()">
+        <span class="sa-text" id="sa-text">검색된 직종 전체 선택</span>
+      </label>
+      <span class="sa-meta" id="sa-meta"></span>
+    </div>
+
+    <!-- 직종 태그 -->
+    <div class="tag-bar" id="tagBar"></div>
+  </div>
+
+  <!-- 활성 필터 표시 -->
+  <div class="filter-bar" id="filter-bar">
+    <span class="fb-label">필터</span>
+    <span class="fb-val" id="fb-val"></span>
+    <span class="fb-cnt" id="fb-cnt"></span>
+    <button class="fb-clear" onclick="resetAll()">✕ 해제</button>
+  </div>
+
+  <!-- 요약 카드 -->
   <div class="summary">
     <div class="scard"><div class="val" id="s-total">—</div><div class="lbl">전체 레코드</div></div>
     <div class="scard"><div class="val" id="s-ds">—</div><div class="lbl">공고 수</div></div>
@@ -119,26 +180,27 @@
     <div class="scard"><div class="val" id="s-max">—</div><div class="lbl">최고 경쟁률</div></div>
   </div>
 
-  <!-- ① 그래프 -->
-  <div class="section">
-    <div class="sec-title">직종별 평균 경쟁률 <small>막대 클릭 → 해당 직종 필터</small></div>
+  <!-- 차트 -->
+  <div class="chart-card">
+    <div class="card-head">
+      <div class="card-title" id="chart-title">직종별 평균 경쟁률</div>
+      <div class="card-hint">막대 클릭 → 해당 직종 필터</div>
+    </div>
     <div class="chart-wrap"><canvas id="jobChart"></canvas></div>
   </div>
 
-  <!-- ② 결과 -->
-  <div class="result-section" id="result-section">
-    <div class="result-header">
-      <div>
-        <div class="result-title" id="result-title">검색 결과</div>
-        <div class="result-count" id="result-count"></div>
-      </div>
-      <div class="result-sort">
-        정렬:
-        <select id="sort-select" onchange="renderTable()">
+  <!-- 결과 테이블 -->
+  <div class="result-card">
+    <div class="result-head">
+      <div class="result-title" id="result-title">검색 결과</div>
+      <span class="result-cnt" id="result-cnt" style="display:none;"></span>
+      <div class="sort-wrap">
+        정렬
+        <select id="sort-sel" onchange="renderTable()">
           <option value="ratio_desc">경쟁률 높은순</option>
           <option value="ratio_asc">경쟁률 낮은순</option>
-          <option value="name_asc">공고명 가나다순</option>
-          <option value="s1_total_desc">1차응시 많은순</option>
+          <option value="name_asc">공고명순</option>
+          <option value="s1_total_desc">응시인원 많은순</option>
           <option value="job_asc">직종명순</option>
         </select>
       </div>
@@ -147,58 +209,19 @@
       <table>
         <thead>
           <tr>
-            <th>공고명</th>
-            <th>직종</th>
-            <th>지역</th>
-            <th>직급</th>
-            <th class="num">1차응시</th>
-            <th class="num">1차합격</th>
-            <th class="num">2차</th>
-            <th class="num">3차</th>
-            <th class="num">최종합격</th>
-            <th class="num">경쟁률</th>
+            <th>공고명</th><th>직종</th><th>지역</th><th>직급</th>
+            <th class="num">1차응시</th><th class="num">1차합격</th>
+            <th class="num">2차</th><th class="num">3차</th>
+            <th class="num">최종합격</th><th class="num">경쟁률</th>
           </tr>
         </thead>
         <tbody id="tbl-body">
-          <tr><td colspan="10" class="placeholder-msg">
-            <span class="ico">🔎</span>
-            전체검색하기를 누르거나 공고명을 검색하세요
+          <tr><td colspan="10" class="placeholder">
+            <span class="pi">🔎</span>
+            직종을 검색하거나 태그를 클릭하세요
           </td></tr>
         </tbody>
       </table>
-    </div>
-  </div>
-
-  <!-- ③ 검색 -->
-  <div class="search-section">
-    <div class="sec-title" style="margin-bottom:16px;">검색</div>
-    <div class="search-row">
-
-      <!-- 좌: 전체 검색 -->
-      <div class="search-left">
-        <div class="desc">전체 공고를 가나다순으로 표시합니다</div>
-        <button class="btn-all" onclick="showAll()">📋 전체검색하기</button>
-        <div class="desc" style="margin-top:4px;">직종별 필터</div>
-        <div class="job-tags" id="jobTags"></div>
-      </div>
-
-      <!-- 우: 직종 검색어 -->
-      <div class="search-right">
-        <div class="desc">직종명으로 검색하여 선택하세요</div>
-        <div class="search-input-wrap">
-          <input type="text" id="search-input" placeholder="직종 검색… (예: 전기, 기계, 사무)"
-            oninput="onSearchInput()" onkeydown="onSearchKeydown(event)" autocomplete="off"/>
-          <span class="ico">🔍</span>
-          <div class="autocomplete" id="ac-list" style="display:none;"></div>
-        </div>
-        <!-- 전체선택 바 -->
-        <label id="select-all-bar" style="display:none;align-items:center;gap:10px;margin-top:10px;padding:10px 14px;background:rgba(59,130,246,.1);border:1px solid rgba(96,165,250,.3);border-radius:10px;cursor:pointer;user-select:none;">
-          <input type="checkbox" id="select-all-cb" style="width:16px;height:16px;accent-color:#3B82F6;cursor:pointer;" onchange="onSelectAllChange()">
-          <span style="font-size:.8rem;color:#60A5FA;font-weight:700;" id="select-all-label">검색된 직종 전체 선택</span>
-          <span style="font-size:.7rem;color:rgba(255,255,255,.35);margin-left:auto;" id="select-all-meta"></span>
-        </label>
-      </div>
-
     </div>
   </div>
 
@@ -211,22 +234,24 @@ const db = createClient(
   'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
 );
 
-let allData = [];
-let displayData = [];
-let selectedJob = null;
-let acIdx = -1;
-let chart = null;
-let lastSearchJobs = null; // 마지막 전체선택 직종 목록
+let allData = [], displayData = [], selectedJob = null, acIdx = -1, chart = null;
+let saJobs = null; // 전체선택 바에 현재 바인딩된 직종 목록
 
 // ── 초기화 ──
 async function init() {
   const { data, error } = await db.from('alio_jobs').select('*');
-  if (error) { document.getElementById('meta-txt').textContent = '오류: ' + error.message; return; }
+  const dot = document.getElementById('h-dot');
+  dot.classList.remove('loading');
+  if (error) {
+    document.getElementById('h-meta').textContent = '오류: ' + error.message;
+    return;
+  }
   allData = data || [];
   renderSummary();
   renderChart();
   renderTags();
-  document.getElementById('meta-txt').textContent = `${allData.length}개 레코드 · ${new Set(allData.map(r=>r.dataset_name)).size}개 공고`;
+  document.getElementById('h-meta').textContent =
+    `${allData.length.toLocaleString()}개 레코드 · ${new Set(allData.map(r=>r.dataset_name)).size}개 공고`;
 }
 
 // ── 요약 ──
@@ -244,31 +269,33 @@ function renderSummary() {
 }
 
 // ── 차트 ──
-function getJobStats(sourceData) {
+function getStats(src) {
   const map = {};
-  (sourceData || allData).forEach(r => {
-    const job = r.job || '기타';
-    if (!map[job]) map[job] = { ratios:[], count:0 };
-    const rv = parseFloat(r.ratio);
-    if (rv>0) map[job].ratios.push(rv);
-    map[job].count++;
+  (src || allData).forEach(r => {
+    const j = r.job || '기타';
+    if (!map[j]) map[j] = { ratios:[], count:0 };
+    const v = parseFloat(r.ratio);
+    if (v > 0) map[j].ratios.push(v);
+    map[j].count++;
   });
-  return Object.entries(map).map(([job,v])=>({
+  return Object.entries(map).map(([job,v]) => ({
     job, count: v.count,
     avg: v.ratios.length ? +(v.ratios.reduce((a,b)=>a+b,0)/v.ratios.length).toFixed(1) : 0,
     max: v.ratios.length ? +Math.max(...v.ratios).toFixed(1) : 0
-  })).sort((a,b)=>b.avg-a.avg);
+  })).sort((a,b) => b.avg - a.avg);
 }
 
-function renderChart(sourceData) {
-  const stats = getJobStats(sourceData);
-  const labels = stats.map(s=>s.job);
-  const avgs = stats.map(s=>s.avg);
-  const colors = avgs.map(v=>v>=80?'rgba(251,113,133,.8)':v>=30?'rgba(251,191,36,.8)':'rgba(52,211,153,.8)');
+function renderChart(src) {
+  const stats = getStats(src);
+  const labels = stats.map(s => s.job);
+  const avgs = stats.map(s => s.avg);
+  const colors = avgs.map(v => v>=80?'rgba(251,113,133,.85)':v>=30?'rgba(251,191,36,.85)':'rgba(52,211,153,.85)');
+  const bords = avgs.map(v => v>=80?'rgba(251,113,133,1)':v>=30?'rgba(251,191,36,1)':'rgba(52,211,153,1)');
+
   if (chart) { chart.destroy(); chart = null; }
-  const wrap = document.querySelector('.chart-wrap');
-  wrap.innerHTML = '<canvas id="jobChart"></canvas>';
+  document.querySelector('.chart-wrap').innerHTML = '<canvas id="jobChart"></canvas>';
   const ctx = document.getElementById('jobChart').getContext('2d');
+
   chart = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -277,32 +304,47 @@ function renderChart(sourceData) {
         label: '평균 경쟁률',
         data: avgs,
         backgroundColor: colors,
-        borderRadius: 5,
+        borderColor: bords,
+        borderWidth: 1,
+        borderRadius: 6,
         borderSkipped: false,
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      onClick: (e, elements) => {
-        if (!elements.length) return;
-        const job = labels[elements[0].index];
-        selectJobFilter(job === selectedJob ? null : job);
+      onClick: (e, els) => {
+        if (!els.length) return;
+        const job = labels[els[0].index];
+        selectJob(job === selectedJob ? null : job);
       },
       plugins: {
-        legend: { labels: { color:'rgba(255,255,255,.45)', font:{size:11} } },
+        legend: { display: false },
         tooltip: {
+          backgroundColor: 'rgba(6,15,30,.95)',
+          borderColor: 'rgba(96,165,250,.3)',
+          borderWidth: 1,
+          titleColor: '#93C5FD',
+          bodyColor: 'rgba(255,255,255,.7)',
+          padding: 12,
           callbacks: {
-            label: ctx => `평균 경쟁률: ${ctx.parsed.y}:1`,
+            title: items => items[0].label,
+            label: ctx => `  평균 경쟁률: ${ctx.parsed.y}:1`,
             afterBody: items => {
               const s = stats[items[0].dataIndex];
-              return [`레코드 수: ${s.count}개`, `최고: ${s.max}:1`];
+              return [`  응시 레코드: ${s.count}개`, `  최고 경쟁률: ${s.max}:1`];
             }
           }
         }
       },
       scales: {
-        x: { ticks:{color:'rgba(255,255,255,.5)',font:{size:11}}, grid:{color:'rgba(255,255,255,.04)'} },
-        y: { ticks:{color:'rgba(255,255,255,.4)',callback:v=>v+':1'}, grid:{color:'rgba(255,255,255,.05)'} }
+        x: {
+          ticks:{ color:'rgba(255,255,255,.45)', font:{size:11}, maxRotation:45 },
+          grid:{ color:'rgba(255,255,255,.03)' }
+        },
+        y: {
+          ticks:{ color:'rgba(255,255,255,.35)', callback: v => v+':1' },
+          grid:{ color:'rgba(255,255,255,.05)' }
+        }
       }
     }
   });
@@ -310,181 +352,189 @@ function renderChart(sourceData) {
 
 // ── 직종 태그 ──
 function renderTags() {
-  const stats = getJobStats();
-  let html = `<span class="job-tag all-tag active" onclick="selectJobFilter(null)">전체 (${allData.length})</span>`;
+  const stats = getStats();
+  let html = `<span class="tag on" data-job="" onclick="selectJob(null)">전체 <small style="opacity:.5">${allData.length}</small></span>`;
   stats.forEach(s => {
-    html += `<span class="job-tag" data-job="${esc(s.job)}" onclick="selectJobFilter('${s.job.replace(/'/g,"\\'")}')">
-      ${esc(s.job)} <span style="opacity:.4;font-size:.65rem;">${s.count}</span>
+    html += `<span class="tag" data-job="${esc(s.job)}" onclick="selectJob('${s.job.replace(/'/g,"\\'")}')">
+      ${esc(s.job)} <small style="opacity:.4">${s.count}</small>
     </span>`;
   });
-  document.getElementById('jobTags').innerHTML = html;
+  document.getElementById('tagBar').innerHTML = html;
 }
 
-function selectJobFilter(job) {
+// ── 직종 선택 ──
+function selectJob(job) {
   selectedJob = job;
-  document.querySelectorAll('.job-tag').forEach(el => {
-    const isAll = el.classList.contains('all-tag');
-    el.classList.toggle('active', isAll ? !job : el.dataset.job === job);
+  document.querySelectorAll('.tag').forEach(el => {
+    el.classList.toggle('on', el.dataset.job === (job||''));
   });
-  // 현재 표시된 데이터가 있으면 필터 적용
-  if (displayData.length > 0) {
-    applyJobFilter();
+  if (job) {
+    displayData = allData.filter(r => r.job === job);
+    setFilterBar(`직종: ${job}`, displayData.length);
+    document.getElementById('chart-title').textContent = `직종별 평균 경쟁률 — ${job} 선택`;
+    renderChart(displayData);
+    renderTable();
+  } else {
+    displayData = [];
+    clearFilterBar();
+    document.getElementById('chart-title').textContent = '직종별 평균 경쟁률';
+    renderChart();
+    clearTable();
   }
 }
 
-function applyJobFilter() {
-  const src = selectedJob
-    ? allData.filter(r => r.job === selectedJob)
-    : allData;
-  displayData = src;
-  const title = selectedJob
-    ? `직종: ${selectedJob}`
-    : document.getElementById('result-title').textContent.includes('전체') ? '전체 데이터' : document.getElementById('result-title').textContent;
-  document.getElementById('result-title').textContent = selectedJob ? `직종 필터: ${selectedJob}` : (displayData.length === allData.length ? '전체 데이터' : document.getElementById('result-title').textContent);
-  renderTable();
+// ── 필터 바 ──
+function setFilterBar(label, cnt) {
+  const bar = document.getElementById('filter-bar');
+  document.getElementById('fb-val').textContent = label;
+  document.getElementById('fb-cnt').textContent = `${cnt}개 레코드`;
+  bar.style.display = 'flex';
+}
+function clearFilterBar() {
+  document.getElementById('filter-bar').style.display = 'none';
 }
 
-// ── 전체검색 (필터 초기화) ──
-function showAll() {
+// ── 초기화 ──
+function resetAll() {
   selectedJob = null;
-  lastSearchJobs = null;
+  saJobs = null;
   displayData = [];
-  hideSelectAllBar();
-  document.querySelectorAll('.job-tag').forEach(el => {
-    el.classList.toggle('active', el.classList.contains('all-tag'));
-  });
   document.getElementById('search-input').value = '';
-  document.getElementById('result-title').textContent = '검색 결과';
-  document.getElementById('result-count').textContent = '';
-  document.getElementById('tbl-body').innerHTML = `<tr><td colspan="10" class="placeholder-msg"><span class="ico">🔎</span>직종을 선택하거나 검색하세요</td></tr>`;
-  document.querySelector('.sec-title').innerHTML = `직종별 평균 경쟁률 <small>막대 클릭 → 해당 직종 필터</small>`;
+  closeAC();
+  hideSaBar();
+  clearFilterBar();
+  document.querySelectorAll('.tag').forEach(el => el.classList.toggle('on', el.dataset.job === ''));
+  document.getElementById('chart-title').textContent = '직종별 평균 경쟁률';
   renderChart();
+  clearTable();
 }
 
-// ── 직종 검색어 자동완성 ──
-function onSearchInput() {
+// ── 검색 입력 ──
+function onInput() {
   const q = document.getElementById('search-input').value.trim();
   acIdx = -1;
-  if (!q) { closeAC(); hideSelectAllBar(); return; }
+  if (!q) { closeAC(); hideSaBar(); return; }
 
-  // job 기준 매칭
   const jobMap = {};
   allData.forEach(r => {
-    const job = r.job || '';
-    if (job.toLowerCase().includes(q.toLowerCase())) {
-      if (!jobMap[job]) jobMap[job] = 0;
-      jobMap[job]++;
+    const j = r.job || '';
+    if (j.toLowerCase().includes(q.toLowerCase())) {
+      jobMap[j] = (jobMap[j] || 0) + 1;
     }
   });
-  const matches = Object.entries(jobMap).sort((a,b)=>a[0].localeCompare(b[0])).slice(0,20);
+  const matches = Object.entries(jobMap).sort((a,b)=>a[0].localeCompare(b[0])).slice(0, 20);
 
   if (!matches.length) {
-    document.getElementById('ac-list').innerHTML = `<div class="ac-empty">검색 결과가 없습니다</div>`;
+    document.getElementById('ac-list').innerHTML = `<div class="ac-empty">검색 결과 없음</div>`;
     document.getElementById('ac-list').style.display = 'block';
+    hideSaBar();
     return;
   }
 
+  // 전체선택 바 업데이트
   const totalCnt = matches.reduce((s,[,c])=>s+c, 0);
-  const allJobs = matches.map(([job])=>job);
-
-  // 전체선택 바 표시
-  const bar = document.getElementById('select-all-bar');
-  const cb = document.getElementById('select-all-cb');
-  const isChecked = lastSearchJobs && JSON.stringify(lastSearchJobs) === JSON.stringify(allJobs);
-  document.getElementById('select-all-label').textContent = `검색된 직종 전체 선택 (${matches.length}개 직종)`;
-  document.getElementById('select-all-meta').textContent = `${totalCnt}개 레코드`;
-  bar._jobs = allJobs;
-  cb.checked = !!isChecked;
-  bar.style.display = 'flex';
+  const jobs = matches.map(([j])=>j);
+  showSaBar(jobs, totalCnt);
 
   document.getElementById('ac-list').innerHTML = matches.map(([job, cnt], i) =>
-    `<div class="ac-item" data-idx="${i}" onclick="selectJobBySearch('${job.replace(/'/g,"\\'")}')">
-      <span class="ac-name">${highlight(job, q)}</span>
-      <span class="ac-count">${cnt}개 레코드</span>
+    `<div class="ac-item" data-i="${i}" onclick="pickJob('${job.replace(/'/g,"\\'")}')">
+      <span>${hl(job, q)}</span>
+      <span class="ac-cnt">${cnt}개</span>
     </div>`
   ).join('');
   document.getElementById('ac-list').style.display = 'block';
 }
 
-function highlight(text, q) {
-  const idx = text.toLowerCase().indexOf(q.toLowerCase());
-  if (idx < 0) return esc(text);
-  return esc(text.slice(0,idx)) + `<mark style="background:rgba(96,165,250,.3);color:#93C5FD;border-radius:2px;">${esc(text.slice(idx,idx+q.length))}</mark>` + esc(text.slice(idx+q.length));
+function hl(text, q) {
+  const i = text.toLowerCase().indexOf(q.toLowerCase());
+  if (i < 0) return esc(text);
+  return esc(text.slice(0,i)) + `<mark style="background:rgba(96,165,250,.3);color:#93C5FD;border-radius:2px;padding:0 1px;">${esc(text.slice(i,i+q.length))}</mark>` + esc(text.slice(i+q.length));
 }
 
-function onSearchKeydown(e) {
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  closeAC();
+  hideSaBar();
+}
+
+function onKey(e) {
   const items = document.querySelectorAll('.ac-item');
   if (!items.length) return;
-  if (e.key === 'ArrowDown') { acIdx = Math.min(acIdx+1, items.length-1); highlightAC(items); e.preventDefault(); }
-  else if (e.key === 'ArrowUp') { acIdx = Math.max(acIdx-1, 0); highlightAC(items); e.preventDefault(); }
-  else if (e.key === 'Enter' && acIdx >= 0) { items[acIdx].click(); }
-  else if (e.key === 'Escape') closeAC();
+  if (e.key==='ArrowDown') { acIdx=Math.min(acIdx+1,items.length-1); hlAC(items); e.preventDefault(); }
+  else if (e.key==='ArrowUp') { acIdx=Math.max(acIdx-1,0); hlAC(items); e.preventDefault(); }
+  else if (e.key==='Enter' && acIdx>=0) items[acIdx].click();
+  else if (e.key==='Escape') closeAC();
 }
-
-function highlightAC(items) {
-  items.forEach((el,i) => el.classList.toggle('selected', i===acIdx));
-}
-
-function closeAC() {
-  document.getElementById('ac-list').style.display = 'none';
-}
+function hlAC(items) { items.forEach((el,i)=>el.classList.toggle('sel',i===acIdx)); }
+function closeAC() { document.getElementById('ac-list').style.display='none'; }
 
 document.addEventListener('click', e => {
-  if (!e.target.closest('.search-right')) closeAC();
+  if (!e.target.closest('.sp-search')) closeAC();
 });
 
-// ── 전체선택 바 숨기기 ──
-function hideSelectAllBar() {
-  const bar = document.getElementById('select-all-bar');
-  bar.style.display = 'none';
-  bar._jobs = null;
-  document.getElementById('select-all-cb').checked = false;
-  lastSearchJobs = null;
-}
-
-// ── 전체선택 체크박스 변경 ──
-function onSelectAllChange() {
-  const cb = document.getElementById('select-all-cb');
-  const bar = document.getElementById('select-all-bar');
-  const jobs = bar._jobs || [];
-  selectedJob = null;
-  document.querySelectorAll('.job-tag').forEach(el => el.classList.remove('active'));
-
-  if (cb.checked) {
-    lastSearchJobs = jobs;
-    displayData = allData.filter(r => jobs.includes(r.job));
-    document.getElementById('result-title').textContent = `직종 검색 전체 (${jobs.length}개 직종)`;
-    document.querySelector('.sec-title').innerHTML = `직종별 평균 경쟁률 <small>검색 결과 (${jobs.length}개 직종) · 막대 클릭 → 필터</small>`;
-    renderChart(displayData);
-    renderTable();
-  } else {
-    lastSearchJobs = null;
-    displayData = [];
-    document.getElementById('result-title').textContent = '검색 결과';
-    document.getElementById('result-count').textContent = '';
-    document.getElementById('tbl-body').innerHTML = `<tr><td colspan="10" class="placeholder-msg"><span class="ico">🔎</span>직종을 선택하거나 검색하세요</td></tr>`;
-    document.querySelector('.sec-title').innerHTML = `직종별 평균 경쟁률 <small>막대 클릭 → 해당 직종 필터</small>`;
-    renderChart();
-  }
-}
-
-// ── 직종 검색 선택 ──
-function selectJobBySearch(job) {
+// ── 직종 선택 (검색 자동완성) ──
+function pickJob(job) {
   document.getElementById('search-input').value = job;
   closeAC();
   selectedJob = job;
-  // 태그 동기화
-  document.querySelectorAll('.job-tag').forEach(el => {
-    el.classList.toggle('active', el.classList.contains('all-tag') ? false : el.dataset.job === job);
-  });
+  document.querySelectorAll('.tag').forEach(el =>
+    el.classList.toggle('on', el.dataset.job === job)
+  );
   displayData = allData.filter(r => r.job === job);
-  document.getElementById('result-title').textContent = `직종: ${job}`;
+  setFilterBar(`직종: ${job}`, displayData.length);
+  document.getElementById('chart-title').textContent = `직종별 평균 경쟁률 — ${job}`;
+  renderChart(displayData);
   renderTable();
 }
 
-// ── 테이블 렌더 ──
+// ── 전체선택 바 ──
+function showSaBar(jobs, totalCnt) {
+  const bar = document.getElementById('sa-bar');
+  const cb = document.getElementById('sa-cb');
+  saJobs = jobs;
+  document.getElementById('sa-text').textContent = `검색된 직종 전체 선택 (${jobs.length}개 직종)`;
+  document.getElementById('sa-meta').textContent = `${totalCnt}개 레코드`;
+  cb.checked = false; // 새 검색마다 체크 초기화
+  bar.style.display = 'flex';
+}
+
+function hideSaBar() {
+  document.getElementById('sa-bar').style.display = 'none';
+  document.getElementById('sa-cb').checked = false;
+  saJobs = null;
+}
+
+function onSaChange() {
+  const checked = document.getElementById('sa-cb').checked;
+  const jobs = saJobs || [];
+
+  selectedJob = null;
+  document.querySelectorAll('.tag').forEach(el => el.classList.remove('on'));
+
+  if (checked) {
+    displayData = allData.filter(r => jobs.includes(r.job));
+    setFilterBar(`직종 전체 선택 (${jobs.length}개)`, displayData.length);
+    document.getElementById('chart-title').textContent = `직종별 평균 경쟁률 — ${jobs.length}개 직종 선택`;
+    renderChart(displayData);
+    renderTable();
+  } else {
+    displayData = [];
+    clearFilterBar();
+    document.getElementById('chart-title').textContent = '직종별 평균 경쟁률';
+    renderChart();
+    clearTable();
+  }
+}
+
+// ── 테이블 ──
+function clearTable() {
+  document.getElementById('result-title').textContent = '검색 결과';
+  document.getElementById('result-cnt').style.display = 'none';
+  document.getElementById('tbl-body').innerHTML = `<tr><td colspan="10" class="placeholder"><span class="pi">🔎</span>직종을 검색하거나 태그를 클릭하세요</td></tr>`;
+}
+
 function renderTable() {
-  const sortVal = document.getElementById('sort-select').value;
+  const sortVal = document.getElementById('sort-sel').value;
   const sorted = [...displayData].sort((a,b) => {
     if (sortVal==='name_asc') return (a.dataset_name||'').localeCompare(b.dataset_name||'');
     if (sortVal==='ratio_asc') return (parseFloat(a.ratio)||0)-(parseFloat(b.ratio)||0);
@@ -494,33 +544,37 @@ function renderTable() {
     return 0;
   });
 
-  document.getElementById('result-count').textContent = `${sorted.length}개 레코드`;
+  const cnt = document.getElementById('result-cnt');
+  cnt.textContent = `${sorted.length}개`;
+  cnt.style.display = '';
 
   if (!sorted.length) {
-    document.getElementById('tbl-body').innerHTML = `<tr><td colspan="10" class="placeholder-msg">결과가 없습니다</td></tr>`;
+    document.getElementById('tbl-body').innerHTML = `<tr><td colspan="10" class="placeholder">결과가 없습니다</td></tr>`;
     return;
   }
 
   const dash = `<span class="dash">—</span>`;
-  const fmt = (p,t) => t ? `<span style="color:#93C5FD;">${p||0}</span><span style="color:rgba(255,255,255,.3);">/${t}</span>` : dash;
+  const fmt = (p,t) => t
+    ? `<span class="pass-num">${p??0}</span><span class="slash">/</span>${t}`
+    : dash;
 
   document.getElementById('tbl-body').innerHTML = sorted.map(r => {
     const rv = parseFloat(r.ratio)||0;
-    const chipCls = rv>=80?'chip-hot':rv>=30?'chip-mid':'chip-low';
+    const cls = rv>=80?'hot':rv>=30?'mid':'low';
     const sc = r.stage_count||3;
     const fp = r.s5_total?r.s5_pass:r.s4_total?r.s4_pass:r.s3_pass;
     const ft = r.s5_total?r.s5_total:r.s4_total?r.s4_total:r.s3_total;
     return `<tr>
-      <td><div class="ds-name" title="${esc(r.dataset_name)}">${esc(r.dataset_name)}</div></td>
-      <td class="job-name">${esc(r.job||'-')}</td>
-      <td style="color:rgba(255,255,255,.5);">${esc(r.region||'-')}</td>
-      <td style="color:rgba(255,255,255,.35);font-size:.7rem;">${esc(r.grade||'-')}</td>
+      <td><div class="td-name" title="${esc(r.dataset_name)}">${esc(r.dataset_name)}</div></td>
+      <td class="td-job">${esc(r.job||'—')}</td>
+      <td style="color:rgba(255,255,255,.45);">${esc(r.region||'—')}</td>
+      <td style="color:rgba(255,255,255,.3);font-size:.7rem;">${esc(r.grade||'—')}</td>
       <td class="num">${r.s1_total?.toLocaleString()||dash}</td>
       <td class="num">${r.s1_pass?.toLocaleString()||dash}</td>
       <td class="num">${fmt(r.s2_pass,r.s2_total)}</td>
       <td class="num">${sc>=4?fmt(r.s3_pass,r.s3_total):dash}</td>
       <td class="num">${fmt(fp,ft)}</td>
-      <td class="num"><span class="chip ${chipCls}">${r.ratio||'—'}:1</span></td>
+      <td class="num"><span class="chip ${cls}">${r.ratio||'—'}:1</span></td>
     </tr>`;
   }).join('');
 }
