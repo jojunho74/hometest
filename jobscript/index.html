@@ -108,7 +108,8 @@
     tbody tr:hover td{background:rgba(59,130,246,.05);}
     tbody tr:nth-child(even) td{background:rgba(255,255,255,.01);}
     td.num{text-align:right;font-variant-numeric:tabular-nums;}
-    .td-name{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#93C5FD;font-weight:600;cursor:default;}
+    .td-name{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#93C5FD;font-weight:600;text-decoration:none;display:block;}
+    .td-name:hover{color:#60A5FA;text-decoration:underline;}
     .td-job{color:#E2E8F0;font-weight:600;}
     .chip{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;}
     .hot{background:rgba(251,113,133,.15);color:#FB7185;border:1px solid rgba(251,113,133,.25);}
@@ -587,7 +588,7 @@ function renderTable() {
     const fp = r.s5_total?r.s5_pass:r.s4_total?r.s4_pass:r.s3_pass;
     const ft = r.s5_total?r.s5_total:r.s4_total?r.s4_total:r.s3_total;
     return `<tr>
-      <td><div class="td-name" title="${esc(r.dataset_name)}">${esc(r.dataset_name)}</div></td>
+      <td><a class="td-name" href="https://ibtcc.kr/competition.html?ds=${encodeURIComponent(r.dataset_name)}" target="_blank" title="${esc(r.dataset_name)}">${esc(r.dataset_name)}</a></td>
       <td class="td-job">${esc(r.job||'—')}</td>
       <td style="color:rgba(255,255,255,.45);">${esc(r.region||'—')}</td>
       <td style="color:rgba(255,255,255,.3);font-size:.7rem;">${esc(r.grade||'—')}</td>

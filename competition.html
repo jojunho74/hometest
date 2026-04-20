@@ -588,6 +588,15 @@ async function init() {
   // 전체 순위 부여
   _allDatasets.forEach((ds, i) => { ds.rank = i + 1; });
   renderDatasetList(_allDatasets);
+
+  // URL ?ds=공고명 파라미터로 자동 선택
+  const dsParam = new URLSearchParams(window.location.search).get('ds');
+  if (dsParam) {
+    const matched = _allDatasets.find(d => d.name === dsParam);
+    if (matched) {
+      setTimeout(() => selectDataset(matched.name), 100);
+    }
+  }
 }
 
 function renderDatasetList(list) {
