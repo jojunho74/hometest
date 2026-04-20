@@ -428,30 +428,29 @@ function selectAllJobs(jobs) {
   selectedJob = null;
   document.querySelectorAll('.job-tag').forEach(el => el.classList.remove('active'));
 
-  // 토글: 이미 같은 목록이 선택된 경우 해제
   const isSame = lastSearchJobs && JSON.stringify(lastSearchJobs) === JSON.stringify(jobs);
+  const cb = document.getElementById('cb-all');
+
   if (isSame) {
     lastSearchJobs = null;
     displayData = [];
+    if (cb) { cb.classList.remove('checked'); cb.textContent = ''; }
     document.getElementById('result-title').textContent = '검색 결과';
     document.getElementById('result-count').textContent = '';
     document.getElementById('tbl-body').innerHTML = `<tr><td colspan="10" class="placeholder-msg"><span class="ico">🔎</span>직종을 선택하거나 검색하세요</td></tr>`;
     document.querySelector('.sec-title').innerHTML = `직종별 평균 경쟁률 <small>막대 클릭 → 해당 직종 필터</small>`;
     renderChart();
-    onSearchInput();
     return;
   }
 
   lastSearchJobs = jobs;
   displayData = allData.filter(r => jobs.includes(r.job));
+  if (cb) { cb.classList.add('checked'); cb.textContent = '✓'; }
 
   document.getElementById('result-title').textContent = `직종 검색 전체 (${jobs.length}개 직종)`;
   document.querySelector('.sec-title').innerHTML = `직종별 평균 경쟁률 <small>검색 결과 (${jobs.length}개 직종) · 막대 클릭 → 필터</small>`;
   renderChart(displayData);
   renderTable();
-
-  // 체크박스 반영을 위해 autocomplete 재렌더링
-  onSearchInput();
 }
 
 // ── 직종 검색 선택 ──
