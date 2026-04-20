@@ -36,6 +36,7 @@
     /* ── 퀵 네비게이션 배너 ── */
     .qnav-banner{
       position:relative;
+      display:flex;align-items:center;
       background:linear-gradient(135deg,#0D1F3C 0%,#1a3a6b 40%,#0f2d55 70%,#0A1628 100%);
       /* 배경 이미지로 교체하려면 아래 주석 해제 후 경로 수정:
          background-image:url('./your-image.jpg');
@@ -48,6 +49,7 @@
       background:linear-gradient(90deg,rgba(0,180,180,.08) 0%,rgba(96,165,250,.05) 100%);
       pointer-events:none;
     }
+    @keyframes qnav-blink{0%,100%{opacity:1}50%{opacity:.3}}
     .qnav-inner{
       position:relative;z-index:1;
       display:flex;align-items:center;justify-content:center;
@@ -399,6 +401,10 @@
     <a href="https://ibtcc.kr/package.html"         class="qnav-btn">대학 및 관계자용 →</a>
     <a href="https://ibtcc.kr/library-pdf.html"     class="qnav-btn">채용공고 자료실 →</a>
     <a href="https://ibtcc.kr/university-board.html" class="qnav-btn">대학소식 →</a>
+  </div>
+  <div style="margin-left:auto;padding-right:1.2rem;display:flex;align-items:center;gap:.45rem;color:#fbbf24;font-size:.8rem;font-weight:600;white-space:nowrap;">
+    <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#fbbf24;animation:qnav-blink 1.2s ease-in-out infinite;"></span>
+    2026년 경쟁률 업데이트 중
   </div>
 </div>
 
