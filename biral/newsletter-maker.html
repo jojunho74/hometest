@@ -676,25 +676,55 @@ function render() {
   document.getElementById('preview-frame').innerHTML = html;
 }
 
-// ── 샘플 불러오기 ──
+// ── 샘플 불러오기 (newsletter-01.html 기준) ──
 function loadSample() {
-  document.getElementById('f-trend').value = '2026년 상반기 공기업 채용시장은 정부 효율화 기조 속에서도 주요 공공기관의 채용이 이어지고 있습니다. NCS 직무 중심 평가가 강화되는 한편, 영어 요건에서 지텔프(G-TELP) 인정 기관이 늘어 단기 전략이 주목받고 있습니다. 특히 110개 이상 공공기관이 지텔프를 공식 인정하면서 토익 대비 준비 기간 단축이 가능해졌습니다. AI 역량 평가를 도입하는 기관도 증가 추세로, 직무 전문성과 디지털 기초 소양을 함께 갖추는 것이 경쟁력의 핵심이 되고 있습니다.';
+  // 취업 동향
+  document.getElementById('f-trend').value     = '2026년 상반기 공기업 채용시장은 정부 효율화 기조 속에서도 주요 공공기관의 채용이 이어지고 있습니다. NCS 직무 중심 평가가 강화되는 한편, 영어 요건에서 지텔프(G-TELP) 인정 기관이 늘어 단기 전략이 주목받고 있습니다. 특히 110개 이상 공공기관이 지텔프를 공식 인정하면서 토익 대비 준비 기간 단축이 가능해졌습니다. AI 역량 평가를 도입하는 기관도 증가 추세로, 직무 전문성과 디지털 기초 소양을 함께 갖추는 것이 경쟁력의 핵심이 되고 있습니다.';
   document.getElementById('f-trend-src').value = '2026년 4월 기준 취합';
   updateTrendCount();
-  document.getElementById('f-title').value = '취업 준비, 이 사이트 하나로 끝낸 사람들';
-  document.getElementById('f-em').value = '이 사이트 하나';
-  document.getElementById('f-subtitle').value = '공기업 경쟁률 · 채용자료 142개 · 지텔프 활용 110개 기관';
-  document.getElementById('f-vol').value = 'VOL.02';
-  document.getElementById('f-date').value = '2026.05';
-  document.getElementById('f-intro').value = '취업 준비를 하다 보면 정보가 너무 흩어져 있다는 느낌, 받으신 적 있으신가요?\n\n경쟁률은 어디서 찾고, 시험 일정은 어디서 확인하고, 스펙 기준은 또 따로 찾아야 하고 —\nibtcc.kr은 그 정보들을 한 곳에 모아두기 위해 만들어진 사이트입니다.';
-  document.getElementById('f-comment').value = '취업 준비는 정보전입니다. 같은 시간을 쓰더라도 어떤 정보를 갖고 있느냐에 따라 결과가 달라집니다.\n\nibtcc.kr은 공기업 취업에 필요한 정보를 누구나 무료로 볼 수 있도록 꾸준히 업데이트하고 있습니다.';
+
+  // 헤더
+  document.getElementById('f-title').value    = '취업 준비, 이 사이트 하나로 끝낸 사람들';
+  document.getElementById('f-em').value       = '이 사이트 하나';
+  document.getElementById('f-subtitle').value = '공기업 경쟁률 · 채용자료 142개 · 지텔프 활용 110개 기관 정보';
+  document.getElementById('f-vol').value      = 'VOL.01';
+  document.getElementById('f-date').value     = '2026.04';
+
+  // 인트로
+  document.getElementById('f-intro').value = '취업 준비를 하다 보면 정보가 너무 흩어져 있다는 느낌, 받으신 적 있으신가요?\n\n경쟁률은 어디서 찾고, 시험 일정은 어디서 확인하고, 스펙 기준은 또 따로 찾아야 하고 —\nibtcc.kr은 그 정보들을 한 곳에 모아두기 위해 만들어진 사이트입니다.\n\n이번 뉴스레터에서는 지금 이 사이트에서 실제로 쓸 수 있는 기능들을 정리했습니다.';
+
+  // 통계 (newsletter-01 기준)
+  stats = [
+    { num:'142',   lbl:'무료 채용자료 PDF' },
+    { num:'110+',  lbl:'지텔프 활용 공공기관' },
+    { num:'실시간', lbl:'공기업 경쟁률 비교' },
+    { num:'자동',   lbl:'대학별 채용공고 수집' },
+  ];
+  renderStatsFields();
+
+  // 카드 5개 (newsletter-01 순서 그대로)
+  cards = [];
+  cards.push({ id: Date.now()+1, icon:'📊', color:'blue',   label:'경쟁률 비교',     title:'직무별 공기업 경쟁률을 한눈에',      desc:'지원하려는 직무명을 입력하면, 공공기관별 경쟁률을 바로 비교할 수 있습니다. 어떤 기관이 상대적으로 진입장벽이 낮은지 전략적으로 파악하세요.',                                stat:'competition.html 바로가기', url:'https://ibtcc.kr/competition.html' });
+  cards.push({ id: Date.now()+2, icon:'📄', color:'green',  label:'채용자료 자료실',  title:'142개 채용공고 자료, 무료 다운로드', desc:'한국철도공사, 국민건강보험공단, 한국수자원공사 등 주요 공공기관의 채용공고 PDF를 한 곳에 모았습니다. 별도 회원가입 없이 바로 다운로드 가능합니다.',     stat:'142개 자료 열람',            url:'https://ibtcc.kr/library-pdf.html' });
+  cards.push({ id: Date.now()+3, icon:'🏛', color:'amber',  label:'지텔프 활용 기관', title:'지텔프로 영어 스펙을 더 빠르게',      desc:'토익만 된다고 생각하셨나요? 국민건강보험공단을 포함한 110개 이상의 공공기관이 지텔프를 영어 기준으로 인정합니다. 단기 준비 전략이 달라집니다.',            stat:'110개 기관 보기',            url:'https://ibtcc.kr/competition.html' });
+  cards.push({ id: Date.now()+4, icon:'🎓', color:'violet', label:'대학활동 게시판',  title:'대학별 채용공고 & 활동 소식 자동수집', desc:'전국 주요 대학의 채용공고, 학교 활동, 기업 협업 소식을 자동으로 수집해 보여줍니다. 관심 있는 학교 소식을 빠르게 확인하세요.',                        stat:'대학활동 보기',              url:'https://ibtcc.kr/university-board.html' });
+  cards.push({ id: Date.now()+5, icon:'📅', color:'sky',    label:'시험 일정',        title:'G-TELP 정기시험 일정 한눈에',         desc:'지텔프(G-TELP) 정기시험 일정을 달력 형태로 확인하고, 원서접수 마감일을 미리 파악해 준비할 수 있습니다.',                                             stat:'일정 확인',                  url:'https://ibtcc.kr/schedule.html' });
+  renderCardList();
+
+  // 에디터 코멘트
+  document.getElementById('f-comment').value = '취업 준비는 정보전입니다. 같은 시간을 쓰더라도 어떤 정보를 갖고 있느냐에 따라 결과가 달라집니다.\n\nibtcc.kr은 공기업 취업에 필요한 정보를 누구나 무료로 볼 수 있도록 꾸준히 업데이트하고 있습니다. 이 뉴스레터가 취업 준비에 작게나마 도움이 되길 바랍니다.';
+
+  // CTA
   document.getElementById('f-cta-title').value = '지금 바로 ibtcc.kr에서 확인해보세요';
-  document.getElementById('f-cta-sub').value = '무료 · 회원가입 불필요 · 매월 업데이트';
-  document.getElementById('f-cta-btn').value = 'ibtcc.kr 방문하기';
-  document.getElementById('f-cta-url').value = 'https://ibtcc.kr';
-  document.getElementById('f-filename').value = 'newsletter-02';
+  document.getElementById('f-cta-sub').value   = '무료 · 회원가입 불필요 · 매월 업데이트';
+  document.getElementById('f-cta-btn').value   = 'ibtcc.kr 방문하기';
+  document.getElementById('f-cta-url').value   = 'https://ibtcc.kr';
+
+  // 파일명
+  document.getElementById('f-filename').value = 'newsletter-01';
+
   render();
-  toast('샘플 데이터를 불러왔습니다');
+  toast('newsletter-01 샘플을 불러왔습니다');
 }
 
 // ── HTML 생성 ──
