@@ -265,6 +265,7 @@
     <div class="topbar-right">
       <button class="btn-action" style="background:#1E3A8A;color:#FCD34D;" onclick="autoTrend()">동향 자동생성</button>
       <button class="btn-action btn-secondary-action" onclick="loadSample()">샘플 불러오기</button>
+      <button class="btn-action" style="background:#7C3AED;color:#EDE9FE;" onclick="exportInline()">이메일용 인라인 변환</button>
       <button class="btn-action btn-success-action" onclick="exportHTML()">HTML 내보내기</button>
       <button class="btn-action btn-primary-action" onclick="saveNewsletter()">파일로 저장</button>
     </div>
@@ -767,6 +768,90 @@ ${preview}
 </div>
 </body>
 </html>`;
+}
+
+// ── 이메일용 인라인 스타일 변환 ──
+// CSS 클래스로 적용된 스타일을 getComputedStyle로 읽어 각 태그에 직접 붙임
+const INLINE_PROPS = [
+  'font-family','font-size','font-weight','font-style','font-variant',
+  'color','background-color',
+  'padding-top','padding-right','padding-bottom','padding-left',
+  'margin-top','margin-right','margin-bottom','margin-left',
+  'border-top','border-right','border-bottom','border-left',
+  'border-radius','border-top-left-radius','border-top-right-radius',
+  'border-bottom-left-radius','border-bottom-right-radius',
+  'text-align','text-decoration','line-height','letter-spacing',
+  'display','width','max-width','min-width','height','min-height',
+  'vertical-align','overflow','white-space',
+  'flex','flex-direction','flex-wrap','gap','align-items','justify-content',
+];
+
+function inlineAllStyles(rootEl) {
+  const clone = rootEl.cloneNode(true);
+  const origEls  = Array.from(rootEl.querySelectorAll('*'));
+  const cloneEls = Array.from(clone.querySelectorAll('*'));
+
+  origEls.forEach((el, i) => {
+    const computed = window.getComputedStyle(el);
+    const existing = cloneEls[i].getAttribute('style') || '';
+
+    // 이미 인라인에 있는 속성은 그대로 유지, 없는 것만 computed에서 추가
+    const existingMap = {};
+    existing.split(';').forEach(s => {
+      const [k, ...v] = s.split(':');
+      if (k && k.trim()) existingMap[k.trim()] = v.join(':').trim();
+    });
+
+    INLINE_PROPS.forEach(prop => {
+      if (existingMap[prop]) return; // 이미 인라인 있음
+      const val = computed.getPropertyValue(prop).trim();
+      if (!val || val === 'normal' || val === 'initial' || val === 'none' || val === 'auto' || val === '0px') return;
+      existingMap[prop] = val;
+    });
+
+    const inlineStr = Object.entries(existingMap).map(([k,v]) => `${k}:${v}`).join(';');
+    if (inlineStr) cloneEls[i].setAttribute('style', inlineStr);
+    cloneEls[i].removeAttribute('class'); // 클래스 제거
+  });
+
+  return clone.outerHTML;
+}
+
+function buildEmailHTML() {
+  const title  = g('f-title') || 'ibtcc.kr 뉴스레터';
+  const frame  = document.getElementById('preview-frame');
+  const inlined = inlineAllStyles(frame);
+
+  return `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${esc(title)} — ibtcc.kr</title>
+</head>
+<body style="margin:0;padding:0;background:#F0F4F8;font-family:'Noto Sans KR',Arial,sans-serif;">
+<div style="max-width:640px;margin:40px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 40px rgba(0,0,0,.10);">
+${inlined}
+</div>
+</body>
+</html>`;
+}
+
+function exportInline() {
+  const html = buildEmailHTML();
+  const filename = (g('f-filename') || 'newsletter-email') + '-email.html';
+
+  // 파일 다운로드
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+
+  // 클립보드에도 복사
+  navigator.clipboard.writeText(html).catch(() => {});
+  toast(`"${filename}" 저장 완료 — 이메일 클라이언트에 바로 붙여넣기 가능합니다`);
 }
 
 function exportHTML() {
