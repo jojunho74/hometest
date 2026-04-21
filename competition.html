@@ -566,6 +566,31 @@
           <div class="jv-chart-wrap"><canvas id="jv-chart"></canvas></div>
         </div>
 
+        <!-- ── 합격선 안내 배너 ── -->
+        <div style="background:linear-gradient(135deg,#0f3460 0%,#16213e 60%,#0d1b2a 100%);border:1px solid rgba(96,165,250,.3);border-radius:16px;padding:28px 24px;margin-bottom:14px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.4);">
+          <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:28px;margin-bottom:22px;">
+            <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:16px 22px;min-width:140px;">
+              <p style="font-size:.72rem;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.08em;margin-bottom:10px;">합격 기준 점수</p>
+              <div style="display:flex;flex-direction:column;gap:7px;">
+                <span style="font-size:1rem;color:#E2E8F0;font-weight:600;">✔ 토익&nbsp;&nbsp;<strong style="color:#60A5FA;font-size:1.05rem;">약 750점 이상</strong></span>
+                <span style="font-size:1rem;color:#E2E8F0;font-weight:600;">✔ 지텔프&nbsp;<strong style="color:#34D399;font-size:1.05rem;">65점 이상</strong></span>
+              </div>
+            </div>
+            <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:16px 22px;min-width:140px;">
+              <p style="font-size:.72rem;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.08em;margin-bottom:10px;">⏱ 준비 기간</p>
+              <div style="display:flex;flex-direction:column;gap:7px;">
+                <span style="font-size:1rem;color:rgba(255,255,255,.75);">토익&nbsp;&nbsp;&nbsp;&nbsp;2~3개월</span>
+                <span style="font-size:1rem;color:rgba(255,255,255,.75);">지텔프&nbsp;<strong style="color:#FBBF24;font-size:1.05rem;">2~3주</strong></span>
+              </div>
+            </div>
+            <div style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:12px;padding:16px 22px;min-width:140px;display:flex;flex-direction:column;justify-content:center;">
+              <p style="font-size:.85rem;font-weight:800;color:#FBBF24;margin-bottom:6px;">🎟 오늘 방문자 한정</p>
+              <p style="font-size:1rem;font-weight:600;color:#fff;">IBT 무료 응시 가능</p>
+            </div>
+          </div>
+          <a href="https://ibtcc.kr/student.html" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:50px;font-size:1rem;font-weight:800;background:linear-gradient(135deg,#1D4ED8,#2563EB);color:#fff;text-decoration:none;white-space:nowrap;box-shadow:0 4px 20px rgba(37,99,235,.5);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(37,99,235,.65)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(37,99,235,.5)'">IBT 신청하기 →</a>
+        </div>
+
         <!-- 결과 테이블 -->
         <div class="jv-result-card">
           <div class="jv-result-head">
@@ -1112,6 +1137,30 @@ function renderVisualization(dsName, rows) {
           </button>
         </div>
       </div>
+    </div>
+    <!-- ── 합격선 안내 배너 ── -->
+    <div style="background:linear-gradient(135deg,#0f3460 0%,#16213e 60%,#0d1b2a 100%);border:1px solid rgba(96,165,250,.3);border-radius:16px;padding:28px 24px;margin-bottom:22px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.4);">
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:28px;margin-bottom:22px;">
+        <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:16px 22px;min-width:140px;">
+          <p style="font-size:.72rem;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.08em;margin-bottom:10px;">합격 기준 점수</p>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <span style="font-size:1rem;color:#E2E8F0;font-weight:600;">✔ 토익&nbsp;&nbsp;<strong style="color:#60A5FA;font-size:1.05rem;">약 750점 이상</strong></span>
+            <span style="font-size:1rem;color:#E2E8F0;font-weight:600;">✔ 지텔프&nbsp;<strong style="color:#34D399;font-size:1.05rem;">65점 이상</strong></span>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:16px 22px;min-width:140px;">
+          <p style="font-size:.72rem;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.08em;margin-bottom:10px;">⏱ 준비 기간</p>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <span style="font-size:1rem;color:rgba(255,255,255,.75);">토익&nbsp;&nbsp;&nbsp;&nbsp;2~3개월</span>
+            <span style="font-size:1rem;color:rgba(255,255,255,.75);">지텔프&nbsp;<strong style="color:#FBBF24;font-size:1.05rem;">2~3주</strong></span>
+          </div>
+        </div>
+        <div style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:12px;padding:16px 22px;min-width:140px;display:flex;flex-direction:column;justify-content:center;">
+          <p style="font-size:.85rem;font-weight:800;color:#FBBF24;margin-bottom:6px;">🎟 오늘 방문자 한정</p>
+          <p style="font-size:1rem;font-weight:600;color:#fff;">IBT 무료 응시 가능</p>
+        </div>
+      </div>
+      <a href="https://ibtcc.kr/student.html" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:50px;font-size:1rem;font-weight:800;background:linear-gradient(135deg,#1D4ED8,#2563EB);color:#fff;text-decoration:none;white-space:nowrap;box-shadow:0 4px 20px rgba(37,99,235,.5);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(37,99,235,.65)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(37,99,235,.5)'">IBT 신청하기 →</a>
     </div>
 
     <div class="sec-title">직종별 전형 단계 현황</div>

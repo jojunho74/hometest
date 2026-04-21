@@ -448,7 +448,10 @@
     const rankMap = {};
     allSorted.forEach((s, i) => { if (_ubViewMap[s]) rankMap[s] = i; });
 
-    let html = '';
+    const hasAnyView = schools.some(s => !!_ubViewMap[s]);
+    let html = hasAnyView
+      ? '<div style="padding:6px 14px 4px;font-size:.6rem;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;">열람순위</div>'
+      : '';
     let dividerInserted = false;
     schools.forEach(s => {
       const hasView = !!_ubViewMap[s];
