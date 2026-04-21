@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>뉴스레터 제작 도구 — ibtcc.kr</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Noto Sans KR", -apple-system, sans-serif;
+      background: #0F172A;
+      color: #1A202C;
+      min-height: 100vh;
+    }
+
+    /* ── 레이아웃 ── */
+    .app {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      grid-template-rows: 56px 1fr;
+      height: 100vh;
+    }
+
+    /* 상단 바 */
+    .topbar {
+      grid-column: 1 / -1;
+      background: #1E293B;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+    .topbar-logo {
+      font-size: 13px;
+      font-weight: 800;
+      color: #60A5FA;
+      letter-spacing: .05em;
+    }
+    .topbar-title {
+      font-size: 13px;
+      color: #94A3B8;
+      font-weight: 500;
+    }
+    .topbar-sep { color: #334155; font-size: 16px; }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+    /* 편집 패널 */
+    .editor-panel {
+      background: #1E293B;
+      border-right: 1px solid #334155;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* 미리보기 패널 */
+    .preview-panel {
+      background: #F0F4F8;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 24px;
+    }
+    .preview-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      color: #94A3B8;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      align-self: flex-start;
+    }
+    #preview-frame {
+      width: 100%;
+      max-width: 640px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 40px rgba(0,0,0,.15);
+      overflow: hidden;
+    }
+
+    /* ── 편집 UI ── */
+    .section-hd {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      color: #60A5FA;
+      text-transform: uppercase;
+      padding: 16px 0 8px;
+      border-bottom: 1px solid #334155;
+      margin-bottom: 12px;
+    }
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #94A3B8;
+      margin-bottom: 6px;
+    }
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      background: #0F172A;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      color: #E2E8F0;
+      outline: none;
+      transition: border-color .2s;
+      resize: vertical;
+    }
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus { border-color: #3B82F6; }
+    .field textarea { min-height: 80px; }
+
+    /* 카드 아이템 */
+    .card-items { display: flex; flex-direction: column; gap: 10px; }
+    .card-item {
+      background: #0F172A;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 14px;
+      position: relative;
+    }
+    .card-item-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .card-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: #60A5FA;
+    }
+    .btn-remove-card {
+      background: none;
+      border: none;
+      color: #475569;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0;
+      line-height: 1;
+      transition: color .2s;
+    }
+    .btn-remove-card:hover { color: #F87171; }
+    .card-item .field { margin-bottom: 8px; }
+    .card-item .field:last-child { margin-bottom: 0; }
+
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .icon-opt {
+      text-align: center;
+      padding: 6px;
+      border-radius: 6px;
+      border: 1.5px solid #334155;
+      cursor: pointer;
+      font-size: 18px;
+      transition: border-color .2s, background .2s;
+    }
+    .icon-opt:hover { border-color: #3B82F6; background: #1E293B; }
+    .icon-opt.selected { border-color: #3B82F6; background: #1E40AF; }
+
+    /* 버튼 */
+    .btn-add-card {
+      width: 100%;
+      padding: 10px;
+      background: none;
+      border: 1px dashed #334155;
+      border-radius: 8px;
+      color: #60A5FA;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      margin-top: 8px;
+    }
+    .btn-add-card:hover { border-color: #3B82F6; background: #0F172A; }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: opacity .2s, transform .15s;
+    }
+    .btn-action:hover { opacity: .85; transform: scale(1.02); }
+    .btn-action:active { transform: scale(.97); }
+    .btn-primary-action { background: linear-gradient(135deg,#3B82F6,#1D4ED8); color: #fff; }
+    .btn-secondary-action { background: #1E3A8A; color: #93C5FD; }
+    .btn-success-action { background: #065F46; color: #6EE7B7; }
+
+    /* 색 선택 */
+    .color-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+    .color-opt {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform .15s, border-color .15s;
+    }
+    .color-opt:hover { transform: scale(1.15); }
+    .color-opt.selected { border-color: #fff; transform: scale(1.15); }
+
+    /* 상태 토스트 */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1E3A8A;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.3);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .25s, transform .25s;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    /* 구분 */
+    .sep { height: 1px; background: #334155; margin: 4px 0 16px; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- 상단바 -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo">ibtcc.kr</span>
+      <span class="topbar-sep">/</span>
+      <span class="topbar-title">뉴스레터 제작 도구</span>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-action btn-secondary-action" onclick="loadSample()">샘플 불러오기</button>
+      <button class="btn-action btn-success-action" onclick="exportHTML()">HTML 내보내기</button>
+      <button class="btn-action btn-primary-action" onclick="saveNewsletter()">파일로 저장</button>
+    </div>
+  </div>
+
+  <!-- 에디터 패널 -->
+  <div class="editor-panel">
+
+    <!-- 기본 정보 -->
+    <div class="section-hd">헤더 설정</div>
+
+    <div class="field">
+      <label>뉴스레터 제목 (굵게 표시)</label>
+      <input type="text" id="f-title" placeholder="예: 공기업 취업, 이 사이트 하나로 정리됩니다" oninput="render()" />
+    </div>
+    <div class="field">
+      <label>강조 키워드 (노란색으로 표시)</label>
+      <input type="text" id="f-em" placeholder="예: 이 사이트 하나" oninput="render()" />
+    </div>
+    <div class="field">
+      <label>헤더 부제목</label>
+      <input type="text" id="f-subtitle" placeholder="예: 무료 · 매월 업데이트 · 회원가입 불필요" oninput="render()" />
+    </div>
+    <div class="field">
+      <label>볼륨 번호</label>
+      <input type="text" id="f-vol" placeholder="예: VOL.02" oninput="render()" />
+    </div>
+    <div class="field">
+      <label>발행일</label>
+      <input type="text" id="f-date" placeholder="예: 2026.05" oninput="render()" />
+    </div>
+
+    <div class="sep"></div>
+    <div class="section-hd">인트로 문구</div>
+
+    <div class="field">
+      <label>인트로 본문</label>
+      <textarea id="f-intro" placeholder="독자에게 전달할 첫 문단을 입력하세요..." oninput="render()"></textarea>
+    </div>
+
+    <div class="sep"></div>
+    <div class="section-hd">수치 통계 (4개)</div>
+
+    <div id="stats-fields"></div>
+
+    <div class="sep"></div>
+    <div class="section-hd">기능 카드</div>
+
+    <div class="card-items" id="card-list"></div>
+    <button class="btn-add-card" onclick="addCard()">+ 카드 추가</button>
+
+    <div class="sep"></div>
+    <div class="section-hd">에디터 코멘트</div>
+
+    <div class="field">
+      <label>코멘트 본문</label>
+      <textarea id="f-comment" placeholder="편집자의 한마디를 입력하세요..." oninput="render()"></textarea>
+    </div>
+
+    <div class="sep"></div>
+    <div class="section-hd">CTA (행동 유도)</div>
+
+    <div class="field">
+      <label>CTA 제목</label>
+      <input type="text" id="f-cta-title" placeholder="예: 지금 바로 확인해보세요" oninput="render()" />
+    </div>
+    <div class="field">
+      <label>CTA 부제목</label>
+      <input type="text" id="f-cta-sub" placeholder="예: 무료 · 회원가입 불필요" oninput="render()" />
+    </div>
+    <div class="field">
+      <label>버튼 텍스트</label>
+      <input type="text" id="f-cta-btn" placeholder="예: ibtcc.kr 방문하기" oninput="render()" />
+    </div>
+    <div class="field">
+      <label>버튼 링크 URL</label>
+      <input type="text" id="f-cta-url" placeholder="https://ibtcc.kr" oninput="render()" />
+    </div>
+
+    <div class="sep"></div>
+    <div class="section-hd">파일명</div>
+    <div class="field">
+      <label>저장할 파일명 (확장자 제외)</label>
+      <input type="text" id="f-filename" placeholder="예: newsletter-02" />
+    </div>
+
+  </div>
+
+  <!-- 미리보기 패널 -->
+  <div class="preview-panel">
+    <div class="preview-label">실시간 미리보기</div>
+    <div id="preview-frame">
+      <div style="padding:60px;text-align:center;color:#94A3B8;font-size:14px;">
+        왼쪽에서 내용을 입력하면<br>여기에 미리보기가 나타납니다
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── 아이콘 목록 ──
+const ICONS = ['📊','📄','🏛','📅','🎓','📰','🔍','💼','📌','🗂','🏆','📢','💡','✅','🔗','📈'];
+const COLORS = [
+  {name:'blue',  bg:'#DBEAFE', ic:'ic-blue'},
+  {name:'green', bg:'#D1FAE5', ic:'ic-green'},
+  {name:'amber', bg:'#FEF3C7', ic:'ic-amber'},
+  {name:'violet',bg:'#EDE9FE', ic:'ic-violet'},
+  {name:'sky',   bg:'#E0F2FE', ic:'ic-sky'},
+];
+
+let cards = [];
+let stats = [
+  {num:'142',   lbl:'무료 채용자료 PDF'},
+  {num:'110+',  lbl:'지텔프 활용 공공기관'},
+  {num:'실시간', lbl:'공기업 경쟁률 비교'},
+  {num:'자동',   lbl:'대학별 채용공고 수집'},
+];
+
+// ── 초기화 ──
+function init() {
+  renderStatsFields();
+  addCard({ icon:'📊', color:'blue', label:'경쟁률 비교', title:'직무별 공기업 경쟁률을 한눈에', desc:'지원하려는 직무명을 입력하면 기관별 경쟁률을 바로 비교할 수 있습니다.', stat:'경쟁률 비교 바로가기', url:'https://ibtcc.kr/competition.html' });
+  addCard({ icon:'📄', color:'green', label:'채용자료 자료실', title:'142개 채용공고 자료, 무료 다운로드', desc:'주요 공공기관 채용공고 PDF를 한 곳에 모았습니다. 바로 다운로드 가능합니다.', stat:'자료실 바로가기', url:'https://ibtcc.kr/library-pdf.html' });
+}
+
+function renderStatsFields() {
+  const el = document.getElementById('stats-fields');
+  el.innerHTML = stats.map((s, i) => `
+    <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div>
+        <label>수치 ${i+1}</label>
+        <input type="text" value="${s.num}" oninput="stats[${i}].num=this.value;render()" />
+      </div>
+      <div>
+        <label>레이블 ${i+1}</label>
+        <input type="text" value="${s.lbl}" oninput="stats[${i}].lbl=this.value;render()" />
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── 카드 관리 ──
+function addCard(defaults = {}) {
+  const id = Date.now() + Math.random();
+  cards.push({
+    id,
+    icon:  defaults.icon  || '📌',
+    color: defaults.color || 'blue',
+    label: defaults.label || '',
+    title: defaults.title || '',
+    desc:  defaults.desc  || '',
+    stat:  defaults.stat  || '',
+    url:   defaults.url   || 'https://ibtcc.kr',
+  });
+  renderCardList();
+  render();
+}
+
+function removeCard(id) {
+  cards = cards.filter(c => c.id !== id);
+  renderCardList();
+  render();
+}
+
+function renderCardList() {
+  const el = document.getElementById('card-list');
+  el.innerHTML = cards.map((c, i) => `
+    <div class="card-item">
+      <div class="card-item-hd">
+        <span class="card-num">카드 ${i+1}</span>
+        <button class="btn-remove-card" onclick="removeCard(${c.id})" title="삭제">✕</button>
+      </div>
+
+      <div class="field">
+        <label>아이콘 선택</label>
+        <div class="icon-grid">
+          ${ICONS.map(ic => `<div class="icon-opt${c.icon===ic?' selected':''}" onclick="setCardProp(${c.id},'icon','${ic}');this.closest('.card-item').querySelectorAll('.icon-opt').forEach(x=>x.classList.remove('selected'));this.classList.add('selected');render()">${ic}</div>`).join('')}
+        </div>
+      </div>
+      <div class="field">
+        <label>배경 색상</label>
+        <div class="color-row">
+          ${COLORS.map(cl => `<div class="color-opt${c.color===cl.name?' selected':''}" style="background:${cl.bg};" onclick="setCardProp(${c.id},'color','${cl.name}');this.closest('.field').querySelectorAll('.color-opt').forEach(x=>x.classList.remove('selected'));this.classList.add('selected');render()" title="${cl.name}"></div>`).join('')}
+        </div>
+      </div>
+      <div class="field">
+        <label>레이블 (소문자 표시)</label>
+        <input type="text" value="${esc(c.label)}" oninput="setCardProp(${c.id},'label',this.value);render()" />
+      </div>
+      <div class="field">
+        <label>카드 제목</label>
+        <input type="text" value="${esc(c.title)}" oninput="setCardProp(${c.id},'title',this.value);render()" />
+      </div>
+      <div class="field">
+        <label>설명</label>
+        <textarea oninput="setCardProp(${c.id},'desc',this.value);render()">${esc(c.desc)}</textarea>
+      </div>
+      <div class="field">
+        <label>뱃지 텍스트</label>
+        <input type="text" value="${esc(c.stat)}" oninput="setCardProp(${c.id},'stat',this.value);render()" />
+      </div>
+      <div class="field">
+        <label>링크 URL</label>
+        <input type="text" value="${esc(c.url)}" oninput="setCardProp(${c.id},'url',this.value);render()" />
+      </div>
+    </div>
+  `).join('');
+}
+
+function setCardProp(id, key, val) {
+  const c = cards.find(c => c.id === id);
+  if (c) c[key] = val;
+}
+
+// ── 렌더링 ──
+function g(id) { return document.getElementById(id)?.value?.trim() || ''; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function getColorBg(name) {
+  return { blue:'#DBEAFE', green:'#D1FAE5', amber:'#FEF3C7', violet:'#EDE9FE', sky:'#E0F2FE' }[name] || '#DBEAFE';
+}
+
+function highlightTitle(title, em) {
+  if (!em || !title.includes(em)) return esc(title);
+  return esc(title).replace(esc(em), `<em style="font-style:normal;color:#FCD34D;">${esc(em)}</em>`);
+}
+
+function render() {
+  const title    = g('f-title');
+  const em       = g('f-em');
+  const subtitle = g('f-subtitle');
+  const vol      = g('f-vol') || 'VOL.01';
+  const date     = g('f-date') || '2026.04';
+  const intro    = g('f-intro').replace(/\n/g, '<br>');
+  const comment  = g('f-comment').replace(/\n/g, '<br>');
+  const ctaTitle = g('f-cta-title');
+  const ctaSub   = g('f-cta-sub');
+  const ctaBtn   = g('f-cta-btn');
+  const ctaUrl   = g('f-cta-url') || 'https://ibtcc.kr';
+
+  const statsHtml = stats.map(s => `
+    <div style="text-align:center;">
+      <span style="font-size:26px;font-weight:800;color:#1E3A8A;display:block;line-height:1.1;">${esc(s.num)}</span>
+      <span style="font-size:12px;color:#64748B;margin-top:4px;display:block;">${esc(s.lbl)}</span>
+    </div>
+  `).join('');
+
+  const cardsHtml = cards.map(c => `
+    <a href="${esc(c.url)}" target="_blank" style="text-decoration:none;color:inherit;display:block;">
+      <div style="display:flex;gap:18px;align-items:flex-start;padding:22px;border-radius:12px;border:1px solid #E8EDF5;background:#FAFBFE;margin-bottom:14px;">
+        <div style="width:44px;height:44px;border-radius:10px;background:${getColorBg(c.color)};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${c.icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:#94A3B8;text-transform:uppercase;margin-bottom:4px;">${esc(c.label)}</div>
+          <div style="font-size:15px;font-weight:700;color:#1E293B;margin-bottom:6px;line-height:1.4;">${esc(c.title)}</div>
+          <div style="font-size:13px;color:#64748B;line-height:1.7;">${esc(c.desc)}</div>
+          ${c.stat ? `<span style="display:inline-block;margin-top:10px;font-size:12px;font-weight:700;color:#1E3A8A;background:#EFF6FF;border-radius:50px;padding:3px 10px;">${esc(c.stat)}</span>` : ''}
+        </div>
+      </div>
+    </a>
+  `).join('');
+
+  const html = `
+<div style="font-family:'Noto Sans KR',-apple-system,sans-serif;background:#fff;color:#1A202C;line-height:1.7;">
+
+  <!-- 헤더 -->
+  <div style="background:linear-gradient(135deg,#0B1D3A 0%,#0f3460 60%,#1E3A8A 100%);padding:48px 40px 40px;text-align:center;">
+    <div style="display:inline-flex;align-items:center;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);border-radius:50px;padding:6px 16px;margin-bottom:28px;">
+      <span style="font-size:12px;font-weight:700;letter-spacing:.08em;color:#93C5FD;text-transform:uppercase;">ibtcc.kr Newsletter</span>
+    </div>
+    <div style="font-size:26px;font-weight:800;color:#fff;line-height:1.35;letter-spacing:-.02em;margin-bottom:14px;">
+      ${title ? highlightTitle(title, em) : '<span style="opacity:.4">제목을 입력하세요</span>'}
+    </div>
+    <div style="font-size:14px;color:rgba(255,255,255,.65);">${subtitle ? esc(subtitle) : ''}</div>
+  </div>
+
+  <!-- 메타 -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:#F8FAFF;border-bottom:1px solid #E2E8F0;">
+    <span style="font-size:12px;color:#64748B;">발행 <strong style="color:#1E3A8A;">${date}</strong> &nbsp;·&nbsp; ibtcc.kr 공식 뉴스레터</span>
+    <span style="font-size:11px;font-weight:700;color:#1E3A8A;background:#DBEAFE;border-radius:50px;padding:3px 10px;">${vol}</span>
+  </div>
+
+  <!-- 본문 -->
+  <div style="padding:36px 40px;">
+
+    ${intro ? `<p style="font-size:15px;color:#475569;line-height:1.8;margin-bottom:36px;padding-bottom:32px;border-bottom:1px solid #E2E8F0;">${intro}</p>` : ''}
+
+    <!-- 통계 -->
+    <div style="background:linear-gradient(135deg,#EFF6FF,#F0FDF4);border:1px solid #BFDBFE;border-radius:12px;padding:24px 26px;margin-bottom:36px;">
+      <p style="font-size:14px;color:#1E3A8A;line-height:1.8;font-weight:500;margin-bottom:18px;">현재 ibtcc.kr에서 제공 중인 데이터 현황</p>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;">${statsHtml}</div>
+    </div>
+
+    <!-- 섹션 레이블 -->
+    <div style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.12em;color:#94A3B8;text-transform:uppercase;margin-bottom:20px;">
+      <span style="width:24px;height:2px;background:#CBD5E1;border-radius:2px;display:inline-block;"></span>
+      이런 걸 할 수 있어요
+    </div>
+
+    <!-- 카드 -->
+    ${cardsHtml || '<div style="padding:40px;text-align:center;color:#94A3B8;font-size:14px;border:1px dashed #E2E8F0;border-radius:12px;">카드를 추가하세요</div>'}
+
+    <!-- 에디터 코멘트 -->
+    ${comment ? `
+    <hr style="border:none;border-top:1px solid #E2E8F0;margin:32px 0;" />
+    <div style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.12em;color:#94A3B8;text-transform:uppercase;margin-bottom:16px;">
+      <span style="width:24px;height:2px;background:#CBD5E1;border-radius:2px;display:inline-block;"></span>
+      에디터의 한마디
+    </div>
+    <p style="font-size:14px;color:#475569;line-height:1.9;margin-bottom:32px;">${comment}</p>
+    ` : ''}
+
+    <!-- CTA -->
+    <div style="background:linear-gradient(135deg,#0B1D3A,#1E3A8A);border-radius:14px;padding:36px 32px;text-align:center;margin-bottom:36px;">
+      <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.4;">${ctaTitle ? esc(ctaTitle) : 'ibtcc.kr 바로가기'}</div>
+      ${ctaSub ? `<div style="font-size:13px;color:rgba(255,255,255,.60);margin-bottom:24px;">${esc(ctaSub)}</div>` : ''}
+      <a href="${esc(ctaUrl)}" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#FCD34D,#F59E0B);color:#0B1D3A;font-size:14px;font-weight:800;padding:14px 32px;border-radius:50px;text-decoration:none;letter-spacing:.02em;">${ctaBtn ? esc(ctaBtn) : '방문하기'}</a>
+    </div>
+
+  </div>
+
+  <!-- 푸터 -->
+  <div style="padding:28px 40px;background:#F8FAFF;border-top:1px solid #E2E8F0;text-align:center;">
+    <p style="font-size:12px;color:#94A3B8;line-height:1.7;">
+      이 뉴스레터는 <a href="https://ibtcc.kr" style="color:#1E3A8A;font-weight:600;">ibtcc.kr</a>에서 발행합니다.<br>
+      문의 및 피드백 &rarr; <a href="mailto:a9723992@gmail.com" style="color:#1E3A8A;font-weight:600;">a9723992@gmail.com</a>
+    </p>
+  </div>
+
+</div>`;
+
+  document.getElementById('preview-frame').innerHTML = html;
+}
+
+// ── 샘플 불러오기 ──
+function loadSample() {
+  document.getElementById('f-title').value = '취업 준비, 이 사이트 하나로 끝낸 사람들';
+  document.getElementById('f-em').value = '이 사이트 하나';
+  document.getElementById('f-subtitle').value = '공기업 경쟁률 · 채용자료 142개 · 지텔프 활용 110개 기관';
+  document.getElementById('f-vol').value = 'VOL.02';
+  document.getElementById('f-date').value = '2026.05';
+  document.getElementById('f-intro').value = '취업 준비를 하다 보면 정보가 너무 흩어져 있다는 느낌, 받으신 적 있으신가요?\n\n경쟁률은 어디서 찾고, 시험 일정은 어디서 확인하고, 스펙 기준은 또 따로 찾아야 하고 —\nibtcc.kr은 그 정보들을 한 곳에 모아두기 위해 만들어진 사이트입니다.';
+  document.getElementById('f-comment').value = '취업 준비는 정보전입니다. 같은 시간을 쓰더라도 어떤 정보를 갖고 있느냐에 따라 결과가 달라집니다.\n\nibtcc.kr은 공기업 취업에 필요한 정보를 누구나 무료로 볼 수 있도록 꾸준히 업데이트하고 있습니다.';
+  document.getElementById('f-cta-title').value = '지금 바로 ibtcc.kr에서 확인해보세요';
+  document.getElementById('f-cta-sub').value = '무료 · 회원가입 불필요 · 매월 업데이트';
+  document.getElementById('f-cta-btn').value = 'ibtcc.kr 방문하기';
+  document.getElementById('f-cta-url').value = 'https://ibtcc.kr';
+  document.getElementById('f-filename').value = 'newsletter-02';
+  render();
+  toast('샘플 데이터를 불러왔습니다');
+}
+
+// ── HTML 생성 ──
+function buildFullHTML() {
+  const title   = g('f-title') || 'ibtcc.kr 뉴스레터';
+  const vol     = g('f-vol') || 'VOL.01';
+  const preview = document.getElementById('preview-frame').innerHTML;
+
+  return `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${esc(title)} — ibtcc.kr</title>
+  <meta name="description" content="공기업 경쟁률 비교, 채용자료 무료 다운, 지텔프 활용 기관 정보 — ibtcc.kr 뉴스레터" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:"Noto Sans KR",-apple-system,sans-serif;background:#F0F4F8;-webkit-text-size-adjust:100%;}
+    a{color:inherit;text-decoration:none;}
+    .wrap{max-width:640px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 40px rgba(0,0,0,.10);}
+    @media(max-width:680px){.wrap{margin:0;border-radius:0;box-shadow:none;}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+${preview}
+</div>
+</body>
+</html>`;
+}
+
+function exportHTML() {
+  const html = buildFullHTML();
+  navigator.clipboard.writeText(html).then(() => {
+    toast('HTML이 클립보드에 복사되었습니다');
+  }).catch(() => {
+    const w = window.open('', '_blank');
+    w.document.write('<pre style="white-space:pre-wrap;font-size:12px;padding:20px;">' + html.replace(/</g,'&lt;') + '</pre>');
+    toast('새 탭에서 HTML을 확인하세요');
+  });
+}
+
+function saveNewsletter() {
+  const html = buildFullHTML();
+  const filename = (g('f-filename') || 'newsletter-new') + '.html';
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast(`"${filename}" 파일이 다운로드되었습니다`);
+}
+
+// ── 토스트 ──
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+init();
+render();
+</script>
+
+</body>
+</html>

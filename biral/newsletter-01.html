@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>취업 준비, 이 사이트 하나로 끝낸 사람들 — ibtcc.kr</title>
+  <meta name="description" content="공기업 경쟁률 비교, 142개 채용자료 무료 다운, 지텔프 활용 기관 110곳 — 취업준비생이 몰라선 안 될 사이트" />
+  <meta property="og:title" content="취업 준비, 이 사이트 하나로 끝낸 사람들" />
+  <meta property="og:description" content="공기업 경쟁률 비교 · 142개 채용자료 무료 · 지텔프 활용 110개 기관 정보" />
+  <meta property="og:url" content="https://ibtcc.kr" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Noto Sans KR", -apple-system, sans-serif;
+      background: #F0F4F8;
+      color: #1A202C;
+      line-height: 1.7;
+      -webkit-text-size-adjust: 100%;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── 래퍼 ── */
+    .wrap {
+      max-width: 640px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 40px rgba(0,0,0,.10);
+    }
+
+    /* ── 헤더 ── */
+    .nl-header {
+      background: linear-gradient(135deg, #0B1D3A 0%, #0f3460 60%, #1E3A8A 100%);
+      padding: 48px 40px 40px;
+      text-align: center;
+    }
+    .nl-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.20);
+      border-radius: 50px;
+      padding: 6px 16px;
+      margin-bottom: 28px;
+    }
+    .nl-logo span {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      color: #93C5FD;
+      text-transform: uppercase;
+    }
+    .nl-header h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.35;
+      letter-spacing: -.02em;
+      margin-bottom: 14px;
+    }
+    .nl-header h1 em {
+      font-style: normal;
+      color: #FCD34D;
+    }
+    .nl-header p {
+      font-size: 14px;
+      color: rgba(255,255,255,.65);
+      font-weight: 400;
+    }
+
+    /* ── 발행 메타 ── */
+    .nl-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 40px;
+      background: #F8FAFF;
+      border-bottom: 1px solid #E2E8F0;
+    }
+    .nl-meta-left { font-size: 12px; color: #64748B; }
+    .nl-meta-left strong { color: #1E3A8A; font-weight: 700; }
+    .nl-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1E3A8A;
+      background: #DBEAFE;
+      border-radius: 50px;
+      padding: 3px 10px;
+      letter-spacing: .04em;
+    }
+
+    /* ── 본문 ── */
+    .nl-body { padding: 36px 40px; }
+
+    .nl-intro {
+      font-size: 15px;
+      color: #475569;
+      line-height: 1.8;
+      margin-bottom: 36px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+    .nl-intro strong { color: #0F172A; font-weight: 700; }
+
+    /* ── 섹션 타이틀 ── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      color: #94A3B8;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .section-label::before {
+      content: '';
+      width: 24px;
+      height: 2px;
+      background: #CBD5E1;
+      border-radius: 2px;
+    }
+
+    /* ── 기능 카드 ── */
+    .feature-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 36px; }
+
+    .feature-card {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      padding: 22px 22px;
+      border-radius: 12px;
+      border: 1px solid #E8EDF5;
+      background: #FAFBFE;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .feature-card:hover {
+      box-shadow: 0 4px 20px rgba(30,58,138,.08);
+      transform: translateY(-1px);
+    }
+
+    .fc-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .ic-blue  { background: #DBEAFE; }
+    .ic-green { background: #D1FAE5; }
+    .ic-amber { background: #FEF3C7; }
+    .ic-violet{ background: #EDE9FE; }
+    .ic-sky   { background: #E0F2FE; }
+
+    .fc-body { flex: 1; min-width: 0; }
+    .fc-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      color: #94A3B8;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .fc-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1E293B;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+    .fc-desc {
+      font-size: 13px;
+      color: #64748B;
+      line-height: 1.7;
+    }
+    .fc-stat {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1E3A8A;
+      background: #EFF6FF;
+      border-radius: 50px;
+      padding: 3px 10px;
+    }
+
+    /* ── 하이라이트 블록 ── */
+    .highlight-block {
+      background: linear-gradient(135deg, #EFF6FF, #F0FDF4);
+      border: 1px solid #BFDBFE;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin-bottom: 36px;
+    }
+    .highlight-block p {
+      font-size: 14px;
+      color: #1E3A8A;
+      line-height: 1.8;
+      font-weight: 500;
+    }
+    .highlight-block .stat-row {
+      display: flex;
+      gap: 24px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1E3A8A;
+      display: block;
+      line-height: 1.1;
+    }
+    .stat-lbl {
+      font-size: 12px;
+      color: #64748B;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ── 구분선 ── */
+    .divider {
+      border: none;
+      border-top: 1px solid #E2E8F0;
+      margin: 32px 0;
+    }
+
+    /* ── CTA ── */
+    .cta-block {
+      background: linear-gradient(135deg, #0B1D3A, #1E3A8A);
+      border-radius: 14px;
+      padding: 36px 32px;
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .cta-block h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    .cta-block p {
+      font-size: 13px;
+      color: rgba(255,255,255,.60);
+      margin-bottom: 24px;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #FCD34D, #F59E0B);
+      color: #0B1D3A;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 14px 32px;
+      border-radius: 50px;
+      letter-spacing: .02em;
+      box-shadow: 0 4px 20px rgba(245,158,11,.35);
+      transition: opacity .2s, transform .15s;
+    }
+    .cta-btn:hover { opacity: .9; transform: scale(1.02); }
+    .cta-sub {
+      display: block;
+      margin-top: 14px;
+      font-size: 12px;
+      color: rgba(255,255,255,.40);
+    }
+
+    /* ── 공유 ── */
+    .share-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .share-label { font-size: 13px; color: #94A3B8; font-weight: 500; flex-shrink: 0; }
+    .share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 14px;
+      border-radius: 50px;
+      border: 1.5px solid #E2E8F0;
+      background: #fff;
+      color: #475569;
+      cursor: pointer;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+    .share-btn:hover { border-color: #1E3A8A; color: #1E3A8A; background: #EFF6FF; }
+
+    /* ── 푸터 ── */
+    .nl-footer {
+      padding: 28px 40px;
+      background: #F8FAFF;
+      border-top: 1px solid #E2E8F0;
+      text-align: center;
+    }
+    .nl-footer p {
+      font-size: 12px;
+      color: #94A3B8;
+      line-height: 1.7;
+    }
+    .nl-footer a { color: #1E3A8A; font-weight: 600; }
+
+    /* ── 반응형 ── */
+    @media (max-width: 680px) {
+      .wrap { margin: 0; border-radius: 0; box-shadow: none; }
+      .nl-header { padding: 36px 24px 32px; }
+      .nl-header h1 { font-size: 21px; }
+      .nl-meta, .nl-body, .nl-footer { padding-left: 24px; padding-right: 24px; }
+      .highlight-block .stat-row { gap: 16px; }
+      .stat-num { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- 헤더 -->
+  <div class="nl-header">
+    <div class="nl-logo">
+      <span>ibtcc.kr Newsletter</span>
+    </div>
+    <h1>취업 준비,<br><em>이 사이트 하나</em>로 끝낸 사람들</h1>
+    <p>공기업 경쟁률 · 채용자료 142개 · 지텔프 활용 110개 기관 정보</p>
+  </div>
+
+  <!-- 메타 -->
+  <div class="nl-meta">
+    <div class="nl-meta-left">발행 <strong>2026.04</strong> &nbsp;·&nbsp; ibtcc.kr 공식 뉴스레터</div>
+    <span class="nl-badge">VOL.01</span>
+  </div>
+
+  <!-- 본문 -->
+  <div class="nl-body">
+
+    <!-- 인트로 -->
+    <p class="nl-intro">
+      취업 준비를 하다 보면 정보가 너무 흩어져 있다는 느낌, 받으신 적 있으신가요?<br><br>
+      경쟁률은 어디서 찾고, 시험 일정은 어디서 확인하고, 스펙 기준은 또 따로 찾아야 하고 —<br>
+      <strong>ibtcc.kr은 그 정보들을 한 곳에 모아두기 위해 만들어진 사이트입니다.</strong><br><br>
+      이번 뉴스레터에서는 지금 이 사이트에서 실제로 쓸 수 있는 기능들을 정리했습니다.
+    </p>
+
+    <!-- 수치 요약 -->
+    <div class="highlight-block">
+      <p>현재 ibtcc.kr에서 제공 중인 데이터 현황</p>
+      <div class="stat-row">
+        <div class="stat-item">
+          <span class="stat-num">142</span>
+          <span class="stat-lbl">무료 채용자료 PDF</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">110<span style="font-size:18px;font-weight:600;">+</span></span>
+          <span class="stat-lbl">지텔프 활용 공공기관</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">실시간</span>
+          <span class="stat-lbl">공기업 경쟁률 비교</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">자동</span>
+          <span class="stat-lbl">대학별 채용공고 수집</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 기능 목록 -->
+    <div class="section-label">이런 걸 할 수 있어요</div>
+
+    <div class="feature-list">
+
+      <a href="https://ibtcc.kr/competition.html" target="_blank">
+        <div class="feature-card">
+          <div class="fc-icon ic-blue">&#128202;</div>
+          <div class="fc-body">
+            <div class="fc-label">경쟁률 비교</div>
+            <div class="fc-title">직무별 공기업 경쟁률을 한눈에</div>
+            <div class="fc-desc">지원하려는 직무명을 입력하면, 공공기관별 경쟁률을 바로 비교할 수 있습니다. 어떤 기관이 상대적으로 진입장벽이 낮은지 전략적으로 파악하세요.</div>
+            <span class="fc-stat">competition.html 바로가기</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://ibtcc.kr/library-pdf.html" target="_blank">
+        <div class="feature-card">
+          <div class="fc-icon ic-green">&#128196;</div>
+          <div class="fc-body">
+            <div class="fc-label">채용자료 자료실</div>
+            <div class="fc-title">142개 채용공고 자료, 무료 다운로드</div>
+            <div class="fc-desc">한국철도공사, 국민건강보험공단, 한국수자원공사 등 주요 공공기관의 채용공고 PDF를 한 곳에 모았습니다. 별도 회원가입 없이 바로 다운로드 가능합니다.</div>
+            <span class="fc-stat">142개 자료 열람</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://ibtcc.kr/competition.html" target="_blank">
+        <div class="feature-card">
+          <div class="fc-icon ic-amber">&#127981;</div>
+          <div class="fc-body">
+            <div class="fc-label">지텔프 활용 기관</div>
+            <div class="fc-title">지텔프로 영어 스펙을 더 빠르게</div>
+            <div class="fc-desc">토익만 된다고 생각하셨나요? 국민건강보험공단을 포함한 110개 이상의 공공기관이 지텔프를 영어 기준으로 인정합니다. 단기 준비 전략이 달라집니다.</div>
+            <span class="fc-stat">110개 기관 보기</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://ibtcc.kr/university-board.html" target="_blank">
+        <div class="feature-card">
+          <div class="fc-icon ic-violet">&#127979;</div>
+          <div class="fc-body">
+            <div class="fc-label">대학활동 게시판</div>
+            <div class="fc-title">대학별 채용공고 & 활동 소식 자동수집</div>
+            <div class="fc-desc">전국 주요 대학의 채용공고, 학교 활동, 기업 협업 소식을 자동으로 수집해 보여줍니다. 관심 있는 학교 소식을 빠르게 확인하세요.</div>
+            <span class="fc-stat">대학활동 보기</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://ibtcc.kr/schedule.html" target="_blank">
+        <div class="feature-card">
+          <div class="fc-icon ic-sky">&#128197;</div>
+          <div class="fc-body">
+            <div class="fc-label">시험 일정</div>
+            <div class="fc-title">G-TELP 정기시험 일정 한눈에</div>
+            <div class="fc-desc">지텔프(G-TELP) 정기시험 일정을 달력 형태로 확인하고, 원서접수 마감일을 미리 파악해 준비할 수 있습니다.</div>
+            <span class="fc-stat">일정 확인</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+
+    <hr class="divider" />
+
+    <!-- 에디터 코멘트 -->
+    <div class="section-label">에디터의 한마디</div>
+    <p style="font-size:14px;color:#475569;line-height:1.9;margin-bottom:32px;">
+      취업 준비는 정보전입니다. 같은 시간을 쓰더라도 어떤 정보를 갖고 있느냐에 따라 결과가 달라집니다.<br><br>
+      ibtcc.kr은 공기업 취업에 필요한 정보를 누구나 무료로 볼 수 있도록 꾸준히 업데이트하고 있습니다. 이 뉴스레터가 취업 준비에 작게나마 도움이 되길 바랍니다.
+    </p>
+
+    <!-- CTA -->
+    <div class="cta-block">
+      <h2>지금 바로 ibtcc.kr에서<br>확인해보세요</h2>
+      <p>무료 · 회원가입 불필요 · 매월 업데이트</p>
+      <a class="cta-btn" href="https://ibtcc.kr" target="_blank">ibtcc.kr 방문하기</a>
+      <span class="cta-sub">* 모바일에서도 최적화되어 있습니다</span>
+    </div>
+
+    <!-- 공유 -->
+    <div class="share-row">
+      <span class="share-label">공유하기</span>
+      <button class="share-btn" onclick="copyLink()">&#128279; 링크 복사</button>
+      <button class="share-btn" onclick="shareKakao()">&#128172; 카카오 공유</button>
+    </div>
+
+  </div>
+
+  <!-- 푸터 -->
+  <div class="nl-footer">
+    <p>
+      이 뉴스레터는 <a href="https://ibtcc.kr" target="_blank">ibtcc.kr</a>에서 발행합니다.<br>
+      문의 및 피드백 &rarr; <a href="mailto:a9723992@gmail.com">a9723992@gmail.com</a>
+    </p>
+    <p style="margin-top:10px;">
+      <a href="../biral/newsletter-maker.html" style="font-size:11px;color:#94A3B8;">다음 뉴스레터 제작하기</a>
+    </p>
+  </div>
+
+</div>
+
+<script>
+  function copyLink() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = event.currentTarget;
+      const orig = btn.innerHTML;
+      btn.innerHTML = '복사됨!';
+      setTimeout(() => { btn.innerHTML = orig; }, 1500);
+    }).catch(() => {
+      prompt('아래 링크를 복사하세요:', url);
+    });
+  }
+
+  function shareKakao() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent('공기업 취업 준비에 필요한 정보를 한 곳에서 — ibtcc.kr');
+    window.open(`https://story.kakao.com/share?url=${url}&text=${text}`, '_blank');
+  }
+</script>
+
+</body>
+</html>
