@@ -244,7 +244,7 @@
 </div>
 
 <!-- ══════ 채용공고 슬라이더 ══════ -->
-<section style="background:#EFF6FF;padding:40px 16px;" id="job-postings">
+<section style="background:linear-gradient(135deg,#0B1D3A 0%,#0f3460 60%,#1E3A8A 100%);padding:40px 16px;" id="job-postings">
   <div style="max-width:1100px;margin:0 auto;">
     <div style="position:relative;">
       <div id="job-slider-wrap" style="overflow:hidden;border-radius:16px;">
@@ -903,7 +903,7 @@
 
     // ── 채용공고 슬라이더 ──
     let jobPage = 0;
-    const JOB_PER_PAGE = 8;
+    const JOB_PER_PAGE = 15;
     let jobPages = [];
 
     function renderJobDots() {
@@ -955,7 +955,7 @@
                 ? `<a href="${r.link}" target="_blank" style="${style}text-decoration:none;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.12)'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,.06)'">${inner}</a>`
                 : `<div style="${style}">${inner}</div>`;
             }).join('');
-            return `<div style="flex:0 0 100%;min-width:100%;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,auto);gap:12px;">${cards}</div>`;
+            return `<div style="flex:0 0 100%;min-width:100%;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(3,auto);gap:12px;">${cards}</div>`;
           }).join('');
           jobGoTo(0);
         }
