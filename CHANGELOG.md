@@ -1,6 +1,6 @@
-# competition.html 작업 이력
+# 작업 이력
 
-> 직종별 경쟁률 페이지 (`competition.html`) 작업 이력
+> `competition.html`, `university-board.html` 등 주요 페이지 작업 이력
 
 ---
 
@@ -10,6 +10,38 @@
 |------|------|
 | `competition.html` | 직종별 채용 경쟁률 비교 메인 페이지 |
 | `jobscript/jobscript_a.html` | 직종별 경쟁률 독립 차트 페이지 |
+| `university-board.html` | 대학교 활동/소식/채용 게시판 |
+
+---
+
+## university-board.html 작업 이력
+
+### 2026-04-21 — 사이드바 열람순위 레이블 추가
+- **커밋**: `dd58c09`
+- 열람 기록이 있는 학교 목록 상단에 "열람순위" 레이블 표시
+- 열람된 학교가 하나도 없으면 레이블 미표시 (조건부 렌더링)
+
+### 2026-04-20 — 사이드바 열람순 정렬 + 배지 + 구분선 추가
+- **커밋**: `333f148`
+- `ubSortedSchools()`: 열람 횟수 내림차순 → 가나다순 정렬
+- 🥇🥈🥉 + 4위/5위 배지 (전체 순위 기준, 검색 필터 시에도 유지)
+- 열람 기록 있는 학교 / 없는 학교 사이 구분선 삽입
+- 학교명 옆에 열람 횟수 소형 표기
+
+### 2026-04-20 — 기본화면(#ub-default-view) 채용공고 캐러셀 + HOT 경쟁률 추가
+- **커밋**: `333f148`
+- `.placeholder` 대체: 채용공고 캐러셀 + 이번주 HOT 경쟁률 그리드
+- 채용공고: `job_postings` 테이블, 8개씩 슬라이드, 5초 자동전환, 도트 네비게이션
+- HOT 경쟁률: `page_views?page=like.competition-click:*` 지난 7일 집계, 상위 6개 표시
+- `ubRenderDots` null 가드, `setInterval` clearInterval 방어 코드 포함
+
+---
+
+## competition.html 작업 이력
+
+> (구: competition.html 작업 이력 단독 섹션)
+
+## competition.html 연관 파일
 
 ## DB 테이블
 
@@ -17,7 +49,22 @@
 
 ---
 
-## 작업 이력
+## competition.html 작업 이력
+
+### 2026-04-21 — 합격선 안내 배너 위치 수정 (차트 하단 전체 너비)
+- **커밋**: `dd58c09`
+- 배너가 `chart-comment-row` flex 안에 포함되어 차트 옆에 표시되던 문제 수정
+- `chart-comment-row` 닫는 `</div>` 밖으로 이동 → 차트+댓글 행 아래 전체 너비 블록으로 표시
+
+### 2026-04-20 — 공공기관 선택 시 그래프 하단 합격선 안내 배너 추가
+- **커밋**: (이전 세션)
+- `ratioChart` 차트 아래에 합격선 안내 배너 추가 (기관 선택 시 노출)
+- 내용: 토익 750점 이상 / 지텔프 65점 이상 / 준비기간 / IBT 무료 응시 가능
+- IBT 신청하기 버튼 → `student.html` 이동
+
+### 2026-04-20 — 기본화면(#default-chart-view) 합격선 안내 배너 추가
+- **커밋**: (이전 세션)
+- `jv-chart-card` 아래 동일한 합격선 안내 배너 추가 (직종 검색 기본화면)
 
 ### 2026-04-20 — 직종 검색 안내 문구 shimmer 반짝이 효과 추가
 - **커밋**: `db91b3c`
