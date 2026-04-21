@@ -343,6 +343,7 @@
   let selectedSchool = null;
   let currentView = 'card';
   let _ratingMap = {};   // key: "school|title" → { sum, count }
+  let _ubViewMap = {};   // key: school_name → view count
 
   function esc(s){ return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
   function fmtDate(d){ if(!d) return '-'; const dt=new Date(d); return dt.getFullYear()+'.'+(dt.getMonth()+1).toString().padStart(2,'0')+'.'+dt.getDate().toString().padStart(2,'0'); }
@@ -373,16 +374,33 @@
   }
 
   // ── 데이터 로드 (대학활동 + 대학소식 + 직원채용공고 병렬) ──
+  function ubSortedSchools(list) {
+    return [...list].sort((a, b) => {
+      const diff = (_ubViewMap[b] || 0) - (_ubViewMap[a] || 0);
+      return diff !== 0 ? diff : a.localeCompare(b, 'ko');
+    });
+  }
+
   async function loadData() {
     try {
       const headers = { 'apikey': SB_KEY, 'Authorization': 'Bearer '+SB_KEY };
-      const [r1, r2, r3] = await Promise.all([
+      const [r1, r2, r3, r4] = await Promise.all([
         fetch(SB_URL+'/rest/v1/school_programs?select=*&is_deleted=eq.false&order=sort_order.asc,created_at.desc', { headers }),
         fetch(SB_URL+'/rest/v1/university_news?select=*&order=sort_order.asc,created_at.desc', { headers }),
-        fetch(SB_URL+'/rest/v1/staff_job_postings?select=*&order=sort_order.asc,created_at.desc', { headers })
+        fetch(SB_URL+'/rest/v1/staff_job_postings?select=*&order=sort_order.asc,created_at.desc', { headers }),
+        fetch(SB_URL+'/rest/v1/page_views?select=page&page=like.university-click:*&limit=5000', { headers })
       ]);
-      const [programs, news, staffJobs] = await Promise.all([r1.json(), r2.json(), r3.json()]);
+      const [programs, news, staffJobs, views] = await Promise.all([r1.json(), r2.json(), r3.json(), r4.json()]);
       await loadRatings();
+
+      // 열람 횟수 집계
+      _ubViewMap = {};
+      if (Array.isArray(views)) {
+        views.forEach(r => {
+          const name = r.page.replace('university-click:', '');
+          _ubViewMap[name] = (_ubViewMap[name] || 0) + 1;
+        });
+      }
 
       const prog = Array.isArray(programs)  ? programs.map(r => ({ ...r, _type:'활동' })) : [];
       const nws  = Array.isArray(news)      ? news.map(r => ({ ...r, _type:'소식' })) : [];
@@ -407,7 +425,7 @@
 
       allData = Object.values(schoolMap).flat();
 
-      renderSchoolList(Object.keys(schoolMap).sort((a,b) => a.localeCompare(b,'ko')));
+      renderSchoolList(ubSortedSchools(Object.keys(schoolMap)));
     } catch(e) {
       console.error(e);
       document.getElementById('school-list').innerHTML = '<div class="empty-list">로드 실패</div>';
@@ -415,28 +433,47 @@
   }
 
   // ── 사이드바 렌더링 ──
+  const _UB_RANK_BADGE = ['🥇','🥈','🥉',
+    '<span style="font-size:.65rem;font-weight:800;padding:1px 5px;border-radius:4px;background:rgba(99,102,241,.25);color:#A5B4FC;">4위</span>',
+    '<span style="font-size:.65rem;font-weight:800;padding:1px 5px;border-radius:4px;background:rgba(16,185,129,.2);color:#6EE7B7;">5위</span>'
+  ];
   function renderSchoolList(schools) {
     const el = document.getElementById('school-list');
     if (schools.length === 0) {
       el.innerHTML = '<div class="empty-list">검색 결과가 없습니다</div>';
       return;
     }
-    el.innerHTML = schools.map(s => {
+    // 전체 목록 기준 열람 순위 계산 (배지는 전체 순위 기준)
+    const allSorted = ubSortedSchools(Object.keys(schoolMap));
+    const rankMap = {};
+    allSorted.forEach((s, i) => { if (_ubViewMap[s]) rankMap[s] = i; });
+
+    let html = '';
+    let dividerInserted = false;
+    schools.forEach(s => {
+      const hasView = !!_ubViewMap[s];
+      if (!dividerInserted && !hasView) {
+        dividerInserted = true;
+        html += '<div style="margin:6px 14px;border-top:1px solid rgba(255,255,255,.1);"></div>';
+      }
       const cnt = schoolMap[s] ? schoolMap[s].length : 0;
       const isActive = selectedSchool === s;
-      return `<div class="school-item${isActive?' active':''}" onclick="selectSchool('${esc(s).replace(/'/g,"\\'")}')">
-        <span class="school-name">${esc(s)}</span>
+      const rank = rankMap[s];
+      const badge = (rank !== undefined && rank < 5) ? _UB_RANK_BADGE[rank] : '';
+      const viewCnt = _ubViewMap[s] ? `<span style="font-size:.6rem;color:rgba(255,255,255,.3);margin-left:2px;">${_ubViewMap[s]}</span>` : '';
+      html += `<div class="school-item${isActive?' active':''}" onclick="selectSchool('${esc(s).replace(/'/g,"\\'")}')">
+        ${badge ? `<span style="margin-right:5px;flex-shrink:0;">${badge}</span>` : ''}
+        <span class="school-name">${esc(s)}${viewCnt}</span>
         <span class="school-cnt">${cnt}</span>
       </div>`;
-    }).join('');
+    });
+    el.innerHTML = html;
   }
 
   // ── 대학 검색 필터 ──
   function filterSchools(q) {
-    const filtered = Object.keys(schoolMap)
-      .filter(s => s.toLowerCase().includes(q.toLowerCase()))
-      .sort((a,b) => a.localeCompare(b,'ko'));
-    renderSchoolList(filtered);
+    const filtered = Object.keys(schoolMap).filter(s => s.toLowerCase().includes(q.toLowerCase()));
+    renderSchoolList(ubSortedSchools(filtered));
   }
 
   // ── 대학 선택 ──
@@ -444,10 +481,18 @@
     selectedSchool = name;
     const posts = schoolMap[name] || [];
 
-    // 사이드바 active 업데이트
-    renderSchoolList(Object.keys(schoolMap)
-      .filter(s => s.toLowerCase().includes(document.getElementById('school-search').value.toLowerCase()))
-      .sort((a,b) => a.localeCompare(b,'ko')));
+    // 열람 기록 (page_views INSERT)
+    _ubViewMap[name] = (_ubViewMap[name] || 0) + 1;
+    fetch(SB_URL + '/rest/v1/page_views', {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ page: 'university-click:' + name })
+    }).catch(() => {});
+
+    // 사이드바 active 업데이트 (열람순 유지)
+    const q = document.getElementById('school-search').value.toLowerCase();
+    const filtered = Object.keys(schoolMap).filter(s => s.toLowerCase().includes(q));
+    renderSchoolList(ubSortedSchools(filtered));
 
     // 상단바
     document.getElementById('topbar-school').textContent = name;
