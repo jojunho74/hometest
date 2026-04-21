@@ -948,6 +948,15 @@ function jvCloseAC(){document.getElementById('jv-ac').style.display='none';}
 
 document.addEventListener('click',e=>{ if(!e.target.closest('.jv-search'))jvCloseAC(); });
 
+function jvTrackPageView(page) {
+  if (localStorage.getItem('gtelp_notrack') === '1') return;
+  fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/page_views', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Prefer': 'return=minimal' },
+    body: JSON.stringify({ page })
+  }).catch(function(){});
+}
+
 function jvPickJob(job) {
   document.getElementById('jv-input').value=job;
   jvCloseAC();
@@ -957,6 +966,7 @@ function jvPickJob(job) {
   jvSetFilter(`직종: ${job}`, _jvDisplayData.length);
   document.getElementById('jv-chart-title').textContent=`직종별 평균 경쟁률 — ${job}`;
   jvRenderChart(_jvDisplayData); jvRenderSummary(); jvRenderTable();
+  jvTrackPageView('competition-search:' + job);
 }
 
 function jvShowSaBar(jobs,totalCnt){
@@ -976,6 +986,8 @@ function jvOnSaChange() {
     jvSetFilter(`직종 전체 선택 (${jobs.length}개)`,_jvDisplayData.length);
     document.getElementById('jv-chart-title').textContent=`직종별 평균 경쟁률 — ${jobs.length}개 직종 선택`;
     jvRenderChart(_jvDisplayData); jvRenderTable();
+    const q = document.getElementById('jv-input').value.trim();
+    if (q) jvTrackPageView('competition-sa-click:' + q);
   } else {
     _jvDisplayData=[]; jvClearFilter();
     document.getElementById('jv-chart-title').textContent='직종별 평균 경쟁률';

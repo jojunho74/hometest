@@ -1201,6 +1201,54 @@
             <div id="uc-pagination" class="flex items-center justify-center gap-2 mt-3 pt-3 border-t"></div>
           </div>
 
+          <!-- 경쟁률 직종 검색 키워드 통계 -->
+          <div class="bg-white rounded-xl shadow-sm p-5 mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <h3 class="font-semibold text-slate-600 text-sm">🔍 경쟁률 직종 검색 키워드 순위 <span id="cs-total-badge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600"></span></h3>
+              <div class="flex items-center gap-1.5">
+                <button id="cs-btn-today" onclick="applyCsPeriod('today')" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">오늘</button>
+                <button id="cs-btn-week"  onclick="applyCsPeriod('week')"  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-indigo-600 text-indigo-600 bg-indigo-50">이번주</button>
+                <button id="cs-btn-all"   onclick="applyCsPeriod('all')"   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">전체</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-x-6 border-b pb-2 mb-1">
+              <div class="grid text-xs text-slate-400 font-semibold" style="grid-template-columns:28px 1fr 44px 80px;">
+                <span>순위</span><span>검색 키워드</span><span class="text-right">횟수</span><span class="pl-2">비율</span>
+              </div>
+              <div class="grid text-xs text-slate-400 font-semibold" style="grid-template-columns:28px 1fr 44px 80px;">
+                <span>순위</span><span>검색 키워드</span><span class="text-right">횟수</span><span class="pl-2">비율</span>
+              </div>
+            </div>
+            <div id="cs-body" class="grid grid-cols-2 gap-x-6">
+              <div class="col-span-2 py-6 text-center text-slate-400 text-xs">불러오는 중...</div>
+            </div>
+            <div id="cs-pagination" class="flex items-center justify-center gap-2 mt-3 pt-3 border-t"></div>
+          </div>
+
+          <!-- 경쟁률 전체선택 클릭 키워드 통계 -->
+          <div class="bg-white rounded-xl shadow-sm p-5 mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <h3 class="font-semibold text-slate-600 text-sm">☑️ 검색된 직종 전체선택 클릭 키워드 순위 <span id="sa-total-badge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600"></span></h3>
+              <div class="flex items-center gap-1.5">
+                <button id="sa-btn-today" onclick="applySaPeriod('today')" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">오늘</button>
+                <button id="sa-btn-week"  onclick="applySaPeriod('week')"  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-indigo-600 text-indigo-600 bg-indigo-50">이번주</button>
+                <button id="sa-btn-all"   onclick="applySaPeriod('all')"   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">전체</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-x-6 border-b pb-2 mb-1">
+              <div class="grid text-xs text-slate-400 font-semibold" style="grid-template-columns:28px 1fr 44px 80px;">
+                <span>순위</span><span>검색 키워드</span><span class="text-right">클릭수</span><span class="pl-2">비율</span>
+              </div>
+              <div class="grid text-xs text-slate-400 font-semibold" style="grid-template-columns:28px 1fr 44px 80px;">
+                <span>순위</span><span>검색 키워드</span><span class="text-right">클릭수</span><span class="pl-2">비율</span>
+              </div>
+            </div>
+            <div id="sa-body" class="grid grid-cols-2 gap-x-6">
+              <div class="col-span-2 py-6 text-center text-slate-400 text-xs">불러오는 중...</div>
+            </div>
+            <div id="sa-pagination" class="flex items-center justify-center gap-2 mt-3 pt-3 border-t"></div>
+          </div>
+
           <!-- 페이지별 접속 현황 -->
           <div class="bg-white rounded-xl shadow-sm p-5">
             <div class="flex items-center justify-between mb-3">
@@ -3580,6 +3628,12 @@
       // ── 경쟁률 클릭 통계 ──
       loadCompetitionClicks();
 
+      // ── 경쟁률 검색 키워드 통계 ──
+      loadCompetitionSearch();
+
+      // ── 경쟁률 전체선택 클릭 통계 ──
+      loadCompetitionSaClick();
+
       // ── 대학활동 클릭 통계 ──
       loadUniversityClicks();
 
@@ -3989,6 +4043,200 @@ ${internalSummary}
       } catch(e) {
         container.innerHTML = `<div class="rounded-xl p-4 bg-red-50 border border-red-200 text-xs text-red-600">AI 분석 오류: ${e.message}</div>`;
       }
+    }
+
+    // ─── 경쟁률 직종 검색 키워드 통계 ───
+    window._csAllRows = [];
+    window._csPeriod  = 'week';
+
+    async function loadCompetitionSearch() {
+      const body = document.getElementById('cs-body');
+      if (!body) return;
+      let allRows = [], offset = 0;
+      while (true) {
+        const { data, error } = await db.from('page_views')
+          .select('page, visited_at')
+          .like('page', 'competition-search:%')
+          .range(offset, offset + 999);
+        if (error || !data || data.length === 0) break;
+        allRows = allRows.concat(data);
+        if (data.length < 1000) break;
+        offset += 1000;
+      }
+      window._csAllRows = allRows;
+      applyCsPeriod(window._csPeriod);
+    }
+
+    function applyCsPeriod(period) {
+      window._csPeriod = period;
+      ['today','week','all'].forEach(p => {
+        const btn = document.getElementById('cs-btn-' + p);
+        if (!btn) return;
+        const active = p === period;
+        btn.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all ' +
+          (active ? 'border-indigo-600 text-indigo-600 bg-indigo-50' : 'border-slate-200 text-slate-400 hover:text-slate-600 bg-white');
+      });
+      const kstNow = new Date(new Date().getTime() + 9*60*60*1000);
+      const todayKey = kstNow.toISOString().slice(0,10);
+      const weekAgo  = new Date(kstNow.getTime() - 7*864e5).toISOString().slice(0,10);
+      const filtered = (window._csAllRows || []).filter(r => {
+        if (period === 'all') return true;
+        const d = new Date(new Date(r.visited_at).getTime() + 9*60*60*1000).toISOString().slice(0,10);
+        return period === 'today' ? d === todayKey : d >= weekAgo;
+      });
+      const map = {};
+      filtered.forEach(r => { const k = r.page.replace('competition-search:', ''); map[k] = (map[k]||0)+1; });
+      const total = filtered.length || 1;
+      const badge = document.getElementById('cs-total-badge');
+      if (badge) badge.textContent = '총 ' + filtered.length.toLocaleString() + '건';
+      const sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+      window._csData = sorted.map(([kw, cnt], i) => ({ kw, cnt, i, pct: Math.round(cnt/total*100) }));
+      window._csPage = 0;
+      renderCompetitionSearch(0);
+    }
+
+    function renderCompetitionSearch(page) {
+      const data = window._csData || [];
+      const PER_PAGE = 20;
+      const totalPages = Math.ceil(data.length / PER_PAGE);
+      window._csPage = page;
+      const body = document.getElementById('cs-body');
+      const pager = document.getElementById('cs-pagination');
+      if (!body) return;
+      if (!data.length) {
+        body.innerHTML = '<div class="col-span-2 py-6 text-center text-slate-400 text-xs">아직 검색 데이터가 없습니다.</div>';
+        if (pager) pager.innerHTML = ''; return;
+      }
+      const MEDAL = ['🥇','🥈','🥉'];
+      const COLORS = ['#F59E0B','#94A3B8','#CD7C3A'];
+      const slice = data.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
+      const left  = slice.slice(0, 10);
+      const right = slice.slice(10, 20);
+      const rowHtml = (d) => {
+        if (!d) return '<div style="height:34px;"></div>';
+        const rank = d.i < 3
+          ? `<span style="font-size:1em;line-height:1;">${MEDAL[d.i]}</span>`
+          : `<span class="text-slate-400 text-xs font-semibold">${d.i+1}위</span>`;
+        const bar_color = d.i < 3 ? COLORS[d.i] : '#6366F1';
+        return `<div class="grid items-center py-1.5 border-b border-slate-50" style="grid-template-columns:28px 1fr 44px 80px;">
+          <div>${rank}</div>
+          <div class="font-semibold text-slate-700 text-xs truncate pr-1" title="${esc(d.kw)}">${esc(d.kw)}</div>
+          <div class="text-right font-bold text-indigo-600 text-xs">${d.cnt.toLocaleString()}</div>
+          <div class="pl-2 flex items-center gap-1">
+            <div style="flex:1;height:5px;background:#EEF2FF;border-radius:3px;"><div style="width:${d.pct}%;height:100%;background:${bar_color};border-radius:3px;"></div></div>
+            <span class="text-xs text-slate-400 w-7 text-right flex-shrink-0">${d.pct}%</span>
+          </div>
+        </div>`;
+      };
+      const maxRows = Math.max(left.length, right.length);
+      let leftHtml = '', rightHtml = '';
+      for (let i = 0; i < maxRows; i++) { leftHtml += rowHtml(left[i]||null); rightHtml += rowHtml(right[i]||null); }
+      body.innerHTML = `<div>${leftHtml}</div><div>${rightHtml}</div>`;
+      if (totalPages <= 1) { if (pager) pager.innerHTML = ''; return; }
+      const btnBase = 'px-3 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer';
+      const btnA = 'bg-indigo-600 text-white border-indigo-600';
+      const btnI = 'bg-white text-slate-500 border-slate-200 hover:border-indigo-400 hover:text-indigo-600';
+      let html = `<button onclick="renderCompetitionSearch(${page-1})" class="${btnBase} ${btnI}" ${page===0?'disabled style="opacity:.35;cursor:not-allowed;"':''}>‹ 이전</button>`;
+      for (let i = 0; i < totalPages; i++) html += `<button onclick="renderCompetitionSearch(${i})" class="${btnBase} ${i===page?btnA:btnI}">${i+1}</button>`;
+      html += `<button onclick="renderCompetitionSearch(${page+1})" class="${btnBase} ${btnI}" ${page===totalPages-1?'disabled style="opacity:.35;cursor:not-allowed;"':''}>다음 ›</button>`;
+      if (pager) pager.innerHTML = html;
+    }
+
+    // ─── 경쟁률 전체선택 클릭 통계 ───
+    window._saAllRows = [];
+    window._saPeriod  = 'week';
+
+    async function loadCompetitionSaClick() {
+      const body = document.getElementById('sa-body');
+      if (!body) return;
+      let allRows = [], offset = 0;
+      while (true) {
+        const { data, error } = await db.from('page_views')
+          .select('page, visited_at')
+          .like('page', 'competition-sa-click:%')
+          .range(offset, offset + 999);
+        if (error || !data || data.length === 0) break;
+        allRows = allRows.concat(data);
+        if (data.length < 1000) break;
+        offset += 1000;
+      }
+      window._saAllRows = allRows;
+      applySaPeriod(window._saPeriod);
+    }
+
+    function applySaPeriod(period) {
+      window._saPeriod = period;
+      ['today','week','all'].forEach(p => {
+        const btn = document.getElementById('sa-btn-' + p);
+        if (!btn) return;
+        const active = p === period;
+        btn.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all ' +
+          (active ? 'border-indigo-600 text-indigo-600 bg-indigo-50' : 'border-slate-200 text-slate-400 hover:text-slate-600 bg-white');
+      });
+      const kstNow = new Date(new Date().getTime() + 9*60*60*1000);
+      const todayKey = kstNow.toISOString().slice(0,10);
+      const weekAgo  = new Date(kstNow.getTime() - 7*864e5).toISOString().slice(0,10);
+      const filtered = (window._saAllRows || []).filter(r => {
+        if (period === 'all') return true;
+        const d = new Date(new Date(r.visited_at).getTime() + 9*60*60*1000).toISOString().slice(0,10);
+        return period === 'today' ? d === todayKey : d >= weekAgo;
+      });
+      const map = {};
+      filtered.forEach(r => { const k = r.page.replace('competition-sa-click:', ''); map[k] = (map[k]||0)+1; });
+      const total = filtered.length || 1;
+      const badge = document.getElementById('sa-total-badge');
+      if (badge) badge.textContent = '총 ' + filtered.length.toLocaleString() + '건';
+      const sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+      window._saData = sorted.map(([kw, cnt], i) => ({ kw, cnt, i, pct: Math.round(cnt/total*100) }));
+      window._saPage = 0;
+      renderCompetitionSaClick(0);
+    }
+
+    function renderCompetitionSaClick(page) {
+      const data = window._saData || [];
+      const PER_PAGE = 20;
+      const totalPages = Math.ceil(data.length / PER_PAGE);
+      window._saPage = page;
+      const body = document.getElementById('sa-body');
+      const pager = document.getElementById('sa-pagination');
+      if (!body) return;
+      if (!data.length) {
+        body.innerHTML = '<div class="col-span-2 py-6 text-center text-slate-400 text-xs">아직 전체선택 클릭 데이터가 없습니다.</div>';
+        if (pager) pager.innerHTML = ''; return;
+      }
+      const MEDAL = ['🥇','🥈','🥉'];
+      const COLORS = ['#F59E0B','#94A3B8','#CD7C3A'];
+      const slice = data.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
+      const left  = slice.slice(0, 10);
+      const right = slice.slice(10, 20);
+      const rowHtml = (d) => {
+        if (!d) return '<div style="height:34px;"></div>';
+        const rank = d.i < 3
+          ? `<span style="font-size:1em;line-height:1;">${MEDAL[d.i]}</span>`
+          : `<span class="text-slate-400 text-xs font-semibold">${d.i+1}위</span>`;
+        const bar_color = d.i < 3 ? COLORS[d.i] : '#10B981';
+        return `<div class="grid items-center py-1.5 border-b border-slate-50" style="grid-template-columns:28px 1fr 44px 80px;">
+          <div>${rank}</div>
+          <div class="font-semibold text-slate-700 text-xs truncate pr-1" title="${esc(d.kw)}">${esc(d.kw)}</div>
+          <div class="text-right font-bold text-emerald-600 text-xs">${d.cnt.toLocaleString()}</div>
+          <div class="pl-2 flex items-center gap-1">
+            <div style="flex:1;height:5px;background:#ECFDF5;border-radius:3px;"><div style="width:${d.pct}%;height:100%;background:${bar_color};border-radius:3px;"></div></div>
+            <span class="text-xs text-slate-400 w-7 text-right flex-shrink-0">${d.pct}%</span>
+          </div>
+        </div>`;
+      };
+      const maxRows = Math.max(left.length, right.length);
+      let leftHtml = '', rightHtml = '';
+      for (let i = 0; i < maxRows; i++) { leftHtml += rowHtml(left[i]||null); rightHtml += rowHtml(right[i]||null); }
+      body.innerHTML = `<div>${leftHtml}</div><div>${rightHtml}</div>`;
+      if (totalPages <= 1) { if (pager) pager.innerHTML = ''; return; }
+      const btnBase = 'px-3 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer';
+      const btnA = 'bg-indigo-600 text-white border-indigo-600';
+      const btnI = 'bg-white text-slate-500 border-slate-200 hover:border-indigo-400 hover:text-indigo-600';
+      let html = `<button onclick="renderCompetitionSaClick(${page-1})" class="${btnBase} ${btnI}" ${page===0?'disabled style="opacity:.35;cursor:not-allowed;"':''}>‹ 이전</button>`;
+      for (let i = 0; i < totalPages; i++) html += `<button onclick="renderCompetitionSaClick(${i})" class="${btnBase} ${i===page?btnA:btnI}">${i+1}</button>`;
+      html += `<button onclick="renderCompetitionSaClick(${page+1})" class="${btnBase} ${btnI}" ${page===totalPages-1?'disabled style="opacity:.35;cursor:not-allowed;"':''}>다음 ›</button>`;
+      if (pager) pager.innerHTML = html;
     }
 
     // ─── 경쟁률 페이지 클릭 통계 ───
