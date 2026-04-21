@@ -4348,18 +4348,13 @@ ${internalSummary}
       if (!confirm('학교별 클릭 카운터를 전체 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) return;
       const { error } = await db.from('page_views').delete().like('page', 'university-click:%');
       if (error) { alert('초기화 실패: ' + error.message); return; }
-      window._ucAllRows = [];
+      // 내부 상태 초기화 후 정상 렌더 경로로 UI 갱신
+      window._ucAllRows  = [];
       window._ucBySchool = {};
-      window._ucData = [];
-      const body = document.getElementById('university-click-body');
-      if (body) body.innerHTML = '<div class="col-span-2 py-6 text-center text-slate-400 text-xs">초기화 완료. 데이터가 없습니다.</div>';
-      const badge = document.getElementById('uc-total-badge');
-      if (badge) badge.textContent = '총 0건';
-      const pager = document.getElementById('uc-pagination');
-      if (pager) pager.innerHTML = '';
+      window._ucData     = [];
+      applyUcPeriod(window._ucPeriod || 'week');
       const panel = document.getElementById('uc-detail-panel');
       if (panel) panel.innerHTML = '';
-      alert('학교별 클릭 카운터가 초기화되었습니다.');
     }
 
     // ─── 대학활동 페이지 클릭 통계 ───
