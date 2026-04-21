@@ -14,6 +14,18 @@
 
 ---
 
+## Supabase 보안 작업 이력
+
+### 2026-04-21 — RLS 정책 전면 적용 (보안 강화)
+- **위치**: Supabase 대시보드 → SQL Editor
+- 모든 주요 테이블 RLS 활성화 및 정책 설정
+- **개인정보 테이블** (`consultations`, `student_applications`): 공개 INSERT 허용 + 조회/수정/삭제는 인증된 관리자만
+- **콘텐츠 테이블** (`school_programs`, `university_news`, `staff_job_postings`, `job_postings`, `company_news`, `popup_ads`): 읽기 공개 + 쓰기는 인증된 관리자만
+- **추적 테이블** (`page_views`, `pdf_ratings`, `cheer_comments`): 공개 INSERT/SELECT + 삭제는 관리자만
+- anon key 노출에도 개인정보 직접 조회 및 무단 데이터 조작 차단
+
+---
+
 ## university-board.html 작업 이력
 
 ### 2026-04-21 — 사이드바 열람순위 레이블 추가
