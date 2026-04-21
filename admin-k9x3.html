@@ -1259,8 +1259,11 @@
               <h3 class="font-semibold text-slate-600 text-sm">페이지별 접속 현황</h3>
               <span class="text-xs text-slate-400" id="pv-page-label">전체 누적 기준</span>
             </div>
-            <!-- 2열 헤더 -->
-            <div class="grid grid-cols-2 gap-x-4 mb-1 border-b pb-2">
+            <!-- 3열 헤더 -->
+            <div class="grid grid-cols-3 gap-x-4 mb-1 border-b pb-2">
+              <div class="grid text-xs text-slate-400 font-semibold" style="grid-template-columns:1fr 42px 42px 42px 90px;">
+                <span>페이지</span><span class="text-right">전체</span><span class="text-right">이번달</span><span class="text-right">오늘</span><span class="pl-2">비율</span>
+              </div>
               <div class="grid text-xs text-slate-400 font-semibold" style="grid-template-columns:1fr 42px 42px 42px 90px;">
                 <span>페이지</span><span class="text-right">전체</span><span class="text-right">이번달</span><span class="text-right">오늘</span><span class="pl-2">비율</span>
               </div>
@@ -1268,9 +1271,9 @@
                 <span>페이지</span><span class="text-right">전체</span><span class="text-right">이번달</span><span class="text-right">오늘</span><span class="pl-2">비율</span>
               </div>
             </div>
-            <!-- 2열 본문 -->
-            <div id="page-stats-body" class="grid grid-cols-2 gap-x-4">
-              <div class="col-span-2 py-6 text-center text-slate-400 text-xs">불러오는 중...</div>
+            <!-- 3열 본문 -->
+            <div id="page-stats-body" class="grid grid-cols-3 gap-x-4">
+              <div class="col-span-3 py-6 text-center text-slate-400 text-xs">불러오는 중...</div>
             </div>
             <!-- 페이지네이션 -->
             <div id="pv-pagination" class="flex items-center justify-center gap-2 mt-3 pt-3 border-t"></div>
@@ -3676,23 +3679,24 @@
       renderPageStats(0);
     }
 
-    // ─── 페이지별 통계 렌더 (2열 × 5행 = 10개/페이지) ───
+    // ─── 페이지별 통계 렌더 (3열 × 10행 = 30개/페이지) ───
     function renderPageStats(page) {
       const data = window._pvData || [];
-      const PER_PAGE = 10;
+      const PER_PAGE = 30;
       const totalPages = Math.ceil(data.length / PER_PAGE);
       window._pvPage = page;
       const body = document.getElementById('page-stats-body');
       const pager = document.getElementById('pv-pagination');
       const label = document.getElementById('pv-page-label');
       if (!data.length) {
-        body.innerHTML = '<div class="col-span-2 py-6 text-center text-slate-400 text-xs">데이터가 없습니다.</div>';
+        body.innerHTML = '<div class="col-span-3 py-6 text-center text-slate-400 text-xs">데이터가 없습니다.</div>';
         pager.innerHTML = ''; return;
       }
       const slice = data.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
-      // 왼쪽 5개 / 오른쪽 5개
-      const left  = slice.slice(0, 5);
-      const right = slice.slice(5, 10);
+      // 왼쪽 10개 / 가운데 10개 / 오른쪽 10개
+      const left  = slice.slice(0, 10);
+      const mid   = slice.slice(10, 20);
+      const right = slice.slice(20, 30);
       const rowHtml = (d) => {
         if (!d) return '<div class="py-2.5" style="grid-column:1/-1;"></div>';
         return `<div class="grid items-center py-2 border-b border-slate-50" style="grid-template-columns:1fr 42px 42px 42px 90px;">
@@ -3711,13 +3715,14 @@
           </div>
         </div>`;
       };
-      const maxRows = Math.max(left.length, right.length);
-      let leftHtml = '', rightHtml = '';
+      const maxRows = Math.max(left.length, mid.length, right.length);
+      let leftHtml = '', midHtml = '', rightHtml = '';
       for (let i = 0; i < maxRows; i++) {
         leftHtml  += rowHtml(left[i]  || null);
+        midHtml   += rowHtml(mid[i]   || null);
         rightHtml += rowHtml(right[i] || null);
       }
-      body.innerHTML = `<div>${leftHtml}</div><div>${rightHtml}</div>`;
+      body.innerHTML = `<div>${leftHtml}</div><div>${midHtml}</div><div>${rightHtml}</div>`;
       // 레이블
       if (label) label.textContent = `전체 누적 기준 — ${page*PER_PAGE+1}~${Math.min((page+1)*PER_PAGE, data.length)} / ${data.length}개`;
       // 페이지네이션
