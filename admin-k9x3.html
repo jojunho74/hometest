@@ -1179,6 +1179,7 @@
             <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
               <h3 class="font-semibold text-slate-600 text-sm">📊 대학활동 페이지 — 학교별 클릭 순위 <span id="uc-total-badge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600"></span></h3>
               <div class="flex items-center gap-1.5">
+                <button id="uc-btn-today" onclick="applyUcPeriod('today')" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">오늘</button>
                 <button id="uc-btn-week" onclick="applyUcPeriod('week')" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-indigo-600 text-indigo-600 bg-indigo-50">이번주</button>
                 <button id="uc-btn-all"  onclick="applyUcPeriod('all')"  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">전체</button>
                 <button onclick="resetUniversityClicks()" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-red-300 text-red-500 hover:bg-red-50 bg-white">초기화</button>
@@ -4381,7 +4382,7 @@ ${internalSummary}
     function applyUcPeriod(period) {
       window._ucPeriod = period;
       // 버튼 스타일
-      ['week','all'].forEach(p => {
+      ['today','week','all'].forEach(p => {
         const btn = document.getElementById('uc-btn-' + p);
         if (!btn) return;
         btn.className = p === period
@@ -4392,16 +4393,23 @@ ${internalSummary}
       const allRows = window._ucAllRows || [];
       const body = document.getElementById('university-click-body');
 
-      // 이번주 월요일 00:00 KST 계산
+      // KST 기준 오늘 시작 계산
       const kstNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
-      const dayOfWeek = kstNow.getUTCDay(); // 0=일 1=월 ... 6=토
+      const todayKst = new Date(kstNow);
+      todayKst.setUTCHours(0, 0, 0, 0);
+      const todayStart = todayKst.toISOString();
+
+      // 이번주 월요일 00:00 KST 계산
+      const dayOfWeek = kstNow.getUTCDay();
       const diffToMon = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek);
       const monKst = new Date(kstNow);
       monKst.setUTCHours(0, 0, 0, 0);
       monKst.setUTCDate(monKst.getUTCDate() + diffToMon);
-      const weekStart = monKst.toISOString(); // UTC ISO — DB visited_at과 직접 비교 가능
+      const weekStart = monKst.toISOString();
 
-      const filtered = period === 'week'
+      const filtered = period === 'today'
+        ? allRows.filter(r => r.visited_at && r.visited_at >= todayStart)
+        : period === 'week'
         ? allRows.filter(r => r.visited_at && r.visited_at >= weekStart)
         : allRows;
 
@@ -4410,9 +4418,9 @@ ${internalSummary}
 
       if (!filtered.length) {
         if (body) body.innerHTML = '<div class="col-span-2 py-6 text-center text-slate-400 text-xs">' +
-          (period === 'week' ? '이번주 클릭 데이터가 없습니다.' : '아직 클릭 데이터가 없습니다.') + '</div>';
+          (period === 'today' ? '오늘 클릭 데이터가 없습니다.' : period === 'week' ? '이번주 클릭 데이터가 없습니다.' : '아직 클릭 데이터가 없습니다.') + '</div>';
         if (badge) badge.textContent = '총 0건';
-        if (label) label.textContent = period === 'week' ? '이번주 기준' : '전체 누적 기준';
+        if (label) label.textContent = period === 'today' ? '오늘 기준' : period === 'week' ? '이번주 기준' : '전체 누적 기준';
         const pager = document.getElementById('uc-pagination');
         if (pager) pager.innerHTML = '';
         return;
@@ -4438,7 +4446,9 @@ ${internalSummary}
 
       // 레이블
       if (label) {
-        if (period === 'week') {
+        if (period === 'today') {
+          label.textContent = `오늘 기준 (${kstNow.toISOString().slice(0,10).replace(/-/g,'.')})`;
+        } else if (period === 'week') {
           const monStr = monKst.toISOString().slice(0,10).replace(/-/g,'.');
           label.textContent = `이번주 기준 (${monStr} ~ 오늘)`;
         } else {
