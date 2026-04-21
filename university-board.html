@@ -31,7 +31,7 @@
     .mobile-menu.open{display:flex;}
     @media(max-width:640px){.hnav{display:none;}.hbtn{display:none;}.hamburger{display:flex;}}
     @media(max-width:640px){#ub-hot-grid{grid-template-columns:repeat(2,1fr) !important;}}
-    @media(max-width:420px){#ub-hot-grid{grid-template-columns:1fr !important;}#ub-job-grid div[style*="repeat(4"]{grid-template-columns:repeat(2,1fr) !important;}}
+    @media(max-width:420px){#ub-hot-grid{grid-template-columns:1fr !important;}#ub-job-grid div[style*="repeat(5"]{grid-template-columns:repeat(2,1fr) !important;}}
 
     /* ── 레이아웃 ── */
     .layout{display:flex;flex:1;overflow:hidden;}
@@ -631,7 +631,7 @@
         return;
       }
       ubJobPages = [];
-      for (let i = 0; i < data.length; i += 8) ubJobPages.push(data.slice(i, i + 8));
+      for (let i = 0; i < data.length; i += 15) ubJobPages.push(data.slice(i, i + 15));
       function ubBuildCards() {
         const g = document.getElementById('ub-job-grid');
         if (!g) return;
@@ -650,7 +650,7 @@
             const st = 'background:' + bg + ';border-radius:10px;border:1px solid rgba(0,0,0,.08);padding:16px;display:flex;flex-direction:column;min-height:130px;';
             return r.link ? '<a href="' + r.link + '" target="_blank" style="' + st + 'text-decoration:none;">' + inner + '</a>' : '<div style="' + st + '">' + inner + '</div>';
           }).join('');
-          return '<div style="flex:0 0 100%;min-width:100%;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">' + cards + '</div>';
+          return '<div style="flex:0 0 100%;min-width:100%;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(3,auto);gap:10px;">' + cards + '</div>';
         }).join('');
         ubJobGoTo(0);
       }
