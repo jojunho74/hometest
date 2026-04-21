@@ -485,8 +485,8 @@
     const posts = schoolMap[name] || [];
 
     // 열람 기록 (page_views INSERT) — 내 방문 제외 ON 시 skip
-    _ubViewMap[name] = (_ubViewMap[name] || 0) + 1;
     if (localStorage.getItem('gtelp_notrack') !== '1') {
+      _ubViewMap[name] = (_ubViewMap[name] || 0) + 1;
       fetch(SB_URL + '/rest/v1/page_views', {
         method: 'POST',
         headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
