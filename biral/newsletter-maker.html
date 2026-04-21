@@ -63,12 +63,13 @@
     /* 미리보기 패널 */
     .preview-panel {
       background: #F0F4F8;
-      overflow-y: auto;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      overflow-y: scroll;
+      height: calc(100vh - 56px);
       padding: 32px 24px;
+    }
+    .preview-inner {
+      max-width: 640px;
+      margin: 0 auto;
     }
     .preview-label {
       font-size: 11px;
@@ -77,11 +78,9 @@
       color: #94A3B8;
       text-transform: uppercase;
       margin-bottom: 16px;
-      align-self: flex-start;
     }
     #preview-frame {
       width: 100%;
-      max-width: 640px;
       background: #fff;
       border-radius: 16px;
       box-shadow: 0 4px 40px rgba(0,0,0,.15);
@@ -264,6 +263,7 @@
       <span class="topbar-title">뉴스레터 제작 도구</span>
     </div>
     <div class="topbar-right">
+      <button class="btn-action" style="background:#1E3A8A;color:#FCD34D;" onclick="autoTrend()">동향 자동생성</button>
       <button class="btn-action btn-secondary-action" onclick="loadSample()">샘플 불러오기</button>
       <button class="btn-action btn-success-action" onclick="exportHTML()">HTML 내보내기</button>
       <button class="btn-action btn-primary-action" onclick="saveNewsletter()">파일로 저장</button>
@@ -276,7 +276,9 @@
     <!-- 취업 동향 -->
     <div class="section-hd">취업 동향 요약 (최상단 노출)</div>
     <div class="field">
-      <label>이번 호 취업 트렌드 (300자 내외) <span id="trend-count" style="color:#60A5FA;font-weight:700;margin-left:6px;">0자</span></label>
+      <label>이번 호 취업 트렌드 (300자 내외) <span id="trend-count" style="color:#60A5FA;font-weight:700;margin-left:6px;">0자</span>
+        <button onclick="autoTrend()" style="margin-left:8px;font-size:11px;font-weight:700;background:#1E3A8A;color:#93C5FD;border:none;border-radius:6px;padding:3px 9px;cursor:pointer;font-family:inherit;">지금 날짜로 갱신</button>
+      </label>
       <textarea id="f-trend" rows="6" placeholder="최근 취업 트렌드와 동향을 요약해서 입력하세요..." oninput="updateTrendCount();render()"></textarea>
     </div>
     <div class="field">
@@ -367,10 +369,12 @@
 
   <!-- 미리보기 패널 -->
   <div class="preview-panel">
-    <div class="preview-label">실시간 미리보기</div>
-    <div id="preview-frame">
-      <div style="padding:60px;text-align:center;color:#94A3B8;font-size:14px;">
-        왼쪽에서 내용을 입력하면<br>여기에 미리보기가 나타납니다
+    <div class="preview-inner">
+      <div class="preview-label">실시간 미리보기</div>
+      <div id="preview-frame">
+        <div style="padding:60px;text-align:center;color:#94A3B8;font-size:14px;">
+          왼쪽에서 내용을 입력하면<br>여기에 미리보기가 나타납니다
+        </div>
       </div>
     </div>
   </div>
@@ -398,9 +402,45 @@ let stats = [
   {num:'자동',   lbl:'대학별 채용공고 수집'},
 ];
 
+// ── 취업 동향 자동 생성 ──
+const TREND_TEMPLATES = {
+  Q1: { season:'상반기 초', events:'공채 시즌 개막, 서류 마감 집중', tip:'서류 및 필기 대비 집중 시기' },
+  Q2: { season:'상반기 말', events:'주요 공기업 필기시험 집중', tip:'필기·면접 준비 병행 시기' },
+  Q3: { season:'하반기 초', events:'하반기 채용 공고 시작, 인턴십 전환 채용', tip:'직무 경험 정리 및 자소서 준비 시기' },
+  Q4: { season:'하반기 말', events:'연말 채용 마감, 내년 상반기 준비 시작', tip:'내년 공채 대비 스펙 점검 시기' },
+};
+
+function getQuarter(month) {
+  if (month <= 3)  return 'Q1';
+  if (month <= 6)  return 'Q2';
+  if (month <= 9)  return 'Q3';
+  return 'Q4';
+}
+
+function autoTrend() {
+  const now   = new Date();
+  const year  = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const q     = getQuarter(month);
+  const t     = TREND_TEMPLATES[q];
+
+  const src = `${year}년 ${month}월 기준 취합`;
+  const half = month <= 6 ? '상반기' : '하반기';
+
+  const text = `${year}년 ${half} 공기업 채용시장은 ${t.season}을 맞아 ${t.events}가 이어지고 있습니다. NCS 직무 중심 평가가 강화되는 한편, 영어 요건에서 지텔프(G-TELP) 인정 기관이 늘어 단기 준비 전략이 주목받고 있습니다. 특히 110개 이상 공공기관이 지텔프를 공식 인정하면서 토익 대비 준비 기간 단축이 가능해졌습니다. AI·디지털 역량 평가를 도입하는 기관도 증가 추세로, 직무 전문성과 디지털 기초 소양을 함께 갖추는 것이 경쟁력의 핵심이 되고 있습니다. ${t.tip}인 만큼, 기관별 경쟁률을 비교하고 전략적으로 접근하는 것이 중요합니다.`;
+
+  document.getElementById('f-trend').value     = text;
+  document.getElementById('f-trend-src').value = src;
+  document.getElementById('f-date').value      = document.getElementById('f-date').value || `${year}.${String(month).padStart(2,'0')}`;
+  updateTrendCount();
+  render();
+  toast(`${year}년 ${month}월 기준으로 동향을 자동 생성했습니다`);
+}
+
 // ── 초기화 ──
 function init() {
   renderStatsFields();
+  autoTrend();
   addCard({ icon:'📊', color:'blue', label:'경쟁률 비교', title:'직무별 공기업 경쟁률을 한눈에', desc:'지원하려는 직무명을 입력하면 기관별 경쟁률을 바로 비교할 수 있습니다.', stat:'경쟁률 비교 바로가기', url:'https://ibtcc.kr/competition.html' });
   addCard({ icon:'📄', color:'green', label:'채용자료 자료실', title:'142개 채용공고 자료, 무료 다운로드', desc:'주요 공공기관 채용공고 PDF를 한 곳에 모았습니다. 바로 다운로드 가능합니다.', stat:'자료실 바로가기', url:'https://ibtcc.kr/library-pdf.html' });
 }

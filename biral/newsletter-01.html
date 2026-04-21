@@ -349,7 +349,7 @@
     <div style="background:#0F172A;border-radius:14px;padding:24px 28px;margin-bottom:32px;border-left:3px solid #3B82F6;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
         <span style="font-size:10px;font-weight:700;letter-spacing:.14em;color:#60A5FA;text-transform:uppercase;">이번 호 취업 동향</span>
-        <span style="font-size:10px;color:#475569;margin-left:auto;">2026년 4월 기준 취합</span>
+        <span id="trend-date" style="font-size:10px;color:#475569;margin-left:auto;"></span>
       </div>
       <p style="font-size:14px;color:#CBD5E1;line-height:1.9;">2026년 상반기 공기업 채용시장은 정부 효율화 기조 속에서도 주요 공공기관의 채용이 이어지고 있습니다. NCS 직무 중심 평가가 강화되는 한편, 영어 요건에서 지텔프(G-TELP) 인정 기관이 늘어 단기 전략이 주목받고 있습니다. 특히 110개 이상 공공기관이 지텔프를 공식 인정하면서 토익 대비 준비 기간 단축이 가능해졌습니다. AI 역량 평가를 도입하는 기관도 증가 추세로, 직무 전문성과 디지털 기초 소양을 함께 갖추는 것이 경쟁력의 핵심이 되고 있습니다.</p>
     </div>
@@ -492,6 +492,15 @@
 </div>
 
 <script>
+  // 취업 동향 날짜 자동 최신화
+  (function() {
+    const now   = new Date();
+    const year  = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const el = document.getElementById('trend-date');
+    if (el) el.textContent = year + '년 ' + month + '월 기준 취합';
+  })();
+
   function copyLink() {
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(() => {
