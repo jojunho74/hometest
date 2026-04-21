@@ -1181,6 +1181,7 @@
               <div class="flex items-center gap-1.5">
                 <button id="uc-btn-week" onclick="applyUcPeriod('week')" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-indigo-600 text-indigo-600 bg-indigo-50">이번주</button>
                 <button id="uc-btn-all"  onclick="applyUcPeriod('all')"  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">전체</button>
+                <button onclick="resetUniversityClicks()" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-red-300 text-red-500 hover:bg-red-50 bg-white">초기화</button>
               </div>
             </div>
             <div class="text-xs text-slate-400 mb-2" id="uc-page-label">이번주 기준</div>
@@ -4334,6 +4335,25 @@ ${internalSummary}
       for (let i = 0; i < totalPages; i++) html += `<button onclick="renderCompetitionClicks(${i})" class="${btnBase} ${i===page?btnActive:btnInactive}">${i+1}</button>`;
       html += `<button onclick="renderCompetitionClicks(${page+1})" class="${btnBase} ${btnInactive}" ${page===totalPages-1?'disabled style="opacity:.35;cursor:not-allowed;"':''}>다음 ›</button>`;
       pager.innerHTML = html;
+    }
+
+    // ─── 대학활동 클릭 카운터 초기화 ───
+    async function resetUniversityClicks() {
+      if (!confirm('학교별 클릭 카운터를 전체 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) return;
+      const { error } = await db.from('page_views').delete().like('page', 'university-click:%');
+      if (error) { alert('초기화 실패: ' + error.message); return; }
+      window._ucAllRows = [];
+      window._ucBySchool = {};
+      window._ucData = [];
+      const body = document.getElementById('university-click-body');
+      if (body) body.innerHTML = '<div class="col-span-2 py-6 text-center text-slate-400 text-xs">초기화 완료. 데이터가 없습니다.</div>';
+      const badge = document.getElementById('uc-total-badge');
+      if (badge) badge.textContent = '총 0건';
+      const pager = document.getElementById('uc-pagination');
+      if (pager) pager.innerHTML = '';
+      const panel = document.getElementById('uc-detail-panel');
+      if (panel) panel.innerHTML = '';
+      alert('학교별 클릭 카운터가 초기화되었습니다.');
     }
 
     // ─── 대학활동 페이지 클릭 통계 ───
