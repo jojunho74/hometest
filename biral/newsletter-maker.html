@@ -53,6 +53,7 @@
       background: #1E293B;
       border-right: 1px solid #334155;
       overflow-y: auto;
+      min-height: 0;
       padding: 24px;
       display: flex;
       flex-direction: column;
@@ -63,6 +64,7 @@
     .preview-panel {
       background: #F0F4F8;
       overflow-y: auto;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -271,6 +273,18 @@
   <!-- 에디터 패널 -->
   <div class="editor-panel">
 
+    <!-- 취업 동향 -->
+    <div class="section-hd">취업 동향 요약 (최상단 노출)</div>
+    <div class="field">
+      <label>이번 호 취업 트렌드 (300자 내외) <span id="trend-count" style="color:#60A5FA;font-weight:700;margin-left:6px;">0자</span></label>
+      <textarea id="f-trend" rows="6" placeholder="최근 취업 트렌드와 동향을 요약해서 입력하세요..." oninput="updateTrendCount();render()"></textarea>
+    </div>
+    <div class="field">
+      <label>동향 출처 / 날짜 (선택)</label>
+      <input type="text" id="f-trend-src" placeholder="예: 2026년 4월 기준 취합" oninput="render()" />
+    </div>
+
+    <div class="sep"></div>
     <!-- 기본 정보 -->
     <div class="section-hd">헤더 설정</div>
 
@@ -493,12 +507,24 @@ function highlightTitle(title, em) {
   return esc(title).replace(esc(em), `<em style="font-style:normal;color:#FCD34D;">${esc(em)}</em>`);
 }
 
+function updateTrendCount() {
+  const val = document.getElementById('f-trend')?.value || '';
+  const el = document.getElementById('trend-count');
+  if (el) {
+    const len = val.replace(/\s/g, '').length;
+    el.textContent = len + '자';
+    el.style.color = len > 300 ? '#F87171' : '#60A5FA';
+  }
+}
+
 function render() {
   const title    = g('f-title');
   const em       = g('f-em');
   const subtitle = g('f-subtitle');
   const vol      = g('f-vol') || 'VOL.01';
   const date     = g('f-date') || '2026.04';
+  const trend    = g('f-trend').replace(/\n/g, '<br>');
+  const trendSrc = g('f-trend-src');
   const intro    = g('f-intro').replace(/\n/g, '<br>');
   const comment  = g('f-comment').replace(/\n/g, '<br>');
   const ctaTitle = g('f-cta-title');
@@ -549,6 +575,17 @@ function render() {
 
   <!-- 본문 -->
   <div style="padding:36px 40px;">
+
+    ${trend ? `
+    <!-- 취업 동향 -->
+    <div style="background:#0F172A;border-radius:14px;padding:24px 28px;margin-bottom:32px;border-left:3px solid #3B82F6;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <span style="font-size:10px;font-weight:700;letter-spacing:.14em;color:#60A5FA;text-transform:uppercase;">이번 호 취업 동향</span>
+        ${trendSrc ? `<span style="font-size:10px;color:#475569;margin-left:auto;">${esc(trendSrc)}</span>` : ''}
+      </div>
+      <p style="font-size:14px;color:#CBD5E1;line-height:1.9;">${trend}</p>
+    </div>
+    ` : ''}
 
     ${intro ? `<p style="font-size:15px;color:#475569;line-height:1.8;margin-bottom:36px;padding-bottom:32px;border-bottom:1px solid #E2E8F0;">${intro}</p>` : ''}
 
@@ -601,6 +638,9 @@ function render() {
 
 // ── 샘플 불러오기 ──
 function loadSample() {
+  document.getElementById('f-trend').value = '2026년 상반기 공기업 채용시장은 정부 효율화 기조 속에서도 주요 공공기관의 채용이 이어지고 있습니다. NCS 직무 중심 평가가 강화되는 한편, 영어 요건에서 지텔프(G-TELP) 인정 기관이 늘어 단기 전략이 주목받고 있습니다. 특히 110개 이상 공공기관이 지텔프를 공식 인정하면서 토익 대비 준비 기간 단축이 가능해졌습니다. AI 역량 평가를 도입하는 기관도 증가 추세로, 직무 전문성과 디지털 기초 소양을 함께 갖추는 것이 경쟁력의 핵심이 되고 있습니다.';
+  document.getElementById('f-trend-src').value = '2026년 4월 기준 취합';
+  updateTrendCount();
   document.getElementById('f-title').value = '취업 준비, 이 사이트 하나로 끝낸 사람들';
   document.getElementById('f-em').value = '이 사이트 하나';
   document.getElementById('f-subtitle').value = '공기업 경쟁률 · 채용자료 142개 · 지텔프 활용 110개 기관';
