@@ -6189,7 +6189,7 @@ ${d.hashtags}`;
         .in('school_name', registeredNames)
         .eq('is_deleted', false)
         .order('created_at', { ascending: false })
-        .limit(500);
+        .limit(3000);
       if (filter) query = query.eq('school_name', filter);
 
       const { data, error } = await query;
