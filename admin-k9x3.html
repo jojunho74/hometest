@@ -198,6 +198,7 @@
       <div class="sb-section-label">신청 관리</div>
       <button onclick="switchTab('consult')"  id="tab-consult"  class="sb-item active"><span class="sb-icon">📋</span><span class="sb-label">신청 관리</span></button>
       <button onclick="switchTab('student')"  id="tab-student"  class="sb-item"><span class="sb-icon">🎓</span><span class="sb-label">학생접수</span></button>
+      <button onclick="switchTab('ibt')"      id="tab-ibt"      class="sb-item"><span class="sb-icon">🏫</span><span class="sb-label">IBT신청접수</span></button>
 
       <div class="sb-section-label">콘텐츠</div>
       <button onclick="switchTab('news')"     id="tab-news"     class="sb-item"><span class="sb-icon">📰</span><span class="sb-label">대학소식</span></button>
@@ -294,6 +295,46 @@
           </table>
         </div>
         <p id="empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">신청 내역이 없습니다.</p>
+      </div>
+
+      <!-- ── IBT신청접수 탭 ── -->
+      <div id="section-ibt" class="hidden">
+        <div class="bg-white rounded-xl shadow-sm p-5 mb-6 flex flex-wrap gap-4">
+          <div class="bg-blue-50 rounded-lg px-5 py-3 text-center min-w-[100px]">
+            <p class="text-2xl font-bold text-blue-700" id="ibt-total">-</p>
+            <p class="text-xs text-slate-500 mt-1">전체 접수</p>
+          </div>
+          <div class="bg-yellow-50 rounded-lg px-5 py-3 text-center min-w-[100px]">
+            <p class="text-2xl font-bold text-yellow-600" id="ibt-pending">-</p>
+            <p class="text-xs text-slate-500 mt-1">대기중</p>
+          </div>
+          <div class="bg-green-50 rounded-lg px-5 py-3 text-center min-w-[100px]">
+            <p class="text-2xl font-bold text-green-600" id="ibt-done">-</p>
+            <p class="text-xs text-slate-500 mt-1">처리완료</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-bold text-slate-700">IBT 시험추천 신청 목록</h3>
+            <button onclick="loadIbtApplications()" class="text-xs text-blue-600 hover:text-blue-800 font-semibold">새로고침</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-50 text-slate-500 text-xs">
+                <tr>
+                  <th class="px-4 py-3 text-left font-semibold">학교명</th>
+                  <th class="px-4 py-3 text-left font-semibold">학과</th>
+                  <th class="px-4 py-3 text-left font-semibold">접수일시</th>
+                  <th class="px-4 py-3 text-left font-semibold">상태</th>
+                  <th class="px-4 py-3 text-left font-semibold">처리</th>
+                </tr>
+              </thead>
+              <tbody id="ibt-tbody">
+                <tr><td colspan="5" class="py-10 text-center text-slate-400 text-sm">불러오는 중...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <!-- ── 학생접수 탭 ── -->
@@ -2408,14 +2449,14 @@
 
     // ─── 탭 전환 ───
     const TAB_LABELS = {
-      consult:'신청 관리', student:'학생접수', news:'대학소식', programs:'대학활동',
+      consult:'신청 관리', student:'학생접수', ibt:'IBT신청접수', news:'대학소식', programs:'대학활동',
       jobs:'채용공고', staffjobs:'직원채용공고', cnews:'기업소식', shorts:'유튜브쇼츠', stats:'통계',
       tracking:'추적', blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고', crawler:'대학활동 수집', alio:'채용AI DATA',
       comments:'댓글 관리', cardnews:'카드뉴스 제작'
     };
 
     function switchTab(tab) {
-      ['consult', 'student', 'news', 'programs', 'jobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'tracking', 'blog', 'calendar', 'popupads', 'crawler', 'alio', 'comments', 'cardnews'].forEach(t => {
+      ['consult', 'student', 'ibt', 'news', 'programs', 'jobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'tracking', 'blog', 'calendar', 'popupads', 'crawler', 'alio', 'comments', 'cardnews'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (btn) { if (t === tab) btn.classList.add('active'); else btn.classList.remove('active'); }
@@ -2428,6 +2469,7 @@
       if (ca) ca.scrollTop = 0;
 
       if (tab === 'student') loadStudents();
+      if (tab === 'ibt')     loadIbtApplications();
       if (tab === 'news') loadNews();
       if (tab === 'programs') loadPrograms();
       if (tab === 'jobs') loadJobs();
@@ -2443,6 +2485,45 @@
       if (tab === 'cardnews') cnInit();
       if (tab === 'alio') loadAlioData();
       if (tab === 'comments') loadAdminComments();
+    }
+
+    // ─── IBT 신청접수 ───
+    async function loadIbtApplications() {
+      const tbody = document.getElementById('ibt-tbody');
+      tbody.innerHTML = '<tr><td colspan="5" class="py-10 text-center text-slate-400 text-sm">불러오는 중...</td></tr>';
+      const { data, error } = await db.from('ibt_applications')
+        .select('*').order('created_at', { ascending: false }).limit(500);
+      if (error) { tbody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-red-400 text-sm">오류: ${error.message}</td></tr>`; return; }
+      const rows = data || [];
+      document.getElementById('ibt-total').textContent   = rows.length;
+      document.getElementById('ibt-pending').textContent = rows.filter(r => r.status === 'pending').length;
+      document.getElementById('ibt-done').textContent    = rows.filter(r => r.status === 'done').length;
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="5" class="py-10 text-center text-slate-400 text-sm">접수된 신청이 없습니다.</td></tr>'; return; }
+      const fmt = iso => { const d = new Date(iso); return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+      tbody.innerHTML = rows.map((r, i) => `
+        <tr class="${i%2===1?'bg-slate-50':''} border-b border-slate-100">
+          <td class="px-4 py-3 font-semibold text-slate-800">${r.school_name || '-'}</td>
+          <td class="px-4 py-3 text-slate-600">${r.department || '-'}</td>
+          <td class="px-4 py-3 text-slate-400 text-xs">${fmt(r.created_at)}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded-full text-xs font-bold ${r.status==='done'?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">
+              ${r.status==='done'?'처리완료':'대기중'}
+            </span>
+          </td>
+          <td class="px-4 py-3 flex gap-2">
+            ${r.status!=='done'?`<button onclick="ibtMarkDone('${r.id}')" class="text-xs px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-semibold">완료처리</button>`:''}
+            <button onclick="ibtDelete('${r.id}')" class="text-xs px-3 py-1 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 font-semibold">삭제</button>
+          </td>
+        </tr>`).join('');
+    }
+    async function ibtMarkDone(id) {
+      await db.from('ibt_applications').update({ status: 'done' }).eq('id', id);
+      loadIbtApplications();
+    }
+    async function ibtDelete(id) {
+      if (!confirm('삭제할까요?')) return;
+      await db.from('ibt_applications').delete().eq('id', id);
+      loadIbtApplications();
     }
 
     // ─── 댓글 관리 ───

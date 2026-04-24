@@ -1531,15 +1531,31 @@ async function submitQuickApply() {
   setTimeout(() => document.getElementById('quickOverlay').classList.remove('open'), 3000);
 }
 
-function ibtRecommend() {
-  const school = (document.getElementById('ibtSchoolInput') || {}).value?.trim();
-  const dept   = (document.getElementById('ibtDeptInput')   || {}).value?.trim();
-  if (!school) { alert('학교명을 입력해주세요.'); document.getElementById('ibtSchoolInput')?.focus(); return; }
+async function ibtRecommend() {
+  const schoolEl = document.getElementById('ibtSchoolInput');
+  const deptEl   = document.getElementById('ibtDeptInput');
+  const school = schoolEl ? schoolEl.value.trim() : '';
+  const dept   = deptEl   ? deptEl.value.trim()   : '';
+  if (!school) { alert('학교명을 입력해주세요.'); schoolEl && schoolEl.focus(); return;  }
+  const btn = document.querySelector('.ibt-recommend-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '저장 중...'; }
+  try {
+    const SB  = 'https://byzulmxcuhsrjdphmuym.supabase.co';
+    const KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
+    await fetch(SB + '/rest/v1/ibt_applications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ school_name: school, department: dept || null, status: 'pending' })
+    });
+  } catch(e) { console.warn('IBT 저장 오류:', e); }
+  if (btn) { btn.disabled = false; btn.innerHTML = 'IBT 시험추천 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>'; }
   openQuickApply();
   const uniInput  = document.getElementById('qmUniversity');
   const deptInput = document.getElementById('qmDept');
   if (uniInput)  uniInput.value  = school;
   if (deptInput) deptInput.value = dept || '';
+  if (schoolEl) schoolEl.value = '';
+  if (deptEl)   deptEl.value   = '';
 }
 </script>
 
