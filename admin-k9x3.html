@@ -7057,11 +7057,12 @@ ${d.hashtags}`;
       ? `<span class="cn-status ${ex.status === 'published' ? 'cn-status-published' : 'cn-status-draft'}">${ex.status === 'published' ? '배포중' : '임시저장'}</span>`
       : `<span class="cn-status" style="background:#f1f5f9;color:#94a3b8;">미수집</span>`;
 
-    const imgHtml = data?.selected_image
-      ? `<img class="cn-card-img" src="${escHtml(data.selected_image)}" onerror="this.style.display='none'" />`
-      : (Array.isArray(data?.images) && data.images.length
-        ? `<img class="cn-card-img" src="${escHtml(data.images[0])}" onerror="this.style.display='none'" />`
-        : `<div class="cn-card-img-empty">📰</div>`);
+    let _imgs = [];
+    try { _imgs = Array.isArray(data?.images) ? data.images : JSON.parse(data?.images || '[]'); } catch(e){}
+    const _imgSrc = data?.selected_image || _imgs[0] || '';
+    const imgHtml = _imgSrc
+      ? `<div style="position:relative;width:100%;height:180px;background:linear-gradient(135deg,#1e3a8a,#0891b2);display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;border-radius:12px 12px 0 0;"><span>📰</span><img class="cn-card-img" src="${escHtml(_imgSrc)}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'" /></div>`
+      : `<div class="cn-card-img-empty">📰</div>`;
 
     const viewBadge = data?.view_count != null
       ? `<span style="background:#e0f2fe;color:#0369a1;font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:999px;">👁 조회수 ${Number(data.view_count).toLocaleString()}</span>`
@@ -7097,7 +7098,7 @@ ${d.hashtags}`;
   }
 
   function cnEditPanelHTML(row, data) {
-    const images = Array.isArray(data?.images) ? data.images : [];
+    let images = []; try { images = Array.isArray(data?.images) ? data.images : JSON.parse(data?.images || '[]'); } catch(e){}
     const imgThumbs = images.map((src, i) => {
       const isSel = (data?.selected_image === src) || (!data?.selected_image && i === 0);
       return `<div class="cn-img-thumb-wrap ${isSel ? 'selected' : ''}" onclick="cnSelectImg('${row.id}','${escHtml(src)}')"><img class="cn-img-thumb" src="${escHtml(src)}" onerror="this.closest('.cn-img-thumb-wrap').style.display='none'" /><span class="cn-check">✓</span></div>`;
@@ -7147,11 +7148,6 @@ ${d.hashtags}`;
       if (imgEl) {
         imgEl.src = src;
         imgEl.style.display = 'block';
-      } else {
-        const emptyEl = cardEl.querySelector('.cn-card-img-empty');
-        if (emptyEl) {
-          emptyEl.outerHTML = `<img class="cn-card-img" src="${escHtml(src)}" style="width:100%;height:180px;object-fit:cover;border-radius:8px 8px 0 0;" />`;
-        }
       }
     }
   }

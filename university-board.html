@@ -903,7 +903,7 @@
       try { imgs = Array.isArray(r.images) ? r.images : JSON.parse(r.images || '[]'); } catch(e){}
       var imgSrc = r.selected_image || (imgs[0] || '');
       var imgHtml = imgSrc
-        ? '<img src="' + imgSrc + '" style="width:100%;height:180px;object-fit:cover;display:block;" onerror="this.style.display=\'none\'" />'
+        ? '<div style="position:relative;width:100%;height:180px;background:linear-gradient(135deg,#1e3a8a,#0891b2);display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;"><span>📰</span><img src="' + imgSrc + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'" /></div>'
         : '<div style="width:100%;height:180px;background:linear-gradient(135deg,#1e3a8a,#0891b2);display:flex;align-items:center;justify-content:center;font-size:2.5rem;">📰</div>';
       var date = r.article_date || (r.published_at ? r.published_at.slice(0,10) : '');
       var vc   = r.view_count != null ? '<span style="font-size:.68rem;color:#60a5fa;">👁 ' + Number(r.view_count).toLocaleString() + '</span>' : '';
