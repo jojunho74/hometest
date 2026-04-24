@@ -7060,7 +7060,9 @@ ${d.hashtags}`;
   let cnCandidates = [];   // school_programs rows (크롤링 대상)
   let cnCards = {};        // { id: { ...cardData } } — 크롤된 카드 데이터
   let cnEditOpen = null;   // 현재 수정 중인 카드 id
-  const cnCollapsed = new Set(); // 접힌 카드 id (String) 집합
+  // 접힌 카드 id 집합 — localStorage에 영속 저장
+  const cnCollapsed = new Set(JSON.parse(localStorage.getItem('cn_collapsed') || '[]'));
+  function cnCollapsedSave() { localStorage.setItem('cn_collapsed', JSON.stringify([...cnCollapsed])); }
 
   async function cnInit() {
     cnLoadCandidates();
@@ -7219,6 +7221,7 @@ ${d.hashtags}`;
   /* 접기 / 펼치기 */
   function cnCollapseCard(rowId) {
     cnCollapsed.add(String(rowId));
+    cnCollapsedSave();
     const cardEl = document.getElementById(`cn-card-${rowId}`);
     if (!cardEl) return;
     const row = cnCandidates.find(r => String(r.id) === String(rowId));
@@ -7243,6 +7246,7 @@ ${d.hashtags}`;
 
   function cnExpandCard(rowId) {
     cnCollapsed.delete(String(rowId));
+    cnCollapsedSave();
     const row = cnCandidates.find(r => String(r.id) === String(rowId));
     if (!row) return;
     const cardEl = document.getElementById(`cn-card-${rowId}`);
