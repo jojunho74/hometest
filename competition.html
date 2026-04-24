@@ -1536,26 +1536,30 @@ async function ibtRecommend() {
   const deptEl   = document.getElementById('ibtDeptInput');
   const school = schoolEl ? schoolEl.value.trim() : '';
   const dept   = deptEl   ? deptEl.value.trim()   : '';
-  if (!school) { alert('학교명을 입력해주세요.'); schoolEl && schoolEl.focus(); return;  }
+  if (!school) { alert('학교명을 입력해주세요.'); schoolEl && schoolEl.focus(); return; }
   const btn = document.querySelector('.ibt-recommend-btn');
-  if (btn) { btn.disabled = true; btn.textContent = '저장 중...'; }
+  if (btn) { btn.disabled = true; btn.textContent = '등록 중...'; }
   try {
     const SB  = 'https://byzulmxcuhsrjdphmuym.supabase.co';
     const KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
-    await fetch(SB + '/rest/v1/ibt_applications', {
+    const res = await fetch(SB + '/rest/v1/ibt_applications', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Prefer': 'return=minimal' },
       body: JSON.stringify({ school_name: school, department: dept || null, status: 'pending' })
     });
-  } catch(e) { console.warn('IBT 저장 오류:', e); }
-  if (btn) { btn.disabled = false; btn.innerHTML = 'IBT 시험추천 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>'; }
-  openQuickApply();
-  const uniInput  = document.getElementById('qmUniversity');
-  const deptInput = document.getElementById('qmDept');
-  if (uniInput)  uniInput.value  = school;
-  if (deptInput) deptInput.value = dept || '';
-  if (schoolEl) schoolEl.value = '';
-  if (deptEl)   deptEl.value   = '';
+    if (!res.ok) throw new Error(res.status);
+    if (schoolEl) schoolEl.value = '';
+    if (deptEl)   deptEl.value   = '';
+    // 버튼 잠깐 완료 표시 후 복원
+    btn.textContent = '✅ 등록완료!';
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerHTML = 'IBT 시험추천 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+    }, 2000);
+  } catch(e) {
+    alert('등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+    if (btn) { btn.disabled = false; btn.innerHTML = 'IBT 시험추천 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>'; }
+  }
 }
 </script>
 
