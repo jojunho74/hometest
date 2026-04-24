@@ -1530,6 +1530,7 @@ async function submitQuickApply() {
   <script>
   /* 체류시간 추적 */
   (function() {
+    if (localStorage.getItem('gtelp_notrack') === '1') return;
     var _s = Date.now(), _sent = false;
     function _send() {
       if (_sent) return; _sent = true;
