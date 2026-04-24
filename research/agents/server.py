@@ -200,10 +200,13 @@ def crawl_article(url):
 
     # 이미지 (최대 3개)
     images = []
-    skip_kw = ['icon', 'logo', 'btn', 'button', 'arrow', 'bullet', 'banner_top', 'common']
+    # 명백한 UI 요소만 제외 (logo는 포함 허용)
+    skip_kw = ['icon', 'btn', 'button', 'arrow', 'bullet', 'banner_top', '/common/', 'spinner', 'loading']
+    # 명백한 비이미지 확장자 제외 목록
+    skip_ext = ['.js', '.css', '.pdf', '.hwp', '.doc', '.xls', '.zip', '.svg']
     for img in soup.find_all('img'):
-        src = img.get('src') or img.get('data-src') or ''
-        if not src:
+        src = img.get('src') or img.get('data-src') or img.get('data-original') or ''
+        if not src or src.startswith('data:'):
             continue
         abs_src = urljoin(url, src)
         if not abs_src.startswith('http'):
@@ -211,12 +214,16 @@ def crawl_article(url):
         lower = abs_src.lower()
         if any(kw in lower for kw in skip_kw):
             continue
-        if not any(ext in lower for ext in ['.jpg', '.jpeg', '.png', '.webp', '.gif', 'imgUrl', 'attach', 'upload', 'file']):
+        if any(lower.endswith(ext) for ext in skip_ext):
             continue
+        # 크기 필터: 명시된 경우만 적용
         try:
             w = int(img.get('width', 0))
             h = int(img.get('height', 0))
-            if w and h and (w < 80 or h < 80):
+            if w and h and (w < 60 or h < 60):
+                continue
+            # alt가 공백이고 크기가 아주 작으면 장식 이미지로 간주
+            if (w and w < 30) or (h and h < 30):
                 continue
         except Exception:
             pass
