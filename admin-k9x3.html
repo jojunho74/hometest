@@ -7181,6 +7181,26 @@ ${d.hashtags}`;
     }
   }
 
+  /* 외부 이미지 → Supabase Storage 미러링 (핫링크 차단 우회) */
+  async function cnMirrorImage(imgUrl) {
+    try {
+      const proxyUrl = `${CN_SERVER}/proxy?url=${encodeURIComponent(imgUrl)}`;
+      const resp = await fetch(proxyUrl);
+      if (!resp.ok) return imgUrl;
+      const blob = await resp.blob();
+      if (!blob.type.startsWith('image/') || blob.size < 500) return imgUrl;
+      const ext = blob.type.includes('png') ? 'png' : blob.type.includes('gif') ? 'gif' : blob.type.includes('webp') ? 'webp' : 'jpg';
+      const path = `cardnews/m_${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+      const { error } = await db.storage.from('logo').upload(path, blob, { upsert: true, contentType: blob.type });
+      if (error) { console.warn('[이미지 미러 실패]', error.message); return imgUrl; }
+      const { data } = db.storage.from('logo').getPublicUrl(path);
+      return data?.publicUrl || imgUrl;
+    } catch (e) {
+      console.warn('[이미지 미러 오류]', e.message);
+      return imgUrl;
+    }
+  }
+
   /* 단건 크롤링 */
   async function cnCrawlOne(rowId, url) {
     if (!url) { alert('링크가 없는 항목입니다.'); return; }
@@ -7196,6 +7216,11 @@ ${d.hashtags}`;
       const json = await res.json();
       if (json.status !== 'ok') throw new Error(json.message || '크롤링 실패');
 
+      // 이미지를 Supabase Storage에 미러링 (핫링크 차단 우회)
+      if (btn) btn.textContent = '이미지 저장 중…';
+      const rawImages = json.images || [];
+      const mirroredImages = await Promise.all(rawImages.map(src => cnMirrorImage(src)));
+
       const row = cnCandidates.find(r => String(r.id) === String(rowId));
       cnCards[rowId] = {
         title: json.title || row?.title || '',
@@ -7203,8 +7228,8 @@ ${d.hashtags}`;
         content: json.content || '',
         article_date: json.date || '',
         school_name: row?.school_name || '',
-        images: json.images || [],
-        selected_image: json.images?.[0] || null,
+        images: mirroredImages,
+        selected_image: mirroredImages[0] || null,
         view_count: json.view_count,
         original_url: url,
         school_program_id: rowId,

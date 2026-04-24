@@ -269,9 +269,6 @@ def crawl_article(url):
         if len(images) >= 3:
             break
 
-    # 외부 이미지를 Supabase Storage에 미러링 (핫링크 차단 우회)
-    images = [_mirror_image(src, url) for src in images]
-
     # 날짜
     date_str = ''
     for prop in ['article:published_time', 'og:updated_time']:
