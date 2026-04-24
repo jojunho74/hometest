@@ -1374,6 +1374,7 @@
           <div class="trk-kpi"><div class="val" id="trk-k-direct">—</div><div class="lbl">직접 접속 %</div></div>
           <div class="trk-kpi"><div class="val" id="trk-k-ext">—</div><div class="lbl">외부 유입 %</div></div>
           <div class="trk-kpi"><div class="val" id="trk-k-internal">—</div><div class="lbl">내부 이동 %</div></div>
+          <div class="trk-kpi"><div class="val" id="trk-k-dwell">—</div><div class="lbl">평균 체류시간</div></div>
         </div>
 
         <!-- ① 유입 경로 -->
@@ -1415,6 +1416,17 @@
           <div class="trk-grid2">
             <div class="trk-card"><div class="trk-card-title">🔍 외부 referrer URL TOP 20</div><div id="trk-ext-ref-table"><div class="trk-loading"><div class="trk-spin"></div> 집계 중…</div></div></div>
             <div class="trk-card"><div class="trk-card-title">🏁 외부 유입 후 착지 페이지</div><div id="trk-ext-landing-table"><div class="trk-loading"><div class="trk-spin"></div> 집계 중…</div></div></div>
+          </div>
+        </div>
+
+        <!-- ⑥ 체류시간 -->
+        <div class="trk-sec">
+          <div class="trk-sec-head"><div class="trk-sec-bar" style="background:#7C3AED;"></div><div class="trk-sec-title">⑥ 페이지별 체류시간</div><div class="trk-sec-hint">방문자가 각 페이지에서 머문 평균 시간</div></div>
+          <div class="trk-grid2">
+            <div class="trk-card" style="grid-column:1/-1;">
+              <div class="trk-card-title">⏱ 페이지별 평균 체류시간</div>
+              <div id="trk-dwell-table"><div class="trk-loading"><div class="trk-spin"></div> 집계 중…</div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -6758,7 +6770,7 @@ ${d.hashtags}`;
       trkLoaded = true;
       document.getElementById('trk-status').textContent = '불러오는 중…';
       const { data, error } = await db.from('page_views')
-        .select('page, visited_at, referrer')
+        .select('page, visited_at, referrer, dwell_seconds')
         .order('visited_at', { ascending: false })
         .limit(10000);
       if (error) { document.getElementById('trk-status').textContent = '오류: ' + error.message; trkLoaded = false; return; }
@@ -6790,12 +6802,20 @@ ${d.hashtags}`;
       return TRK_PAGE_LABELS[name] || name;
     }
 
+    function trkFmtDwell(sec) {
+      if (!sec || sec < 1) return '—';
+      if (sec < 60) return sec + '초';
+      const m = Math.floor(sec / 60), s = sec % 60;
+      return m + '분 ' + (s > 0 ? s + '초' : '');
+    }
+
     function trkRender(rows) {
       document.getElementById('trk-status').textContent = `${rows.length.toLocaleString()}건 표시 중`;
       trkRenderKPI(rows); trkRenderRefChart(rows); trkRenderPageBars(rows);
       trkRenderFlowTable(rows); trkRenderLandingTable(rows);
       trkRenderHourChart(rows); trkRenderDayChart(rows);
       trkRenderHeatmap(rows); trkRenderExtRef(rows); trkRenderExtLanding(rows);
+      trkRenderDwell(rows);
     }
 
     function trkRenderKPI(rows) {
@@ -6805,11 +6825,45 @@ ${d.hashtags}`;
       const direct = cl.filter(c => c.type==='직접접속').length;
       const internal = cl.filter(c => c.type==='내부링크').length;
       const ext = total - direct - internal;
+      const dwellRows = rows.filter(r => r.dwell_seconds > 0);
+      const avgDwell = dwellRows.length ? Math.round(dwellRows.reduce((s,r)=>s+r.dwell_seconds,0)/dwellRows.length) : null;
       document.getElementById('trk-k-total').textContent    = total.toLocaleString();
       document.getElementById('trk-k-pages').textContent    = pages;
       document.getElementById('trk-k-direct').textContent   = total ? Math.round(direct/total*100)+'%' : '—';
       document.getElementById('trk-k-ext').textContent      = total ? Math.round(ext/total*100)+'%' : '—';
       document.getElementById('trk-k-internal').textContent = total ? Math.round(internal/total*100)+'%' : '—';
+      document.getElementById('trk-k-dwell').textContent    = avgDwell ? trkFmtDwell(avgDwell) : '—';
+    }
+
+    function trkRenderDwell(rows) {
+      const dwellRows = rows.filter(r => r.dwell_seconds > 0);
+      const el = document.getElementById('trk-dwell-table');
+      if (!dwellRows.length) { el.innerHTML = '<p style="color:#94a3b8;font-size:.8rem;padding:12px;">아직 수집된 체류시간 데이터가 없습니다. 배포 후 방문자가 페이지를 나갈 때 자동 기록됩니다.</p>'; return; }
+      // 페이지별 집계
+      const map = {};
+      dwellRows.forEach(r => {
+        const pg = trkNormPage(r.page);
+        if (!map[pg]) map[pg] = { sum: 0, cnt: 0, max: 0, min: Infinity };
+        map[pg].sum += r.dwell_seconds;
+        map[pg].cnt++;
+        if (r.dwell_seconds > map[pg].max) map[pg].max = r.dwell_seconds;
+        if (r.dwell_seconds < map[pg].min) map[pg].min = r.dwell_seconds;
+      });
+      const sorted = Object.entries(map).sort((a,b) => (b[1].sum/b[1].cnt) - (a[1].sum/a[1].cnt));
+      const maxAvg = sorted[0] ? sorted[0][1].sum / sorted[0][1].cnt : 1;
+      el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.8rem;">
+        <thead><tr style="background:#f1f5f9;"><th style="padding:8px 12px;text-align:left;color:#64748b;font-weight:700;">페이지</th><th style="padding:8px 12px;text-align:right;color:#64748b;font-weight:700;">평균</th><th style="padding:8px 12px;text-align:right;color:#64748b;font-weight:700;">최대</th><th style="padding:8px 12px;text-align:right;color:#64748b;font-weight:700;">샘플 수</th><th style="padding:8px 12px;width:140px;"></th></tr></thead>
+        <tbody>${sorted.map(([pg, s], i) => {
+          const avg = Math.round(s.sum / s.cnt);
+          const pct = Math.round(avg / maxAvg * 100);
+          return `<tr style="border-bottom:1px solid #f1f5f9;${i%2===1?'background:#f8fafc;':''}">
+            <td style="padding:9px 12px;font-weight:600;color:#1e293b;">${pg}</td>
+            <td style="padding:9px 12px;text-align:right;font-weight:700;color:#7C3AED;">${trkFmtDwell(avg)}</td>
+            <td style="padding:9px 12px;text-align:right;color:#64748b;">${trkFmtDwell(s.max)}</td>
+            <td style="padding:9px 12px;text-align:right;color:#94a3b8;">${s.cnt}건</td>
+            <td style="padding:9px 12px;"><div style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#7C3AED,#a78bfa);border-radius:4px;"></div></div></td>
+          </tr>`;
+        }).join('')}</tbody></table>`;
     }
 
     function trkRenderRefChart(rows) {
