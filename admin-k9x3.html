@@ -7025,6 +7025,13 @@ ${d.hashtags}`;
       schoolCount[school] = (schoolCount[school] || 0) + 1;
       seenTitles.add(titleKey);
       filtered.push({ ...r, _existing: ex || null });
+      // DB에 저장된 images/selected_image를 cnCards에 동기화 (세션 간 유지)
+      if (ex) {
+        let imgs = []; try { imgs = Array.isArray(ex.images) ? ex.images : JSON.parse(ex.images || '[]'); } catch(e){}
+        if (!cnCards[r.id]) cnCards[r.id] = {};
+        cnCards[r.id].images = imgs;
+        if (ex.selected_image) cnCards[r.id].selected_image = ex.selected_image;
+      }
     }
     cnCandidates = filtered;
     document.getElementById('cn-status-text').textContent = `후보 ${cnCandidates.length}개 (학교별 최대 2개)`;
@@ -7281,7 +7288,7 @@ ${d.hashtags}`;
       content:      document.getElementById(`cn-inp-content-${rowId}`)?.value || '',
       article_date: document.getElementById(`cn-inp-date-${rowId}`)?.value || '',
       school_name:  document.getElementById(`cn-inp-school-${rowId}`)?.value || '',
-      selected_image: cnCards[rowId]?.selected_image || null,
+      selected_image: cnCards[rowId]?.selected_image || ex.selected_image || null,
       updated_at: new Date().toISOString(),
     };
     const { error } = await db.from('card_news').update(payload).eq('id', ex.id);
