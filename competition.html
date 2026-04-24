@@ -227,7 +227,22 @@
     .ic-submit:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(124,58,237,.6);}
     .ic-submit:active{transform:scale(.97);}
     .ic-submit:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
-    @media(max-width:768px){.chart-comment-row{flex-direction:column;}.inline-comment-col{width:100%;}}
+    @media(max-width:768px){.chart-comment-row{flex-direction:column;}.inline-comment-col{width:100%;}.ibt-push-col{width:100%;}}
+
+    /* ── IBT 신청 PUSH 패널 ── */
+    .ibt-push-col{width:220px;flex-shrink:0;background:linear-gradient(160deg,#0c2340 0%,#0e3060 45%,#091a30 100%);border:1px solid rgba(96,165,250,.35);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 0 1px rgba(96,165,250,.1),0 8px 32px rgba(0,0,0,.5);}
+    .ibt-push-head{padding:12px 14px 10px;border-bottom:1px solid rgba(96,165,250,.2);flex-shrink:0;background:rgba(96,165,250,.1);}
+    .ibt-push-title{font-size:.76rem;font-weight:900;color:#93C5FD;letter-spacing:.01em;}
+    .ibt-push-sub{font-size:.62rem;color:rgba(147,197,253,.5);margin-top:2px;}
+    .ibt-push-body{flex:1;padding:12px;display:flex;flex-direction:column;gap:10px;}
+    .ibt-school-label{font-size:.68rem;font-weight:700;color:rgba(147,197,253,.7);}
+    .ibt-school-select{width:100%;background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.3);border-radius:8px;padding:7px 9px;font-size:.76rem;color:#E2E8F0;outline:none;cursor:pointer;font-family:inherit;}
+    .ibt-school-select:focus{border-color:rgba(96,165,250,.7);}
+    .ibt-school-select option{background:#0D1F3C;color:#E2E8F0;}
+    .ibt-recommend-btn{margin-top:auto;width:100%;padding:10px;border-radius:10px;background:linear-gradient(135deg,#1D4ED8,#3B82F6);color:#fff;font-size:.8rem;font-weight:900;border:none;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 14px rgba(59,130,246,.45);display:flex;align-items:center;justify-content:center;gap:6px;}
+    .ibt-recommend-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(59,130,246,.65);}
+    .ibt-recommend-btn:active{transform:scale(.97);}
+    .ibt-push-notice{font-size:.62rem;color:rgba(147,197,253,.45);line-height:1.6;}
 
     /* ── 댓글 패널 (FAB) ── */
     .comment-fab{position:fixed;bottom:88px;right:24px;z-index:200;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#4F46E5);color:#fff;font-size:1.3rem;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,58,237,.6),0 0 0 0 rgba(124,58,237,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;animation:fabPulse 2.8s ease-in-out infinite;}
@@ -1146,6 +1161,29 @@ function renderVisualization(dsName, rows) {
       <div class="chart-card chart-col">
         <div class="chart-canvas-wrap"><canvas id="ratioChart"></canvas></div>
       </div>
+      <!-- IBT 신청 PUSH 패널 -->
+      <div class="ibt-push-col">
+        <div class="ibt-push-head">
+          <div class="ibt-push-title">🏫 우리대학 IBT신청 PUSH</div>
+          <div class="ibt-push-sub">학교를 선택하고 시험을 추천받으세요</div>
+        </div>
+        <div class="ibt-push-body">
+          <div>
+            <div class="ibt-school-label">학교 선택</div>
+            <select class="ibt-school-select" id="ibtSchoolSelect">
+              <option value="">불러오는 중...</option>
+            </select>
+          </div>
+          <div class="ibt-push-notice">
+            IBT 도입을 희망하는 학교를 선택하면 담당자에게 시험 추천 안내가 전달됩니다.
+          </div>
+          <button class="ibt-recommend-btn" onclick="ibtRecommend()">
+            IBT 시험추천
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </div>
+
       <div class="inline-comment-col">
         <div class="ic-head">
           <span class="ic-title">💬 댓글</span>
@@ -1492,6 +1530,33 @@ async function submitQuickApply() {
   document.getElementById('qmContent').style.display = 'none';
   document.getElementById('qmSuccess').style.display = 'block';
   setTimeout(() => document.getElementById('quickOverlay').classList.remove('open'), 3000);
+}
+
+/* ── IBT 신청 PUSH: 학교 목록 로드 ── */
+(async function loadIbtSchools() {
+  const sel = document.getElementById('ibtSchoolSelect');
+  if (!sel) return;
+  try {
+    const { data, error } = await db
+      .from('school_programs')
+      .select('school_name')
+      .eq('is_deleted', false)
+      .order('school_name', { ascending: true });
+    if (error || !data) { sel.innerHTML = '<option value="">학교 정보를 불러올 수 없습니다</option>'; return; }
+    const names = [...new Set(data.map(r => r.school_name).filter(Boolean))];
+    sel.innerHTML = '<option value="">학교를 선택하세요</option>' +
+      names.map(n => `<option value="${n.replace(/"/g,'&quot;')}">${n}</option>`).join('');
+  } catch(e) {
+    sel.innerHTML = '<option value="">오류: 불러오기 실패</option>';
+  }
+})();
+
+function ibtRecommend() {
+  const sel = document.getElementById('ibtSchoolSelect');
+  const school = sel ? sel.value : '';
+  if (!school) { alert('학교를 선택해주세요.'); sel && sel.focus(); return; }
+  const url = 'student.html?school=' + encodeURIComponent(school);
+  window.location.href = url;
 }
 </script>
 

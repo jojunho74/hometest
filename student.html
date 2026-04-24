@@ -492,6 +492,14 @@
 </script>
 
   <script>
+  /* competition.html IBT PUSH 패널에서 학교명 파라미터 수신 */
+  (function() {
+    const school = new URLSearchParams(location.search).get('school');
+    if (school) {
+      const el = document.getElementById('s-university');
+      if (el) { el.value = school; el.focus(); }
+    }
+  })();
   /* 체류시간 추적 */
   (function() {
     if (localStorage.getItem('gtelp_notrack') === '1') return;
