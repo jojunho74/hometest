@@ -2334,7 +2334,7 @@
       if (tab === 'cnews') loadCNews();
       if (tab === 'shorts') loadShorts();
       if (tab === 'stats')  requestAnimationFrame(() => loadStats());
-      if (tab === 'tracking') trkInit();
+      if (tab === 'tracking') { trkLoaded = false; trkInit(); }
       if (tab === 'blog')     loadBlogDrafts();
       if (tab === 'calendar') loadCalendarAdmin();
       if (tab === 'popupads') loadPopupAds();

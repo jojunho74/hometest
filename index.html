@@ -1689,13 +1689,15 @@
   <!-- 방문 트래킹 -->
   <script>
     (function() {
+      var SB_URL = 'https://byzulmxcuhsrjdphmuym.supabase.co';
+      var SB_KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
       var page = window.location.pathname.split('/').pop() || 'index.html';
-      fetch('/rest/v1/page_views', {
+      fetch(SB_URL + '/rest/v1/page_views', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'apikey': '',
-          'Authorization': 'Bearer ',
+          'apikey': SB_KEY,
+          'Authorization': 'Bearer ' + SB_KEY,
           'Prefer': 'return=minimal'
         },
         body: JSON.stringify({ page: page, referrer: document.referrer || null })
