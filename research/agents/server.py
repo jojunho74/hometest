@@ -147,6 +147,43 @@ class Handler(BaseHTTPRequestHandler):
         print(f"[{self.address_string()}] {format % args}")
 
 
+def _mirror_image(img_url, page_url):
+    """외부 이미지를 Supabase Storage에 업로드하고 공개 URL 반환. 실패 시 원본 URL 반환."""
+    import requests, hashlib, mimetypes
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except Exception:
+        pass
+    sb_url = os.environ.get('SUPABASE_URL', '').rstrip('/')
+    sb_key = os.environ.get('SUPABASE_KEY', '')
+    if not sb_url or not sb_key:
+        return img_url
+    try:
+        r = requests.get(img_url, headers={
+            'User-Agent': 'Mozilla/5.0',
+            'Referer': page_url,
+            'Accept': 'image/*,*/*',
+        }, timeout=10)
+        if r.status_code != 200 or len(r.content) < 1000:
+            return img_url
+        ct = r.headers.get('Content-Type', 'image/jpeg').split(';')[0].strip()
+        ext = mimetypes.guess_extension(ct) or '.jpg'
+        if ext in ('.jpe', '.jpeg'):
+            ext = '.jpg'
+        path = f"cardnews/{hashlib.md5(img_url.encode()).hexdigest()}{ext}"
+        up = requests.post(
+            f"{sb_url}/storage/v1/object/logo/{path}",
+            headers={'Authorization': f'Bearer {sb_key}', 'Content-Type': ct, 'x-upsert': 'true'},
+            data=r.content, timeout=15
+        )
+        if up.status_code in (200, 201):
+            return f"{sb_url}/storage/v1/object/public/logo/{path}"
+    except Exception as e:
+        print(f"[이미지 미러 실패] {img_url}: {e}")
+    return img_url
+
+
 def crawl_article(url):
     import requests
     from bs4 import BeautifulSoup
@@ -231,6 +268,9 @@ def crawl_article(url):
             images.append(abs_src)
         if len(images) >= 3:
             break
+
+    # 외부 이미지를 Supabase Storage에 미러링 (핫링크 차단 우회)
+    images = [_mirror_image(src, url) for src in images]
 
     # 날짜
     date_str = ''
