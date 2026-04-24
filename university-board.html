@@ -900,7 +900,16 @@
     section.style.display = 'block';
     countEl.textContent   = rows.length + '개';
 
-    grid.innerHTML = rows.map(function(r){
+    var CN_PALETTES = [
+      { bg:'#0D1F3C', border:'rgba(96,165,250,.2)',  accent:'#60a5fa', left:'#1e3a8a' },
+      { bg:'#0f2027', border:'rgba(8,145,178,.25)',  accent:'#22d3ee', left:'#0e7490' },
+      { bg:'#1a0f2e', border:'rgba(139,92,246,.25)', accent:'#a78bfa', left:'#6d28d9' },
+      { bg:'#0f1f17', border:'rgba(34,197,94,.2)',   accent:'#4ade80', left:'#15803d' },
+      { bg:'#1f0f0f', border:'rgba(239,68,68,.2)',   accent:'#f87171', left:'#991b1b' },
+      { bg:'#1a1500', border:'rgba(234,179,8,.2)',   accent:'#facc15', left:'#854d0e' },
+    ];
+    grid.innerHTML = rows.map(function(r, i){
+      var pal = CN_PALETTES[i % CN_PALETTES.length];
       var imgs = [];
       try { imgs = Array.isArray(r.images) ? r.images : JSON.parse(r.images || '[]'); } catch(e){}
       var imgSrc = r.selected_image || (imgs[0] || '');
@@ -908,14 +917,14 @@
         ? '<div style="position:relative;width:100%;height:180px;background:linear-gradient(135deg,#1e3a8a,#0891b2);display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;"><span>📰</span><img src="' + imgSrc + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'" /></div>'
         : '<div style="width:100%;height:180px;background:linear-gradient(135deg,#1e3a8a,#0891b2);display:flex;align-items:center;justify-content:center;font-size:2.5rem;">📰</div>';
       var date = r.article_date || (r.published_at ? r.published_at.slice(0,10) : '');
-      var vc   = r.view_count != null ? '<span style="font-size:.68rem;color:#60a5fa;">👁 ' + Number(r.view_count).toLocaleString() + '</span>' : '';
-      return '<div style="background:#0D1F3C;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.08);transition:box-shadow .2s;" onmouseover="this.style.boxShadow=\'0 8px 32px rgba(0,0,0,.4)\'" onmouseout="this.style.boxShadow=\'none\'">'
+      var vc   = r.view_count != null ? '<span style="font-size:.68rem;color:' + pal.accent + ';">👁 ' + Number(r.view_count).toLocaleString() + '</span>' : '';
+      return '<div style="background:' + pal.bg + ';border-radius:16px;overflow:hidden;border:1px solid ' + pal.border + ';transition:box-shadow .2s,transform .2s;" onmouseover="this.style.boxShadow=\'0 8px 32px rgba(0,0,0,.5)\';this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.boxShadow=\'none\';this.style.transform=\'translateY(0)\'">'
         + imgHtml
         + '<div style="padding:16px;">'
-        + '<div style="font-size:.68rem;font-weight:700;color:#0891b2;letter-spacing:.06em;margin-bottom:6px;">' + (r.school_name || '') + '</div>'
+        + '<div style="font-size:.68rem;font-weight:700;color:' + pal.accent + ';letter-spacing:.06em;margin-bottom:6px;">' + (r.school_name || '') + '</div>'
         + '<div style="font-size:.95rem;font-weight:800;color:#e2e8f0;line-height:1.4;margin-bottom:6px;">' + (r.title || '').slice(0,50) + '</div>'
         + (r.subtitle ? '<div style="font-size:.78rem;color:#94a3b8;margin-bottom:8px;line-height:1.5;">' + r.subtitle.slice(0,60) + '</div>' : '')
-        + (r.content  ? '<div style="font-size:.75rem;color:#64748b;line-height:1.6;border-left:2px solid #1e3a8a;padding-left:10px;margin-bottom:10px;">' + r.content + '</div>' : '')
+        + (r.content  ? '<div style="font-size:.75rem;color:#64748b;line-height:1.6;border-left:2px solid ' + pal.left + ';padding-left:10px;margin-bottom:10px;">' + r.content + '</div>' : '')
         + '<div style="display:flex;align-items:center;justify-content:space-between;font-size:.7rem;color:#475569;">'
         + '<span>' + date + '</span>' + vc
         + '</div>'
