@@ -209,6 +209,7 @@
       <button onclick="switchTab('calendar')" id="tab-calendar" class="sb-item"><span class="sb-icon">📅</span><span class="sb-label">채용달력</span></button>
 
       <div class="sb-section-label">자동화</div>
+      <button onclick="switchTab('cardnews')" id="tab-cardnews" class="sb-item"><span class="sb-icon">📰</span><span class="sb-label">카드뉴스제작</span></button>
       <button onclick="switchTab('crawler')" id="tab-crawler" class="sb-item"><span class="sb-icon">🤖</span><span class="sb-label">대학활동 수집</span></button>
       <button onclick="switchTab('alio')" id="tab-alio" class="sb-item"><span class="sb-icon">📊</span><span class="sb-label">채용AI DATA</span></button>
 
@@ -1981,6 +1982,81 @@
 
       </div>
 
+      <!-- ══════ 카드뉴스제작 ══════ -->
+      <div id="section-cardnews" class="hidden" style="flex:1;overflow:hidden;">
+        <style>
+          .cn-wrap{display:flex;flex:1;height:100%;overflow:hidden;gap:0;}
+          .cn-center{flex:1;overflow-y:auto;padding:20px 20px 20px 24px;}
+          .cn-right{width:280px;flex-shrink:0;background:#f8fafc;border-left:1px solid #e2e8f0;overflow-y:auto;padding:16px;}
+          .cn-topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+          #cn-cards-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;}
+          .cn-card{background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.07);overflow:hidden;border:1px solid #e8edf5;transition:box-shadow .2s;}
+          .cn-card:hover{box-shadow:0 6px 24px rgba(0,0,0,.12);}
+          .cn-card-img{width:100%;height:180px;object-fit:cover;display:block;background:#e2e8f0;}
+          .cn-card-img-empty{width:100%;height:180px;background:linear-gradient(135deg,#1e3a8a,#0891b2);display:flex;align-items:center;justify-content:center;font-size:2.5rem;}
+          .cn-card-body{padding:16px;}
+          .cn-card-school{font-size:.72rem;font-weight:700;color:#0891b2;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+          .cn-card-title{font-size:1rem;font-weight:800;color:#0f172a;line-height:1.35;margin-bottom:6px;}
+          .cn-card-subtitle{font-size:.8rem;color:#475569;margin-bottom:8px;line-height:1.5;}
+          .cn-card-content{font-size:.78rem;color:#64748b;line-height:1.6;border-left:3px solid #e2e8f0;padding-left:10px;margin-bottom:10px;}
+          .cn-card-meta{display:flex;align-items:center;gap:10px;font-size:.72rem;color:#94a3b8;margin-bottom:12px;}
+          .cn-card-actions{display:flex;gap:6px;flex-wrap:wrap;}
+          .cn-btn{padding:6px 14px;border-radius:8px;font-size:.75rem;font-weight:700;border:none;cursor:pointer;transition:opacity .15s;}
+          .cn-btn:hover{opacity:.8;}
+          .cn-btn-edit{background:#f1f5f9;color:#334155;}
+          .cn-btn-save{background:#1e3a8a;color:#fff;}
+          .cn-btn-preview{background:#0891b2;color:#fff;}
+          .cn-btn-publish{background:#16a34a;color:#fff;}
+          .cn-btn-unpublish{background:#ef4444;color:#fff;}
+          .cn-status{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;font-size:.7rem;font-weight:700;}
+          .cn-status-draft{background:#fef3c7;color:#b45309;}
+          .cn-status-published{background:#dcfce7;color:#15803d;}
+          .cn-edit-panel{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-top:12px;}
+          .cn-edit-panel label{display:block;font-size:.72rem;font-weight:700;color:#64748b;margin-bottom:4px;margin-top:10px;}
+          .cn-edit-panel label:first-child{margin-top:0;}
+          .cn-edit-panel input,.cn-edit-panel textarea{width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:7px 10px;font-size:.82rem;outline:none;font-family:inherit;}
+          .cn-edit-panel input:focus,.cn-edit-panel textarea:focus{border-color:#0891b2;}
+          .cn-img-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+          .cn-img-thumb-wrap{position:relative;display:inline-block;width:72px;height:54px;border-radius:8px;overflow:hidden;cursor:pointer;border:3px solid transparent;transition:border-color .15s;flex-shrink:0;}
+          .cn-img-thumb-wrap.selected{border-color:#0891b2;box-shadow:0 0 0 2px #0891b2;}
+          .cn-img-thumb-wrap .cn-check{display:none;position:absolute;top:3px;right:3px;background:#0891b2;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:18px;text-align:center;font-weight:700;}
+          .cn-img-thumb-wrap.selected .cn-check{display:block;}
+          .cn-img-thumb{width:100%;height:100%;object-fit:cover;display:block;}
+          .cn-right-item{padding:10px 0;border-bottom:1px solid #e2e8f0;}
+          .cn-right-item:last-child{border-bottom:none;}
+          .cn-right-title{font-size:.8rem;font-weight:700;color:#0f172a;line-height:1.3;margin-bottom:4px;}
+          .cn-right-meta{font-size:.7rem;color:#94a3b8;}
+          .cn-crawl-status{font-size:.72rem;padding:3px 10px;border-radius:999px;background:#e0f2fe;color:#0369a1;font-weight:600;}
+          .cn-crawl-status.done{background:#dcfce7;color:#15803d;}
+          .cn-crawl-status.error{background:#fee2e2;color:#b91c1c;}
+        </style>
+
+        <div class="cn-wrap" style="flex:1;height:calc(100vh - 64px);">
+          <!-- 메인 영역 -->
+          <div class="cn-center">
+            <div class="cn-topbar">
+              <h3 style="font-size:1.05rem;font-weight:800;color:#0f172a;">📰 카드뉴스 제작</h3>
+              <span id="cn-status-text" style="font-size:.78rem;color:#94a3b8;"></span>
+              <button onclick="cnLoadCandidates()" class="btn btn-secondary text-xs" style="margin-left:auto;">🔄 후보 새로고침</button>
+              <button onclick="cnCrawlAll()" id="cn-crawl-all-btn" class="cn-btn cn-btn-save text-xs">⚡ 전체 크롤링 (학교별 2개)</button>
+              <button onclick="cnResetAll()" class="cn-btn" style="background:#fee2e2;color:#b91c1c;font-size:.75rem;">🗑 전체 초기화</button>
+            </div>
+
+            <div id="cn-cards-wrap">
+              <div style="text-align:center;padding:40px;color:#94a3b8;font-size:.9rem;">후보를 불러오는 중...</div>
+            </div>
+          </div>
+
+          <!-- 우측: 배포 리스트 -->
+          <div class="cn-right">
+            <div style="font-size:.82rem;font-weight:800;color:#0f172a;margin-bottom:12px;">📤 배포중인 카드뉴스</div>
+            <div id="cn-published-list">
+              <div style="font-size:.78rem;color:#94a3b8;">불러오는 중...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       </main>
     </div><!-- /main-content -->
   </div><!-- /main-app -->
@@ -2309,15 +2385,14 @@
       consult:'신청 관리', student:'학생접수', news:'대학소식', programs:'대학활동',
       jobs:'채용공고', staffjobs:'직원채용공고', cnews:'기업소식', shorts:'유튜브쇼츠', stats:'통계',
       tracking:'추적', blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고', crawler:'대학활동 수집', alio:'채용AI DATA',
-      comments:'댓글 관리'
+      comments:'댓글 관리', cardnews:'카드뉴스 제작'
     };
 
     function switchTab(tab) {
-      ['consult', 'student', 'news', 'programs', 'jobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'tracking', 'blog', 'calendar', 'popupads', 'crawler', 'alio', 'comments'].forEach(t => {
+      ['consult', 'student', 'news', 'programs', 'jobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'tracking', 'blog', 'calendar', 'popupads', 'crawler', 'alio', 'comments', 'cardnews'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
-        if (t === tab) btn.classList.add('active');
-        else           btn.classList.remove('active');
+        if (btn) { if (t === tab) btn.classList.add('active'); else btn.classList.remove('active'); }
       });
       // 상단 바 타이틀 업데이트
       const titleEl = document.getElementById('topbar-title');
@@ -2339,6 +2414,7 @@
       if (tab === 'calendar') loadCalendarAdmin();
       if (tab === 'popupads') loadPopupAds();
       if (tab === 'crawler') { loadUnivSites(); restoreDetectResults(); }
+      if (tab === 'cardnews') cnInit();
       if (tab === 'alio') loadAlioData();
       if (tab === 'comments') loadAdminComments();
     }
@@ -6895,6 +6971,407 @@ ${d.hashtags}`;
         <table class="trk-mini-tbl"><thead><tr><th>유입 채널</th><th>착지 페이지</th><th class="num">건수</th></tr></thead>
         <tbody>${sorted.map(([key,cnt])=>{const [src,page]=key.split('|||');return `<tr><td><span class="trk-chip ext" style="font-size:.64rem;">${src}</span></td><td><span class="trk-chip">${page}</span></td><td class="num">${cnt}</td></tr>`;}).join('')}</tbody></table>`;
     }
+  </script>
+
+  <script>
+  /* ══════════════════════════════════════════════
+     카드뉴스 제작 탭 (section-cardnews)
+  ══════════════════════════════════════════════ */
+  function escHtml(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  const CN_SERVER = 'http://127.0.0.1:8765';
+  let cnCandidates = [];   // school_programs rows (크롤링 대상)
+  let cnCards = {};        // { id: { ...cardData } } — 크롤된 카드 데이터
+  let cnEditOpen = null;   // 현재 수정 중인 카드 id
+
+  async function cnInit() {
+    cnLoadCandidates();
+    cnLoadPublished();
+  }
+
+  /* 후보 목록 로드 (school_programs, is_deleted=false, 최신 200개) */
+  async function cnLoadCandidates() {
+    document.getElementById('cn-status-text').textContent = '후보 로딩 중…';
+    document.getElementById('cn-cards-wrap').innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;">불러오는 중...</div>';
+    const since14 = new Date(Date.now() - 14 * 86400 * 1000).toISOString();
+    const { data, error } = await db.from('school_programs')
+      .select('id, school_name, title, link, created_at')
+      .eq('is_deleted', false)
+      .not('link', 'is', null)
+      .gte('created_at', since14)
+      .order('created_at', { ascending: false })
+      .limit(200);
+    if (error) { document.getElementById('cn-status-text').textContent = '오류: ' + error.message; return; }
+
+    // card_news 테이블에서 크롤된/제외된 항목 로드
+    const { data: existing } = await db.from('card_news').select('school_program_id, id, status, title, subtitle, content, article_date, view_count, images, selected_image');
+    const existingMap = {};
+    (existing || []).forEach(r => { existingMap[r.school_program_id] = r; });
+
+    // 학교별 2개 제한 + 중복 제목 제거 + excluded 항목 제외
+    const excluded = cnGetExcluded().map(String);
+    const schoolCount = {};
+    const seenTitles = new Set();
+    const filtered = [];
+    for (const r of (data || [])) {
+      const ex = existingMap[r.id];
+      if (excluded.includes(String(r.id))) continue;   // localStorage 제외 목록
+      if (ex?.status === 'excluded') continue;          // DB excluded 항목 제외
+      const school = r.school_name || '';
+      const titleKey = (r.title || '').trim().replace(/\s+/g, '');
+      if (seenTitles.has(titleKey)) continue;
+      if ((schoolCount[school] || 0) >= 2) continue;
+      schoolCount[school] = (schoolCount[school] || 0) + 1;
+      seenTitles.add(titleKey);
+      filtered.push({ ...r, _existing: ex || null });
+    }
+    cnCandidates = filtered;
+    document.getElementById('cn-status-text').textContent = `후보 ${cnCandidates.length}개 (학교별 최대 2개)`;
+    cnRenderCards();
+  }
+
+  /* 카드 HTML 렌더링 */
+  function cnRenderCards() {
+    const wrap = document.getElementById('cn-cards-wrap');
+    if (!cnCandidates.length) { wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;">수집된 대학활동 데이터가 없습니다.</div>'; return; }
+
+    // 정렬: ① 조회수 높은 순 (null이면 후순위) → ② 최신 수집순
+    const sorted = [...cnCandidates].sort((a, b) => {
+      const aVC = a._existing?.view_count ?? null;
+      const bVC = b._existing?.view_count ?? null;
+      if (aVC !== null && bVC !== null) return bVC - aVC;
+      if (aVC !== null) return -1;
+      if (bVC !== null) return 1;
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+
+    wrap.innerHTML = sorted.map(row => cnCardHTML(row)).join('');
+  }
+
+  function cnCardHTML(row) {
+    const ex = row._existing;
+    const card = cnCards[row.id] || null;
+    const data = ex || card;
+    const statusBadge = ex
+      ? `<span class="cn-status ${ex.status === 'published' ? 'cn-status-published' : 'cn-status-draft'}">${ex.status === 'published' ? '배포중' : '임시저장'}</span>`
+      : `<span class="cn-status" style="background:#f1f5f9;color:#94a3b8;">미수집</span>`;
+
+    const imgHtml = data?.selected_image
+      ? `<img class="cn-card-img" src="${escHtml(data.selected_image)}" onerror="this.style.display='none'" />`
+      : (Array.isArray(data?.images) && data.images.length
+        ? `<img class="cn-card-img" src="${escHtml(data.images[0])}" onerror="this.style.display='none'" />`
+        : `<div class="cn-card-img-empty">📰</div>`);
+
+    const viewBadge = data?.view_count != null
+      ? `<span style="background:#e0f2fe;color:#0369a1;font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:999px;">👁 조회수 ${Number(data.view_count).toLocaleString()}</span>`
+      : '';
+
+    return `
+    <div class="cn-card" id="cn-card-${row.id}">
+      ${imgHtml}
+      <div class="cn-card-body">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">${statusBadge}${viewBadge}</div>
+        <div class="cn-card-school">${escHtml(row.school_name || '')}</div>
+        <div class="cn-card-title">${escHtml((data?.title || row.title || '').slice(0, 60))}</div>
+        ${data?.subtitle ? `<div class="cn-card-subtitle">${escHtml(data.subtitle.slice(0, 80))}</div>` : ''}
+        ${data?.content ? `<div class="cn-card-content">${escHtml(data.content)}</div>` : ''}
+        <div class="cn-card-meta">
+          <span>📅 ${data?.article_date || row.created_at?.slice(0, 10) || ''}</span>
+          ${row.link ? `<a href="${escHtml(row.link)}" target="_blank" style="color:#0891b2;text-decoration:none;font-size:.7rem;">원문 →</a>` : ''}
+        </div>
+        <div class="cn-card-actions">
+          <button class="cn-btn cn-btn-save" onclick="cnCrawlOne('${row.id}','${escHtml(row.link || '')}')">⚡ ${ex ? '재크롤링' : '크롤링'}</button>
+          <button class="cn-btn" style="background:#fee2e2;color:#b91c1c;" onclick="cnDeleteCard('${row.id}')">🗑 삭제</button>
+          ${data ? `<button class="cn-btn cn-btn-edit" onclick="cnToggleEdit('${row.id}')">✏️ 수정</button>` : ''}
+          ${ex ? `<button class="cn-btn cn-btn-save" onclick="cnSave('${row.id}')">💾 저장</button>` : ''}
+          ${ex ? `<a href="${escHtml(row.link || '#')}" target="_blank" class="cn-btn cn-btn-preview" style="text-decoration:none;">🔍 보기</a>` : ''}
+          ${ex && ex.status !== 'published' ? `<button class="cn-btn cn-btn-publish" onclick="cnPublish('${row.id}','${ex?.id}')">📤 배포</button>` : ''}
+          ${ex && ex.status === 'published' ? `<button class="cn-btn cn-btn-unpublish" onclick="cnUnpublish('${ex?.id}')">⏹ 배포중단</button>` : ''}
+        </div>
+        <div id="cn-edit-${row.id}" style="display:none;">
+          ${cnEditPanelHTML(row, data)}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function cnEditPanelHTML(row, data) {
+    const images = Array.isArray(data?.images) ? data.images : [];
+    const imgThumbs = images.map((src, i) => {
+      const isSel = (data?.selected_image === src) || (!data?.selected_image && i === 0);
+      return `<div class="cn-img-thumb-wrap ${isSel ? 'selected' : ''}" onclick="cnSelectImg('${row.id}','${escHtml(src)}')"><img class="cn-img-thumb" src="${escHtml(src)}" onerror="this.closest('.cn-img-thumb-wrap').style.display='none'" /><span class="cn-check">✓</span></div>`;
+    }).join('');
+    return `
+    <div class="cn-edit-panel">
+      <label>사진 선택 (최대 3개)</label>
+      <div class="cn-img-row">${imgThumbs || '<span style="font-size:.75rem;color:#94a3b8;">수집된 이미지 없음</span>'}
+        <label style="width:72px;height:54px;border:2px dashed #cbd5e1;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.2rem;color:#94a3b8;margin:0;">
+          +<input type="file" accept="image/*" style="display:none;" onchange="cnUploadImg('${row.id}', this)"/>
+        </label>
+      </div>
+      <label>제목</label>
+      <input id="cn-inp-title-${row.id}" type="text" value="${escHtml(data?.title || row.title || '')}" />
+      <label>부제목</label>
+      <input id="cn-inp-subtitle-${row.id}" type="text" value="${escHtml(data?.subtitle || '')}" />
+      <label>내용 (100자)</label>
+      <textarea id="cn-inp-content-${row.id}" rows="3" maxlength="100">${escHtml(data?.content || '')}</textarea>
+      <label>날짜</label>
+      <input id="cn-inp-date-${row.id}" type="text" value="${escHtml(data?.article_date || '')}" placeholder="YYYY-MM-DD" />
+      <label>대학명</label>
+      <input id="cn-inp-school-${row.id}" type="text" value="${escHtml(data?.school_name || row.school_name || '')}" />
+    </div>`;
+  }
+
+  function cnToggleEdit(id) {
+    const el = document.getElementById(`cn-edit-${id}`);
+    if (!el) return;
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function cnSelectImg(rowId, src) {
+    const row = cnCandidates.find(r => String(r.id) === String(rowId));
+    if (!row) return;
+    if (!cnCards[rowId]) cnCards[rowId] = {};
+    cnCards[rowId].selected_image = src;
+    // 썸네일 하이라이트
+    document.querySelectorAll(`#cn-edit-${rowId} .cn-img-thumb-wrap`).forEach(el => {
+      const img = el.querySelector('img');
+      const elSrc = img ? (img.getAttribute('src') || '') : '';
+      el.classList.toggle('selected', elSrc === src);
+    });
+    // 카드 상단 메인 이미지 실시간 업데이트
+    const cardEl = document.getElementById(`cn-card-${rowId}`);
+    if (cardEl) {
+      let imgEl = cardEl.querySelector('.cn-card-img');
+      if (imgEl) {
+        imgEl.src = src;
+        imgEl.style.display = 'block';
+      } else {
+        const emptyEl = cardEl.querySelector('.cn-card-img-empty');
+        if (emptyEl) {
+          emptyEl.outerHTML = `<img class="cn-card-img" src="${escHtml(src)}" style="width:100%;height:180px;object-fit:cover;border-radius:8px 8px 0 0;" />`;
+        }
+      }
+    }
+  }
+
+  async function cnUploadImg(rowId, input) {
+    const file = input.files[0];
+    if (!file) return;
+    const ext = file.name.split('.').pop().replace(/[^a-zA-Z0-9]/g, '') || 'jpg';
+    const safeName = `${rowId}_${Date.now()}.${ext}`;
+    const path = `cardnews/${safeName}`;
+    const { error } = await db.storage.from('logo').upload(path, file, { upsert: true });
+    if (error) { alert('업로드 실패: ' + error.message); return; }
+    const { data: urlData } = db.storage.from('logo').getPublicUrl(path);
+    const src = urlData.publicUrl;
+    if (!cnCards[rowId]) cnCards[rowId] = {};
+    if (!Array.isArray(cnCards[rowId].images)) cnCards[rowId].images = [];
+    cnCards[rowId].images.push(src);
+    cnCards[rowId].selected_image = src;
+    // 패널 새로고침
+    const row = cnCandidates.find(r => String(r.id) === String(rowId));
+    if (row) {
+      const editEl = document.getElementById(`cn-edit-${rowId}`);
+      if (editEl) editEl.innerHTML = cnEditPanelHTML(row, cnCards[rowId]);
+    }
+  }
+
+  /* 단건 크롤링 */
+  async function cnCrawlOne(rowId, url) {
+    if (!url) { alert('링크가 없는 항목입니다.'); return; }
+    const btn = document.querySelector(`#cn-card-${rowId} .cn-btn-save`);
+    if (btn) { btn.disabled = true; btn.textContent = '크롤링 중…'; }
+
+    try {
+      const res = await fetch(`${CN_SERVER}/crawl`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      const json = await res.json();
+      if (json.status !== 'ok') throw new Error(json.message || '크롤링 실패');
+
+      const row = cnCandidates.find(r => String(r.id) === String(rowId));
+      cnCards[rowId] = {
+        title: json.title || row?.title || '',
+        subtitle: json.subtitle || '',
+        content: json.content || '',
+        article_date: json.date || '',
+        school_name: row?.school_name || '',
+        images: json.images || [],
+        selected_image: json.images?.[0] || null,
+        view_count: json.view_count,
+        original_url: url,
+        school_program_id: rowId,
+      };
+
+      // card_news 테이블에 upsert (조회수 없어도 저장, 정렬 시 후순위)
+      {
+        const payload = {
+          school_program_id: rowId,
+          school_name: cnCards[rowId].school_name,
+          original_url: url,
+          title: cnCards[rowId].title,
+          subtitle: cnCards[rowId].subtitle,
+          content: cnCards[rowId].content,
+          article_date: cnCards[rowId].article_date,
+          images: cnCards[rowId].images,
+          selected_image: cnCards[rowId].selected_image,
+          view_count: json.view_count,
+          // 이미 배포 중이면 상태 유지, 신규 크롤이면 draft
+          status: (cnCandidates.find(r => String(r.id) === String(rowId))?._existing?.status === 'published') ? 'published' : 'draft',
+        };
+        const { error: upsertErr } = await db.from('card_news').upsert([payload], { onConflict: 'school_program_id' });
+        if (upsertErr) console.error('upsert 오류', upsertErr);
+      }
+
+      // 후보 목록 갱신 후 재렌더링
+      await cnLoadCandidates();
+    } catch (e) {
+      alert('크롤링 오류: ' + e.message);
+      if (btn) { btn.disabled = false; btn.textContent = '⚡ 크롤링'; }
+    }
+  }
+
+  /* 전체 크롤링 (view_count 있는 상위 20개) */
+  async function cnCrawlAll() {
+    const btn = document.getElementById('cn-crawl-all-btn');
+    btn.disabled = true; btn.textContent = '크롤링 중…';
+
+    // 배포 중인 항목 카운트 (건드리지 않음)
+    const publishedCount = cnCandidates.filter(r => r._existing?.status === 'published').length;
+
+    // 미크롤링 항목만, 학교별 2개 이내, 최대 20개
+    const crawledPerSchool = {};
+    cnCandidates.filter(r => r._existing).forEach(r => {
+      crawledPerSchool[r.school_name] = (crawledPerSchool[r.school_name] || 0) + 1;
+    });
+    const targets = cnCandidates.filter(r => {
+      if (r._existing || !r.link) return false;       // 이미 크롤된 항목(배포 포함) 제외
+      return (crawledPerSchool[r.school_name] || 0) < 2;
+    }).slice(0, 20);
+
+    if (!targets.length) {
+      document.getElementById('cn-status-text').textContent =
+        `신규 크롤 대상 없음 (배포 중 ${publishedCount}개 유지)`;
+      btn.disabled = false; btn.textContent = '⚡ 전체 크롤링 (학교별 2개)';
+      return;
+    }
+
+    let done = 0;
+    for (const row of targets) {
+      document.getElementById('cn-status-text').textContent =
+        `크롤링 중… (${++done}/${targets.length}) | 배포 중 ${publishedCount}개 유지`;
+      await cnCrawlOne(row.id, row.link);
+      await new Promise(r => setTimeout(r, 800));
+    }
+
+    btn.disabled = false; btn.textContent = '⚡ 전체 크롤링 (학교별 2개)';
+    document.getElementById('cn-status-text').textContent =
+      `완료! 신규 ${done}개 크롤링 | 배포 중 ${publishedCount}개 유지`;
+    await cnLoadCandidates();
+  }
+
+  /* 저장 */
+  async function cnSave(rowId) {
+    const ex = cnCandidates.find(r => String(r.id) === String(rowId))?._existing;
+    if (!ex?.id) { alert('먼저 크롤링하세요.'); return; }
+
+    const payload = {
+      title:        document.getElementById(`cn-inp-title-${rowId}`)?.value || ex.title,
+      subtitle:     document.getElementById(`cn-inp-subtitle-${rowId}`)?.value || '',
+      content:      document.getElementById(`cn-inp-content-${rowId}`)?.value || '',
+      article_date: document.getElementById(`cn-inp-date-${rowId}`)?.value || '',
+      school_name:  document.getElementById(`cn-inp-school-${rowId}`)?.value || '',
+      selected_image: cnCards[rowId]?.selected_image || null,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = await db.from('card_news').update(payload).eq('id', ex.id);
+    if (error) { alert('저장 실패: ' + error.message); return; }
+    alert('저장되었습니다.');
+    await cnLoadCandidates();
+  }
+
+  /* 배포 */
+  async function cnPublish(rowId, cnId) {
+    if (!cnId) return;
+    const { error } = await db.from('card_news').update({ status: 'published', published_at: new Date().toISOString() }).eq('id', cnId);
+    if (error) { alert('배포 실패: ' + error.message); return; }
+    alert('배포되었습니다! university-board.html 하단에 표시됩니다.');
+    await cnLoadCandidates();
+    await cnLoadPublished();
+  }
+
+  /* 전체 초기화 */
+  async function cnResetAll() {
+    if (!confirm('card_news 전체 데이터와 제외 목록을 초기화할까요?')) return;
+    localStorage.removeItem('cn_excluded');
+    await db.from('card_news').delete().neq('id', 0);
+    cnCandidates = [];
+    cnCards = {};
+    await cnInit();
+  }
+
+  /* 제외 목록 — localStorage 기반 (DB 타입 무관) */
+  function cnGetExcluded() {
+    try { return JSON.parse(localStorage.getItem('cn_excluded') || '[]'); } catch { return []; }
+  }
+  function cnAddExcluded(rowId) {
+    const list = cnGetExcluded();
+    if (!list.includes(String(rowId))) list.push(String(rowId));
+    localStorage.setItem('cn_excluded', JSON.stringify(list));
+  }
+
+  /* 삭제 — localStorage에 제외 등록 + 크롤된 항목은 DB status 업데이트 */
+  async function cnDeleteCard(rowId) {
+    if (!confirm('이 카드뉴스를 삭제할까요?\n(동일 게시글은 다시 수집되지 않습니다)')) return;
+    try {
+      cnAddExcluded(rowId);
+      const row = cnCandidates.find(r => String(r.id) === String(rowId));
+      if (row?._existing) {
+        const { error } = await db.from('card_news')
+          .update({ status: 'excluded' })
+          .eq('original_url', row.link || '');
+        if (error) console.warn('DB excluded 처리 오류 (무시):', error.message);
+      }
+      cnCandidates = cnCandidates.filter(r => String(r.id) !== String(rowId));
+      cnRenderCards();
+      cnLoadPublished();
+    } catch(e) {
+      alert('삭제 오류: ' + e.message);
+    }
+  }
+
+  /* 배포 중단 */
+  async function cnUnpublish(cnId) {
+    if (!cnId || !confirm('배포를 중단할까요?')) return;
+    const { error } = await db.from('card_news').update({ status: 'draft' }).eq('id', cnId);
+    if (error) { alert('오류: ' + error.message); return; }
+    await cnLoadCandidates();
+    await cnLoadPublished();
+  }
+
+  /* 우측 배포 리스트 */
+  async function cnLoadPublished() {
+    const { data, error } = await db.from('card_news').select('*').eq('status', 'published').order('published_at', { ascending: false });
+    const el = document.getElementById('cn-published-list');
+    if (error || !data?.length) { el.innerHTML = '<div style="font-size:.78rem;color:#94a3b8;">배포중인 카드뉴스 없음</div>'; return; }
+    el.innerHTML = data.map(r => `
+      <div class="cn-right-item">
+        ${r.selected_image ? `<img src="${escHtml(r.selected_image)}" style="width:100%;height:80px;object-fit:cover;border-radius:8px;margin-bottom:6px;" />` : ''}
+        <div class="cn-right-title">${escHtml((r.title || '').slice(0, 35))}</div>
+        <div class="cn-right-meta">${escHtml(r.school_name || '')} · ${r.article_date || r.published_at?.slice(0,10) || ''}</div>
+        <button onclick="cnUnpublish('${r.id}')" class="cn-btn cn-btn-unpublish" style="margin-top:6px;font-size:.68rem;padding:4px 10px;">⏹ 배포중단</button>
+      </div>`).join('');
+  }
+
+  /* section-cardnews display fix */
+  const _origSwitchTab = window.switchTab;
+  if (typeof switchTab === 'function') {
+    // switchTab already defined above; cardnews display handled via class toggling
+  }
   </script>
 </body>
 </html>

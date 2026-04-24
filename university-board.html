@@ -333,6 +333,17 @@
               무료 진단 신청하기 →
             </a>
           </div>
+
+          <!-- ══ 카드뉴스 섹션 ══ -->
+          <div id="cardnews-section" style="display:none;margin-top:28px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+              <div style="width:4px;height:24px;background:linear-gradient(180deg,#60A5FA,#0891B2);border-radius:2px;flex-shrink:0;"></div>
+              <span style="font-size:1rem;font-weight:800;color:#fff;">📰 대학 카드뉴스</span>
+              <span id="cardnews-count" style="font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:999px;background:rgba(96,165,250,.18);color:#60A5FA;"></span>
+            </div>
+            <div id="cardnews-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;"></div>
+          </div>
+
         </div>
 
       </div>
@@ -867,6 +878,51 @@
     if (navigator.share) { navigator.share({title:title,url:url}).catch(function(){}); return; }
     navigator.clipboard.writeText(url).catch(function(){});
   };
+})();
+</script>
+
+<script>
+(function(){
+  const SB_URL = 'https://byzulmxcuhsrjdphmuym.supabase.co';
+  const SB_KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
+
+  fetch(SB_URL + '/rest/v1/card_news?status=eq.published&order=published_at.desc', {
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(rows){
+    if (!rows || !rows.length) return;
+    var section = document.getElementById('cardnews-section');
+    var grid    = document.getElementById('cardnews-grid');
+    var countEl = document.getElementById('cardnews-count');
+    section.style.display = 'block';
+    countEl.textContent   = rows.length + '개';
+
+    grid.innerHTML = rows.map(function(r){
+      var imgs = [];
+      try { imgs = Array.isArray(r.images) ? r.images : JSON.parse(r.images || '[]'); } catch(e){}
+      var imgSrc = r.selected_image || (imgs[0] || '');
+      var imgHtml = imgSrc
+        ? '<img src="' + imgSrc + '" style="width:100%;height:180px;object-fit:cover;display:block;" onerror="this.style.display=\'none\'" />'
+        : '<div style="width:100%;height:180px;background:linear-gradient(135deg,#1e3a8a,#0891b2);display:flex;align-items:center;justify-content:center;font-size:2.5rem;">📰</div>';
+      var date = r.article_date || (r.published_at ? r.published_at.slice(0,10) : '');
+      var vc   = r.view_count != null ? '<span style="font-size:.68rem;color:#60a5fa;">👁 ' + Number(r.view_count).toLocaleString() + '</span>' : '';
+      return '<div style="background:#0D1F3C;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.08);transition:box-shadow .2s;" onmouseover="this.style.boxShadow=\'0 8px 32px rgba(0,0,0,.4)\'" onmouseout="this.style.boxShadow=\'none\'">'
+        + imgHtml
+        + '<div style="padding:16px;">'
+        + '<div style="font-size:.68rem;font-weight:700;color:#0891b2;letter-spacing:.06em;margin-bottom:6px;">' + (r.school_name || '') + '</div>'
+        + '<div style="font-size:.95rem;font-weight:800;color:#e2e8f0;line-height:1.4;margin-bottom:6px;">' + (r.title || '').slice(0,50) + '</div>'
+        + (r.subtitle ? '<div style="font-size:.78rem;color:#94a3b8;margin-bottom:8px;line-height:1.5;">' + r.subtitle.slice(0,60) + '</div>' : '')
+        + (r.content  ? '<div style="font-size:.75rem;color:#64748b;line-height:1.6;border-left:2px solid #1e3a8a;padding-left:10px;margin-bottom:10px;">' + r.content + '</div>' : '')
+        + '<div style="display:flex;align-items:center;justify-content:space-between;font-size:.7rem;color:#475569;">'
+        + '<span>' + date + '</span>' + vc
+        + '</div>'
+        + (r.original_url ? '<a href="' + r.original_url + '" target="_blank" style="display:block;margin-top:12px;text-align:center;padding:8px;border-radius:8px;background:rgba(96,165,250,.12);color:#60a5fa;font-size:.75rem;font-weight:700;text-decoration:none;">원문 보기 →</a>' : '')
+        + '</div>'
+        + '</div>';
+    }).join('');
+  })
+  .catch(function(e){ console.error('cardnews load error', e); });
 })();
 </script>
 
