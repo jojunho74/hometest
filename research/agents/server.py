@@ -139,6 +139,29 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
                 self.wfile.write(json.dumps({'error': str(e)}).encode())
+        elif self.path.startswith('/proxy-img?url='):
+            import urllib.parse, urllib.request
+            try:
+                target_url = urllib.parse.unquote(self.path[len('/proxy-img?url='):])
+                req = urllib.request.Request(target_url, headers={
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    'Accept': 'image/*,*/*;q=0.8',
+                    'Referer': target_url,
+                })
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    content_type = resp.headers.get('Content-Type', 'image/jpeg')
+                    data = resp.read()
+                self.send_response(200)
+                self.send_header('Content-Type', content_type)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(data)
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps({'error': str(e)}).encode())
         else:
             self.send_response(404)
             self.end_headers()
