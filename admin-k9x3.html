@@ -1309,6 +1309,9 @@
           .trk-pb{padding:4px 11px;border-radius:7px;font-size:.7rem;font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);transition:all .15s;}
           .trk-pb.on{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.6);color:#fff;}
           .trk-pb:hover:not(.on){background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);}
+          .dwell-pb{padding:3px 9px;border-radius:6px;font-size:.68rem;font-weight:700;cursor:pointer;border:1.5px solid #e2e8f0;background:#f8fafc;color:#94a3b8;transition:all .15s;}
+          .dwell-pb.on{background:#7C3AED;border-color:#7C3AED;color:#fff;}
+          .dwell-pb:hover:not(.on){background:#f1f5f9;color:#64748b;border-color:#cbd5e1;}
           #trk-status{font-size:.68rem;color:rgba(255,255,255,.35);}
           .trk-kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px;}
           .trk-kpi{background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.05);}
@@ -1424,7 +1427,16 @@
           <div class="trk-sec-head"><div class="trk-sec-bar" style="background:#7C3AED;"></div><div class="trk-sec-title">⑥ 페이지별 체류시간</div><div class="trk-sec-hint">방문자가 각 페이지에서 머문 평균 시간</div></div>
           <div class="trk-grid2">
             <div class="trk-card" style="grid-column:1/-1;">
-              <div class="trk-card-title">⏱ 페이지별 평균 체류시간</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <div class="trk-card-title" style="margin-bottom:0;">⏱ 페이지별 평균 체류시간</div>
+                <div style="display:flex;gap:4px;">
+                  <button class="dwell-pb" onclick="trkSetDwellPeriod('today')">오늘</button>
+                  <button class="dwell-pb" onclick="trkSetDwellPeriod('yesterday')">어제</button>
+                  <button class="dwell-pb" onclick="trkSetDwellPeriod('week')">주간</button>
+                  <button class="dwell-pb" onclick="trkSetDwellPeriod('month')">월간</button>
+                  <button class="dwell-pb on" onclick="trkSetDwellPeriod('all')">전체</button>
+                </div>
+              </div>
               <div id="trk-dwell-table"><div class="trk-loading"><div class="trk-spin"></div> 집계 중…</div></div>
             </div>
           </div>
@@ -6744,7 +6756,7 @@ ${d.hashtags}`;
       'competition.html':'경쟁률','university-board.html':'대학활동','job-board.html':'게시판','library.html':'홍보자료'
     };
     const TRK_DAYS = ['일','월','화','수','목','금','토'];
-    let trkRows = [], trkPeriod = 'month', trkLoaded = false;
+    let trkRows = [], trkPeriod = 'month', trkDwellPeriod = 'all', trkLoaded = false;
     let trkRefChart = null, trkHourChart = null, trkDayChart = null;
 
     function trkSetPeriod(p) {
@@ -6752,6 +6764,14 @@ ${d.hashtags}`;
       document.querySelectorAll('.trk-pb').forEach(el =>
         el.classList.toggle('on', el.textContent.trim() === {today:'오늘',yesterday:'어제',week:'7일',month:'30일',all:'전체'}[p]));
       trkRender(trkFilterRows(trkRows, p));
+    }
+
+    function trkSetDwellPeriod(p) {
+      trkDwellPeriod = p;
+      const label = {today:'오늘',yesterday:'어제',week:'주간',month:'월간',all:'전체'};
+      document.querySelectorAll('.dwell-pb').forEach(el =>
+        el.classList.toggle('on', el.textContent.trim() === label[p]));
+      trkRenderDwell(trkFilterRows(trkRows, p));
     }
 
     function trkFilterRows(rows, period) {
