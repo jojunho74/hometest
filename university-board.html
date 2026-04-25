@@ -204,6 +204,16 @@
     .ub-popup-skip{display:block;text-align:center;font-size:11px;color:#94A3B8;margin-top:14px;cursor:pointer;background:none;border:none;width:100%;padding:4px;}
     .ub-popup-skip:hover{color:#64748B;}
     @media(max-width:480px){.ub-popup-head{padding:20px 16px 16px;}.ub-popup-body{padding:18px 16px 16px;}.ub-star{font-size:2.2rem;}}
+    @keyframes scoreShimmer{
+      0%  {background-position:100% center;box-shadow:0 0 10px rgba(251,191,36,.5);}
+      50% {box-shadow:0 0 28px rgba(251,191,36,1);}
+      100%{background-position:-100% center;box-shadow:0 0 10px rgba(251,191,36,.5);}
+    }
+    .score-btn{
+      background:linear-gradient(90deg,#92400e,#f59e0b,#fde68a,#f59e0b,#92400e)!important;
+      background-size:300% 100%!important;
+      animation:scoreShimmer 2s linear infinite!important;
+    }
   </style>
 </head>
 <body>
@@ -253,7 +263,7 @@
       <a href="library-pdf.html"      style="display:inline-flex;align-items:center;padding:7px 18px;border-radius:50px;font-size:.82rem;font-weight:700;white-space:nowrap;text-decoration:none;background:#16A34A;color:#fff;transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">채용공고 자료실 →</a>
       <a href="university-board.html" style="display:inline-flex;align-items:center;padding:7px 18px;border-radius:50px;font-size:.82rem;font-weight:700;white-space:nowrap;text-decoration:none;background:#D97706;color:#fff;box-shadow:0 0 0 2px #fff;transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">대학소식 →</a>
       <a href="competition.html"      style="display:inline-flex;align-items:center;padding:7px 18px;border-radius:50px;font-size:.82rem;font-weight:700;white-space:nowrap;text-decoration:none;background:#DC2626;color:#fff;transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">경쟁률 →</a>
-      <a href="https://ibtcc.kr/gtelp-score.html" style="display:inline-flex;align-items:center;padding:7px 18px;border-radius:50px;font-size:.82rem;font-weight:700;white-space:nowrap;text-decoration:none;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;box-shadow:0 2px 12px rgba(245,158,11,.5);transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">TOEIC·GTELP 점수대비표 →</a>
+      <a href="https://ibtcc.kr/gtelp-score.html" class="score-btn" style="display:inline-flex;align-items:center;padding:7px 18px;border-radius:50px;font-size:.82rem;font-weight:700;white-space:nowrap;text-decoration:none;color:#fff;transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">TOEIC·GTELP 점수대비표 →</a>
     </div>
   </div>
 </div>
