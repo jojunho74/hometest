@@ -37,17 +37,16 @@
     .search-clear{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;background:var(--sub);color:#fff;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;}
 
     /* ── KPI 카드 행 ── */
-    .kpi-scroll{overflow-x:auto;scrollbar-width:none;padding:14px 16px 2px;}
-    .kpi-scroll::-webkit-scrollbar{display:none;}
-    .kpi-row{display:flex;gap:8px;min-width:max-content;}
-    .kpi-card{background:var(--white);border-radius:14px;padding:14px 16px;min-width:130px;flex-shrink:0;}
-    .kpi-label{font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px;letter-spacing:.03em;}
-    .kpi-val{font-size:22px;font-weight:800;letter-spacing:-.5px;}
+    .kpi-scroll{padding:10px 12px 2px;}
+    .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
+    .kpi-card{background:var(--white);border-radius:10px;padding:9px 6px;min-width:0;overflow:hidden;}
+    .kpi-label{font-size:9px;font-weight:700;color:var(--sub);margin-bottom:4px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .kpi-val{font-size:13px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .kpi-val.blue{color:var(--blue);}
     .kpi-val.red{color:var(--red);}
     .kpi-val.green{color:var(--green);}
     .kpi-val.gold{color:var(--gold);}
-    .kpi-sub{font-size:11px;color:var(--sub);margin-top:3px;}
+    .kpi-sub{font-size:9px;color:var(--sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
     /* ── 섹션 헤더 ── */
     .sec-hdr{padding:16px 16px 8px;display:flex;align-items:center;justify-content:space-between;}
