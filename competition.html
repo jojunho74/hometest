@@ -1184,6 +1184,10 @@ function renderVisualization(dsName, rows) {
             IBT 시험추천
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
+          <button class="cp-kakao" style="width:100%;margin-top:0;" onclick="ibtShareKakao()">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
+            카카오톡 공유
+          </button>
         </div>
       </div>
 
@@ -1533,6 +1537,27 @@ async function submitQuickApply() {
   document.getElementById('qmContent').style.display = 'none';
   document.getElementById('qmSuccess').style.display = 'block';
   setTimeout(() => document.getElementById('quickOverlay').classList.remove('open'), 3000);
+}
+
+function ibtShareKakao() {
+  const url = 'https://ibtcc.kr/competition.html';
+  if (window.Kakao && Kakao.isInitialized()) {
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '우리대학 IBT신청 PUSH',
+        description: '지텔프IBT 시험 도입을 신청해보세요!',
+        imageUrl: 'https://ibtcc.kr/partner-logos.png',
+        link: { mobileWebUrl: url, webUrl: url }
+      },
+      buttons: [{ title: '신청하러 가기', link: { mobileWebUrl: url, webUrl: url } }]
+    });
+  } else {
+    const text = encodeURIComponent('우리대학 IBT신청 PUSH — ' + url);
+    const ta = document.createElement('textarea');
+    ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    alert('링크가 복사됐습니다!\n카카오톡을 열어 친구에게 붙여넣기 해주세요 😊');
+  }
 }
 
 async function ibtRecommend() {
