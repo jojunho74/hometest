@@ -6868,17 +6868,26 @@ ${d.hashtags}`;
       return rows;
     }
 
+    let trkTotalCount = null; // 전체 방문수 (COUNT)
+
     async function trkInit() {
       if (trkLoaded) return;
       trkLoaded = true;
       document.getElementById('trk-status').textContent = '불러오는 중…';
+
+      // 전체 건수 COUNT (Supabase 행수 제한 우회)
+      const { count } = await db.from('page_views')
+        .select('*', { count: 'exact', head: true });
+      trkTotalCount = count;
+
+      // 분석용 최신 1,000개 로드
       const { data, error } = await db.from('page_views')
         .select('page, visited_at, referrer, dwell_seconds')
         .order('visited_at', { ascending: false })
-        .limit(10000);
+        .limit(1000);
       if (error) { document.getElementById('trk-status').textContent = '오류: ' + error.message; trkLoaded = false; return; }
       trkRows = (data || []).filter(r => r.page);
-      document.getElementById('trk-status').textContent = `${trkRows.length.toLocaleString()}개 레코드`;
+      document.getElementById('trk-status').textContent = `전체 ${(trkTotalCount||trkRows.length).toLocaleString()}건 (최신 ${trkRows.length.toLocaleString()}개 분석)`;
       trkRender(trkFilterRows(trkRows, trkPeriod));
     }
 
@@ -6924,6 +6933,8 @@ ${d.hashtags}`;
     function trkRenderKPI(rows) {
       const total = rows.length;
       const pages = new Set(rows.map(r => r.page)).size;
+      // 총 방문수는 전체 COUNT 사용 (기간 필터 무관)
+      if (trkTotalCount !== null) document.getElementById('trk-k-total').textContent = trkTotalCount.toLocaleString();
       const cl = rows.map(r => trkClassifyRef(r.referrer));
       const direct = cl.filter(c => c.type==='직접접속').length;
       const internal = cl.filter(c => c.type==='내부링크').length;
