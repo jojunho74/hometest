@@ -724,13 +724,13 @@
 </div>
 
 <!-- 댓글 FAB -->
-<button class="comment-fab" id="commentFab" onclick="toggleCommentPanel()" title="댓글 보기/쓰기">
+<button class="comment-fab" id="commentFab" onclick="toggleCommentPanel()" title="댓글 보기/쓰기" style="display:none;">
   💬
   <span class="fab-cnt hidden" id="fabCnt">0</span>
 </button>
 
 <!-- 댓글 패널 -->
-<div class="comment-panel hidden" id="commentPanel">
+<div class="comment-panel hidden" id="commentPanel" style="display:none!important;">
   <div class="cp-head">
     <span class="cp-title" id="cpTitle">💬 댓글</span>
     <button class="cp-close" onclick="toggleCommentPanel()">✕</button>
