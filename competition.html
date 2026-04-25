@@ -55,14 +55,14 @@
     .qnav-inner{
       position:relative;z-index:1;
       display:flex;align-items:center;justify-content:center;
-      gap:12px;padding:18px 20px;
+      gap:7px;padding:10px 14px;
       flex-wrap:wrap;
     }
     .qnav-btn{
       display:inline-flex;align-items:center;
-      padding:10px 22px;
+      padding:5px 13px;
       border-radius:999px;
-      font-size:.82rem;font-weight:700;
+      font-size:.72rem;font-weight:700;
       text-decoration:none;
       border:none;
       color:#fff;
@@ -95,9 +95,10 @@
       transform:translateY(-3px)!important;
       box-shadow:0 10px 28px rgba(0,0,0,.4)!important;
     }
-    @media(max-width:600px){
-      .qnav-inner{gap:8px;padding:14px 12px;}
-      .qnav-btn{font-size:.75rem;padding:8px 16px;}
+    @media(max-width:768px){
+      .qnav-inner{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;justify-content:flex-start;gap:5px;padding:8px 10px;scrollbar-width:none;}
+      .qnav-inner::-webkit-scrollbar{display:none;}
+      .qnav-btn{font-size:.62rem;padding:4px 10px;}
     }
 
     /* ── 레이아웃 ── */
@@ -429,11 +430,11 @@
 <div class="qnav-banner">
   <div class="qnav-overlay"></div>
   <div class="qnav-inner">
-    <a href="https://ibtcc.kr/student.html"        class="qnav-btn">학생용 →</a>
-    <a href="https://ibtcc.kr/package.html"         class="qnav-btn">대학 및 관계자용 →</a>
-    <a href="https://ibtcc.kr/library-pdf.html"     class="qnav-btn">채용공고 자료실 →</a>
-    <a href="https://ibtcc.kr/university-board.html" class="qnav-btn">대학소식 →</a>
-    <a href="https://ibtcc.kr/gtelp-score.html"     class="qnav-btn">TOEIC·GTELP 점수대비표 →</a>
+    <a href="https://ibtcc.kr/student.html"        class="qnav-btn">학생용</a>
+    <a href="https://ibtcc.kr/package.html"         class="qnav-btn">대학 및 관계자용</a>
+    <a href="https://ibtcc.kr/library-pdf.html"     class="qnav-btn">채용공고 자료실</a>
+    <a href="https://ibtcc.kr/university-board.html" class="qnav-btn">대학소식</a>
+    <a href="https://ibtcc.kr/gtelp-score.html"     class="qnav-btn">TOEIC·GTELP 점수대비표</a>
   </div>
   <div style="margin-left:auto;padding-right:1.2rem;display:flex;align-items:center;gap:.45rem;color:#fbbf24;font-size:.8rem;font-weight:600;white-space:nowrap;">
     <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#fbbf24;animation:qnav-blink 1.2s ease-in-out infinite;"></span>

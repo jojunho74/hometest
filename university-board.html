@@ -214,6 +214,15 @@
       background-size:300% 100%!important;
       animation:scoreShimmer 2s linear infinite!important;
     }
+    .ub-qnav-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+    .ub-qnav-wrap::-webkit-scrollbar{display:none;}
+    .ub-qnav-inner{display:flex;flex-wrap:wrap;gap:7px;}
+    .ub-qbtn{display:inline-flex;align-items:center;padding:5px 13px;border-radius:50px;font-size:.72rem;font-weight:700;white-space:nowrap;text-decoration:none;color:#fff;transition:opacity .15s;}
+    .ub-qbtn:hover{opacity:.8;}
+    @media(max-width:768px){
+      .ub-qnav-inner{flex-wrap:nowrap;}
+      .ub-qbtn{font-size:.62rem;padding:4px 10px;}
+    }
   </style>
 </head>
 <body>
@@ -255,15 +264,15 @@
 </header>
 
 <!-- ── 퀵 메뉴 바 ── -->
-<div style="background:#0D1F3C;border-bottom:1px solid rgba(255,255,255,.08);padding:12px 20px;">
-  <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;flex-wrap:wrap;gap:10px;">
-    <div style="display:flex;flex-wrap:wrap;gap:8px;">
-      <a href="student.html"          style="display:inline-flex;align-items:center;padding:7px 18px;border-radius:50px;font-size:.82rem;font-weight:700;white-space:nowrap;text-decoration:none;background:#0891B2;color:#fff;transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">학생용 →</a>
-      <a href="package.html"          style="display:inline-flex;align-items:center;padding:7px 18px;border-radius:50px;font-size:.82rem;font-weight:700;white-space:nowrap;text-decoration:none;background:#7C3AED;color:#fff;transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">대학 및 관계자용 →</a>
-      <a href="library-pdf.html"      style="display:inline-flex;align-items:center;padding:7px 18px;border-radius:50px;font-size:.82rem;font-weight:700;white-space:nowrap;text-decoration:none;background:#16A34A;color:#fff;transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">채용공고 자료실 →</a>
-      <a href="university-board.html" style="display:inline-flex;align-items:center;padding:7px 18px;border-radius:50px;font-size:.82rem;font-weight:700;white-space:nowrap;text-decoration:none;background:#D97706;color:#fff;box-shadow:0 0 0 2px #fff;transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">대학소식 →</a>
-      <a href="competition.html"      style="display:inline-flex;align-items:center;padding:7px 18px;border-radius:50px;font-size:.82rem;font-weight:700;white-space:nowrap;text-decoration:none;background:#DC2626;color:#fff;transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">경쟁률 →</a>
-      <a href="https://ibtcc.kr/gtelp-score.html" class="score-btn" style="display:inline-flex;align-items:center;padding:7px 18px;border-radius:50px;font-size:.82rem;font-weight:700;white-space:nowrap;text-decoration:none;color:#fff;transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">TOEIC·GTELP 점수대비표 →</a>
+<div style="background:#0D1F3C;border-bottom:1px solid rgba(255,255,255,.08);padding:8px 14px;">
+  <div class="ub-qnav-wrap">
+    <div class="ub-qnav-inner">
+      <a href="student.html"          class="ub-qbtn" style="background:#0891B2;">학생용</a>
+      <a href="package.html"          class="ub-qbtn" style="background:#7C3AED;">대학 및 관계자용</a>
+      <a href="library-pdf.html"      class="ub-qbtn" style="background:#16A34A;">채용공고 자료실</a>
+      <a href="university-board.html" class="ub-qbtn" style="background:#D97706;box-shadow:0 0 0 2px #fff;">대학소식</a>
+      <a href="competition.html"      class="ub-qbtn" style="background:#DC2626;">경쟁률</a>
+      <a href="https://ibtcc.kr/gtelp-score.html" class="ub-qbtn score-btn">TOEIC·GTELP 점수대비표</a>
     </div>
   </div>
 </div>
