@@ -1187,21 +1187,7 @@ function renderVisualization(dsName, rows) {
         </div>
       </div>
 
-      <div class="inline-comment-col">
-        <div class="ic-head">
-          <span class="ic-title">💬 댓글</span>
-          <span class="ic-cnt" id="icCnt"></span>
-        </div>
-        <div class="ic-list" id="icList"><div class="ic-empty">불러오는 중...</div></div>
-        <div class="ic-form">
-          <textarea class="ic-textarea" id="icText" rows="2" placeholder="의견을 남겨보세요..."></textarea>
-          <button class="ic-submit" onclick="submitInlineComment()">등록</button>
-          <button class="cp-kakao" style="margin-top:7px;" onclick="shareKakaoCompetition()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
-            카카오 공유
-          </button>
-        </div>
-      </div>
+      <div class="inline-comment-col" style="display:none;"></div>
     </div>
     <!-- ── 합격선 안내 배너 ── -->
     <div style="background:linear-gradient(135deg,#0f3460 0%,#16213e 60%,#0d1b2a 100%);border:1px solid rgba(96,165,250,.3);border-radius:16px;padding:28px 24px;margin-bottom:22px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.4);">
