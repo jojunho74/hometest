@@ -1523,21 +1523,23 @@ async function submitQuickApply() {
 
 function ibtShareKakao() {
   const url = 'https://ibtcc.kr/competition.html';
-  if (typeof Kakao === 'undefined' || !Kakao.Share) {
-    alert('카카오톡 공유를 사용할 수 없습니다.');
-    return;
+  try {
+    if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '우리대학 IBT신청 PUSH',
+        description: '지텔프IBT 시험 도입을 희망하는 학교를 추천해보세요!',
+        imageUrl: 'https://ibtcc.kr/partner-logos.png',
+        link: { mobileWebUrl: url, webUrl: url }
+      },
+      buttons: [{ title: '신청하러 가기', link: { mobileWebUrl: url, webUrl: url } }]
+    });
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    alert('링크가 복사됐습니다!\n카카오톡을 열어 붙여넣기 해주세요 😊');
   }
-  if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
-  Kakao.Share.sendDefault({
-    objectType: 'feed',
-    content: {
-      title: '우리대학 IBT신청 PUSH',
-      description: '지텔프IBT 시험 도입을 희망하는 학교를 추천해보세요!',
-      imageUrl: 'https://ibtcc.kr/partner-logos.png',
-      link: { mobileWebUrl: url, webUrl: url }
-    },
-    buttons: [{ title: '신청하러 가기', link: { mobileWebUrl: url, webUrl: url } }]
-  });
 }
 
 async function ibtRecommend() {
