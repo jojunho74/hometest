@@ -5361,17 +5361,17 @@ ${internalSummary}
           const pathHtml = steps.map((s, idx) => {
             const isLast = idx === steps.length - 1;
             const isMid  = is3 && idx === 1;
-            const style  = isLast ? 'font-semibold text-slate-800' : isMid ? 'text-blue-600 font-semibold' : 'text-slate-400';
-            return `<span class="text-xs font-mono ${style}">${esc(s)}</span>${isLast ? '' : '<span class="text-slate-300 mx-1 font-bold">→</span>'}`;
+            const style  = isLast ? 'font-semibold text-slate-700' : isMid ? 'text-blue-500 font-semibold' : 'text-slate-400';
+            return `<span style="font-size:10.5px;" class="font-mono ${style}">${esc(s)}</span>${isLast ? '' : '<span class="text-slate-300 mx-0.5" style="font-size:10px;">→</span>'}`;
           }).join('');
-          const badge = is3 ? `<span class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-500 align-middle">3단계</span>` : '';
+          const badge = is3 ? `<span class="ml-1 text-[9px] font-bold px-1 py-0 rounded-full bg-blue-50 text-blue-500 align-middle">3단계</span>` : '';
           return `<tr class="border-b border-slate-50 hover:bg-slate-50">
-            <td class="py-2.5 pr-4"><div class="flex flex-wrap items-center gap-0.5">${pathHtml}${badge}</div></td>
-            <td class="py-2.5 text-right font-bold text-slate-800 whitespace-nowrap">${cnt.toLocaleString()}</td>
-            <td class="py-2.5 pl-4">
-              <div class="flex items-center gap-2">
-                <div class="flex-1 bg-slate-100 rounded-full h-2" style="min-width:80px;"><div class="h-2 rounded-full" style="width:${pct}%;background:${color};"></div></div>
-                <span class="text-xs text-slate-400 w-8 text-right">${pct}%</span>
+            <td class="py-1 pr-3"><div class="flex flex-wrap items-center gap-0">${pathHtml}${badge}</div></td>
+            <td class="py-1 text-right text-slate-700 whitespace-nowrap" style="font-size:11px;">${cnt.toLocaleString()}</td>
+            <td class="py-1 pl-3">
+              <div class="flex items-center gap-1.5">
+                <div class="flex-1 bg-slate-100 rounded-full" style="height:4px;min-width:50px;"><div style="height:4px;border-radius:9999px;width:${pct}%;background:${color};"></div></div>
+                <span style="font-size:10px;" class="text-slate-400 w-7 text-right">${pct}%</span>
               </div>
             </td>
           </tr>`;
@@ -5380,17 +5380,37 @@ ${internalSummary}
         if (paginEl) {
           const start = (page - 1) * PAGE_SIZE + 1;
           const end   = Math.min(page * PAGE_SIZE, allPaths.length);
-          const btnClass = (active) => active
-            ? 'px-2.5 py-1 rounded-lg bg-blue-600 text-white font-semibold'
-            : 'px-2.5 py-1 rounded-lg border border-slate-200 text-slate-500 hover:border-blue-400 hover:text-blue-600 bg-white';
+          const btnA = 'px-1.5 py-0.5 rounded bg-blue-600 text-white font-bold text-[10px]';
+          const btnN = 'px-1.5 py-0.5 rounded border border-slate-200 text-slate-500 text-[10px] hover:border-blue-400 hover:text-blue-600 bg-white';
+          const btnD = 'px-1.5 py-0.5 rounded text-slate-300 text-[10px] cursor-default';
 
-          let pageButtons = '';
-          for (let p = 1; p <= totalPages; p++) {
-            pageButtons += `<button onclick="window._intlinkPage(${p})" class="${btnClass(p === page)}">${p}</button>`;
-          }
-          paginEl.innerHTML = `
-            <span>${start}–${end} / 총 ${allPaths.length}개</span>
-            <div class="flex gap-1">${pageButtons}</div>`;
+          const makePages = () => {
+            const pages = [];
+            const delta = 2;
+            const left  = page - delta, right = page + delta;
+            let last = 0;
+            for (let p = 1; p <= totalPages; p++) {
+              if (p === 1 || p === totalPages || (p >= left && p <= right)) {
+                if (last && p - last > 1) pages.push('…');
+                pages.push(p);
+                last = p;
+              }
+            }
+            return pages;
+          };
+
+          const pageItems = makePages().map(p =>
+            p === '…'
+              ? `<span class="${btnD}">…</span>`
+              : `<button onclick="window._intlinkPage(${p})" class="${p === page ? btnA : btnN}">${p}</button>`
+          ).join('');
+
+          paginEl.innerHTML = `<div class="flex items-center gap-1 flex-wrap overflow-hidden" style="max-width:100%;">
+            <span style="font-size:10px;" class="text-slate-400 whitespace-nowrap mr-1">${start}–${end} / ${allPaths.length}개</span>
+            <button onclick="window._intlinkPage(${page - 1})" class="${btnN}" ${page===1?'disabled style="opacity:.35;cursor:not-allowed;"':''}>‹</button>
+            ${pageItems}
+            <button onclick="window._intlinkPage(${page + 1})" class="${btnN}" ${page===totalPages?'disabled style="opacity:.35;cursor:not-allowed;"':''}>›</button>
+          </div>`;
         }
       }
 
