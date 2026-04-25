@@ -6951,32 +6951,78 @@ ${d.hashtags}`;
       document.getElementById('trk-k-dwell').textContent    = avgDwell ? trkFmtDwell(avgDwell) : '—';
     }
 
-    function trkRenderDwell(rows) {
-      const dwellRows = rows.filter(r => r.dwell_seconds > 0);
+    function trkRenderDwell(filteredRows) {
+      // 페이지 목록은 항상 전체(trkRows) 기준
+      const allDwell = trkRows.filter(r => r.dwell_seconds > 0);
       const el = document.getElementById('trk-dwell-table');
-      if (!dwellRows.length) { el.innerHTML = '<p style="color:#94a3b8;font-size:.8rem;padding:12px;">아직 수집된 체류시간 데이터가 없습니다. 배포 후 방문자가 페이지를 나갈 때 자동 기록됩니다.</p>'; return; }
-      // 페이지별 집계
-      const map = {};
-      dwellRows.forEach(r => {
+      if (!allDwell.length) { el.innerHTML = '<p style="color:#94a3b8;font-size:.8rem;padding:12px;">아직 수집된 체류시간 데이터가 없습니다. 배포 후 방문자가 페이지를 나갈 때 자동 기록됩니다.</p>'; return; }
+
+      // 오늘/어제 기준 시간
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yestStart  = new Date(+todayStart - 86400000);
+
+      // 전체(바 기준) / 선택기간 / 오늘 / 어제 맵
+      const allMap = {}, periodMap = {}, todayMap = {}, yestMap = {};
+      allDwell.forEach(r => {
         const pg = trkNormPage(r.page);
-        if (!map[pg]) map[pg] = { sum: 0, cnt: 0, max: 0, min: Infinity };
-        map[pg].sum += r.dwell_seconds;
-        map[pg].cnt++;
-        if (r.dwell_seconds > map[pg].max) map[pg].max = r.dwell_seconds;
-        if (r.dwell_seconds < map[pg].min) map[pg].min = r.dwell_seconds;
+        if (!allMap[pg]) allMap[pg] = { sum: 0, cnt: 0 };
+        allMap[pg].sum += r.dwell_seconds; allMap[pg].cnt++;
+        const d = new Date(r.visited_at);
+        if (d >= todayStart) {
+          if (!todayMap[pg]) todayMap[pg] = { sum: 0, cnt: 0 };
+          todayMap[pg].sum += r.dwell_seconds; todayMap[pg].cnt++;
+        } else if (d >= yestStart) {
+          if (!yestMap[pg]) yestMap[pg] = { sum: 0, cnt: 0 };
+          yestMap[pg].sum += r.dwell_seconds; yestMap[pg].cnt++;
+        }
       });
-      const sorted = Object.entries(map).sort((a,b) => (b[1].sum/b[1].cnt) - (a[1].sum/a[1].cnt));
+      (filteredRows || trkRows).filter(r => r.dwell_seconds > 0).forEach(r => {
+        const pg = trkNormPage(r.page);
+        if (!periodMap[pg]) periodMap[pg] = { sum: 0, cnt: 0, max: 0 };
+        periodMap[pg].sum += r.dwell_seconds; periodMap[pg].cnt++;
+        if (r.dwell_seconds > periodMap[pg].max) periodMap[pg].max = r.dwell_seconds;
+      });
+
+      const sorted = Object.entries(allMap).sort((a,b) => (b[1].sum/b[1].cnt) - (a[1].sum/a[1].cnt));
       const maxAvg = sorted[0] ? sorted[0][1].sum / sorted[0][1].cnt : 1;
+
       el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.8rem;">
-        <thead><tr style="background:#f1f5f9;"><th style="padding:8px 12px;text-align:left;color:#64748b;font-weight:700;">페이지</th><th style="padding:8px 12px;text-align:right;color:#64748b;font-weight:700;">평균</th><th style="padding:8px 12px;text-align:right;color:#64748b;font-weight:700;">최대</th><th style="padding:8px 12px;text-align:right;color:#64748b;font-weight:700;">샘플 수</th><th style="padding:8px 12px;width:140px;"></th></tr></thead>
+        <thead><tr style="background:#f1f5f9;">
+          <th style="padding:8px 12px;text-align:left;color:#64748b;font-weight:700;">페이지</th>
+          <th style="padding:8px 12px;text-align:right;color:#64748b;font-weight:700;">평균</th>
+          <th style="padding:8px 12px;text-align:right;color:#64748b;font-weight:700;">최대</th>
+          <th style="padding:8px 12px;text-align:right;color:#64748b;font-weight:700;">오늘</th>
+          <th style="padding:8px 12px;text-align:right;color:#64748b;font-weight:700;">전일대비</th>
+          <th style="padding:8px 12px;text-align:right;color:#64748b;font-weight:700;">샘플 수</th>
+          <th style="padding:8px 12px;width:120px;"></th>
+        </tr></thead>
         <tbody>${sorted.map(([pg, s], i) => {
-          const avg = Math.round(s.sum / s.cnt);
-          const pct = Math.round(avg / maxAvg * 100);
+          const ps = periodMap[pg];
+          const avg    = ps ? Math.round(ps.sum / ps.cnt) : null;
+          const maxSec = ps ? ps.max : null;
+          const todayAvg = todayMap[pg] ? Math.round(todayMap[pg].sum / todayMap[pg].cnt) : null;
+          const yestAvg  = yestMap[pg]  ? Math.round(yestMap[pg].sum  / yestMap[pg].cnt)  : null;
+          const allAvg   = Math.round(s.sum / s.cnt);
+          const pct = Math.round(allAvg / maxAvg * 100);
+
+          let delta = '<span style="color:#cbd5e1;">—</span>';
+          if (todayAvg !== null && yestAvg !== null) {
+            const diff = todayAvg - yestAvg;
+            if (diff > 0)      delta = `<span style="color:#16a34a;font-weight:700;">▲ ${trkFmtDwell(diff)}</span>`;
+            else if (diff < 0) delta = `<span style="color:#dc2626;font-weight:700;">▼ ${trkFmtDwell(-diff)}</span>`;
+            else               delta = `<span style="color:#94a3b8;">변동없음</span>`;
+          } else if (todayAvg !== null) {
+            delta = `<span style="color:#7C3AED;font-size:.7rem;font-weight:700;">신규</span>`;
+          }
+
           return `<tr style="border-bottom:1px solid #f1f5f9;${i%2===1?'background:#f8fafc;':''}">
             <td style="padding:9px 12px;font-weight:600;color:#1e293b;">${pg}</td>
-            <td style="padding:9px 12px;text-align:right;font-weight:700;color:#7C3AED;">${trkFmtDwell(avg)}</td>
-            <td style="padding:9px 12px;text-align:right;color:#64748b;">${trkFmtDwell(s.max)}</td>
-            <td style="padding:9px 12px;text-align:right;color:#94a3b8;">${s.cnt}건</td>
+            <td style="padding:9px 12px;text-align:right;font-weight:700;color:#7C3AED;">${avg !== null ? trkFmtDwell(avg) : '—'}</td>
+            <td style="padding:9px 12px;text-align:right;color:#64748b;">${maxSec ? trkFmtDwell(maxSec) : '—'}</td>
+            <td style="padding:9px 12px;text-align:right;font-weight:700;color:#0369a1;">${todayAvg !== null ? trkFmtDwell(todayAvg) : '—'}</td>
+            <td style="padding:9px 12px;text-align:right;">${delta}</td>
+            <td style="padding:9px 12px;text-align:right;color:#94a3b8;">${ps ? ps.cnt+'건' : '—'}</td>
             <td style="padding:9px 12px;"><div style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#7C3AED,#a78bfa);border-radius:4px;"></div></div></td>
           </tr>`;
         }).join('')}</tbody></table>`;
