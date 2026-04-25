@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <title>공공기관 경쟁률 — 지텔프IBT</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    :root{
+      --blue:#3182F6;
+      --blue-dark:#1B64DA;
+      --bg:#F2F4F6;
+      --white:#FFFFFF;
+      --text:#191919;
+      --sub:#8B95A1;
+      --border:#E5E8EB;
+      --red:#F04452;
+      --green:#00C471;
+      --gold:#F59E0B;
+      --purple:#8B5CF6;
+    }
+    html,body{font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;min-height:100%;}
+
+    /* ── 헤더 ── */
+    .hdr{position:sticky;top:0;z-index:50;height:52px;background:var(--white);display:flex;align-items:center;padding:0 20px;border-bottom:1px solid var(--border);}
+    .hdr-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--text);text-decoration:none;flex-shrink:0;}
+    .hdr-title{flex:1;text-align:center;font-size:17px;font-weight:700;letter-spacing:-.3px;}
+    .hdr-placeholder{width:32px;}
+
+    /* ── 검색 ── */
+    .search-bar{background:var(--white);padding:12px 16px;border-bottom:1px solid var(--border);position:sticky;top:52px;z-index:40;}
+    .search-inner{position:relative;}
+    .search-input{width:100%;height:48px;background:#F8F9FA;border:1.5px solid var(--border);border-radius:12px;padding:0 44px 0 44px;font-size:16px;font-family:inherit;color:var(--text);outline:none;transition:border-color .15s,background .15s;}
+    .search-input:focus{border-color:var(--blue);background:var(--white);}
+    .search-left-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--sub);}
+    .search-clear{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;background:var(--sub);color:#fff;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;}
+
+    /* ── KPI 카드 행 ── */
+    .kpi-scroll{overflow-x:auto;scrollbar-width:none;padding:14px 16px 2px;}
+    .kpi-scroll::-webkit-scrollbar{display:none;}
+    .kpi-row{display:flex;gap:8px;min-width:max-content;}
+    .kpi-card{background:var(--white);border-radius:14px;padding:14px 16px;min-width:130px;flex-shrink:0;}
+    .kpi-label{font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px;letter-spacing:.03em;}
+    .kpi-val{font-size:22px;font-weight:800;letter-spacing:-.5px;}
+    .kpi-val.blue{color:var(--blue);}
+    .kpi-val.red{color:var(--red);}
+    .kpi-val.green{color:var(--green);}
+    .kpi-val.gold{color:var(--gold);}
+    .kpi-sub{font-size:11px;color:var(--sub);margin-top:3px;}
+
+    /* ── 섹션 헤더 ── */
+    .sec-hdr{padding:16px 16px 8px;display:flex;align-items:center;justify-content:space-between;}
+    .sec-title{font-size:15px;font-weight:800;letter-spacing:-.3px;}
+    .sec-count{font-size:13px;color:var(--sub);}
+
+    /* ── 기관 카드 ── */
+    .org-list{padding:0 16px 24px;}
+    .org-card{background:var(--white);border-radius:16px;margin-bottom:8px;overflow:hidden;cursor:pointer;transition:transform .1s;}
+    .org-card:active{transform:scale(.98);}
+    .org-header{padding:16px;display:flex;align-items:center;gap:12px;}
+    .org-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+    .org-info{flex:1;min-width:0;}
+    .org-name{font-size:15px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .org-meta{font-size:12px;color:var(--sub);margin-top:2px;}
+    .org-ratio{text-align:right;flex-shrink:0;}
+    .org-ratio-val{font-size:18px;font-weight:800;color:var(--red);}
+    .org-ratio-label{font-size:10px;color:var(--sub);font-weight:600;}
+    .org-arrow{color:var(--border);flex-shrink:0;margin-left:4px;}
+    .org-card.open .org-arrow{transform:rotate(180deg);}
+
+    /* ── 기관 상세 ── */
+    .org-detail{display:none;border-top:1px solid var(--border);}
+    .org-card.open .org-detail{display:block;}
+    .od-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);}
+    .od-stat{background:var(--white);padding:12px;text-align:center;}
+    .od-stat-val{font-size:17px;font-weight:800;margin-bottom:2px;}
+    .od-stat-label{font-size:10px;color:var(--sub);font-weight:600;}
+    .od-jobs{padding:12px 16px 16px;}
+    .od-job-title{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:8px;letter-spacing:.03em;}
+    .od-job{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--bg);}
+    .od-job:last-child{border-bottom:none;}
+    .od-job-name{flex:1;font-size:13px;font-weight:600;min-width:0;}
+    .od-job-region{font-size:11px;color:var(--sub);margin-top:1px;}
+    .od-job-bar-wrap{width:80px;margin:0 10px;}
+    .od-job-bar-bg{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;}
+    .od-job-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--purple));}
+    .od-job-ratio{font-size:13px;font-weight:800;color:var(--red);white-space:nowrap;}
+
+    /* ── 로딩 ── */
+    .loading{padding:48px 20px;text-align:center;color:var(--sub);}
+    .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .loading-text{font-size:14px;font-weight:600;}
+
+    /* ── 빈 상태 ── */
+    .empty{padding:48px 20px;text-align:center;color:var(--sub);}
+    .empty-icon{font-size:2.5rem;margin-bottom:12px;}
+    .empty-text{font-size:15px;font-weight:600;}
+
+    /* ── 배지 ── */
+    .badge{display:inline-block;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:700;}
+    .badge-blue{background:#EFF6FF;color:var(--blue);}
+    .badge-red{background:#FFF1F2;color:var(--red);}
+
+    /* ── IBT 신청 배너 ── */
+    .ibt-banner{margin:12px 16px 0;background:linear-gradient(135deg,#091a30,#1a4a80);border-radius:16px;padding:16px;color:#fff;}
+    .ibt-banner-title{font-size:14px;font-weight:800;margin-bottom:4px;}
+    .ibt-banner-sub{font-size:12px;opacity:.7;margin-bottom:12px;}
+    .ibt-row{display:flex;gap:8px;}
+    .ibt-input{flex:1;height:40px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:0 12px;font-size:15px;font-family:inherit;color:#fff;outline:none;}
+    .ibt-input::placeholder{color:rgba(255,255,255,.4);}
+    .ibt-btn{height:40px;padding:0 14px;background:var(--gold);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;white-space:nowrap;transition:opacity .15s;}
+    .ibt-btn:active{opacity:.8;}
+    .ibt-btn:disabled{opacity:.5;cursor:not-allowed;}
+  </style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html" class="hdr-back">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </a>
+  <div class="hdr-title">공공기관 경쟁률</div>
+  <div class="hdr-placeholder"></div>
+</header>
+
+<!-- 검색 -->
+<div class="search-bar">
+  <div class="search-inner">
+    <div class="search-left-ico">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+    <input class="search-input" id="searchInput" type="text" placeholder="기관명 검색..." oninput="onSearch(this.value)"/>
+    <div class="search-clear" id="searchClear" onclick="clearSearch()">✕</div>
+  </div>
+</div>
+
+<!-- KPI -->
+<div class="kpi-scroll" id="kpiSection" style="display:none;">
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">총 채용인원</div>
+      <div class="kpi-val blue" id="kpiHired">—</div>
+      <div class="kpi-sub">최종 합격자</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">전체 지원자</div>
+      <div class="kpi-val" id="kpiApply">—</div>
+      <div class="kpi-sub">1차 응시 합계</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">최고 경쟁률</div>
+      <div class="kpi-val red" id="kpiMax">—</div>
+      <div class="kpi-sub" id="kpiMaxSub">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">최저 경쟁률</div>
+      <div class="kpi-val green" id="kpiMin">—</div>
+      <div class="kpi-sub" id="kpiMinSub">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">평균 경쟁률</div>
+      <div class="kpi-val gold" id="kpiAvg">—</div>
+      <div class="kpi-sub" id="kpiCnt">기관 수</div>
+    </div>
+  </div>
+</div>
+
+<!-- IBT 신청 배너 -->
+<div class="ibt-banner">
+  <div class="ibt-banner-title">🏫 우리대학 IBT신청 PUSH</div>
+  <div class="ibt-banner-sub">학교·학과를 입력하고 IBT 시험을 추천받으세요</div>
+  <div class="ibt-row">
+    <input class="ibt-input" id="ibtSchool" type="text" placeholder="학교명"/>
+    <input class="ibt-input" id="ibtDept" type="text" placeholder="학과" style="max-width:100px;"/>
+    <button class="ibt-btn" id="ibtBtn" onclick="ibtSubmit()">신청</button>
+  </div>
+</div>
+
+<!-- 기관 목록 -->
+<div class="sec-hdr">
+  <div class="sec-title" id="listTitle">공공기관 목록</div>
+  <div class="sec-count" id="listCount"></div>
+</div>
+<div class="org-list" id="orgList">
+  <div class="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">데이터 불러오는 중...</div>
+  </div>
+</div>
+
+<script>
+const SB  = 'https://byzulmxcuhsrjdphmuym.supabase.co';
+const KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
+const { createClient } = supabase;
+const db = createClient(SB, KEY);
+
+// 페이지뷰 추적
+if (localStorage.getItem('gtelp_notrack') !== '1') {
+  fetch(SB + '/rest/v1/page_views', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY,'Prefer':'return=minimal'},
+    body:JSON.stringify({page:'competition-m.html',referrer:document.referrer||null})
+  }).catch(()=>{});
+}
+
+let allDatasets = [];  // [{name, jobs:[...], totalHired, totalApply, avgRatio, maxRatio}]
+let filtered    = [];
+let searchVal   = '';
+
+const ICONS = ['🏛','🏢','🏗','🏥','🎓','⚡','🚇','🌊','🌿','🏦'];
+const COLORS = ['#EFF6FF','#F0FDF4','#FFF7ED','#FDF2F8','#F5F3FF'];
+
+async function init() {
+  const { data, error } = await db.from('alio_jobs')
+    .select('dataset_name,job,region,s1_total,s3_pass,ratio')
+    .order('dataset_name');
+
+  if (error || !data) {
+    document.getElementById('orgList').innerHTML = `<div class="empty"><div class="empty-icon">😞</div><div class="empty-text">데이터를 불러올 수 없습니다</div></div>`;
+    return;
+  }
+
+  // 기관별 그룹핑
+  const map = {};
+  data.forEach(r => {
+    const n = r.dataset_name;
+    if (!map[n]) map[n] = { name:n, jobs:[], totalHired:0, totalApply:0, ratios:[] };
+    map[n].jobs.push(r);
+    map[n].totalHired += (r.s3_pass || 0);
+    map[n].totalApply += (r.s1_total || 0);
+    if (parseFloat(r.ratio) > 0) map[n].ratios.push(parseFloat(r.ratio));
+  });
+
+  allDatasets = Object.values(map).map(d => ({
+    ...d,
+    avgRatio: d.ratios.length ? (d.ratios.reduce((s,v)=>s+v,0)/d.ratios.length).toFixed(1) : 0,
+    maxRatio: d.ratios.length ? Math.max(...d.ratios) : 0,
+  })).sort((a,b) => b.maxRatio - a.maxRatio);
+
+  // KPI
+  const allJobs = data;
+  const totalHired = allJobs.reduce((s,r)=>s+(r.s3_pass||0),0);
+  const totalApply = allJobs.reduce((s,r)=>s+(r.s1_total||0),0);
+  const ratios = allJobs.map(r=>parseFloat(r.ratio)||0).filter(v=>v>0);
+  const maxR = Math.max(...ratios), minR = Math.min(...ratios);
+  const avgR = ratios.length ? (ratios.reduce((s,v)=>s+v,0)/ratios.length).toFixed(1) : 0;
+  const maxRow = allJobs.find(r=>parseFloat(r.ratio)===maxR);
+  const minRow = allJobs.find(r=>parseFloat(r.ratio)===minR);
+
+  document.getElementById('kpiHired').textContent = totalHired.toLocaleString() + '명';
+  document.getElementById('kpiApply').textContent = totalApply.toLocaleString() + '명';
+  document.getElementById('kpiMax').textContent   = maxR + ':1';
+  document.getElementById('kpiMaxSub').textContent = maxRow ? maxRow.job.slice(0,8) : '';
+  document.getElementById('kpiMin').textContent   = minR + ':1';
+  document.getElementById('kpiMinSub').textContent = minRow ? minRow.job.slice(0,8) : '';
+  document.getElementById('kpiAvg').textContent   = avgR + ':1';
+  document.getElementById('kpiCnt').textContent   = allDatasets.length + '개 기관';
+  document.getElementById('kpiSection').style.display = '';
+
+  filtered = allDatasets;
+  render();
+}
+
+function onSearch(val) {
+  searchVal = val.trim();
+  document.getElementById('searchClear').style.display = val ? 'flex' : 'none';
+  filtered = searchVal
+    ? allDatasets.filter(d => d.name.includes(searchVal))
+    : allDatasets;
+  render();
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  onSearch('');
+}
+
+function render() {
+  const el = document.getElementById('orgList');
+  document.getElementById('listTitle').textContent = searchVal ? '검색 결과' : '공공기관 목록';
+  document.getElementById('listCount').textContent = filtered.length + '개';
+
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">검색 결과가 없습니다</div></div>`;
+    return;
+  }
+
+  el.innerHTML = filtered.map((d, i) => {
+    const icon  = ICONS[i % ICONS.length];
+    const bg    = COLORS[i % COLORS.length];
+    const maxJob = d.jobs.reduce((m,j) => parseFloat(j.ratio||0) > parseFloat(m.ratio||0) ? j : m, d.jobs[0]);
+    const maxRatioJobs = d.jobs.filter(j => parseFloat(j.ratio) === d.maxRatio);
+
+    const jobRows = d.jobs
+      .filter(j => parseFloat(j.ratio) > 0)
+      .sort((a,b) => parseFloat(b.ratio) - parseFloat(a.ratio))
+      .map(j => {
+        const r = parseFloat(j.ratio);
+        const pct = d.maxRatio > 0 ? Math.round(r / d.maxRatio * 100) : 0;
+        return `<div class="od-job">
+          <div style="flex:1;min-width:0;">
+            <div class="od-job-name">${j.job || '—'}</div>
+            <div class="od-job-region">${j.region || ''}</div>
+          </div>
+          <div class="od-job-bar-wrap">
+            <div class="od-job-bar-bg"><div class="od-job-bar-fill" style="width:${pct}%;"></div></div>
+          </div>
+          <div class="od-job-ratio">${r}:1</div>
+        </div>`;
+      }).join('');
+
+    return `<div class="org-card" onclick="toggleOrg(this)">
+      <div class="org-header">
+        <div class="org-icon" style="background:${bg};">${icon}</div>
+        <div class="org-info">
+          <div class="org-name">${d.name}</div>
+          <div class="org-meta">${d.jobs.length}개 직종 · 채용 ${d.totalHired}명</div>
+        </div>
+        <div class="org-ratio">
+          <div class="org-ratio-val">${d.maxRatio || '—'}</div>
+          <div class="org-ratio-label">최고 경쟁률</div>
+        </div>
+        <svg class="org-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="org-detail">
+        <div class="od-stats">
+          <div class="od-stat"><div class="od-stat-val blue">${d.totalHired}</div><div class="od-stat-label">채용인원</div></div>
+          <div class="od-stat"><div class="od-stat-val">${d.totalApply.toLocaleString()}</div><div class="od-stat-label">지원자</div></div>
+          <div class="od-stat"><div class="od-stat-val gold">${d.avgRatio}:1</div><div class="od-stat-label">평균경쟁률</div></div>
+        </div>
+        <div class="od-jobs">
+          <div class="od-job-title">직종별 경쟁률</div>
+          ${jobRows || '<div style="color:var(--sub);font-size:13px;padding:8px 0;">경쟁률 데이터 없음</div>'}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleOrg(el) {
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.org-card.open').forEach(c => c.classList.remove('open'));
+  if (!isOpen) {
+    el.classList.add('open');
+    el.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+}
+
+// IBT 신청
+async function ibtSubmit() {
+  const school = document.getElementById('ibtSchool').value.trim();
+  const dept   = document.getElementById('ibtDept').value.trim();
+  if (!school) { alert('학교명을 입력해주세요.'); return; }
+  const btn = document.getElementById('ibtBtn');
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    await fetch(SB + '/rest/v1/ibt_applications', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY,'Prefer':'return=minimal'},
+      body:JSON.stringify({school_name:school, department:dept||null, status:'pending'})
+    });
+    document.getElementById('ibtSchool').value = '';
+    document.getElementById('ibtDept').value = '';
+    btn.textContent = '✅';
+    setTimeout(() => { btn.disabled = false; btn.textContent = '신청'; }, 2000);
+  } catch {
+    btn.disabled = false; btn.textContent = '신청';
+    alert('오류가 발생했습니다.');
+  }
+}
+
+init();
+</script>
+</body>
+</html>

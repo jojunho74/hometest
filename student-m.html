@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <title>IBT 무료신청 — 지텔프IBT</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    :root{
+      --blue:#3182F6;
+      --blue-dark:#1B64DA;
+      --bg:#F2F4F6;
+      --white:#FFFFFF;
+      --text:#191919;
+      --sub:#8B95A1;
+      --border:#E5E8EB;
+      --green:#00C471;
+      --red:#F04452;
+    }
+    html,body{height:100%;font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
+
+    /* ── 헤더 ── */
+    .hdr{position:sticky;top:0;z-index:50;height:52px;background:var(--white);display:flex;align-items:center;padding:0 20px;border-bottom:1px solid var(--border);}
+    .hdr-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--text);text-decoration:none;font-size:1.3rem;flex-shrink:0;}
+    .hdr-title{flex:1;text-align:center;font-size:17px;font-weight:700;letter-spacing:-.3px;}
+    .hdr-placeholder{width:32px;flex-shrink:0;}
+
+    /* ── 콘텐츠 ── */
+    .body{padding:20px 16px 140px;}
+
+    /* ── 히어로 카드 ── */
+    .hero-card{background:linear-gradient(135deg,#1a2f5a 0%,#1e4a9e 50%,#3182F6 100%);border-radius:20px;padding:24px 20px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden;}
+    .hero-card::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:rgba(255,255,255,.06);border-radius:50%;}
+    .hero-card::after{content:'';position:absolute;bottom:-30px;right:20px;width:90px;height:90px;background:rgba(255,255,255,.04);border-radius:50%;}
+    .hero-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border-radius:99px;padding:4px 10px;font-size:11px;font-weight:700;margin-bottom:12px;}
+    .hero-badge span{width:6px;height:6px;background:#4ade80;border-radius:50%;animation:blink 1.4s ease-in-out infinite;}
+    @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+    .hero-title{font-size:22px;font-weight:800;line-height:1.3;margin-bottom:6px;letter-spacing:-.5px;}
+    .hero-sub{font-size:13px;opacity:.75;line-height:1.5;}
+    .hero-chips{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap;}
+    .hero-chip{background:rgba(255,255,255,.15);border-radius:99px;padding:4px 10px;font-size:11px;font-weight:600;}
+
+    /* ── 진행 단계 ── */
+    .steps-card{background:var(--white);border-radius:16px;padding:18px 16px;margin-bottom:16px;}
+    .steps-title{font-size:13px;font-weight:700;color:var(--sub);margin-bottom:14px;letter-spacing:.02em;}
+    .steps{display:flex;align-items:center;gap:0;}
+    .step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
+    .step-dot{width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;position:relative;z-index:1;}
+    .step-dot.done{background:var(--green);}
+    .step-dot.pending{background:var(--border);color:var(--sub);}
+    .step-line{flex:1;height:2px;background:var(--border);margin-top:-14px;}
+    .step-line.done{background:var(--blue);}
+    .step-label{font-size:10px;font-weight:600;color:var(--sub);text-align:center;white-space:nowrap;}
+    .step-label.active{color:var(--blue);}
+
+    /* ── 폼 카드 ── */
+    .form-card{background:var(--white);border-radius:16px;padding:20px 16px;margin-bottom:12px;}
+    .form-section-title{font-size:15px;font-weight:800;margin-bottom:16px;letter-spacing:-.3px;}
+    .field{margin-bottom:16px;}
+    .field:last-child{margin-bottom:0;}
+    .field-label{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;display:flex;align-items:center;gap:4px;}
+    .field-label .req{color:var(--blue);font-size:13px;line-height:1;}
+    .field-input{width:100%;height:52px;border:1.5px solid var(--border);border-radius:12px;padding:0 16px;font-size:16px;font-family:inherit;color:var(--text);background:var(--white);outline:none;transition:border-color .15s,box-shadow .15s;}
+    .field-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(49,130,246,.12);}
+    .field-input.error{border-color:var(--red);}
+    .field-hint{font-size:11px;color:var(--sub);margin-top:5px;}
+    .field-hint.err{color:var(--red);}
+
+    /* ── 안내 카드 ── */
+    .info-card{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:16px;padding:16px;margin-bottom:12px;}
+    .info-title{font-size:13px;font-weight:800;color:#1D4ED8;margin-bottom:12px;}
+    .info-step{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+    .info-step:last-child{margin-bottom:0;}
+    .info-num{width:22px;height:22px;background:#3182F6;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;}
+    .info-text{font-size:13px;color:#1E40AF;font-weight:500;}
+
+    /* ── 하단 CTA ── */
+    .bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--white);padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);z-index:50;}
+    .cta-btn{width:100%;height:52px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;transition:background .15s,transform .1s;letter-spacing:-.2px;}
+    .cta-btn:active{background:var(--blue-dark);transform:scale(.985);}
+    .cta-btn:disabled{background:var(--border);color:var(--sub);cursor:not-allowed;transform:none;}
+    .cta-btn.success{background:var(--green);}
+
+    /* ── 성공 화면 ── */
+    .success-wrap{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;padding:32px 20px;text-align:center;}
+    .success-icon{width:72px;height:72px;background:#DCFCE7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:20px;}
+    .success-title{font-size:22px;font-weight:800;margin-bottom:8px;letter-spacing:-.5px;}
+    .success-sub{font-size:14px;color:var(--sub);line-height:1.6;}
+    .success-card{background:var(--white);border-radius:16px;padding:18px;margin-top:20px;width:100%;text-align:left;}
+    .success-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;}
+    .success-row:last-child{border-bottom:none;}
+    .success-row .key{color:var(--sub);font-weight:500;}
+    .success-row .val{font-weight:700;}
+    .back-btn{width:100%;height:48px;background:var(--bg);border:none;border-radius:12px;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;margin-top:12px;}
+  </style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html" class="hdr-back">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </a>
+  <div class="hdr-title">IBT 무료신청</div>
+  <div class="hdr-placeholder"></div>
+</header>
+
+<div class="body" id="formBody">
+
+  <!-- 히어로 -->
+  <div class="hero-card">
+    <div class="hero-badge"><span></span> 무료 신청 진행 중</div>
+    <div class="hero-title">G-TELP IBT<br>무료로 도입하세요</div>
+    <div class="hero-sub">학교 취업센터에 IBT 시험을 도입하고<br>학생들에게 더 빠른 취업 기회를 드립니다</div>
+    <div class="hero-chips">
+      <div class="hero-chip">✓ 완전 무료</div>
+      <div class="hero-chip">✓ 1~2일 내 연락</div>
+      <div class="hero-chip">✓ 간편 신청</div>
+    </div>
+  </div>
+
+  <!-- 진행 단계 -->
+  <div class="steps-card">
+    <div class="steps-title">신청 진행 절차</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">1</div>
+        <div class="step-label active">신청서 제출</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-dot pending">2</div>
+        <div class="step-label">담당자 검토</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-dot pending">3</div>
+        <div class="step-label">담당자 연락</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-dot pending">4</div>
+        <div class="step-label">도입 완료</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 폼 -->
+  <div class="form-card">
+    <div class="form-section-title">신청 정보 입력</div>
+
+    <div class="field">
+      <div class="field-label"><span class="req">*</span> 이름</div>
+      <input class="field-input" id="s-name" type="text" placeholder="홍길동" autocomplete="name"/>
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="req">*</span> 이메일</div>
+      <input class="field-input" id="s-email" type="email" placeholder="example@university.ac.kr" autocomplete="email" inputmode="email"/>
+      <div class="field-hint">이메일 형식으로 입력해주세요</div>
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="req">*</span> 소속 대학교</div>
+      <input class="field-input" id="s-university" type="text" placeholder="예) 한성대학교" autocomplete="organization"/>
+    </div>
+    <div class="field">
+      <div class="field-label">학과 / 전공 <span style="font-size:11px;font-weight:400;color:var(--sub);">(선택)</span></div>
+      <input class="field-input" id="s-department" type="text" placeholder="예) 경영학과"/>
+    </div>
+  </div>
+
+  <!-- 안내 -->
+  <div class="info-card">
+    <div class="info-title">신청 후 진행 절차</div>
+    <div class="info-step"><div class="info-num">1</div><div class="info-text">신청서 검토 (1~2일 이내)</div></div>
+    <div class="info-step"><div class="info-num">2</div><div class="info-text">취업센터 담당자가 직접 연락드립니다</div></div>
+    <div class="info-step"><div class="info-num">3</div><div class="info-text">IBT 도입 절차 안내 및 진행</div></div>
+  </div>
+
+</div>
+
+<!-- 성공 화면 -->
+<div class="body success-wrap" id="successBody" style="display:none;">
+  <div class="success-icon">✅</div>
+  <div class="success-title">신청이 완료됐습니다</div>
+  <div class="success-sub">담당자가 1~2일 내로<br>이메일로 연락드립니다</div>
+  <div class="success-card" id="successCard"></div>
+  <button class="back-btn" onclick="location.href='index.html'">메인으로 돌아가기</button>
+</div>
+
+<div class="bottom-bar" id="bottomBar">
+  <button class="cta-btn" id="submitBtn" onclick="submitForm()">무료로 신청하기</button>
+</div>
+
+<script>
+const SB  = 'https://byzulmxcuhsrjdphmuym.supabase.co';
+const KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
+
+// 페이지뷰 추적
+if (localStorage.getItem('gtelp_notrack') !== '1') {
+  fetch(SB + '/rest/v1/page_views', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY,'Prefer':'return=minimal'},
+    body:JSON.stringify({page:'student-m.html',referrer:document.referrer||null})
+  }).catch(()=>{});
+}
+
+async function submitForm() {
+  const name       = document.getElementById('s-name').value.trim();
+  const email      = document.getElementById('s-email').value.trim();
+  const university = document.getElementById('s-university').value.trim();
+  const department = document.getElementById('s-department').value.trim();
+
+  // 유효성
+  let err = false;
+  ['s-name','s-email','s-university'].forEach(id => {
+    const el = document.getElementById(id);
+    const ok = id === 's-email' ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim()) : el.value.trim().length > 0;
+    el.classList.toggle('error', !ok);
+    if (!ok) err = true;
+  });
+  if (err) { document.getElementById('s-name').scrollIntoView({behavior:'smooth',block:'center'}); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '제출 중...';
+
+  try {
+    const res = await fetch(SB + '/rest/v1/student_applications', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY,'Prefer':'return=minimal'},
+      body:JSON.stringify({name, email, phone:null, university, department:department||null})
+    });
+    if (!res.ok) throw new Error();
+
+    // 성공
+    document.getElementById('formBody').style.display = 'none';
+    document.getElementById('successBody').style.display = 'flex';
+    document.getElementById('bottomBar').style.display = 'none';
+    document.getElementById('successCard').innerHTML = [
+      {k:'이름', v:name}, {k:'이메일', v:email},
+      {k:'대학교', v:university}, {k:'학과', v:department||'미입력'}
+    ].map(({k,v}) => `<div class="success-row"><span class="key">${k}</span><span class="val">${v}</span></div>`).join('');
+  } catch {
+    btn.disabled = false;
+    btn.textContent = '무료로 신청하기';
+    alert('오류가 발생했습니다. 다시 시도해주세요.');
+  }
+}
+
+// 입력 시 에러 클래스 제거
+document.querySelectorAll('.field-input').forEach(el => {
+  el.addEventListener('input', () => el.classList.remove('error'));
+});
+</script>
+</body>
+</html>

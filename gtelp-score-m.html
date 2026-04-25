@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <title>G-TELP 점수대비표 — 지텔프IBT</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    :root{
+      --blue:#3182F6;
+      --bg:#F2F4F6;
+      --white:#FFFFFF;
+      --text:#191919;
+      --sub:#8B95A1;
+      --border:#E5E8EB;
+      --gold:#F59E0B;
+      --green:#00C471;
+    }
+    html,body{font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
+
+    /* ── 헤더 ── */
+    .hdr{position:sticky;top:0;z-index:50;height:52px;background:var(--white);display:flex;align-items:center;padding:0 20px;border-bottom:1px solid var(--border);}
+    .hdr-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--text);text-decoration:none;font-size:1.3rem;flex-shrink:0;}
+    .hdr-title{flex:1;text-align:center;font-size:17px;font-weight:700;letter-spacing:-.3px;}
+    .hdr-placeholder{width:32px;}
+
+    /* ── 검색바 ── */
+    .search-section{background:var(--white);padding:12px 16px 0;border-bottom:1px solid var(--border);position:sticky;top:52px;z-index:40;}
+    .search-wrap{position:relative;margin-bottom:12px;}
+    .search-input{width:100%;height:48px;border:1.5px solid var(--border);border-radius:12px;padding:0 44px 0 16px;font-size:16px;font-family:inherit;color:var(--text);background:#F8F9FA;outline:none;transition:border-color .15s,background .15s;}
+    .search-input:focus{border-color:var(--blue);background:var(--white);}
+    .search-ico{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--sub);pointer-events:none;}
+    .search-reset{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;background:var(--sub);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;display:none;}
+
+    /* ── 탭 ── */
+    .tabs{display:flex;gap:6px;padding-bottom:12px;overflow-x:auto;scrollbar-width:none;}
+    .tabs::-webkit-scrollbar{display:none;}
+    .tab{flex-shrink:0;padding:7px 16px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;border:none;background:var(--border);color:var(--sub);transition:all .15s;font-family:inherit;}
+    .tab.on{background:var(--blue);color:#fff;}
+
+    /* ── 내 점수 결과 배너 ── */
+    .result-banner{margin:12px 16px 0;background:linear-gradient(135deg,#1B4FBB,#3182F6);border-radius:16px;padding:16px;color:#fff;display:none;}
+    .result-banner.show{display:block;}
+    .rb-label{font-size:11px;opacity:.75;font-weight:600;margin-bottom:4px;letter-spacing:.05em;}
+    .rb-score{font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:10px;}
+    .rb-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .rb-item{background:rgba(255,255,255,.15);border-radius:10px;padding:10px 12px;}
+    .rb-item-label{font-size:10px;opacity:.7;font-weight:600;margin-bottom:3px;}
+    .rb-item-val{font-size:16px;font-weight:800;}
+    .rb-close{position:absolute;top:12px;right:12px;width:24px;height:24px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;}
+
+    /* ── 목록 ── */
+    .list{padding:12px 16px 80px;}
+    .list-label{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:8px;letter-spacing:.04em;}
+
+    /* ── 점수 카드 ── */
+    .score-card{background:var(--white);border-radius:14px;padding:0;margin-bottom:8px;overflow:hidden;cursor:pointer;border:1.5px solid transparent;transition:border-color .15s,box-shadow .15s;}
+    .score-card:active{transform:scale(.985);}
+    .score-card.highlighted{border-color:var(--gold);box-shadow:0 0 0 4px rgba(245,158,11,.15);}
+    .sc-header{display:flex;align-items:center;padding:14px 16px;gap:12px;}
+    .sc-gtelp{width:44px;height:44px;border-radius:12px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;flex-shrink:0;}
+    .sc-gtelp.highlighted{background:var(--gold);}
+    .sc-info{flex:1;}
+    .sc-title{font-size:15px;font-weight:800;letter-spacing:-.3px;margin-bottom:2px;}
+    .sc-sub{font-size:12px;color:var(--sub);}
+    .sc-arrow{color:var(--border);transition:transform .2s;}
+    .score-card.open .sc-arrow{transform:rotate(180deg);}
+    .sc-body{display:none;padding:0 16px 14px;border-top:1px solid var(--border);}
+    .score-card.open .sc-body{display:block;}
+    .sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+    .sc-cell{background:var(--bg);border-radius:10px;padding:12px;}
+    .sc-cell-label{font-size:10px;font-weight:700;color:var(--sub);margin-bottom:4px;letter-spacing:.04em;}
+    .sc-cell-val{font-size:17px;font-weight:800;color:var(--text);}
+    .sc-cell-val.empty{color:var(--border);font-size:14px;}
+    .sc-cell.highlight-cell{background:#FEF3C7;}
+    .sc-cell.highlight-cell .sc-cell-val{color:#92400E;}
+
+    /* ── 빈 상태 ── */
+    .empty-state{text-align:center;padding:48px 20px;color:var(--sub);}
+    .empty-state .icon{font-size:2.5rem;margin-bottom:12px;}
+    .empty-state .msg{font-size:15px;font-weight:600;}
+
+    /* ── 내 점수 입력 바 ── */
+    .my-score-bar{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--border);padding:10px 16px;padding-bottom:calc(10px + env(safe-area-inset-bottom));z-index:50;}
+    .msb-inner{display:flex;gap:8px;align-items:center;}
+    .msb-input{flex:1;height:44px;border:1.5px solid var(--border);border-radius:10px;padding:0 14px;font-size:16px;font-family:inherit;color:var(--text);background:#F8F9FA;outline:none;transition:border-color .15s;}
+    .msb-input:focus{border-color:var(--blue);background:var(--white);}
+    .msb-btn{height:44px;padding:0 18px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;white-space:nowrap;transition:background .15s;}
+    .msb-btn:active{background:#1B64DA;}
+    .msb-label{font-size:11px;color:var(--sub);margin-bottom:5px;font-weight:600;}
+  </style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html" class="hdr-back">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </a>
+  <div class="hdr-title">G-TELP 점수대비표</div>
+  <div class="hdr-placeholder"></div>
+</header>
+
+<!-- 검색 + 탭 -->
+<div class="search-section">
+  <div class="search-wrap">
+    <input class="search-input" id="searchInput" type="number" placeholder="G-TELP 점수 검색 (50~99)" inputmode="numeric" min="50" max="99" oninput="onSearch(this.value)" onkeydown="if(event.key==='Enter')findScore()"/>
+    <div class="search-ico" id="searchIco">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+  </div>
+  <div class="tabs" id="tabs">
+    <button class="tab on" onclick="setTab('all',this)">전체</button>
+    <button class="tab" onclick="setTab('lv1',this)">Level 1 대비</button>
+    <button class="tab" onclick="setTab('lv2',this)">Level 2 대비</button>
+  </div>
+</div>
+
+<!-- 내 점수 결과 -->
+<div class="result-banner" id="resultBanner" style="position:relative;">
+  <div class="rb-close" onclick="clearResult()">✕</div>
+  <div class="rb-label">G-TELP <span id="rbLevel"></span></div>
+  <div class="rb-score" id="rbScore"></div>
+  <div class="rb-grid" id="rbGrid"></div>
+</div>
+
+<!-- 목록 -->
+<div class="list" id="list">
+  <div class="list-label" id="listLabel">점수 범위 50~99점</div>
+  <div id="cardList"></div>
+</div>
+
+<!-- 하단 점수 입력 -->
+<div class="my-score-bar">
+  <div class="msb-label">내 G-TELP 점수로 바로 찾기</div>
+  <div class="msb-inner">
+    <input class="msb-input" id="myScoreInput" type="number" placeholder="예) 65" inputmode="numeric" min="50" max="99" onkeydown="if(event.key==='Enter')findScore()"/>
+    <button class="msb-btn" onclick="findScore()">조회하기</button>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  [99,'없음','114-115',969,'111-112'],
+  [98,'없음','',962,110],
+  [97,'없음','',954,109],
+  [96,'없음',113,947,''],
+  [95,'없음','',940,'106-108'],
+  [94,'없음','',932,''],
+  [93,'없음','111-112',925,''],
+  [92,'없음','',918,105],
+  [91,989,'',910,''],
+  [90,984,'',903,''],
+  [89,980,110,896,'103-104'],
+  [88,976,'',889,'101-102'],
+  [87,972,109,881,''],
+  [86,967,'',874,100],
+  [85,963,'',867,''],
+  [84,959,'',859,'98-99'],
+  [83,954,'106-108',852,''],
+  [82,950,'',845,'96-97'],
+  [81,946,'',837,''],
+  [80,941,'',830,'94-95'],
+  [79,937,'',823,''],
+  [78,933,105,815,'92-93'],
+  [77,928,'',808,''],
+  [76,924,'',801,'90-91'],
+  [75,920,'',793,'88-89'],
+  [74,916,'103-104',786,''],
+  [73,911,'',779,''],
+  [72,907,'',771,'86-87'],
+  [71,903,'101-102',764,'84-85'],
+  [70,898,'',757,83],
+  [69,894,'',749,''],
+  [68,890,'',742,'81-82'],
+  [67,885,100,735,'79-80'],
+  [66,881,'',720,'77-78'],
+  [65,877,'',713,76],
+  [64,873,'',706,''],
+  [63,868,'98-99',698,''],
+  [62,864,'',691,'74-75'],
+  [61,860,'',684,'72-73'],
+  [60,855,'96-97',676,''],
+  [59,851,'',669,71],
+  [58,847,'',662,''],
+  [57,842,'',654,'69-70'],
+  [56,838,'94-95',647,68],
+  [55,834,'',640,'66-67'],
+  [54,830,'',632,''],
+  [53,825,'92-93',625,65],
+  [52,821,'',618,64],
+  [51,817,'',610,''],
+  [50,812,'',603,''],
+];
+
+let currentTab = 'all';
+let highlightScore = null;
+let searchQuery = '';
+
+function setTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  renderCards();
+}
+
+function onSearch(val) {
+  searchQuery = val;
+  renderCards();
+}
+
+function findScore() {
+  const val = parseInt(document.getElementById('myScoreInput').value);
+  if (!val || val < 50 || val > 99) { alert('50~99 사이의 점수를 입력해주세요.'); return; }
+  highlightScore = val;
+  document.getElementById('searchInput').value = val;
+  searchQuery = String(val);
+
+  // 결과 배너 표시
+  const row = DATA.find(d => d[0] === val);
+  if (row) {
+    const [g, t1, f1, t2, f2] = row;
+    document.getElementById('rbScore').textContent = g + '점';
+    document.getElementById('rbLevel').textContent = '';
+    const items = [
+      {label:'TOEIC (Lv.1)', val: t1||'—'},
+      {label:'TOEFL IBT (Lv.1)', val: f1||'—'},
+      {label:'TOEIC (Lv.2)', val: t2||'—'},
+      {label:'TOEFL IBT (Lv.2)', val: f2||'—'},
+    ];
+    document.getElementById('rbGrid').innerHTML = items.map(i =>
+      `<div class="rb-item"><div class="rb-item-label">${i.label}</div><div class="rb-item-val">${i.val}</div></div>`
+    ).join('');
+    document.getElementById('resultBanner').classList.add('show');
+  }
+  renderCards();
+  // 해당 카드로 스크롤
+  setTimeout(() => {
+    const el = document.getElementById('card-'+val);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 100);
+}
+
+function clearResult() {
+  highlightScore = null;
+  document.getElementById('resultBanner').classList.remove('show');
+  document.getElementById('myScoreInput').value = '';
+  document.getElementById('searchInput').value = '';
+  searchQuery = '';
+  renderCards();
+}
+
+function fmtVal(v, tab) {
+  if (v === '' || v === null || v === undefined) return '—';
+  if (String(v) === '없음') return '없음';
+  return String(v);
+}
+
+function renderCards() {
+  let data = DATA;
+  if (searchQuery && !isNaN(parseInt(searchQuery))) {
+    const q = parseInt(searchQuery);
+    data = DATA.filter(d => d[0] === q);
+  }
+
+  const container = document.getElementById('cardList');
+  if (!data.length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><div class="msg">검색 결과가 없습니다</div></div>`;
+    return;
+  }
+
+  document.getElementById('listLabel').textContent = searchQuery ? `검색 결과 ${data.length}건` : `점수 범위 50~99점 · ${data.length}개`;
+
+  container.innerHTML = data.map(([g, t1, f1, t2, f2]) => {
+    const isHL = g === highlightScore;
+    const lvl1 = currentTab !== 'lv2';
+    const lvl2 = currentTab !== 'lv1';
+
+    const sub = [];
+    if (lvl1 && (t1 || f1)) {
+      if (t1 && t1 !== '없음' && t1 !== '') sub.push(`TOEIC Lv.1 ${t1}`);
+      if (f1 && f1 !== '') sub.push(`TOEFL Lv.1 ${f1}`);
+    }
+    if (lvl2 && (t2 || f2)) {
+      if (t2 && t2 !== '') sub.push(`TOEIC Lv.2 ${t2}`);
+      if (f2 && f2 !== '') sub.push(`TOEFL Lv.2 ${f2}`);
+    }
+
+    const cells = [];
+    if (lvl1) {
+      cells.push(`<div class="sc-cell${isHL?' highlight-cell':''}"><div class="sc-cell-label">TOEIC · Level 1</div><div class="sc-cell-val${!t1||t1===''?' empty':''}">${t1||'—'}</div></div>`);
+      cells.push(`<div class="sc-cell${isHL?' highlight-cell':''}"><div class="sc-cell-label">TOEFL IBT · Level 1</div><div class="sc-cell-val${!f1||f1===''?' empty':''}">${f1||'—'}</div></div>`);
+    }
+    if (lvl2) {
+      cells.push(`<div class="sc-cell${isHL?' highlight-cell':''}"><div class="sc-cell-label">TOEIC · Level 2</div><div class="sc-cell-val${!t2||t2===''?' empty':''}">${t2||'—'}</div></div>`);
+      cells.push(`<div class="sc-cell${isHL?' highlight-cell':''}"><div class="sc-cell-label">TOEFL IBT · Level 2</div><div class="sc-cell-val${!f2||f2===''?' empty':''}">${f2||'—'}</div></div>`);
+    }
+
+    return `<div class="score-card${isHL?' highlighted':''}" id="card-${g}" onclick="toggleCard(this)">
+      <div class="sc-header">
+        <div class="sc-gtelp${isHL?' highlighted':''}">${g}</div>
+        <div class="sc-info">
+          <div class="sc-title">G-TELP ${g}점</div>
+          <div class="sc-sub">${sub.length ? sub.slice(0,2).join(' · ') : '탭하여 환산 점수 보기'}</div>
+        </div>
+        <svg class="sc-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="sc-body">
+        <div class="sc-grid">${cells.join('')}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // 검색 결과 자동 열기
+  if (data.length === 1) {
+    const card = document.querySelector('.score-card');
+    if (card) toggleCard(card);
+  }
+  // 하이라이트 카드 자동 열기
+  if (highlightScore) {
+    const hlCard = document.getElementById('card-'+highlightScore);
+    if (hlCard && !hlCard.classList.contains('open')) toggleCard(hlCard);
+  }
+}
+
+function toggleCard(el) {
+  const isOpen = el.classList.contains('open');
+  // 모두 닫기
+  document.querySelectorAll('.score-card.open').forEach(c => c.classList.remove('open'));
+  if (!isOpen) el.classList.add('open');
+}
+
+renderCards();
+</script>
+</body>
+</html>
