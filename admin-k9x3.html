@@ -324,13 +324,14 @@
                 <tr>
                   <th class="px-4 py-3 text-left font-semibold">학교명</th>
                   <th class="px-4 py-3 text-left font-semibold">학과</th>
+                  <th class="px-4 py-3 text-left font-semibold">문의·메모</th>
                   <th class="px-4 py-3 text-left font-semibold">접수일시</th>
                   <th class="px-4 py-3 text-left font-semibold">상태</th>
                   <th class="px-4 py-3 text-left font-semibold">처리</th>
                 </tr>
               </thead>
               <tbody id="ibt-tbody">
-                <tr><td colspan="5" class="py-10 text-center text-slate-400 text-sm">불러오는 중...</td></tr>
+                <tr><td colspan="6" class="py-10 text-center text-slate-400 text-sm">불러오는 중...</td></tr>
               </tbody>
             </table>
           </div>
@@ -2490,20 +2491,21 @@
     // ─── IBT 신청접수 ───
     async function loadIbtApplications() {
       const tbody = document.getElementById('ibt-tbody');
-      tbody.innerHTML = '<tr><td colspan="5" class="py-10 text-center text-slate-400 text-sm">불러오는 중...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="py-10 text-center text-slate-400 text-sm">불러오는 중...</td></tr>';
       const { data, error } = await db.from('ibt_applications')
         .select('*').order('created_at', { ascending: false }).limit(500);
-      if (error) { tbody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-red-400 text-sm">오류: ${error.message}</td></tr>`; return; }
+      if (error) { tbody.innerHTML = `<tr><td colspan="6" class="py-10 text-center text-red-400 text-sm">오류: ${error.message}</td></tr>`; return; }
       const rows = data || [];
       document.getElementById('ibt-total').textContent   = rows.length;
       document.getElementById('ibt-pending').textContent = rows.filter(r => r.status === 'pending').length;
       document.getElementById('ibt-done').textContent    = rows.filter(r => r.status === 'done').length;
-      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="5" class="py-10 text-center text-slate-400 text-sm">접수된 신청이 없습니다.</td></tr>'; return; }
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6" class="py-10 text-center text-slate-400 text-sm">접수된 신청이 없습니다.</td></tr>'; return; }
       const fmt = iso => { const d = new Date(iso); return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
       tbody.innerHTML = rows.map((r, i) => `
         <tr class="${i%2===1?'bg-slate-50':''} border-b border-slate-100">
           <td class="px-4 py-3 font-semibold text-slate-800">${r.school_name || '-'}</td>
           <td class="px-4 py-3 text-slate-600">${r.department || '-'}</td>
+          <td class="px-4 py-3 text-slate-500 text-xs max-w-xs" style="white-space:pre-wrap;word-break:break-word;">${r.memo ? r.memo.replace(/</g,'&lt;') : '-'}</td>
           <td class="px-4 py-3 text-slate-400 text-xs">${fmt(r.created_at)}</td>
           <td class="px-4 py-3">
             <span class="px-2 py-0.5 rounded-full text-xs font-bold ${r.status==='done'?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">
