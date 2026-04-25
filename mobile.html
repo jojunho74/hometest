@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <title>모바일 서비스 — 지텔프IBT</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    :root{
+      --blue:#3182F6;
+      --bg:#F2F4F6;
+      --white:#FFFFFF;
+      --text:#191919;
+      --sub:#8B95A1;
+      --border:#E5E8EB;
+    }
+    html,body{font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;min-height:100%;}
+
+    /* ── 헤더 ── */
+    .hdr{height:52px;background:var(--white);display:flex;align-items:center;padding:0 20px;border-bottom:1px solid var(--border);}
+    .hdr-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--text);text-decoration:none;flex-shrink:0;}
+    .hdr-title{flex:1;text-align:center;font-size:17px;font-weight:700;letter-spacing:-.3px;}
+    .hdr-placeholder{width:32px;}
+
+    /* ── 본문 ── */
+    .body{padding:20px 16px 40px;}
+
+    /* ── 히어로 ── */
+    .hero{background:linear-gradient(135deg,#1a2f5a 0%,#1e4a9e 55%,#3182F6 100%);border-radius:20px;padding:28px 22px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%;}
+    .hero::after{content:'';position:absolute;bottom:-40px;left:-20px;width:120px;height:120px;background:rgba(255,255,255,.04);border-radius:50%;}
+    .hero-label{font-size:11px;font-weight:700;opacity:.65;letter-spacing:.08em;margin-bottom:8px;}
+    .hero-title{font-size:24px;font-weight:800;line-height:1.3;letter-spacing:-.5px;margin-bottom:8px;}
+    .hero-sub{font-size:13px;opacity:.75;line-height:1.6;}
+
+    /* ── 섹션 타이틀 ── */
+    .sec-title{font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.04em;margin-bottom:10px;padding-left:2px;}
+
+    /* ── 서비스 카드 ── */
+    .service-card{background:var(--white);border-radius:18px;margin-bottom:10px;overflow:hidden;text-decoration:none;display:block;transition:transform .1s,box-shadow .1s;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    .service-card:active{transform:scale(.97);box-shadow:0 1px 2px rgba(0,0,0,.04);}
+    .sc-inner{display:flex;align-items:center;padding:18px 16px;gap:14px;}
+    .sc-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
+    .sc-text{flex:1;min-width:0;}
+    .sc-name{font-size:16px;font-weight:800;letter-spacing:-.3px;margin-bottom:3px;}
+    .sc-desc{font-size:13px;color:var(--sub);line-height:1.45;}
+    .sc-badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;margin-top:5px;}
+    .sc-arrow{color:#D1D5DB;flex-shrink:0;}
+
+    /* ── 색상 테마 ── */
+    .theme-blue .sc-icon{background:#EFF6FF;}
+    .theme-gold .sc-icon{background:#FFFBEB;}
+    .theme-red  .sc-icon{background:#FFF1F2;}
+    .theme-blue .sc-badge{background:#EFF6FF;color:#3182F6;}
+    .theme-gold .sc-badge{background:#FFFBEB;color:#D97706;}
+    .theme-red  .sc-badge{background:#FFF1F2;color:#F04452;}
+
+    /* ── 안내 카드 ── */
+    .info-card{background:#EFF6FF;border-radius:14px;padding:14px 16px;margin-top:20px;display:flex;gap:10px;align-items:flex-start;}
+    .info-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+    .info-text{font-size:13px;color:#1E40AF;line-height:1.6;font-weight:500;}
+
+    /* ── PC앱 버튼 ── */
+    .pc-btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#fff;text-decoration:none;background:linear-gradient(135deg,#1E4D8C,#0891B2);white-space:nowrap;transition:opacity .15s;}
+    .pc-btn::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:pc-shimmer 2s ease-in-out infinite;}
+    @keyframes pc-shimmer{0%{left:-100%}60%,100%{left:160%}}
+    .pc-btn:active{opacity:.7;}
+
+    /* ── 바텀 홈 버튼 ── */
+    .home-btn{display:block;text-align:center;margin-top:20px;padding:14px;background:var(--white);border-radius:14px;font-size:15px;font-weight:700;color:var(--text);text-decoration:none;transition:opacity .15s;}
+    .home-btn:active{opacity:.7;}
+  </style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html" class="hdr-back">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </a>
+  <div class="hdr-title">모바일 서비스</div>
+  <a href="index.html" class="pc-btn">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    PC앱
+  </a>
+</header>
+
+<div class="body">
+
+  <!-- 히어로 -->
+  <div class="hero">
+    <div class="hero-label">GTELP IBT · MOBILE</div>
+    <div class="hero-title">모바일에 최적화된<br>서비스를 이용하세요</div>
+    <div class="hero-sub">신청·점수 조회·경쟁률을<br>스마트폰에서 간편하게</div>
+  </div>
+
+  <!-- 서비스 목록 -->
+  <div class="sec-title">서비스 선택</div>
+
+  <a href="mobile/competition-m.html" class="service-card theme-red">
+    <div class="sc-inner">
+      <div class="sc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F04452" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 6 2 6 2 18 8 18"/><polyline points="16 6 22 6 22 18 16 18"/><rect x="8" y="2" width="8" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div>
+      <div class="sc-text">
+        <div class="sc-name">공공기관 경쟁률</div>
+        <div class="sc-desc">공공기관·기업별 채용 경쟁률을 검색하고 비교해보세요</div>
+        <div class="sc-badge">기관별 상세 조회</div>
+      </div>
+      <svg class="sc-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </a>
+
+  <a href="mobile/student-m.html" class="service-card theme-blue">
+    <div class="sc-inner">
+      <div class="sc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3182F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+      <div class="sc-text">
+        <div class="sc-name">IBT 무료신청</div>
+        <div class="sc-desc">학교 취업센터에 G-TELP IBT 시험을 무료로 도입하세요</div>
+        <div class="sc-badge">완전 무료 · 1~2일 내 연락</div>
+      </div>
+      <svg class="sc-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </a>
+
+  <a href="mobile/gtelp-score-m.html" class="service-card theme-gold">
+    <div class="sc-inner">
+      <div class="sc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+      <div class="sc-text">
+        <div class="sc-name">G-TELP 점수대비표</div>
+        <div class="sc-desc">내 G-TELP 점수로 TOEIC·TOEFL 환산 점수를 확인하세요</div>
+        <div class="sc-badge">점수 즉시 조회</div>
+      </div>
+      <svg class="sc-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </a>
+
+  <!-- 안내 -->
+  <div class="info-card">
+    <div class="info-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+    <div class="info-text">모바일에 최적화된 페이지입니다. PC에서는 상단 메뉴를 통해 전체 기능을 이용하실 수 있습니다.</div>
+  </div>
+
+  <a href="index.html" class="home-btn">메인 홈으로</a>
+
+</div>
+</body>
+</html>

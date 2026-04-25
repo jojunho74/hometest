@@ -208,6 +208,9 @@
     /* ── 스텝 원 ── */
     .step-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; flex-shrink: 0; }
     .hamburger { display: flex; flex-direction: column; justify-content: center; gap: 5px; width: 36px; height: 36px; cursor: pointer; background: #1E4D8C; border: none; padding: 6px; border-radius: 8px; }
+    .mobile-app-btn { position:relative; overflow:hidden; display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:20px; font-size:12px; font-weight:700; color:#fff; text-decoration:none; background:linear-gradient(135deg,#1E4D8C,#0891B2); white-space:nowrap; flex-shrink:0; }
+    .mobile-app-btn::after { content:''; position:absolute; top:0; left:-100%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent); animation:mab-shimmer 2s ease-in-out infinite; }
+    @keyframes mab-shimmer { 0%{left:-100%} 60%,100%{left:160%} }
     .hamburger span { display: block; height: 2px; background: #fff; border-radius: 2px; transition: transform .25s, opacity .25s; }
     .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
@@ -282,7 +285,13 @@
   <header class="sticky top-0 z-50 bg-white" style="box-shadow: 0 1px 0 #E2E8F0, 0 4px 16px rgba(0,0,0,.06);">
     <div class="header-accent-line"></div>
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-      <a href="index.html" class="font-display text-xl font-bold tracking-tight" style="background:linear-gradient(135deg,#1E3A8A,#0891B2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;flex-shrink:0;">지텔프IBT 대학컨설팅</a>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+        <a href="index.html" class="font-display text-xl font-bold tracking-tight" style="background:linear-gradient(135deg,#1E3A8A,#0891B2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;">지텔프IBT 대학컨설팅</a>
+        <a href="mobile.html" class="mobile-app-btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          모바일앱
+        </a>
+      </div>
       <nav class="hidden items-center gap-1 font-semibold">
         <a href="#about" class="nav-link">서비스 소개</a>
         <a href="package.html" class="nav-link">패키지</a>
@@ -306,6 +315,7 @@
     </div>
   </header>
   <div class="mobile-menu" id="mobile-menu">
+    <a href="mobile.html">모바일 서비스</a>
     <a href="#about">서비스 소개</a>
     <a href="package.html">패키지</a>
     <a href="schedule.html">정기시험 일정</a>
