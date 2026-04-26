@@ -215,14 +215,29 @@ const COLORS = ['#EFF6FF','#F0FDF4','#FFF7ED','#FDF2F8','#F5F3FF'];
 const TEXT_COLORS = ['#3182F6','#16A34A','#D97706','#9333EA','#7C3AED'];
 
 async function init() {
-  const { data, error } = await db.from('alio_jobs')
-    .select('dataset_name,job,region,s1_total,s3_pass,ratio')
-    .order('dataset_name');
+  const [jobsRes, cacheRes] = await Promise.all([
+    db.from('alio_jobs')
+      .select('dataset_name,job,region,s1_total,s3_pass,ratio')
+      .order('dataset_name'),
+    db.from('alio_source_cache')
+      .select('dataset_name,upload_data')
+      .eq('status','published')
+      .not('upload_data','is',null)
+  ]);
 
-  if (error || !data) {
+  if (jobsRes.error || !jobsRes.data) {
     document.getElementById('orgList').innerHTML = `<div class="empty"><div class="empty-text">데이터를 불러올 수 없습니다</div></div>`;
     return;
   }
+
+  // alio_jobs + alio_source_cache 병합 (중복 dataset_name은 alio_jobs 우선)
+  const data = [...jobsRes.data];
+  const jobDatasets = new Set(jobsRes.data.map(r => r.dataset_name));
+  (cacheRes.data || []).forEach(row => {
+    if (!jobDatasets.has(row.dataset_name) && Array.isArray(row.upload_data)) {
+      row.upload_data.forEach(r => data.push(r));
+    }
+  });
 
   // 기관별 그룹핑
   const map = {};
