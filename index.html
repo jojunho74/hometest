@@ -1710,7 +1710,7 @@
           'Authorization': 'Bearer ' + SB_KEY,
           'Prefer': 'return=minimal'
         },
-        body: JSON.stringify({ page: page, referrer: document.referrer || null })
+        body: JSON.stringify({ page: page, referrer: document.referrer || null, ua: navigator.userAgent || null })
       }).catch(function(){});
     })();
   </script>

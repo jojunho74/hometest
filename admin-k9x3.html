@@ -204,6 +204,7 @@
       <button onclick="switchTab('news')"     id="tab-news"     class="sb-item"><span class="sb-icon">📰</span><span class="sb-label">대학소식</span></button>
       <button onclick="switchTab('programs')" id="tab-programs" class="sb-item"><span class="sb-icon">🏫</span><span class="sb-label">대학활동</span></button>
       <button onclick="switchTab('jobs')"     id="tab-jobs"     class="sb-item"><span class="sb-icon">💼</span><span class="sb-label">채용공고</span></button>
+      <button onclick="switchTab('foreignjobs')" id="tab-foreignjobs" class="sb-item"><span class="sb-icon">🌐</span><span class="sb-label">외국인채용공고</span></button>
       <button onclick="switchTab('staffjobs')" id="tab-staffjobs" class="sb-item"><span class="sb-icon">👔</span><span class="sb-label">직원채용공고</span></button>
       <button onclick="switchTab('cnews')"    id="tab-cnews"    class="sb-item"><span class="sb-icon">🏢</span><span class="sb-label">기업소식</span></button>
       <button onclick="switchTab('shorts')"   id="tab-shorts"   class="sb-item"><span class="sb-icon">🎬</span><span class="sb-label">유튜브쇼츠</span></button>
@@ -218,6 +219,8 @@
       <button onclick="switchTab('comments')" id="tab-comments" class="sb-item"><span class="sb-icon">💬</span><span class="sb-label">댓글 관리</span></button>
       <button onclick="switchTab('stats')"    id="tab-stats"    class="sb-item"><span class="sb-icon">📊</span><span class="sb-label">통계</span></button>
       <button onclick="switchTab('tracking')" id="tab-tracking" class="sb-item"><span class="sb-icon">📡</span><span class="sb-label">추적</span></button>
+      <button onclick="switchTab('analysis1')" id="tab-analysis1" class="sb-item"><span class="sb-icon">🔬</span><span class="sb-label">분석 1</span></button>
+      <button onclick="switchTab('analysis2')" id="tab-analysis2" class="sb-item"><span class="sb-icon">📈</span><span class="sb-label">분석 2</span></button>
       <button onclick="switchTab('blog')"     id="tab-blog"     class="sb-item"><span class="sb-icon">✍️</span><span class="sb-label">블로그 원고</span></button>
       <button onclick="switchTab('popupads')" id="tab-popupads" class="sb-item"><span class="sb-icon">📢</span><span class="sb-label">팝업광고</span></button>
 
@@ -553,6 +556,58 @@
         <p id="job-empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">등록된 채용공고가 없습니다.</p>
       </div>
 
+      <!-- ── 외국인채용공고 탭 ── -->
+      <div id="section-foreignjobs" class="hidden">
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 class="font-bold text-slate-700 mb-4">새 외국인채용공고 등록</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">기관명 *</label>
+              <input id="fj-school" type="text" placeholder="예) 한국수자원공사" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">제목 *</label>
+              <input id="fj-title" type="text" placeholder="외국인채용공고 제목을 입력하세요" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">링크 (선택)</label>
+              <input id="fj-link" type="url" placeholder="https://..." class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">로고 이미지 (선택)</label>
+            <input id="fj-logo" type="file" accept="image/*" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+            <p id="fj-logo-preview-wrap" class="hidden mt-2"><img id="fj-logo-preview" src="" class="h-12 object-contain rounded border border-slate-200 p-1"/></p>
+          </div>
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-500 mb-2">카드 배경색</label>
+            <input type="hidden" id="fj-color" value="#FFFFFF"/>
+            <div id="fj-color-swatches" class="flex flex-wrap gap-2"></div>
+          </div>
+          <button onclick="addForeignJob()" class="btn btn-primary">+ 등록하기</button>
+          <p id="fj-msg" class="hidden text-sm text-green-600 mt-2 font-semibold">✓ 등록되었습니다.</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm table-wrap">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-slate-400 text-xs border-b">
+                <th class="px-4 py-3 font-semibold">순서</th>
+                <th class="px-4 py-3 font-semibold">기관명</th>
+                <th class="px-4 py-3 font-semibold">제목</th>
+                <th class="px-4 py-3 font-semibold hidden md:table-cell">링크</th>
+                <th class="px-4 py-3 font-semibold hidden md:table-cell">등록일</th>
+                <th class="px-4 py-3 font-semibold">수정</th>
+                <th class="px-4 py-3 font-semibold">삭제</th>
+              </tr>
+            </thead>
+            <tbody id="fj-body">
+              <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">불러오는 중...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p id="fj-empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">등록된 외국인채용공고가 없습니다.</p>
+      </div>
+
       <!-- ── 직원채용공고 탭 ── -->
       <div id="section-staffjobs" class="hidden">
         <!-- 등록 폼 -->
@@ -699,6 +754,44 @@
           <div class="px-6 py-4 border-t flex justify-end gap-2">
             <button onclick="closeJobModal()" class="btn btn-secondary">취소</button>
             <button onclick="saveJobEdit()" class="btn btn-primary">저장</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 외국인채용공고 수정 모달 -->
+      <div id="fj-modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:200;padding:16px;">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+          <div class="flex items-center justify-between px-6 py-4 border-b">
+            <h2 class="font-bold text-lg text-slate-800">외국인채용공고 수정</h2>
+            <button onclick="closeFjModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+          </div>
+          <div class="px-6 py-5 space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">기관명</label>
+              <input id="edit-fj-school" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">제목</label>
+              <input id="edit-fj-title" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">링크 (선택)</label>
+              <input id="edit-fj-link" type="url" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">로고 이미지 변경 (선택)</label>
+              <input id="edit-fj-logo" type="file" accept="image/*" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+              <p id="edit-fj-logo-preview-wrap" class="mt-2"><img id="edit-fj-logo-preview" src="" class="h-12 object-contain rounded border border-slate-200 p-1"/></p>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-2">카드 배경색</label>
+              <input type="hidden" id="edit-fj-color" value="#FFFFFF"/>
+              <div id="edit-fj-color-swatches" class="flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t flex justify-end gap-2">
+            <button onclick="closeFjModal()" class="btn btn-secondary">취소</button>
+            <button onclick="saveFjEdit()" class="btn btn-primary">저장</button>
           </div>
         </div>
       </div>
@@ -1647,6 +1740,345 @@
 
       </div>
 
+      <!-- ── 분석 1 탭 ── -->
+      <div id="section-analysis1" class="hidden">
+        <style>
+          #section-analysis1{background:#F0F4F8;padding:20px;}
+          .an1-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+          .an1-hdr h2{font-size:1.05rem;font-weight:800;color:#1E293B;letter-spacing:-.3px;}
+          .an1-hdr .an1-sub{font-size:.75rem;color:#94A3B8;margin-top:2px;}
+          .an1-refresh{display:flex;align-items:center;gap:8px;}
+          .an1-update-btn{padding:8px 18px;background:linear-gradient(135deg,#3B82F6,#1D4ED8);color:#fff;border:none;border-radius:10px;font-size:.8rem;font-weight:700;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;gap:6px;}
+          .an1-update-btn:hover{opacity:.85;}
+          .an1-update-btn:disabled{opacity:.5;cursor:not-allowed;}
+          .an1-status{font-size:.72rem;color:#94A3B8;}
+          /* KPI */
+          .an1-kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px;}
+          @media(max-width:900px){.an1-kpi-row{grid-template-columns:repeat(3,1fr);}}
+          @media(max-width:600px){.an1-kpi-row{grid-template-columns:repeat(2,1fr);}}
+          .an1-kpi{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+          .an1-kpi-val{font-size:1.5rem;font-weight:800;color:#1E293B;letter-spacing:-.5px;}
+          .an1-kpi-lbl{font-size:.7rem;color:#94A3B8;font-weight:600;margin-top:2px;}
+          .an1-kpi-sub{font-size:.68rem;margin-top:3px;}
+          /* 섹션 */
+          .an1-sec{background:#fff;border-radius:14px;padding:18px 20px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+          .an1-sec-hdr{display:flex;align-items:center;gap:8px;margin-bottom:14px;border-bottom:1.5px solid #F1F5F9;padding-bottom:10px;}
+          .an1-sec-bar{width:4px;height:18px;border-radius:3px;background:#3B82F6;flex-shrink:0;}
+          .an1-sec-title{font-size:.88rem;font-weight:800;color:#1E293B;}
+          .an1-sec-hint{font-size:.72rem;color:#94A3B8;margin-left:auto;}
+          /* 퍼널 */
+          .an1-funnel{display:flex;flex-direction:column;gap:8px;}
+          .an1-funnel-row{display:flex;align-items:center;gap:10px;}
+          .an1-funnel-label{width:130px;font-size:.75rem;font-weight:700;color:#475569;flex-shrink:0;}
+          .an1-funnel-bar-wrap{flex:1;background:#F1F5F9;border-radius:6px;height:28px;overflow:hidden;position:relative;}
+          .an1-funnel-bar{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;font-size:.72rem;font-weight:800;color:#fff;transition:width .6s ease;}
+          .an1-funnel-cnt{width:80px;font-size:.78rem;font-weight:700;color:#1E293B;text-align:right;flex-shrink:0;}
+          .an1-funnel-pct{width:52px;font-size:.7rem;color:#94A3B8;text-align:right;flex-shrink:0;}
+          /* 테이블 */
+          .an1-tbl{width:100%;border-collapse:collapse;font-size:.78rem;}
+          .an1-tbl th{padding:7px 10px;font-size:.68rem;font-weight:700;color:#94A3B8;text-align:left;border-bottom:2px solid #F1F5F9;}
+          .an1-tbl td{padding:8px 10px;border-bottom:1px solid #F8FAFC;color:#334155;}
+          .an1-tbl tr:last-child td{border-bottom:none;}
+          .an1-tbl tr:hover td{background:#F8FAFC;}
+          .an1-badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.65rem;font-weight:700;}
+          .an1-bar-inline{display:inline-block;height:6px;border-radius:3px;background:#3B82F6;margin-left:6px;vertical-align:middle;}
+          /* 디바이스 */
+          .an1-device-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+          @media(max-width:600px){.an1-device-grid{grid-template-columns:1fr;}}
+          .an1-device-card{background:#F8FAFC;border-radius:10px;padding:12px 14px;text-align:center;}
+          .an1-device-icon{font-size:1.6rem;margin-bottom:4px;}
+          .an1-device-pct{font-size:1.2rem;font-weight:800;color:#1E293B;}
+          .an1-device-lbl{font-size:.68rem;color:#94A3B8;font-weight:600;}
+          .an1-sql-box{background:#1E293B;border-radius:10px;padding:14px 16px;font-size:.72rem;color:#94D2BD;font-family:monospace;line-height:1.7;margin-top:10px;overflow-x:auto;}
+          .an1-notice{background:#EFF6FF;border-radius:10px;padding:12px 14px;font-size:.78rem;color:#1E40AF;display:flex;gap:8px;align-items:flex-start;}
+          .an1-loading{text-align:center;padding:30px;color:#94A3B8;font-size:.82rem;}
+          .an1-two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+          @media(max-width:700px){.an1-two-col{grid-template-columns:1fr;}}
+          .an1-pb{padding:5px 13px;border-radius:20px;font-size:.73rem;font-weight:700;border:1.5px solid #E2E8F0;background:#F8FAFC;color:#94A3B8;cursor:pointer;transition:all .15s;}
+          .an1-pb.on{background:#3B82F6;border-color:#3B82F6;color:#fff;}
+          .an1-pb:hover:not(.on){border-color:#3B82F6;color:#3B82F6;}
+        </style>
+
+        <!-- 헤더 -->
+        <div class="an1-hdr">
+          <div>
+            <h2>🔬 분석 1 — 전환·이탈·디바이스 인사이트</h2>
+            <div class="an1-sub">page_views, ibt_applications, consultations 실시간 분석</div>
+          </div>
+          <div class="an1-refresh">
+            <span class="an1-status" id="an1-status">—</span>
+            <button class="an1-update-btn" onclick="an1Reload()" id="an1-update-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              업데이트
+            </button>
+          </div>
+        </div>
+
+        <!-- 기간 필터 -->
+        <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+          <button class="an1-pb on" id="an1-pb-월간" onclick="an1SetPeriod('월간')">월간(30일)</button>
+          <button class="an1-pb" id="an1-pb-주간" onclick="an1SetPeriod('주간')">주간(7일)</button>
+          <button class="an1-pb" id="an1-pb-어제" onclick="an1SetPeriod('어제')">어제</button>
+          <button class="an1-pb" id="an1-pb-오늘" onclick="an1SetPeriod('오늘')">오늘</button>
+        </div>
+
+        <!-- KPI -->
+        <div class="an1-kpi-row">
+          <div class="an1-kpi">
+            <div class="an1-kpi-val" id="an1-k-visit">—</div>
+            <div class="an1-kpi-lbl">최근 30일 방문</div>
+          </div>
+          <div class="an1-kpi">
+            <div class="an1-kpi-val" id="an1-k-apply">—</div>
+            <div class="an1-kpi-lbl">총 신청수 (IBT+상담)</div>
+          </div>
+          <div class="an1-kpi">
+            <div class="an1-kpi-val" id="an1-k-cvr" style="color:#16A34A;">—</div>
+            <div class="an1-kpi-lbl">전환율</div>
+            <div class="an1-kpi-sub" style="color:#94A3B8;">방문 대비 신청</div>
+          </div>
+          <div class="an1-kpi">
+            <div class="an1-kpi-val" id="an1-k-dwell">—</div>
+            <div class="an1-kpi-lbl">평균 체류시간</div>
+          </div>
+          <div class="an1-kpi">
+            <div class="an1-kpi-val" id="an1-k-bounce" style="color:#EF4444;">—</div>
+            <div class="an1-kpi-lbl">30초 이탈률</div>
+            <div class="an1-kpi-sub" style="color:#94A3B8;">체류 30초 미만</div>
+          </div>
+        </div>
+
+        <div class="an1-two-col">
+
+          <!-- ① 전환 퍼널 -->
+          <div class="an1-sec">
+            <div class="an1-sec-hdr">
+              <div class="an1-sec-bar" style="background:#3B82F6;"></div>
+              <div class="an1-sec-title">① 전환 퍼널</div>
+              <div class="an1-sec-hint">방문 → 관심 → 신청</div>
+            </div>
+            <div class="an1-funnel" id="an1-funnel">
+              <div class="an1-loading">집계 중…</div>
+            </div>
+          </div>
+
+          <!-- ② 페이지별 이탈 분석 -->
+          <div class="an1-sec">
+            <div class="an1-sec-hdr">
+              <div class="an1-sec-bar" style="background:#EF4444;"></div>
+              <div class="an1-sec-title">② 이탈 분석</div>
+              <div class="an1-sec-hint">체류 30초 미만 비율</div>
+            </div>
+            <table class="an1-tbl">
+              <thead><tr><th>페이지</th><th>이탈수</th><th>이탈률</th><th>평균체류</th></tr></thead>
+              <tbody id="an1-bounce-tbody"><tr><td colspan="4" class="an1-loading">집계 중…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ③ 유입채널 성과 -->
+        <div class="an1-sec">
+          <div class="an1-sec-hdr">
+            <div class="an1-sec-bar" style="background:#D97706;"></div>
+            <div class="an1-sec-title">③ 유입채널별 성과</div>
+            <div class="an1-sec-hint">채널 → 방문수, 평균 체류시간, 이탈률</div>
+          </div>
+          <table class="an1-tbl">
+            <thead><tr><th>채널</th><th>방문수</th><th>비율</th><th>평균체류</th><th>이탈률</th><th>평가</th></tr></thead>
+            <tbody id="an1-channel-tbody"><tr><td colspan="6" class="an1-loading">집계 중…</td></tr></tbody>
+          </table>
+        </div>
+
+        <!-- ④ 디바이스·유입경로 추적 -->
+        <div class="an1-sec">
+          <div class="an1-sec-hdr">
+            <div class="an1-sec-bar" style="background:#7C3AED;"></div>
+            <div class="an1-sec-title">④ 디바이스 추적</div>
+            <div class="an1-sec-hint" id="an1-device-hint">ua 컬럼 확인 중…</div>
+          </div>
+
+          <!-- 디바이스 현황 (ua 컬럼 있을 때) -->
+          <div id="an1-device-charts" class="hidden">
+            <div class="an1-device-grid" id="an1-device-grid"></div>
+            <table class="an1-tbl">
+              <thead><tr><th>디바이스</th><th>방문수</th><th>비율</th><th>평균체류</th></tr></thead>
+              <tbody id="an1-device-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- ua 컬럼 없을 때 안내 -->
+          <div id="an1-device-guide">
+            <div class="an1-notice">
+              <span>ℹ️</span>
+              <span>디바이스 추적을 위해 <strong>Supabase → SQL Editor</strong>에서 아래 SQL을 실행하세요. 이후 자동으로 모바일·PC·태블릿 비율이 집계됩니다.</span>
+            </div>
+            <div class="an1-sql-box">-- page_views 테이블에 ua 컬럼 추가<br>ALTER TABLE page_views ADD COLUMN IF NOT EXISTS ua TEXT;<br><br>-- 추가 후 이 페이지 "업데이트" 버튼을 누르면 추적 시작</div>
+            <div style="margin-top:10px;font-size:.75rem;color:#64748B;">컬럼 추가 후 새 방문부터 디바이스가 기록됩니다. 기존 데이터는 소급 적용되지 않습니다.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── 분석 2 탭 ── -->
+      <div id="section-analysis2" class="hidden">
+        <style>
+          #section-analysis2{background:#F0F4F8;padding:20px;}
+          .an2-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+          .an2-hdr h2{font-size:1.05rem;font-weight:800;color:#1E293B;letter-spacing:-.3px;}
+          .an2-hdr .an2-sub{font-size:.75rem;color:#94A3B8;margin-top:2px;}
+          .an2-refresh{display:flex;align-items:center;gap:8px;}
+          .an2-pb{padding:5px 13px;border-radius:20px;font-size:.73rem;font-weight:700;border:1.5px solid #E2E8F0;background:#F8FAFC;color:#94A3B8;cursor:pointer;transition:all .15s;}
+          .an2-pb.on{background:#7C3AED;border-color:#7C3AED;color:#fff;}
+          .an2-pb:hover:not(.on){border-color:#7C3AED;color:#7C3AED;}
+          .an2-update-btn{padding:8px 18px;background:linear-gradient(135deg,#7C3AED,#4F46E5);color:#fff;border:none;border-radius:10px;font-size:.8rem;font-weight:700;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;gap:6px;}
+          .an2-update-btn:hover{opacity:.85;}
+          .an2-update-btn:disabled{opacity:.5;cursor:not-allowed;}
+          .an2-status{font-size:.72rem;color:#94A3B8;}
+          .an2-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+          @media(max-width:800px){.an2-kpi-row{grid-template-columns:repeat(2,1fr);}}
+          .an2-kpi{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+          .an2-kpi-val{font-size:1.5rem;font-weight:800;color:#1E293B;letter-spacing:-.5px;}
+          .an2-kpi-lbl{font-size:.7rem;color:#94A3B8;font-weight:600;margin-top:2px;}
+          .an2-kpi-delta{font-size:.72rem;font-weight:700;margin-top:3px;}
+          .an2-sec{background:#fff;border-radius:14px;padding:18px 20px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+          .an2-sec-hdr{display:flex;align-items:center;gap:8px;margin-bottom:14px;border-bottom:1.5px solid #F1F5F9;padding-bottom:10px;}
+          .an2-sec-bar{width:4px;height:18px;border-radius:3px;background:#7C3AED;flex-shrink:0;}
+          .an2-sec-title{font-size:.88rem;font-weight:800;color:#1E293B;}
+          .an2-sec-hint{font-size:.72rem;color:#94A3B8;margin-left:auto;}
+          .an2-tbl{width:100%;border-collapse:collapse;font-size:.78rem;}
+          .an2-tbl th{padding:7px 10px;font-size:.68rem;font-weight:700;color:#94A3B8;text-align:left;border-bottom:2px solid #F1F5F9;}
+          .an2-tbl td{padding:8px 10px;border-bottom:1px solid #F8FAFC;color:#334155;}
+          .an2-tbl tr:last-child td{border-bottom:none;}
+          .an2-tbl tr:hover td{background:#F8FAFC;}
+          .an2-two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+          @media(max-width:700px){.an2-two-col{grid-template-columns:1fr;}}
+          .an2-trend-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+          .an2-trend-lbl{width:80px;font-size:.72rem;font-weight:700;color:#64748B;flex-shrink:0;}
+          .an2-trend-bars{flex:1;display:flex;gap:4px;align-items:flex-end;height:32px;}
+          .an2-trend-bar{flex:1;border-radius:3px 3px 0 0;min-height:2px;position:relative;}
+          .an2-trend-cnt{width:50px;text-align:right;font-size:.72rem;font-weight:700;color:#1E293B;flex-shrink:0;}
+          .an2-hour-wrap{display:grid;grid-template-columns:repeat(24,1fr);gap:2px;height:60px;align-items:flex-end;}
+          .an2-hour-bar{border-radius:2px 2px 0 0;min-height:2px;background:#7C3AED;cursor:default;transition:opacity .1s;}
+          .an2-hour-bar:hover{opacity:.7;}
+          .an2-hour-labels{display:grid;grid-template-columns:repeat(24,1fr);gap:2px;margin-top:3px;}
+          .an2-hour-lbl{font-size:8px;color:#94A3B8;text-align:center;}
+          .an2-badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.65rem;font-weight:700;}
+          .an2-rank-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:.65rem;font-weight:800;flex-shrink:0;}
+          .an2-loading{text-align:center;padding:30px;color:#94A3B8;font-size:.82rem;}
+          .an2-bar-inline{display:inline-block;height:6px;border-radius:3px;margin-left:6px;vertical-align:middle;}
+        </style>
+
+        <div class="an2-hdr">
+          <div>
+            <h2>📈 분석 2 — 콘텐츠 참여·트렌드·검색 인텔리전스</h2>
+            <div class="an2-sub">주간 트렌드, 콘텐츠 참여도, 신청 시간대, 경쟁률 검색 패턴</div>
+          </div>
+          <div class="an2-refresh">
+            <span class="an2-status" id="an2-status">—</span>
+            <button class="an2-update-btn" onclick="an2Reload()" id="an2-update-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              업데이트
+            </button>
+          </div>
+        </div>
+
+        <!-- 기간 필터 -->
+        <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+          <button class="an2-pb on" id="an2-pb-월간" onclick="an2SetPeriod('월간')">월간(30일)</button>
+          <button class="an2-pb" id="an2-pb-주간" onclick="an2SetPeriod('주간')">주간(7일)</button>
+          <button class="an2-pb" id="an2-pb-어제" onclick="an2SetPeriod('어제')">어제</button>
+          <button class="an2-pb" id="an2-pb-오늘" onclick="an2SetPeriod('오늘')">오늘</button>
+        </div>
+
+        <!-- KPI -->
+        <div class="an2-kpi-row">
+          <div class="an2-kpi">
+            <div class="an2-kpi-val" id="an2-k-week">—</div>
+            <div class="an2-kpi-lbl">이번 주 방문</div>
+            <div class="an2-kpi-delta" id="an2-k-week-delta">—</div>
+          </div>
+          <div class="an2-kpi">
+            <div class="an2-kpi-val" id="an2-k-engage">—</div>
+            <div class="an2-kpi-lbl">최고 참여 페이지</div>
+            <div class="an2-kpi-delta" id="an2-k-engage-sub" style="color:#94A3B8;font-weight:400;font-size:.68rem;">평균체류 기준</div>
+          </div>
+          <div class="an2-kpi">
+            <div class="an2-kpi-val" id="an2-k-peak">—</div>
+            <div class="an2-kpi-lbl">피크 시간대</div>
+            <div class="an2-kpi-delta" id="an2-k-peak-sub" style="color:#94A3B8;font-weight:400;font-size:.68rem;">방문 최다 시간</div>
+          </div>
+          <div class="an2-kpi">
+            <div class="an2-kpi-val" id="an2-k-search">—</div>
+            <div class="an2-kpi-lbl">경쟁률 검색 수</div>
+            <div class="an2-kpi-delta" id="an2-k-search-sub" style="color:#94A3B8;font-weight:400;font-size:.68rem;">최근 30일</div>
+          </div>
+        </div>
+
+        <div class="an2-two-col">
+          <!-- ⑤ 콘텐츠 참여도 순위 -->
+          <div class="an2-sec">
+            <div class="an2-sec-hdr">
+              <div class="an2-sec-bar" style="background:#16A34A;"></div>
+              <div class="an2-sec-title">⑤ 콘텐츠 참여도 순위</div>
+              <div class="an2-sec-hint">평균 체류시간 기준</div>
+            </div>
+            <table class="an2-tbl">
+              <thead><tr><th>#</th><th>페이지</th><th>방문수</th><th>평균체류</th><th>참여점수</th></tr></thead>
+              <tbody id="an2-engage-tbody"><tr><td colspan="5" class="an2-loading">집계 중…</td></tr></tbody>
+            </table>
+          </div>
+
+          <!-- ⑥ 주간 트렌드 비교 -->
+          <div class="an2-sec">
+            <div class="an2-sec-hdr">
+              <div class="an2-sec-bar" style="background:#D97706;"></div>
+              <div class="an2-sec-title">⑥ 주간 트렌드 비교</div>
+              <div class="an2-sec-hint">이번 주 vs 지난 주</div>
+            </div>
+            <div id="an2-trend-content"><div class="an2-loading">집계 중…</div></div>
+          </div>
+        </div>
+
+        <!-- ⑦ 신청 시간대 분포 -->
+        <div class="an2-sec">
+          <div class="an2-sec-hdr">
+            <div class="an2-sec-bar" style="background:#0EA5E9;"></div>
+            <div class="an2-sec-title">⑦ 방문자 시간대 분포</div>
+            <div class="an2-sec-hint">0~23시 방문 패턴 (최근 30일, KST)</div>
+          </div>
+          <div class="an2-hour-wrap" id="an2-hour-bars"><div class="an2-loading" style="grid-column:1/-1;">집계 중…</div></div>
+          <div class="an2-hour-labels" id="an2-hour-labels"></div>
+          <div id="an2-hour-peak" style="margin-top:10px;font-size:.75rem;color:#64748B;"></div>
+        </div>
+
+        <!-- ⑧ 경쟁률 검색 인텔리전스 -->
+        <div class="an2-two-col">
+          <div class="an2-sec">
+            <div class="an2-sec-hdr">
+              <div class="an2-sec-bar" style="background:#EF4444;"></div>
+              <div class="an2-sec-title">⑧ 직종 검색 TOP 15</div>
+              <div class="an2-sec-hint">경쟁률 페이지 검색어</div>
+            </div>
+            <table class="an2-tbl">
+              <thead><tr><th>#</th><th>검색어</th><th>검색수</th></tr></thead>
+              <tbody id="an2-search-tbody"><tr><td colspan="3" class="an2-loading">집계 중…</td></tr></tbody>
+            </table>
+          </div>
+          <div class="an2-sec">
+            <div class="an2-sec-hdr">
+              <div class="an2-sec-bar" style="background:#EF4444;"></div>
+              <div class="an2-sec-title">⑧ 기관 클릭 TOP 15</div>
+              <div class="an2-sec-hint">경쟁률 페이지 기관 클릭</div>
+            </div>
+            <table class="an2-tbl">
+              <thead><tr><th>#</th><th>기관명</th><th>클릭수</th></tr></thead>
+              <tbody id="an2-inst-tbody"><tr><td colspan="3" class="an2-loading">집계 중…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
       <!-- ── 블로그 원고 탭 ── -->
       <div id="section-blog" class="hidden">
 
@@ -2451,13 +2883,13 @@
     // ─── 탭 전환 ───
     const TAB_LABELS = {
       consult:'신청 관리', student:'학생접수', ibt:'IBT신청접수', news:'대학소식', programs:'대학활동',
-      jobs:'채용공고', staffjobs:'직원채용공고', cnews:'기업소식', shorts:'유튜브쇼츠', stats:'통계',
-      tracking:'추적', blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고', crawler:'대학활동 수집', alio:'채용AI DATA',
+      jobs:'채용공고', foreignjobs:'외국인채용공고', staffjobs:'직원채용공고', cnews:'기업소식', shorts:'유튜브쇼츠', stats:'통계',
+      tracking:'추적', analysis1:'분석 1', analysis2:'분석 2', blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고', crawler:'대학활동 수집', alio:'채용AI DATA',
       comments:'댓글 관리', cardnews:'카드뉴스 제작'
     };
 
     function switchTab(tab) {
-      ['consult', 'student', 'ibt', 'news', 'programs', 'jobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'tracking', 'blog', 'calendar', 'popupads', 'crawler', 'alio', 'comments', 'cardnews'].forEach(t => {
+      ['consult', 'student', 'ibt', 'news', 'programs', 'jobs', 'foreignjobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'tracking', 'analysis1', 'analysis2', 'blog', 'calendar', 'popupads', 'crawler', 'alio', 'comments', 'cardnews'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (btn) { if (t === tab) btn.classList.add('active'); else btn.classList.remove('active'); }
@@ -2474,11 +2906,14 @@
       if (tab === 'news') loadNews();
       if (tab === 'programs') loadPrograms();
       if (tab === 'jobs') loadJobs();
+      if (tab === 'foreignjobs') loadForeignJobs();
       if (tab === 'staffjobs') loadStaffJobs();
       if (tab === 'cnews') loadCNews();
       if (tab === 'shorts') loadShorts();
       if (tab === 'stats')  requestAnimationFrame(() => loadStats());
       if (tab === 'tracking') { trkLoaded = false; trkInit(); }
+      if (tab === 'analysis1') { an1Loaded = false; an1Init(); }
+      if (tab === 'analysis2') { an2Loaded = false; an2Init(); }
       if (tab === 'blog')     loadBlogDrafts();
       if (tab === 'calendar') loadCalendarAdmin();
       if (tab === 'popupads') loadPopupAds();
@@ -3359,6 +3794,156 @@
     // ─── 채용공고 ───
     let jobData = [];
     let editingJobId = null;
+
+    // ─── 외국인채용공고 ───
+    let fjData = [];
+    let editingFjId = null;
+
+    async function loadForeignJobs() {
+      const { data, error } = await db.from('foreign_job_postings').select('*').order('sort_order', { ascending: true });
+      if (error) { console.error(error); return; }
+      fjData = data || [];
+      renderSwatches('fj-color-swatches', 'fj-color', '#FFFFFF');
+      document.getElementById('fj-logo').onchange = function() {
+        const f = this.files[0];
+        if (!f) return;
+        const img = document.getElementById('fj-logo-preview');
+        img.src = URL.createObjectURL(f);
+        document.getElementById('fj-logo-preview-wrap').classList.remove('hidden');
+      };
+      document.getElementById('edit-fj-logo').onchange = function() {
+        const f = this.files[0];
+        if (!f) return;
+        const img = document.getElementById('edit-fj-logo-preview');
+        img.src = URL.createObjectURL(f);
+        img.parentElement.classList.remove('hidden');
+      };
+      const tbody = document.getElementById('fj-body');
+      const empty = document.getElementById('fj-empty-msg');
+      if (fjData.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+      tbody.innerHTML = fjData.map((r, i) => {
+        const bg = r.bg_color || '#FFFFFF';
+        const date = new Date(r.created_at);
+        const dateStr = `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`;
+        return `
+        <tr class="border-b last:border-0 hover:bg-slate-50">
+          <td class="px-4 py-3">
+            <div class="flex flex-col gap-1">
+              <button onclick="moveFj(${i}, -1)" ${i === 0 ? 'disabled' : ''} class="text-slate-400 hover:text-slate-700 disabled:opacity-20 text-xs leading-none">▲</button>
+              <button onclick="moveFj(${i}, 1)" ${i === fjData.length-1 ? 'disabled' : ''} class="text-slate-400 hover:text-slate-700 disabled:opacity-20 text-xs leading-none">▼</button>
+            </div>
+          </td>
+          <td class="px-4 py-3 font-medium text-slate-700">${esc(r.school_name)}</td>
+          <td class="px-4 py-3 text-slate-700">${esc(r.title)}</td>
+          <td class="px-4 py-3 hidden md:table-cell">${r.link ? `<a href="${esc(r.link)}" target="_blank" class="text-blue-600 underline text-xs">링크</a>` : '-'}</td>
+          <td class="px-4 py-3 hidden md:table-cell text-xs text-slate-400">${dateStr}</td>
+          <td class="px-4 py-3"><button onclick="openFjEdit('${r.id}')" class="btn text-xs px-3 py-1.5 btn-secondary">수정</button></td>
+          <td class="px-4 py-3"><button onclick="deleteFj('${r.id}')" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">삭제</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function moveFj(idx, dir) {
+      const swapIdx = idx + dir;
+      if (swapIdx < 0 || swapIdx >= fjData.length) return;
+      const newOrder = [...fjData];
+      const tmp = newOrder[idx];
+      newOrder[idx] = newOrder[swapIdx];
+      newOrder[swapIdx] = tmp;
+      for (let i = 0; i < newOrder.length; i++) {
+        const { error } = await db.from('foreign_job_postings').update({ sort_order: -(i + 1) }).eq('id', newOrder[i].id);
+        if (error) { alert('순서 변경 실패: ' + error.message); loadForeignJobs(); return; }
+      }
+      for (let i = 0; i < newOrder.length; i++) {
+        const { error } = await db.from('foreign_job_postings').update({ sort_order: i + 1 }).eq('id', newOrder[i].id);
+        if (error) { alert('순서 변경 실패: ' + error.message); loadForeignJobs(); return; }
+      }
+      loadForeignJobs();
+    }
+
+    async function uploadFjLogo(fileInput) {
+      const file = fileInput.files[0];
+      if (!file) return null;
+      const ext = file.name.split('.').pop();
+      const path = `${Date.now()}.${ext}`;
+      const { error } = await db.storage.from('logo').upload(path, file, { upsert: true });
+      if (error) { alert('이미지 업로드 실패: ' + error.message); return null; }
+      const { data } = db.storage.from('logo').getPublicUrl(path);
+      return data.publicUrl;
+    }
+
+    async function addForeignJob() {
+      const school = document.getElementById('fj-school').value.trim();
+      const title  = document.getElementById('fj-title').value.trim();
+      const link   = document.getElementById('fj-link').value.trim();
+      const color  = document.getElementById('fj-color').value || '#FFFFFF';
+      if (!school || !title) { alert('기관명과 제목을 입력해주세요.'); return; }
+      const logoInput = document.getElementById('fj-logo');
+      const logo_url = await uploadFjLogo(logoInput);
+      const maxOrder = fjData.length > 0 ? Math.max(...fjData.map(r => r.sort_order)) + 1 : 1;
+      const { error } = await db.from('foreign_job_postings').insert([{ school_name: school, title, link: link || null, sort_order: maxOrder, bg_color: color, logo_url }]);
+      if (error) { alert('등록 실패: ' + error.message); return; }
+      document.getElementById('fj-school').value = '';
+      document.getElementById('fj-title').value  = '';
+      document.getElementById('fj-link').value   = '';
+      document.getElementById('fj-color').value  = '#FFFFFF';
+      logoInput.value = '';
+      document.getElementById('fj-logo-preview-wrap').classList.add('hidden');
+      const msg = document.getElementById('fj-msg');
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 2000);
+      loadForeignJobs();
+    }
+
+    async function deleteFj(id) {
+      if (!confirm('이 외국인채용공고를 삭제하시겠습니까?')) return;
+      const { error } = await db.from('foreign_job_postings').delete().eq('id', id);
+      if (error) { alert('삭제 실패: ' + error.message); return; }
+      loadForeignJobs();
+    }
+
+    function openFjEdit(id) {
+      const r = fjData.find(n => String(n.id) === String(id));
+      if (!r) return;
+      editingFjId = id;
+      document.getElementById('edit-fj-school').value = r.school_name;
+      document.getElementById('edit-fj-title').value  = r.title;
+      document.getElementById('edit-fj-link').value   = r.link || '';
+      document.getElementById('edit-fj-color').value  = r.bg_color || '#FFFFFF';
+      renderSwatches('edit-fj-color-swatches', 'edit-fj-color', r.bg_color || '#FFFFFF');
+      const preview = document.getElementById('edit-fj-logo-preview');
+      if (r.logo_url) { preview.src = r.logo_url; preview.parentElement.classList.remove('hidden'); }
+      else { preview.src = ''; preview.parentElement.classList.add('hidden'); }
+      document.getElementById('edit-fj-logo').value = '';
+      document.getElementById('fj-modal').style.display = 'flex';
+    }
+
+    function closeFjModal() {
+      document.getElementById('fj-modal').style.display = 'none';
+      editingFjId = null;
+    }
+
+    async function saveFjEdit() {
+      const school = document.getElementById('edit-fj-school').value.trim();
+      const title  = document.getElementById('edit-fj-title').value.trim();
+      const link   = document.getElementById('edit-fj-link').value.trim();
+      const color  = document.getElementById('edit-fj-color').value || '#FFFFFF';
+      if (!school || !title) { alert('기관명과 제목을 입력해주세요.'); return; }
+      const logoInput = document.getElementById('edit-fj-logo');
+      let logo_url = fjData.find(n => String(n.id) === String(editingFjId))?.logo_url || null;
+      if (logoInput.files[0]) {
+        const uploaded = await uploadFjLogo(logoInput);
+        if (uploaded) logo_url = uploaded;
+      }
+      const { error } = await db.from('foreign_job_postings').update({ school_name: school, title, link: link || null, bg_color: color, logo_url }).eq('id', editingFjId);
+      if (error) { alert('수정 실패: ' + error.message); return; }
+      closeFjModal();
+      loadForeignJobs();
+      const msg = document.getElementById('fj-msg');
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 2000);
+    }
 
     async function loadJobs() {
       const { data, error } = await db.from('job_postings').select('*').order('sort_order', { ascending: true });
@@ -7683,6 +8268,471 @@ ${d.hashtags}`;
         <div class="cn-right-meta">${escHtml(r.school_name || '')} · ${r.article_date || r.published_at?.slice(0,10) || ''}</div>
         <button onclick="cnUnpublish('${r.id}')" class="cn-btn cn-btn-unpublish" style="margin-top:6px;font-size:.68rem;padding:4px 10px;">⏹ 배포중단</button>
       </div>`).join('');
+  }
+
+  // ─── 분석 1 ───────────────────────────────────────────────
+  let an1Loaded = false;
+  let an1Period = '월간';
+  let an1PvAll = null;
+  let an1IbtCnt = 0;
+  let an1ConsultCnt = 0;
+  let an1HasUa = false;
+
+  const AN1_PAGE_LABELS = {
+    'index.html':'메인', 'competition.html':'경쟁률', 'university-board.html':'대학활동',
+    'gtelp-score.html':'점수대비표', 'schedule.html':'정기일정', 'library-pdf.html':'자료실',
+    'job-board.html':'채용공고', 'student.html':'IBT신청', 'package.html':'패키지',
+    'mobile.html':'모바일허브', 'competition-m.html':'경쟁률(모바일)',
+    'gtelp-score-m.html':'점수대비표(모바일)', 'student-m.html':'IBT신청(모바일)',
+    'cardnews-m.html':'카드뉴스(모바일)'
+  };
+
+  function an1PageLabel(p) {
+    if (!p) return 'index.html';
+    const n = p.split('/').pop().split('?')[0] || 'index.html';
+    return AN1_PAGE_LABELS[n] || n;
+  }
+
+  function an1FmtDwell(sec) {
+    if (!sec || sec < 1) return '—';
+    if (sec < 60) return Math.round(sec) + '초';
+    return Math.floor(sec/60) + '분 ' + (Math.round(sec)%60) + '초';
+  }
+
+  function an1ClassifyRef(ref) {
+    if (!ref) return '직접접속';
+    try {
+      const h = new URL(ref).hostname.replace(/^www\./,'');
+      if (h.includes('ibtcc.kr') || h.includes('vercel.app')) return '내부링크';
+      if (h.includes('blog.naver')) return '네이버블로그';
+      if (h.includes('google')) return 'Google';
+      if (h.includes('naver')) return 'Naver검색';
+      if (h.includes('kakao') || h.includes('kakaotalk')) return '카카오';
+      if (h.includes('instagram')) return '인스타그램';
+      if (h.includes('facebook')) return '페이스북';
+      return '기타외부(' + h.split('.')[0] + ')';
+    } catch { return '기타외부'; }
+  }
+
+  function an1ClassifyDevice(ua) {
+    if (!ua) return '알수없음';
+    if (/iPhone|Android.*Mobile|Mobile.*Android/i.test(ua)) return '모바일';
+    if (/iPad|Android(?!.*Mobile)|Tablet/i.test(ua)) return '태블릿';
+    return 'PC';
+  }
+
+  function an1FilterPv(rows) {
+    const now = new Date();
+    const kstNow = new Date(now.getTime() + 9*3600*1000);
+    const todayKST = kstNow.toISOString().slice(0, 10);
+    const utcTodayStart = new Date(todayKST + 'T00:00:00+09:00');
+    if (an1Period === '오늘') {
+      return rows.filter(r => new Date(r.visited_at) >= utcTodayStart);
+    } else if (an1Period === '어제') {
+      const utcYestStart = new Date(utcTodayStart.getTime() - 86400*1000);
+      return rows.filter(r => { const d = new Date(r.visited_at); return d >= utcYestStart && d < utcTodayStart; });
+    } else if (an1Period === '주간') {
+      const since = new Date(now.getTime() - 7*86400*1000);
+      return rows.filter(r => new Date(r.visited_at) >= since);
+    } else {
+      const since = new Date(now.getTime() - 30*86400*1000);
+      return rows.filter(r => new Date(r.visited_at) >= since);
+    }
+  }
+
+  function an1SetPeriod(p) {
+    an1Period = p;
+    ['월간','주간','어제','오늘'].forEach(k => {
+      const el = document.getElementById('an1-pb-' + k);
+      if (el) el.classList.toggle('on', k === p);
+    });
+    if (an1PvAll) an1Render(an1FilterPv(an1PvAll));
+  }
+
+  async function an1Init() {
+    if (an1Loaded) return;
+    an1Loaded = true;
+    await an1Load();
+  }
+
+  async function an1Reload() {
+    an1Loaded = false;
+    an1PvAll = null;
+    document.getElementById('an1-update-btn').disabled = true;
+    document.getElementById('an1-status').textContent = '업데이트 중…';
+    await an1Load();
+    document.getElementById('an1-update-btn').disabled = false;
+  }
+
+  async function an1Load() {
+    const now = new Date();
+    if (!an1PvAll) {
+      const pvRes = await db.from('page_views')
+        .select('page, visited_at, referrer, dwell_seconds, ua')
+        .order('visited_at', { ascending: false })
+        .limit(2000);
+      an1PvAll = pvRes.data || [];
+      an1HasUa = an1PvAll.length > 0 && 'ua' in an1PvAll[0];
+      const [ibtRes, consultRes] = await Promise.all([
+        db.from('ibt_applications').select('*', { count: 'exact', head: true }),
+        db.from('consultations').select('*', { count: 'exact', head: true })
+      ]);
+      an1IbtCnt = ibtRes.count || 0;
+      an1ConsultCnt = consultRes.count || 0;
+    }
+    document.getElementById('an1-status').textContent = '업데이트: ' + now.toLocaleTimeString('ko-KR');
+    an1Render(an1FilterPv(an1PvAll));
+  }
+
+  function an1Render(pv) {
+    const totalApply = an1IbtCnt + an1ConsultCnt;
+    const visitCnt = pv.length;
+    const cvr = visitCnt > 0 ? (totalApply / visitCnt * 100).toFixed(1) : '0.0';
+    const dwellRows = pv.filter(r => r.dwell_seconds > 0);
+    const avgDwell = dwellRows.length > 0 ? dwellRows.reduce((s, r) => s + r.dwell_seconds, 0) / dwellRows.length : 0;
+    const bounceRows = pv.filter(r => r.dwell_seconds > 0 && r.dwell_seconds < 30);
+    const bounceRate = dwellRows.length > 0 ? (bounceRows.length / dwellRows.length * 100).toFixed(1) : '0.0';
+
+    document.getElementById('an1-k-visit').textContent = visitCnt.toLocaleString();
+    document.getElementById('an1-k-apply').textContent = totalApply.toLocaleString();
+    document.getElementById('an1-k-cvr').textContent = cvr + '%';
+    document.getElementById('an1-k-dwell').textContent = an1FmtDwell(avgDwell);
+    document.getElementById('an1-k-bounce').textContent = bounceRate + '%';
+
+    // ① 퍼널
+    const compVisit = pv.filter(r => r.page && r.page.includes('competition') && !r.page.includes('click:')).length;
+    const studentVisit = pv.filter(r => r.page && r.page.includes('student')).length;
+    const funnelSteps = [
+      { label:'전체 방문', count: visitCnt, color:'#3B82F6' },
+      { label:'경쟁률 조회', count: compVisit, color:'#7C3AED' },
+      { label:'IBT신청 페이지', count: studentVisit, color:'#D97706' },
+      { label:'신청 완료', count: totalApply, color:'#16A34A' }
+    ];
+    document.getElementById('an1-funnel').innerHTML = funnelSteps.map((s, i) => {
+      const pct = visitCnt > 0 ? (s.count / visitCnt * 100).toFixed(1) : 0;
+      const barW = visitCnt > 0 ? Math.max(4, s.count / visitCnt * 100) : 4;
+      return `<div class="an1-funnel-row">
+        <div class="an1-funnel-label">${i+1}. ${s.label}</div>
+        <div class="an1-funnel-bar-wrap"><div class="an1-funnel-bar" style="width:${barW}%;background:${s.color};">${s.count > 0 ? s.count.toLocaleString() : ''}</div></div>
+        <div class="an1-funnel-cnt">${s.count.toLocaleString()}</div>
+        <div class="an1-funnel-pct">${pct}%</div>
+      </div>`;
+    }).join('');
+
+    // ② 이탈 분석
+    const pageMap = {};
+    pv.forEach(r => {
+      const pg = an1PageLabel(r.page);
+      if (!pageMap[pg]) pageMap[pg] = { total:0, bounce:0, dwellSum:0, dwellCnt:0 };
+      pageMap[pg].total++;
+      if (r.dwell_seconds > 0 && r.dwell_seconds < 30) pageMap[pg].bounce++;
+      if (r.dwell_seconds > 0) { pageMap[pg].dwellSum += r.dwell_seconds; pageMap[pg].dwellCnt++; }
+    });
+    const bounceList = Object.entries(pageMap)
+      .filter(([, v]) => v.total >= 2)
+      .map(([pg, v]) => ({ pg, ...v, bRate: v.total > 0 ? v.bounce / v.total : 0, avgD: v.dwellCnt > 0 ? v.dwellSum / v.dwellCnt : 0 }))
+      .sort((a, b) => b.bRate - a.bRate).slice(0, 8);
+    document.getElementById('an1-bounce-tbody').innerHTML = bounceList.length ? bounceList.map(r => {
+      const bPct = (r.bRate * 100).toFixed(0);
+      const color = r.bRate > 0.6 ? '#EF4444' : r.bRate > 0.35 ? '#F59E0B' : '#16A34A';
+      return `<tr><td style="font-weight:600;">${r.pg}</td><td>${r.bounce}</td>
+        <td><span style="color:${color};font-weight:700;">${bPct}%</span><span class="an1-bar-inline" style="width:${bPct}px;background:${color};"></span></td>
+        <td>${an1FmtDwell(r.avgD)}</td></tr>`;
+    }).join('') : '<tr><td colspan="4" style="text-align:center;color:#94A3B8;padding:16px;">데이터 부족</td></tr>';
+
+    // ③ 유입채널
+    const chMap = {};
+    pv.forEach(r => {
+      const ch = an1ClassifyRef(r.referrer);
+      if (!chMap[ch]) chMap[ch] = { cnt:0, dwellSum:0, dwellCnt:0, bounce:0 };
+      chMap[ch].cnt++;
+      if (r.dwell_seconds > 0) { chMap[ch].dwellSum += r.dwell_seconds; chMap[ch].dwellCnt++; }
+      if (r.dwell_seconds > 0 && r.dwell_seconds < 30) chMap[ch].bounce++;
+    });
+    const chList = Object.entries(chMap)
+      .map(([ch, v]) => ({ ch, ...v, avgD: v.dwellCnt > 0 ? v.dwellSum / v.dwellCnt : 0, bRate: v.dwellCnt > 0 ? v.bounce / v.dwellCnt : 0 }))
+      .sort((a, b) => b.cnt - a.cnt);
+    const chTotal = chList.reduce((s, r) => s + r.cnt, 0);
+    const chColors = {'직접접속':'#3B82F6','Google':'#EA4335','Naver검색':'#03C75A','카카오':'#FEE500','네이버블로그':'#00C73C','인스타그램':'#E1306C','내부링크':'#7C3AED','페이스북':'#1877F2'};
+    document.getElementById('an1-channel-tbody').innerHTML = chList.length ? chList.map(r => {
+      const pct = chTotal > 0 ? (r.cnt / chTotal * 100).toFixed(1) : 0;
+      const bPct = (r.bRate * 100).toFixed(0);
+      const eval_ = r.avgD > 120 ? '<span class="an1-badge" style="background:#DCFCE7;color:#16A34A;">우수</span>'
+        : r.avgD > 60 ? '<span class="an1-badge" style="background:#FEF3C7;color:#D97706;">보통</span>'
+        : '<span class="an1-badge" style="background:#FEE2E2;color:#EF4444;">개선필요</span>';
+      const dot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${chColors[r.ch]||'#94A3B8'};margin-right:5px;"></span>`;
+      return `<tr><td>${dot}${r.ch}</td><td style="font-weight:700;">${r.cnt.toLocaleString()}</td>
+        <td>${pct}%</td><td>${an1FmtDwell(r.avgD)}</td>
+        <td style="color:${r.bRate>0.5?'#EF4444':r.bRate>0.3?'#F59E0B':'#16A34A'};font-weight:700;">${bPct}%</td>
+        <td>${eval_}</td></tr>`;
+    }).join('') : '<tr><td colspan="6" style="text-align:center;color:#94A3B8;padding:16px;">데이터 없음</td></tr>';
+
+    // ④ 디바이스
+    if (an1HasUa) {
+      document.getElementById('an1-device-guide').classList.add('hidden');
+      document.getElementById('an1-device-charts').classList.remove('hidden');
+      document.getElementById('an1-device-hint').textContent = 'ua 컬럼 활성화됨';
+      const devMap = {};
+      pv.filter(r => r.ua).forEach(r => {
+        const d = an1ClassifyDevice(r.ua);
+        if (!devMap[d]) devMap[d] = { cnt:0, dwellSum:0, dwellCnt:0 };
+        devMap[d].cnt++;
+        if (r.dwell_seconds > 0) { devMap[d].dwellSum += r.dwell_seconds; devMap[d].dwellCnt++; }
+      });
+      const devTotal = Object.values(devMap).reduce((s, v) => s + v.cnt, 0);
+      const devIcons = { '모바일':'📱', 'PC':'🖥️', '태블릿':'📟', '알수없음':'❓' };
+      const devColors = { '모바일':'#3B82F6', 'PC':'#7C3AED', '태블릿':'#D97706', '알수없음':'#94A3B8' };
+      document.getElementById('an1-device-grid').innerHTML = Object.entries(devMap).map(([d, v]) => {
+        const pct = devTotal > 0 ? (v.cnt / devTotal * 100).toFixed(1) : 0;
+        return `<div class="an1-device-card">
+          <div class="an1-device-icon">${devIcons[d]||'❓'}</div>
+          <div class="an1-device-pct" style="color:${devColors[d]||'#1E293B'};">${pct}%</div>
+          <div class="an1-device-lbl">${d} (${v.cnt.toLocaleString()})</div>
+        </div>`;
+      }).join('');
+      document.getElementById('an1-device-tbody').innerHTML = Object.entries(devMap).map(([d, v]) => {
+        const pct = devTotal > 0 ? (v.cnt / devTotal * 100).toFixed(1) : 0;
+        const avgD = v.dwellCnt > 0 ? v.dwellSum / v.dwellCnt : 0;
+        return `<tr><td>${devIcons[d]||''} ${d}</td><td style="font-weight:700;">${v.cnt.toLocaleString()}</td><td>${pct}%</td><td>${an1FmtDwell(avgD)}</td></tr>`;
+      }).join('');
+    } else {
+      document.getElementById('an1-device-guide').classList.remove('hidden');
+      document.getElementById('an1-device-charts').classList.add('hidden');
+      document.getElementById('an1-device-hint').textContent = 'ua 컬럼 미설정';
+    }
+  }
+
+  // ─── 분석 2 ───────────────────────────────────────────────
+  let an2Loaded = false;
+  let an2Period = '월간';
+  let an2PvAll = null;
+  let an2ClickAll = null;
+
+  const AN2_PAGE_LABELS = {
+    'index.html':'메인', 'competition.html':'경쟁률', 'university-board.html':'대학활동',
+    'gtelp-score.html':'점수대비표', 'schedule.html':'정기일정', 'library-pdf.html':'자료실',
+    'job-board.html':'채용공고', 'student.html':'IBT신청', 'package.html':'패키지',
+    'mobile.html':'모바일허브', 'competition-m.html':'경쟁률(모바일)',
+    'gtelp-score-m.html':'점수대비표(모바일)', 'student-m.html':'IBT신청(모바일)',
+    'cardnews-m.html':'카드뉴스(모바일)'
+  };
+
+  function an2PageLabel(p) {
+    if (!p) return 'index.html';
+    const n = p.split('/').pop().split('?')[0] || 'index.html';
+    return AN2_PAGE_LABELS[n] || n;
+  }
+
+  function an2FmtDwell(sec) {
+    if (!sec || sec < 1) return '—';
+    if (sec < 60) return Math.round(sec) + '초';
+    return Math.floor(sec/60) + '분 ' + (Math.round(sec)%60) + '초';
+  }
+
+  function an2FilterPv(rows) {
+    const now = new Date();
+    const kstNow = new Date(now.getTime() + 9*3600*1000);
+    const todayKST = kstNow.toISOString().slice(0, 10);
+    const utcTodayStart = new Date(todayKST + 'T00:00:00+09:00');
+    if (an2Period === '오늘') {
+      return rows.filter(r => new Date(r.visited_at) >= utcTodayStart);
+    } else if (an2Period === '어제') {
+      const utcYestStart = new Date(utcTodayStart.getTime() - 86400*1000);
+      return rows.filter(r => { const d = new Date(r.visited_at); return d >= utcYestStart && d < utcTodayStart; });
+    } else if (an2Period === '주간') {
+      const since = new Date(now.getTime() - 7*86400*1000);
+      return rows.filter(r => new Date(r.visited_at) >= since);
+    } else {
+      const since = new Date(now.getTime() - 30*86400*1000);
+      return rows.filter(r => new Date(r.visited_at) >= since);
+    }
+  }
+
+  function an2SetPeriod(p) {
+    an2Period = p;
+    ['월간','주간','어제','오늘'].forEach(k => {
+      const el = document.getElementById('an2-pb-' + k);
+      if (el) el.classList.toggle('on', k === p);
+    });
+    if (an2PvAll) an2Render(an2FilterPv(an2PvAll), an2FilterPv(an2ClickAll));
+  }
+
+  async function an2Init() {
+    if (an2Loaded) return;
+    an2Loaded = true;
+    await an2Load();
+  }
+
+  async function an2Reload() {
+    an2Loaded = false;
+    an2PvAll = null;
+    an2ClickAll = null;
+    document.getElementById('an2-update-btn').disabled = true;
+    document.getElementById('an2-status').textContent = '업데이트 중…';
+    await an2Load();
+    document.getElementById('an2-update-btn').disabled = false;
+  }
+
+  async function an2Load() {
+    const now = new Date();
+    if (!an2PvAll) {
+      const { data: pvData } = await db.from('page_views')
+        .select('page, visited_at, dwell_seconds')
+        .order('visited_at', { ascending: false })
+        .limit(2000);
+      an2PvAll = pvData || [];
+
+      const { data: clickData } = await db.from('page_views')
+        .select('page, visited_at')
+        .like('page', 'competition-%')
+        .order('visited_at', { ascending: false })
+        .limit(2000);
+      an2ClickAll = clickData || [];
+    }
+    document.getElementById('an2-status').textContent = '업데이트: ' + now.toLocaleTimeString('ko-KR');
+    an2Render(an2FilterPv(an2PvAll), an2FilterPv(an2ClickAll));
+  }
+
+  function an2Render(pv, clickRows) {
+    const now = new Date();
+    const kst = d => new Date(new Date(d).getTime() + 9*3600*1000);
+
+    // ─ ⑥ 주간 트렌드는 항상 "이번 주 vs 지난 주" 고정 ─
+    const weekStart = new Date(now - 7*86400*1000).toISOString();
+    const prevWeekStart = new Date(now - 14*86400*1000).toISOString();
+    const pvAll = an2PvAll || [];
+    const pvThisWeek = pvAll.filter(r => r.visited_at >= weekStart);
+    const pvLastWeek = pvAll.filter(r => r.visited_at >= prevWeekStart && r.visited_at < weekStart);
+
+    // ─ KPI ─
+    const thisWeekCnt = pvThisWeek.length;
+    const lastWeekCnt = pvLastWeek.length;
+    const weekDelta = lastWeekCnt > 0 ? ((thisWeekCnt - lastWeekCnt) / lastWeekCnt * 100).toFixed(1) : null;
+    document.getElementById('an2-k-week').textContent = thisWeekCnt.toLocaleString();
+    const deltaEl = document.getElementById('an2-k-week-delta');
+    if (weekDelta !== null) {
+      const up = parseFloat(weekDelta) >= 0;
+      deltaEl.textContent = (up ? '▲ +' : '▼ ') + weekDelta + '% vs 지난주';
+      deltaEl.style.color = up ? '#16A34A' : '#EF4444';
+    } else deltaEl.textContent = '지난주 데이터 부족';
+
+    const searchCnt = clickRows.filter(r => r.page.startsWith('competition-sa-click:')).length;
+    document.getElementById('an2-k-search').textContent = searchCnt.toLocaleString();
+
+    // ─ ⑤ 콘텐츠 참여도 ─
+    const pgMap = {};
+    pv.forEach(r => {
+      if (!r.page || r.page.includes('click:') || r.page.includes('-click')) return;
+      const pg = an2PageLabel(r.page);
+      if (!pgMap[pg]) pgMap[pg] = { cnt:0, dwellSum:0, dwellCnt:0 };
+      pgMap[pg].cnt++;
+      if (r.dwell_seconds > 0) { pgMap[pg].dwellSum += r.dwell_seconds; pgMap[pg].dwellCnt++; }
+    });
+    const pgList = Object.entries(pgMap)
+      .map(([pg, v]) => ({ pg, ...v, avg: v.dwellCnt > 0 ? v.dwellSum / v.dwellCnt : 0 }))
+      .filter(r => r.dwellCnt >= 2)
+      .sort((a, b) => b.avg - a.avg).slice(0, 10);
+    const maxScore = pgList.length ? Math.max(...pgList.map(r => r.avg * Math.log10(r.cnt + 1))) : 1;
+    if (pgList.length) {
+      document.getElementById('an2-k-engage').textContent = pgList[0].pg;
+      document.getElementById('an2-k-engage-sub').textContent = an2FmtDwell(pgList[0].avg) + ' 평균 체류';
+    }
+    const rankColors = ['#F59E0B','#94A3B8','#CD7F32'];
+    document.getElementById('an2-engage-tbody').innerHTML = pgList.map((r, i) => {
+      const score = r.avg * Math.log10(r.cnt + 1);
+      const scorePct = maxScore > 0 ? Math.round(score / maxScore * 100) : 0;
+      const bg = i < 3 ? rankColors[i] : '#E2E8F0';
+      const tc = i < 3 ? '#fff' : '#64748B';
+      return `<tr>
+        <td><span class="an2-rank-num" style="background:${bg};color:${tc};">${i+1}</span></td>
+        <td style="font-weight:600;">${r.pg}</td><td>${r.cnt}</td>
+        <td style="font-weight:700;color:#7C3AED;">${an2FmtDwell(r.avg)}</td>
+        <td><span style="font-size:.72rem;font-weight:700;color:#16A34A;">${scorePct}</span><span class="an2-bar-inline" style="width:${scorePct/2}px;background:#16A34A;"></span></td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="5" style="text-align:center;color:#94A3B8;padding:16px;">데이터 부족</td></tr>';
+
+    // ─ ⑥ 주간 트렌드 (항상 이번주/지난주) ─
+    const dayMapFn = rows => {
+      const m = {};
+      rows.forEach(r => { const d = kst(new Date(r.visited_at)).toISOString().slice(0,10); m[d] = (m[d]||0)+1; });
+      return m;
+    };
+    const thisMap = dayMapFn(pvThisWeek);
+    const lastMap = dayMapFn(pvLastWeek);
+    const days = [];
+    for (let i = 6; i >= 0; i--) days.push(kst(new Date(now - i*86400*1000)).toISOString().slice(0,10));
+    const prevDays = days.map(d => new Date(new Date(d).getTime() - 7*86400*1000).toISOString().slice(0,10));
+    const maxVal = Math.max(1, ...days.map(d => thisMap[d]||0), ...prevDays.map(d => lastMap[d]||0));
+    document.getElementById('an2-trend-content').innerHTML =
+      '<div style="display:flex;gap:12px;margin-bottom:10px;font-size:.7rem;"><span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#7C3AED;border-radius:2px;display:inline-block;"></span>이번주</span><span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#CBD5E1;border-radius:2px;display:inline-block;"></span>지난주</span></div>'
+      + days.map((d, i) => {
+        const thisV = thisMap[d]||0, lastV = lastMap[prevDays[i]]||0;
+        const dayLabel = ['일','월','화','수','목','금','토'][new Date(d).getDay()];
+        const thisW = Math.round(thisV/maxVal*120), lastW = Math.round(lastV/maxVal*120);
+        const delta = lastV > 0 ? ((thisV-lastV)/lastV*100).toFixed(0) : null;
+        return `<div class="an2-trend-row">
+          <div class="an2-trend-lbl">${d.slice(5)} (${dayLabel})</div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">
+              <div style="width:${thisW}px;height:8px;background:#7C3AED;border-radius:3px;min-width:2px;"></div>
+              <span style="font-size:.68rem;font-weight:700;color:#7C3AED;">${thisV}</span>
+              ${delta!==null?`<span style="font-size:.62rem;color:${parseFloat(delta)>=0?'#16A34A':'#EF4444'};font-weight:700;">${parseFloat(delta)>=0?'▲+':'▼'}${delta}%</span>`:''}
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <div style="width:${lastW}px;height:6px;background:#CBD5E1;border-radius:3px;min-width:2px;"></div>
+              <span style="font-size:.65rem;color:#94A3B8;">${lastV}</span>
+            </div>
+          </div></div>`;
+      }).join('');
+
+    // ─ ⑦ 시간대 분포 ─
+    const hourCnts = Array(24).fill(0);
+    pv.forEach(r => { const h = kst(new Date(r.visited_at)).getHours(); hourCnts[h]++; });
+    const maxH = Math.max(1, ...hourCnts);
+    const peakH = hourCnts.indexOf(maxH);
+    document.getElementById('an2-k-peak').textContent = peakH + '시';
+    document.getElementById('an2-k-peak-sub').textContent = maxH + '명 방문 (최다)';
+    const heatColor = h => {
+      const ratio = hourCnts[h] / maxH;
+      return ratio > 0.7 ? '#7C3AED' : ratio > 0.4 ? '#A78BFA' : ratio > 0.1 ? '#DDD6FE' : '#F1F5F9';
+    };
+    document.getElementById('an2-hour-bars').innerHTML = hourCnts.map((c, h) =>
+      `<div class="an2-hour-bar" style="height:${Math.max(4, Math.round(c/maxH*100))}%;background:${heatColor(h)};" title="${h}시: ${c}명"></div>`
+    ).join('');
+    document.getElementById('an2-hour-labels').innerHTML = hourCnts.map((_,h) =>
+      `<div class="an2-hour-lbl">${h%3===0?h+'시':''}</div>`).join('');
+    document.getElementById('an2-hour-peak').innerHTML =
+      `🔥 피크: <strong>${[...hourCnts.map((c,h)=>({h,c}))].sort((a,b)=>b.c-a.c).slice(0,3).map(x=>x.h+'시('+x.c+'명)').join(' · ')}</strong>`;
+
+    // ─ ⑧ 검색 인텔리전스 ─
+    const saMap = {}, instMap = {};
+    clickRows.forEach(r => {
+      if (r.page.startsWith('competition-sa-click:')) {
+        const k = r.page.replace('competition-sa-click:','').trim();
+        if (k) saMap[k] = (saMap[k]||0)+1;
+      } else if (r.page.startsWith('competition-click:')) {
+        const k = r.page.replace('competition-click:','').trim();
+        if (k) instMap[k] = (instMap[k]||0)+1;
+      }
+    });
+    const saList = Object.entries(saMap).sort((a,b)=>b[1]-a[1]).slice(0,15);
+    const instList = Object.entries(instMap).sort((a,b)=>b[1]-a[1]).slice(0,15);
+    const saMax = saList.length ? saList[0][1] : 1;
+    const instMax = instList.length ? instList[0][1] : 1;
+    document.getElementById('an2-search-tbody').innerHTML = saList.length
+      ? saList.map(([k,v],i) => `<tr>
+          <td><span class="an2-rank-num" style="background:${i<3?'#EF4444':'#F1F5F9'};color:${i<3?'#fff':'#64748B'};">${i+1}</span></td>
+          <td style="font-weight:600;">${k}</td>
+          <td><strong>${v}</strong><span class="an2-bar-inline" style="width:${Math.round(v/saMax*60)}px;background:#EF4444;"></span></td>
+        </tr>`).join('')
+      : '<tr><td colspan="3" style="text-align:center;color:#94A3B8;padding:16px;">데이터 없음</td></tr>';
+    document.getElementById('an2-inst-tbody').innerHTML = instList.length
+      ? instList.map(([k,v],i) => `<tr>
+          <td><span class="an2-rank-num" style="background:${i<3?'#EF4444':'#F1F5F9'};color:${i<3?'#fff':'#64748B'};">${i+1}</span></td>
+          <td style="font-weight:600;">${k}</td>
+          <td><strong>${v}</strong><span class="an2-bar-inline" style="width:${Math.round(v/instMax*60)}px;background:#EF4444;"></span></td>
+        </tr>`).join('')
+      : '<tr><td colspan="3" style="text-align:center;color:#94A3B8;padding:16px;">데이터 없음</td></tr>';
   }
 
   /* section-cardnews display fix */
