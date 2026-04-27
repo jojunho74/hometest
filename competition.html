@@ -52,6 +52,15 @@
     }
     @keyframes qnav-blink{0%,100%{opacity:1}50%{opacity:.3}}
     @keyframes jv-shimmer-txt{0%{background-position:200% center}100%{background-position:-200% center}}
+
+    /* ── 합격선 배너 반응형 ── */
+    .info-banner-flex{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:14px;}
+    .info-cell{flex:1;min-width:140px;border-radius:12px;padding:10px 12px;}
+    .info-cell-wide{flex:2;min-width:220px;border-radius:12px;padding:10px 12px;text-align:left;}
+    @media(max-width:520px){
+      .info-cell{flex:1 1 calc(50% - 4px);min-width:0;}
+      .info-cell-wide{flex:1 1 100%;min-width:0;}
+    }
     .qnav-inner{
       position:relative;z-index:1;
       display:flex;align-items:center;justify-content:center;
@@ -600,26 +609,26 @@
 
         <!-- ── 합격선 안내 배너 ── -->
         <div style="background:linear-gradient(135deg,#0f3460 0%,#16213e 60%,#0d1b2a 100%);border:1px solid rgba(96,165,250,.3);border-radius:16px;padding:28px 24px;margin-bottom:14px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.4);">
-          <div style="display:flex;flex-wrap:nowrap;justify-content:center;gap:10px;margin-bottom:14px;">
-            <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:10px 12px;min-width:0;flex-shrink:0;">
+          <div class="info-banner-flex">
+            <div class="info-cell" style="background:rgba(255,255,255,.06);">
               <p style="font-size:.65rem;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.08em;margin-bottom:6px;">합격 기준 점수</p>
               <div style="display:flex;flex-direction:column;gap:5px;">
                 <span style="font-size:.82rem;color:#E2E8F0;font-weight:600;">✔ 토익&nbsp;&nbsp;<strong style="color:#60A5FA;font-size:.86rem;">약 750점 이상</strong></span>
                 <span style="font-size:.82rem;color:#E2E8F0;font-weight:600;">✔ 지텔프&nbsp;<strong style="color:#34D399;font-size:.86rem;">65점 이상</strong></span>
               </div>
             </div>
-            <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:10px 12px;min-width:0;flex-shrink:0;">
+            <div class="info-cell" style="background:rgba(255,255,255,.06);">
               <p style="font-size:.65rem;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.08em;margin-bottom:6px;">⏱ 준비 기간</p>
               <div style="display:flex;flex-direction:column;gap:5px;">
                 <span style="font-size:.82rem;color:rgba(255,255,255,.75);">토익&nbsp;&nbsp;&nbsp;&nbsp;2~3개월</span>
                 <span style="font-size:.82rem;color:rgba(255,255,255,.75);">지텔프&nbsp;<strong style="color:#FBBF24;font-size:.86rem;">2~3주</strong></span>
               </div>
             </div>
-            <div style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:12px;padding:10px 12px;min-width:0;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;">
+            <div class="info-cell" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);display:flex;flex-direction:column;justify-content:center;">
               <p style="font-size:.75rem;font-weight:800;color:#FBBF24;margin-bottom:4px;">오늘 방문자 한정</p>
               <p style="font-size:.82rem;font-weight:600;color:#fff;">IBT 무료 응시 가능</p>
             </div>
-            <div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.28);border-radius:12px;padding:10px 12px;min-width:0;flex:1;text-align:left;">
+            <div class="info-cell-wide" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.28);">
               <p style="font-size:.65rem;font-weight:700;letter-spacing:.06em;margin-bottom:6px;background:linear-gradient(90deg,#93c5fd,#e2e8f0,#fbbf24,#e2e8f0,#93c5fd);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:jv-shimmer-txt 2.8s linear infinite;">공기업 영어 준비 전략</p>
               <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;">
                 <span style="font-size:.78rem;color:#E2E8F0;font-weight:500;line-height:1.4;">토익만 인정 기관 <span style="color:#60A5FA;font-weight:700;">→ 토익 준비</span></span>
