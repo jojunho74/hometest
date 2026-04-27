@@ -160,6 +160,46 @@
     @media(max-width:768px){ .ibt-nav { display:none; } }
     #site-header { top:44px; }
 
+    /* 히어로 탐색 영역 */
+    .hero-explore{margin-top:24px;display:flex;flex-direction:column;gap:11px;}
+    .he-row{display:flex;gap:10px;flex-wrap:wrap;}
+    .he-label{font-size:.62rem;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;margin-bottom:2px;}
+    .he-chip{display:inline-flex;align-items:center;gap:5px;padding:11px 22px;border-radius:30px;font-size:.88rem;font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,.28);background:rgba(255,255,255,.1);color:rgba(255,255,255,.9);transition:all .18s;white-space:nowrap;user-select:none;backdrop-filter:blur(4px);}
+    .he-chip:hover,.he-chip.selected{background:rgba(255,255,255,.95);color:var(--navy);border-color:transparent;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+    .he-btn{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:30px;font-size:.88rem;font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:rgba(255,255,255,.8);transition:all .18s;white-space:nowrap;backdrop-filter:blur(4px);}
+    .he-btn:hover,.he-btn.open{background:var(--orange);border-color:var(--orange);color:#fff;box-shadow:0 4px 16px rgba(232,98,10,.4);}
+    #exp-panels{border-bottom:1px solid var(--border);}
+    .exp-panel{display:none;background:linear-gradient(135deg,#0D1F3C 0%,#112B50 60%,#0A1628 100%);padding:18px 20px 22px;border-top:2px solid rgba(96,165,250,.2);}
+    .exp-panel.open{display:block;}
+    .ep-inner{max-width:1280px;margin:0 auto;}
+    .ep-title{font-size:.78rem;font-weight:800;color:#E2E8F0;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+    .ep-hint{font-size:.65rem;font-weight:400;color:rgba(255,255,255,.4);}
+    .ep-chips{display:flex;flex-wrap:wrap;gap:8px;}
+    .ep-chip{padding:7px 16px;border-radius:20px;font-size:.76rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);transition:all .15s;white-space:nowrap;}
+    .ep-chip:hover{border-color:#60A5FA;background:rgba(96,165,250,.2);color:#93C5FD;}
+    .crec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}
+    .crec-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .15s;}
+    .crec-card:hover{border-color:#60A5FA;background:rgba(96,165,250,.15);}
+    .crec-flag{font-size:1.4rem;line-height:1.2;margin-bottom:3px;}
+    .crec-name{font-size:.8rem;font-weight:700;color:#E2E8F0;}
+    .crec-cnt{font-size:.68rem;color:rgba(255,255,255,.45);margin-bottom:4px;}
+    .crec-tags{display:flex;flex-wrap:wrap;gap:3px;}
+    .crec-tag{font-size:.58rem;font-weight:700;padding:1px 6px;border-radius:4px;}
+    .crec-tag-blue{background:rgba(96,165,250,.25);color:#93C5FD;}
+    .crec-tag-green{background:rgba(52,211,153,.2);color:#6EE7B7;}
+    .crec-tag-orange{background:rgba(232,98,10,.25);color:#FDBA74;}
+    .rank-row{display:flex;align-items:center;gap:10px;padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer;border-radius:8px;transition:background .1s;}
+    .rank-row:hover{background:rgba(96,165,250,.15);}
+    .rank-row:last-child{border-bottom:none;}
+    .rank-num{font-size:.88rem;font-weight:900;color:rgba(255,255,255,.3);min-width:22px;text-align:center;}
+    .rank-num.gold{color:#FBBF24;}
+    /* 상태 표시 */
+    .state-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;font-size:.7rem;font-weight:700;transition:all .2s;}
+    .state-browse{background:#F1F5F9;color:var(--muted);}
+    .state-active{background:#EBF3FF;color:var(--navy);}
+    #btn-clear-filter{display:none;padding:2px 8px;border-radius:6px;border:1px solid var(--border);background:#fff;font-size:.68rem;font-weight:600;cursor:pointer;color:var(--muted);}
+    #btn-clear-filter:hover{border-color:var(--navy);color:var(--navy);}
+
     /* 푸터 */
     #site-footer { background:#1A2C42; color:rgba(255,255,255,.55); padding:28px 20px; margin-top:40px; font-size:.75rem; text-align:center; line-height:1.9; }
     #site-footer a { color:rgba(255,255,255,.7); text-decoration:none; }
@@ -231,9 +271,29 @@
         oninput="applyFilters()" />
       <button class="search-btn" onclick="applyFilters()">검색</button>
     </div>
-    <div class="hero-stats" id="hero-stats"></div>
+    <div class="hero-explore">
+      <div>
+        <div class="he-label">AI 인사이트</div>
+        <div class="he-row">
+          <div class="he-chip" id="chip-korea" onclick="applyInsight('korea')">✔ 한국인 채용 많은 국가</div>
+          <div class="he-chip" id="chip-entry" onclick="applyInsight('entry')">✔ 초보자 진입 쉬움</div>
+          <div class="he-chip" id="chip-it" onclick="applyInsight('it')">✔ IT 직군 수요 많음</div>
+        </div>
+      </div>
+      <div class="he-row">
+        <button class="he-btn" id="ebtn-major" onclick="toggleExpPanel('major')">🎓 전공으로 찾기</button>
+        <button class="he-btn" id="ebtn-country" onclick="toggleExpPanel('country')">🌏 추천 국가 보기</button>
+        <button class="he-btn" id="ebtn-top" onclick="toggleExpPanel('top')">📊 취업 쉬운 국가 TOP</button>
+      </div>
+    </div>
   </div>
 </section>
+
+<div id="exp-panels">
+  <div class="exp-panel" id="ep-major"></div>
+  <div class="exp-panel" id="ep-country"></div>
+  <div class="exp-panel" id="ep-top"></div>
+</div>
 
 <!-- 정보 배너 -->
 <div id="info-bar">
@@ -260,7 +320,11 @@
 
   <div id="content-area">
     <div class="toolbar">
-      <div class="result-count" id="result-count">불러오는 중…</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span class="state-badge state-browse" id="state-badge">🔍 탐색 중</span>
+        <button id="btn-clear-filter" onclick="clearAllFilters()">✕ 초기화</button>
+        <div class="result-count" id="result-count">불러오는 중…</div>
+      </div>
       <select class="sort-select" id="sort-select" onchange="setSortAndApply(this.value)">
         <option value="default">기본 정렬</option>
         <option value="deadline_asc">마감임박순</option>
@@ -335,7 +399,7 @@ function ddayHtml(dateStr) {
 
 /* ── 상태 ── */
 let ALL = [], FILTERED = [];
-let curCountry = 'all', curSort = 'default', curPage = 1;
+let curCountry = 'all', curSort = 'default', curPage = 1, insightType = null;
 const PER = 30;
 
 /* ── 데이터 초기화 ── */
@@ -359,7 +423,6 @@ const PER = 30;
     document.getElementById('fetched-label').innerHTML =
       `<div class="info-dot"></div>수집일시: ${d.fetchedAt}`;
   }
-  renderHeroStats();
   renderSidebar();
   renderMobileFilters();
   applyFilters();
@@ -422,15 +485,25 @@ function applyFilters() {
       (r.entNm||'').toLowerCase().includes(q) ||
       (r.rctntcKscoNm||'').toLowerCase().includes(q) ||
       (r.rctntcNationNm||'').includes(q);
-    return okC && okQ;
+    let okI = true;
+    if (insightType === 'entry') {
+      const c = (r.careerStleNm||'').toLowerCase();
+      okI = c.includes('신입') || c.includes('무경력') || c.includes('무관') || c.includes('경력무관');
+    } else if (insightType === 'it') {
+      const j = (r.rctntcKscoNm||'').toLowerCase();
+      okI = j.includes('it') || j.includes('정보통신') || j.includes('소프트웨어') || j.includes('컴퓨터') || j.includes('개발');
+    }
+    return okC && okQ && okI;
   });
   sortFiltered();
   curPage = 1;
   renderCards();
   renderPagination();
   const label = curCountry === 'all' ? '전체' : curCountry + ' 국가';
+  const insightLabel = insightType === 'entry' ? '초보자 가능 공고' : insightType === 'it' ? 'IT 직군 공고' : null;
   document.getElementById('result-count').innerHTML =
-    `<strong>${FILTERED.length.toLocaleString()}건</strong> ${q ? `"${q}" 검색결과` : label + ' 채용공고'}`;
+    `<strong>${FILTERED.length.toLocaleString()}건</strong> ${insightLabel || (q ? `"${q}" 검색결과` : label + ' 채용공고')}`;
+  updateStateBadge();
 }
 
 function sortFiltered() {
@@ -534,6 +607,155 @@ function goPage(p) {
   renderPagination();
   window.scrollTo({ top: document.getElementById('content-area').offsetTop-80, behavior:'smooth' });
 }
+/* ── 상태 배지 ── */
+function updateStateBadge() {
+  const q = document.getElementById('search-input').value.trim();
+  const badge = document.getElementById('state-badge');
+  const clearBtn = document.getElementById('btn-clear-filter');
+  const hasFilter = curCountry !== 'all' || q || insightType;
+  if (hasFilter) {
+    badge.className = 'state-badge state-active';
+    const label = insightType === 'entry' ? '초보자 가능'
+                : insightType === 'it'    ? 'IT 직군'
+                : insightType === 'korea' ? curCountry
+                : curCountry !== 'all'    ? curCountry
+                : `"${q}"`;
+    badge.textContent = '✅ 선택: ' + label;
+    clearBtn.style.display = '';
+  } else {
+    badge.className = 'state-badge state-browse';
+    badge.textContent = '🔍 탐색 중';
+    clearBtn.style.display = 'none';
+  }
+}
+
+/* ── AI 인사이트 칩 ── */
+function applyInsight(type) {
+  if (insightType === type) { clearAllFilters(); return; }
+  insightType = type;
+  document.querySelectorAll('.he-chip').forEach(c => c.classList.remove('selected'));
+  document.getElementById('chip-' + type).classList.add('selected');
+  document.getElementById('search-input').value = '';
+  if (type === 'korea') {
+    const cnt = {};
+    ALL.forEach(r => { const n = r.rctntcNationNm||'기타'; cnt[n]=(cnt[n]||0)+1; });
+    const top = Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+    curCountry = top ? top[0] : 'all';
+  } else {
+    curCountry = 'all';
+  }
+  renderSidebar(); renderMobileFilters(); applyFilters();
+  window.scrollTo({ top: document.getElementById('main-wrap').offsetTop - 80, behavior:'smooth' });
+}
+
+function clearAllFilters() {
+  insightType = null; curCountry = 'all';
+  document.getElementById('search-input').value = '';
+  document.querySelectorAll('.he-chip').forEach(c => c.classList.remove('selected'));
+  closeAllPanels();
+  renderSidebar(); renderMobileFilters(); applyFilters();
+}
+
+/* ── 탐색 패널 ── */
+function toggleExpPanel(type) {
+  const ids = { major:'ep-major', country:'ep-country', top:'ep-top' };
+  const btns = { major:'ebtn-major', country:'ebtn-country', top:'ebtn-top' };
+  const el = document.getElementById(ids[type]);
+  const isOpen = el.classList.contains('open');
+  closeAllPanels();
+  if (!isOpen) {
+    el.classList.add('open');
+    document.getElementById(btns[type]).classList.add('open');
+    renderExpPanel(type);
+  }
+}
+function closeAllPanels() {
+  ['ep-major','ep-country','ep-top'].forEach(id => document.getElementById(id).classList.remove('open'));
+  ['ebtn-major','ebtn-country','ebtn-top'].forEach(id => document.getElementById(id).classList.remove('open'));
+}
+function renderExpPanel(type) {
+  if (type === 'major')   renderMajorPanel();
+  else if (type === 'country') renderCountryPanel();
+  else                    renderTopPanel();
+}
+
+function renderMajorPanel() {
+  const cnt = {};
+  ALL.forEach(r => { const j = r.rctntcKscoNm||'기타'; cnt[j]=(cnt[j]||0)+1; });
+  const top = Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,24);
+  document.getElementById('ep-major').innerHTML =
+    `<div class="ep-inner"><div class="ep-title">🎓 직종·전공으로 찾기 <span class="ep-hint">(클릭 시 해당 직종 검색)</span></div>
+    <div class="ep-chips">${top.map(([name,c]) =>
+      `<div class="ep-chip" onclick="filterByMajor('${esc(name)}')">${name} <span style="opacity:.5;font-size:.65rem;">${c}</span></div>`
+    ).join('')}</div></div>`;
+}
+function filterByMajor(name) {
+  insightType = null; curCountry = 'all';
+  document.getElementById('search-input').value = name;
+  document.querySelectorAll('.he-chip').forEach(c => c.classList.remove('selected'));
+  renderSidebar(); renderMobileFilters(); applyFilters(); closeAllPanels();
+  window.scrollTo({ top: document.getElementById('main-wrap').offsetTop - 80, behavior:'smooth' });
+}
+
+function renderCountryPanel() {
+  const cnt = {}, entryCnt = {}, itCnt = {};
+  ALL.forEach(r => {
+    const n = r.rctntcNationNm||'기타';
+    cnt[n] = (cnt[n]||0)+1;
+    const c = (r.careerStleNm||'').toLowerCase();
+    if (c.includes('신입')||c.includes('무경력')||c.includes('무관')) entryCnt[n]=(entryCnt[n]||0)+1;
+    const j = (r.rctntcKscoNm||'').toLowerCase();
+    if (j.includes('it')||j.includes('정보통신')||j.includes('소프트웨어')||j.includes('개발')) itCnt[n]=(itCnt[n]||0)+1;
+  });
+  const top = Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  document.getElementById('ep-country').innerHTML =
+    `<div class="ep-inner"><div class="ep-title">🌏 추천 국가</div>
+    <div class="crec-grid">${top.map(([name,c]) => {
+      const tags = [];
+      if (c >= 50) tags.push(`<span class="crec-tag crec-tag-blue">채용 많음</span>`);
+      if ((entryCnt[name]||0) >= 3) tags.push(`<span class="crec-tag crec-tag-green">초보 가능</span>`);
+      if ((itCnt[name]||0) >= 3) tags.push(`<span class="crec-tag crec-tag-orange">IT 수요</span>`);
+      return `<div class="crec-card" onclick="filterByCountry('${esc(name)}');closeAllPanels();">
+        <div class="crec-flag">${getFlag(name)}</div>
+        <div class="crec-name">${name}</div>
+        <div class="crec-cnt">${c}개 공고</div>
+        <div class="crec-tags">${tags.join('')}</div>
+      </div>`;
+    }).join('')}</div></div>`;
+}
+
+function renderTopPanel() {
+  const cnt = {}, entryCnt = {};
+  ALL.forEach(r => {
+    const n = r.rctntcNationNm||'기타';
+    cnt[n] = (cnt[n]||0)+1;
+    const c = (r.careerStleNm||'').toLowerCase();
+    if (c.includes('신입')||c.includes('무경력')||c.includes('무관')||c.includes('경력무관')) entryCnt[n]=(entryCnt[n]||0)+1;
+  });
+  const ranked = Object.entries(cnt)
+    .filter(([,c]) => c >= 5)
+    .map(([n,c]) => ({ name:n, total:c, entry:entryCnt[n]||0, pct:Math.round(((entryCnt[n]||0)/c)*100) }))
+    .sort((a,b) => b.entry - a.entry || b.total - a.total)
+    .slice(0,10);
+  const medals = ['🥇','🥈','🥉'];
+  document.getElementById('ep-top').innerHTML =
+    `<div class="ep-inner"><div class="ep-title">📊 취업 쉬운 국가 TOP <span class="ep-hint">신입·경력무관 공고가 많은 국가 순 · 경력 없이 지원 가능한 공고가 많을수록 상위</span></div>
+    <div>${ranked.map((r,i) =>
+      `<div class="rank-row" onclick="filterByCountry('${esc(r.name)}');closeAllPanels();">
+        <span class="rank-num ${i<3?'gold':''}">${medals[i]||i+1}</span>
+        <span style="font-size:1.1rem;">${getFlag(r.name)}</span>
+        <div style="flex:1;">
+          <div style="font-size:.8rem;font-weight:700;color:#E2E8F0;">${r.name}</div>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.4);">신입·무경력 ${r.entry}건 / 전체 ${r.total}건</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:.82rem;font-weight:800;color:#60A5FA;">${r.pct}%</div>
+          <div style="font-size:.6rem;color:rgba(255,255,255,.35);">진입 가능</div>
+        </div>
+      </div>`
+    ).join('')}</div></div>`;
+}
+
 function toggleIbtMenu() {
   const btn = document.getElementById('ibt-hamburger');
   const menu = document.getElementById('ibt-mobile-menu');
