@@ -1321,7 +1321,13 @@
                 <button onclick="resetUniversityClicks()" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-red-300 text-red-500 hover:bg-red-50 bg-white">초기화</button>
               </div>
             </div>
-            <div class="text-xs text-slate-400 mb-2" id="uc-page-label">이번주 기준</div>
+            <div class="flex items-center gap-3 mb-2">
+              <div class="text-xs text-slate-400" id="uc-page-label">이번주 기준</div>
+              <div id="uc-reset-indicator" class="hidden text-xs text-orange-500 font-semibold">
+                ⚠ 초기화 적용 중 (<span id="uc-reset-date"></span>)
+                <button onclick="clearUcReset()" class="ml-1 underline text-orange-600 hover:text-orange-800">해제</button>
+              </div>
+            </div>
             <!-- 2열 헤더 -->
             <div class="grid grid-cols-2 gap-x-6 border-b pb-2 mb-1">
               <div class="grid text-xs text-slate-400 font-semibold" style="grid-template-columns:28px 1fr 52px 80px;">
@@ -5148,11 +5154,32 @@ ${internalSummary}
     window._ucAllRows = [];   // 전체 원본 보관
     window._ucPeriod  = 'week';
 
+    function clearUcReset() {
+      localStorage.removeItem(UC_RESET_KEY);
+      const ind = document.getElementById('uc-reset-indicator');
+      if (ind) ind.classList.add('hidden');
+      loadUniversityClicks();
+    }
+
     async function loadUniversityClicks() {
       const tbody = document.getElementById('university-click-body');
       if (!tbody) return;
       let allRows = [], offset = 0;
       const resetAt = getUcResetAt(); // 초기화 기준 시각
+
+      // 초기화 인디케이터 표시
+      const ind = document.getElementById('uc-reset-indicator');
+      const indDate = document.getElementById('uc-reset-date');
+      if (ind) {
+        if (resetAt) {
+          const kstReset = new Date(new Date(resetAt).getTime() + 9 * 60 * 60 * 1000);
+          if (indDate) indDate.textContent = kstReset.toISOString().slice(0, 16).replace('T', ' ') + ' KST';
+          ind.classList.remove('hidden');
+        } else {
+          ind.classList.add('hidden');
+        }
+      }
+
       while (true) {
         let query = db.from('page_views')
           .select('page, visited_at, referrer')
@@ -5184,11 +5211,12 @@ ${internalSummary}
       const allRows = window._ucAllRows || [];
       const body = document.getElementById('university-click-body');
 
-      // KST 기준 오늘 시작 계산
+      // KST 기준 오늘 시작 계산 (KST midnight → UTC)
       const kstNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
       const todayKst = new Date(kstNow);
       todayKst.setUTCHours(0, 0, 0, 0);
-      const todayStart = todayKst.toISOString();
+      // KST midnight을 UTC로 변환: 9시간 빼기
+      const todayStart = new Date(todayKst.getTime() - 9 * 60 * 60 * 1000).toISOString();
 
       // 이번주 월요일 00:00 KST 계산
       const dayOfWeek = kstNow.getUTCDay();
@@ -5196,7 +5224,7 @@ ${internalSummary}
       const monKst = new Date(kstNow);
       monKst.setUTCHours(0, 0, 0, 0);
       monKst.setUTCDate(monKst.getUTCDate() + diffToMon);
-      const weekStart = monKst.toISOString();
+      const weekStart = new Date(monKst.getTime() - 9 * 60 * 60 * 1000).toISOString();
 
       const filtered = period === 'today'
         ? allRows.filter(r => r.visited_at && r.visited_at >= todayStart)
