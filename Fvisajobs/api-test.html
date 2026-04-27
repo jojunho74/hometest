@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <title>API 필드 확인</title>
+  <style>
+    body{font-family:monospace;padding:24px;background:#0f172a;color:#e2e8f0;}
+    h2{color:#60a5fa;margin-bottom:16px;}
+    .status{padding:8px 14px;border-radius:8px;font-weight:700;margin-bottom:20px;display:inline-block;}
+    .ok{background:#14532d;color:#86efac;}
+    .err{background:#7f1d1d;color:#fca5a5;}
+    .raw{background:#1e293b;border-radius:10px;padding:16px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;font-size:12px;max-height:300px;overflow-y:auto;}
+    table{width:100%;border-collapse:collapse;margin-top:20px;}
+    th{background:#1e40af;color:#fff;padding:10px 14px;text-align:left;font-size:13px;}
+    td{padding:9px 14px;border-bottom:1px solid #1e293b;font-size:13px;}
+    tr:nth-child(even)td{background:#1e293b;}
+    .field-name{color:#f59e0b;font-weight:700;}
+    .field-val{color:#86efac;}
+    .field-empty{color:#6b7280;font-style:italic;}
+    .item-block{background:#1e293b;border-radius:10px;padding:16px;margin-bottom:12px;border-left:4px solid #1a56db;}
+    .item-title{color:#60a5fa;font-weight:700;margin-bottom:10px;font-size:14px;}
+    .badge{display:inline-block;background:#1e40af;color:#93c5fd;padding:2px 8px;border-radius:4px;font-size:11px;margin-right:4px;}
+  </style>
+</head>
+<body>
+<h2>🔍 API 응답 필드 확인 도구</h2>
+<div id="status">⏳ API 호출 중...</div>
+<div id="summary" style="margin:16px 0;"></div>
+<div id="rawXml" style="display:none;"><h3 style="color:#94a3b8;margin-bottom:8px;">📄 RAW XML (1번 아이템)</h3><div class="raw" id="rawContent"></div></div>
+<div id="fieldsTable" style="display:none;"><h3 style="color:#94a3b8;margin:16px 0 8px;">📋 발견된 필드 목록 (전체)</h3><table><thead><tr><th>필드명 (XML 태그)</th><th>샘플 데이터</th><th>데이터 있는 항목 수</th></tr></thead><tbody id="fieldsBody"></tbody></table></div>
+<div id="itemsSection" style="display:none;"><h3 style="color:#94a3b8;margin:16px 0 8px;">📦 실제 데이터 (처음 5건)</h3><div id="itemsList"></div></div>
+
+<script>
+const PROXY = 'http://127.0.0.1:8766';
+
+async function run() {
+  try {
+    const url = `${PROXY}?pageNo=1&numOfRows=10`;
+    const res = await fetch(url);
+    const text = await res.text();
+
+    // RAW XML 표시
+    document.getElementById('rawContent').textContent = text;
+    document.getElementById('rawXml').style.display = 'block';
+
+    const xml = new DOMParser().parseFromString(text, 'text/xml');
+    const resultCode = xml.querySelector('resultCode')?.textContent;
+    const resultMsg = xml.querySelector('resultMsg')?.textContent;
+    const totalCount = xml.querySelector('totalCount')?.textContent;
+    const items = xml.querySelectorAll('item');
+
+    if (resultCode !== '00') {
+      document.getElementById('status').innerHTML = `<span class="status err">❌ 오류: ${resultCode} — ${resultMsg}</span>`;
+      return;
+    }
+
+    document.getElementById('status').innerHTML = `<span class="status ok">✅ 정상 응답 (${resultCode}: ${resultMsg})</span>`;
+    document.getElementById('summary').innerHTML = `
+      <span class="badge">총 데이터: ${parseInt(totalCount).toLocaleString()}건</span>
+      <span class="badge">이번 응답: ${items.length}건</span>
+      <span class="badge">상태: ${resultMsg}</span>`;
+
+    // 전체 필드 수집
+    const fieldStats = {};
+    const allItems = [];
+    items.forEach(item => {
+      const obj = {};
+      item.childNodes.forEach(node => {
+        if (node.nodeType === 1) {
+          const name = node.nodeName;
+          const val = node.textContent.trim();
+          obj[name] = val;
+          if (!fieldStats[name]) fieldStats[name] = { count: 0, samples: [] };
+          if (val) {
+            fieldStats[name].count++;
+            if (fieldStats[name].samples.length < 3) fieldStats[name].samples.push(val);
+          }
+        }
+      });
+      allItems.push(obj);
+    });
+
+    // 필드 테이블
+    const tbody = document.getElementById('fieldsBody');
+    Object.entries(fieldStats).forEach(([field, stat]) => {
+      const sample = stat.samples[0] || '';
+      tbody.innerHTML += `<tr>
+        <td class="field-name">${field}</td>
+        <td>${sample ? `<span class="field-val">${sample.substring(0,80)}</span>` : '<span class="field-empty">값 없음</span>'}</td>
+        <td>${stat.count} / ${items.length}</td>
+      </tr>`;
+    });
+    document.getElementById('fieldsTable').style.display = 'block';
+
+    // 처음 5건 상세 표시
+    const list = document.getElementById('itemsList');
+    allItems.slice(0, 5).forEach((item, i) => {
+      const entries = Object.entries(item).map(([k,v]) =>
+        v ? `<div><span class="field-name">${k}</span>: <span class="field-val">${v}</span></div>`
+          : `<div><span class="field-name">${k}</span>: <span class="field-empty">(비어있음)</span></div>`
+      ).join('');
+      list.innerHTML += `<div class="item-block"><div class="item-title">📌 ${i+1}번 데이터</div>${entries}</div>`;
+    });
+    document.getElementById('itemsSection').style.display = 'block';
+
+  } catch(e) {
+    document.getElementById('status').innerHTML = `<span class="status err">❌ 오류: ${e.message}</span>
+      <div style="margin-top:12px;color:#fca5a5;font-size:13px;">
+        server.py(포트 8765)가 실행 중인지 확인하세요.<br>
+        <span style="color:#fbbf24;">바탕화면의 수집시작.bat을 실행하면 server.py가 시작됩니다.</span>
+      </div>`;
+  }
+}
+
+run();
+</script>
+</body>
+</html>

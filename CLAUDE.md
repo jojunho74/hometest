@@ -983,3 +983,6 @@ https://ibtcc.kr/
 - .env 파일은 git에서 제외 (SUPABASE_URL, SUPABASE_KEY, ANTHROPIC_API_KEY 포함)
 - requirements.txt: requests, beautifulsoup4, supabase, python-dotenv, feedparser, playwright
 ```
+## 반드시 수정사항이 생기면
+-수정사항이 생기면 먼저 file:///C:/Users/User/Desktop/homepage/index.html에 반영하고
+-반영이 된 이후 다시한번 최종 배포할 것인지 묻도록해 . 최종배포를 동의하면 https://ibtcc.kr/index.html로 배포해

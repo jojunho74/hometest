@@ -221,13 +221,24 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
 
       <!-- ─── 저장된 소스 목록 ─── -->
       <div id="section-source-list" class="hidden bg-white rounded-xl shadow-sm overflow-hidden">
-        <div class="px-4 py-3 border-b flex items-center justify-between bg-slate-50">
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-slate-500">🗂️ 저장된 HTML 소스 목록</span>
-            <span id="source-list-count" class="text-xs text-slate-400"></span>
+        <div class="px-4 py-3 border-b bg-slate-50" style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-500">🗂️ 저장된 HTML 소스 목록</span>
+              <span id="source-list-count" class="text-xs text-slate-400"></span>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button onclick="bulkReparse()" class="btn btn-purple" style="font-size:.72rem;padding:4px 10px;" id="bulk-btn">⚡ 전체 일괄 재파싱</button>
+              <button onclick="loadSourceList()" class="btn btn-secondary" style="font-size:.72rem;padding:4px 8px;">🔄 새로고침</button>
+            </div>
           </div>
-          <button onclick="bulkReparse()" class="btn btn-purple" style="font-size:.72rem;padding:4px 10px;" id="bulk-btn">⚡ 전체 일괄 재파싱</button>
-          <button onclick="loadSourceList()" class="btn btn-secondary" style="font-size:.72rem;padding:4px 8px;">🔄 새로고침</button>
+          <div style="position:relative;">
+            <input type="text" id="source-search" class="form-input" placeholder="🔍 기업명으로 검색..."
+              style="padding-left:12px;font-size:.82rem;"
+              oninput="filterSourceList(this.value)"/>
+            <button onclick="document.getElementById('source-search').value='';filterSourceList('');"
+              style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94A3B8;font-size:.75rem;display:none;" id="source-search-clear">✕</button>
+          </div>
         </div>
         <div class="overflow-x-auto">
           <table class="data-tbl">
@@ -598,9 +609,30 @@ function cancelAutoResult() {
 
 // ── 저장된 소스 목록 ──
 let _sourceMap = {};
+let _allSources = [];
+let _updatedDates = {}; // id → 'YYYY-MM-DD' (세션 내 업데이트 기록)
+const _UPDATE_PALETTE = ['#F59E0B','#3B82F6','#8B5CF6','#EC4899','#14B8A6','#EF4444'];
+
+function getUpdatedBtnColor(id) {
+  const d = _updatedDates[id];
+  if (!d) return null;
+  const uniqueDates = [...new Set(Object.values(_updatedDates))].sort();
+  return _UPDATE_PALETTE[uniqueDates.indexOf(d) % _UPDATE_PALETTE.length];
+}
+
+function renderUpdateBtn(id) {
+  const color = getUpdatedBtnColor(id);
+  const d = _updatedDates[id];
+  const label = d ? `✅ ${d.slice(5)}` : '🔄 업데이트';
+  const bg = color || '#10B981';
+  return `<button onclick="updateSource('${id}')" class="btn" id="update-btn-${id}"
+    style="font-size:11px;padding:4px 10px;background:${bg};color:#fff;" title="${d ? d + ' 업데이트됨' : '업데이트'}">${label}</button>`;
+}
 
 async function loadSourceList() {
   document.getElementById('section-source-list').classList.remove('hidden');
+  document.getElementById('source-search').value = '';
+  document.getElementById('source-search-clear').style.display = 'none';
   const tbody = document.getElementById('source-list-tbody');
   tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr>';
 
@@ -609,13 +641,29 @@ async function loadSourceList() {
     tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-sm text-red-400">오류: ${esc(error.message)}<br><small>테이블 SQL 가이드에서 테이블을 먼저 생성하세요.</small></td></tr>`;
     return;
   }
-  const rows = data || [];
+  _allSources = data || [];
   _sourceMap = {};
-  rows.forEach(r => { _sourceMap[r.id] = r.url; });
+  _allSources.forEach(r => { _sourceMap[r.id] = r.url; });
 
-  document.getElementById('source-list-count').textContent = rows.length + '개';
+  renderSourceRows(_allSources);
+}
+
+function filterSourceList(kw) {
+  const clearBtn = document.getElementById('source-search-clear');
+  clearBtn.style.display = kw ? 'block' : 'none';
+  const filtered = kw
+    ? _allSources.filter(r => (r.dataset_name||'').toLowerCase().includes(kw.toLowerCase()))
+    : _allSources;
+  renderSourceRows(filtered, kw);
+}
+
+function renderSourceRows(rows, highlight) {
+  const total = _allSources.length;
+  document.getElementById('source-list-count').textContent =
+    rows.length === total ? total + '개' : `${rows.length} / ${total}개`;
+  const tbody = document.getElementById('source-list-tbody');
   if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-sm text-slate-400">저장된 소스가 없습니다.</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-sm text-slate-400">${highlight ? '검색 결과가 없습니다.' : '저장된 소스가 없습니다.'}</td></tr>`;
     return;
   }
   tbody.innerHTML = rows.map(r => {
@@ -624,13 +672,17 @@ async function loadSourceList() {
       : '<span class="text-xs font-bold text-slate-400 px-2 py-0.5 rounded-full" style="background:#F1F5F9;">임시저장</span>';
     const dt = r.created_at ? r.created_at.slice(0,16).replace('T',' ') : '-';
     const shortUrl = (r.url||'').length > 40 ? (r.url||'').slice(0,40)+'…' : (r.url||'-');
+    const nameRaw = r.dataset_name || '(미입력)';
+    const nameHtml = highlight
+      ? esc(nameRaw).replace(new RegExp(esc(highlight).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'),
+          m => `<mark style="background:#FEF08A;color:#1E293B;border-radius:2px;">${m}</mark>`)
+      : esc(nameRaw);
     return `<tr>
       <td class="text-xs text-blue-600 max-w-[200px]" title="${esc(r.url)}"><a href="${esc(r.url)}" target="_blank" style="text-decoration:underline;">${esc(shortUrl)}</a></td>
-      <td class="text-xs font-semibold text-slate-700">${esc(r.dataset_name||'(미입력)')}</td>
+      <td class="text-xs font-semibold text-slate-700">${nameHtml}</td>
       <td>${statusChip}</td>
       <td class="text-xs text-slate-400">${dt}</td>
-      <td style="display:flex;gap:6px;align-items:center;">
-        <button onclick="updateSource('${r.id}')" class="btn btn-success" style="font-size:11px;padding:4px 10px;" id="update-btn-${r.id}">🔄 업데이트</button>
+      <td style="display:flex;gap:6px;align-items:center;">${renderUpdateBtn(r.id)}
         <button onclick="loadSourceById('${r.id}')" class="btn btn-primary" style="font-size:11px;padding:4px 10px;">불러오기</button>
         <button onclick="deleteSource('${r.id}')" class="btn btn-danger">삭제</button>
       </td>
@@ -707,6 +759,7 @@ async function updateSource(id) {
     await db.from('alio_jobs').insert(parsedData);
   }
 
+  _updatedDates[id] = new Date().toISOString().slice(0,10);
   toast(`업데이트 완료! ${parsedData ? parsedData.length + '개 직종 파싱 → alio_jobs 갱신됨' : 'HTML 소스만 갱신'}`);
   loadSourceList();
 }

@@ -1,13 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8"/>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>공공기관 채용 경쟁률 — 지텔프IBT</title>
+  <title>[테스트] 공공기관 채용 경쟁률 — 지텔프IBT</title>
+  <style>
+    #test-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:#DC2626;color:#fff;text-align:center;font-size:13px;font-weight:700;padding:6px;letter-spacing:.05em;}
+    body{padding-top:34px!important;}
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" crossorigin="anonymous"></script>
+  <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#0A1628;color:#E2E8F0;height:100vh;display:flex;flex-direction:column;}
@@ -37,7 +40,6 @@
     /* ── 퀵 네비게이션 배너 ── */
     .qnav-banner{
       position:relative;
-      display:flex;align-items:center;
       background:linear-gradient(135deg,#0D1F3C 0%,#1a3a6b 40%,#0f2d55 70%,#0A1628 100%);
       /* 배경 이미지로 교체하려면 아래 주석 해제 후 경로 수정:
          background-image:url('./your-image.jpg');
@@ -50,19 +52,17 @@
       background:linear-gradient(90deg,rgba(0,180,180,.08) 0%,rgba(96,165,250,.05) 100%);
       pointer-events:none;
     }
-    @keyframes qnav-blink{0%,100%{opacity:1}50%{opacity:.3}}
-    @keyframes jv-shimmer-txt{0%{background-position:200% center}100%{background-position:-200% center}}
     .qnav-inner{
       position:relative;z-index:1;
       display:flex;align-items:center;justify-content:center;
-      gap:7px;padding:10px 14px;
+      gap:12px;padding:18px 20px;
       flex-wrap:wrap;
     }
     .qnav-btn{
       display:inline-flex;align-items:center;
-      padding:5px 13px;
+      padding:10px 22px;
       border-radius:999px;
-      font-size:.72rem;font-weight:700;
+      font-size:.82rem;font-weight:700;
       text-decoration:none;
       border:none;
       color:#fff;
@@ -75,18 +75,7 @@
     .qnav-btn:nth-child(2){ background:linear-gradient(135deg,#7C3AED,#A78BFA); animation-delay:-2s; }
     .qnav-btn:nth-child(3){ background:linear-gradient(135deg,#059669,#34D399); animation-delay:-4s; }
     .qnav-btn:nth-child(4){ background:linear-gradient(135deg,#D97706,#FBBF24); animation-delay:-6s; }
-    .qnav-btn:nth-child(5){
-      background:linear-gradient(90deg,#92400e,#f59e0b,#fde68a,#f59e0b,#92400e);
-      background-size:300% 100%;
-      animation:scoreShimmer 2s linear infinite!important;
-      box-shadow:0 0 16px rgba(251,191,36,.6);
-    }
-    .qnav-btn:nth-child(6){ background:linear-gradient(135deg,#0F766E,#14B8A6); animation-delay:-1s; }
-    @keyframes scoreShimmer{
-      0%  {background-position:100% center;box-shadow:0 0 10px rgba(251,191,36,.5);}
-      50% {box-shadow:0 0 28px rgba(251,191,36,1);}
-      100%{background-position:-100% center;box-shadow:0 0 10px rgba(251,191,36,.5);}
-    }
+    .qnav-btn:nth-child(5){ background:linear-gradient(135deg,#0F766E,#14B8A6); animation-delay:-1s; }
     @keyframes qnavBg{
       0%,100%{ filter:brightness(1); transform:translateY(0); box-shadow:0 4px 16px rgba(0,0,0,.2); }
       50%     { filter:brightness(1.2); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.35); }
@@ -96,10 +85,9 @@
       transform:translateY(-3px)!important;
       box-shadow:0 10px 28px rgba(0,0,0,.4)!important;
     }
-    @media(max-width:768px){
-      .qnav-inner{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;justify-content:flex-start;gap:5px;padding:8px 10px;scrollbar-width:none;}
-      .qnav-inner::-webkit-scrollbar{display:none;}
-      .qnav-btn{font-size:.62rem;padding:4px 10px;}
+    @media(max-width:600px){
+      .qnav-inner{gap:8px;padding:14px 12px;}
+      .qnav-btn{font-size:.75rem;padding:8px 16px;}
     }
 
     /* ── 레이아웃 ── */
@@ -240,26 +228,7 @@
     .ic-submit:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(124,58,237,.6);}
     .ic-submit:active{transform:scale(.97);}
     .ic-submit:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
-    @media(max-width:768px){.chart-comment-row{flex-direction:column;}.inline-comment-col{width:100%;}.ibt-push-col{width:100%;}}
-
-    /* ── IBT 신청 PUSH 패널 ── */
-    @keyframes ibtShimmer{
-      0%{background-position:200% 50%;}
-      100%{background-position:-200% 50%;}
-    }
-    .ibt-push-col{width:220px;flex-shrink:0;background:linear-gradient(105deg,#091a30 0%,#0c2340 35%,#1a4a80 50%,#0c2340 65%,#091a30 100%);background-size:300% 100%;border:1px solid rgba(96,165,250,.4);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:ibtShimmer 3s linear infinite;}
-    .ibt-push-head{padding:12px 14px 10px;border-bottom:1px solid rgba(96,165,250,.2);flex-shrink:0;background:rgba(96,165,250,.1);}
-    .ibt-push-title{font-size:.76rem;font-weight:900;color:#93C5FD;letter-spacing:.01em;}
-    .ibt-push-sub{font-size:.62rem;color:rgba(147,197,253,.5);margin-top:2px;}
-    .ibt-push-body{flex:1;padding:12px;display:flex;flex-direction:column;gap:10px;}
-    .ibt-school-label{font-size:.68rem;font-weight:700;color:rgba(147,197,253,.7);margin-bottom:4px;}
-    .ibt-school-input{width:100%;background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.3);border-radius:8px;padding:7px 9px;font-size:.76rem;color:#E2E8F0;outline:none;font-family:inherit;box-sizing:border-box;}
-    .ibt-school-input:focus{border-color:rgba(96,165,250,.7);background:rgba(96,165,250,.18);}
-    .ibt-school-input::placeholder{color:rgba(147,197,253,.35);}
-    .ibt-recommend-btn{margin-top:auto;width:100%;padding:10px;border-radius:10px;background:linear-gradient(135deg,#1D4ED8,#3B82F6);color:#fff;font-size:.8rem;font-weight:900;border:none;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 14px rgba(59,130,246,.45);display:flex;align-items:center;justify-content:center;gap:6px;}
-    .ibt-recommend-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(59,130,246,.65);}
-    .ibt-recommend-btn:active{transform:scale(.97);}
-    .ibt-push-notice{font-size:.62rem;color:rgba(147,197,253,.45);line-height:1.6;}
+    @media(max-width:768px){.chart-comment-row{flex-direction:column;}.inline-comment-col{width:100%;}}
 
     /* ── 댓글 패널 (FAB) ── */
     .comment-fab{position:fixed;bottom:88px;right:24px;z-index:200;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#4F46E5);color:#fff;font-size:1.3rem;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,58,237,.6),0 0 0 0 rgba(124,58,237,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;animation:fabPulse 2.8s ease-in-out infinite;}
@@ -393,10 +362,11 @@
   </style>
 </head>
 <body>
+<div id="test-banner">🧪 테스트 페이지 — 실제 DB 데이터를 그대로 사용합니다 (배포 전 확인용)</div>
 
 <header>
   <div class="hinner">
-    <a href="index.html" class="hlogo">IBT C&amp;C</a>
+    <a href="index.html" class="hlogo">지텔프IBT 대학컨설팅</a>
     <nav class="hnav">
       <a href="index.html#about">서비스 소개</a>
       <a href="package.html">패키지</a>
@@ -432,12 +402,11 @@
 <div class="qnav-banner">
   <div class="qnav-overlay"></div>
   <div class="qnav-inner">
-    <a href="https://ibtcc.kr/student.html"        class="qnav-btn">학생용</a>
-    <a href="https://ibtcc.kr/package.html"         class="qnav-btn">대학 및 관계자용</a>
-    <a href="https://ibtcc.kr/library-pdf.html"     class="qnav-btn">채용공고 자료실</a>
-    <a href="https://ibtcc.kr/university-board.html" class="qnav-btn">대학소식</a>
-    <a href="https://ibtcc.kr/gtelp-score.html"     class="qnav-btn">TOEIC·GTELP 점수대비표</a>
-    <a href="Fvisajobs/index.html"                  class="qnav-btn">해외취업</a>
+    <a href="https://ibtcc.kr/student.html"        class="qnav-btn">학생용 →</a>
+    <a href="https://ibtcc.kr/package.html"         class="qnav-btn">대학 및 관계자용 →</a>
+    <a href="https://ibtcc.kr/library-pdf.html"     class="qnav-btn">채용공고 자료실 →</a>
+    <a href="https://ibtcc.kr/university-board.html" class="qnav-btn">대학소식 →</a>
+    <a href="Fvisajobs/index.html"                   class="qnav-btn">해외취업</a>
   </div>
 </div>
 
@@ -462,208 +431,10 @@
     <div class="topbar">
       <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰ 목록</button>
       <span class="topbar-title" id="topbar-title">공고를 선택하세요</span>
-      <button id="btn-back-chart" onclick="location.href='competition.html'" style="display:none;padding:5px 13px;border-radius:8px;font-size:.73rem;font-weight:700;background:rgba(96,165,250,.15);color:#60A5FA;border:1px solid rgba(96,165,250,.3);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='rgba(96,165,250,.25)'" onmouseout="this.style.background='rgba(96,165,250,.15)'">← 직종별 경쟁률</button>
-      <span style="font-size:.72rem;color:rgba(255,255,255,.35);font-weight:400;white-space:nowrap;margin-left:auto;">본 자료는 공공기관 경영정보 공개시스템의 자료를 근거로 작성되었습니다.</span>
+      <span style="font-size:.72rem;color:rgba(255,255,255,.35);font-weight:400;white-space:nowrap;">본 자료는 공공기관 경영정보 공개시스템의 자료를 근거로 작성되었습니다.</span>
       <span class="topbar-cnt hidden" id="topbar-cnt"></span>
     </div>
     <div class="content-area" id="content-area">
-
-      <!-- 공고 미선택 기본 차트 뷰 (jobscript_a 내장) -->
-      <div id="default-chart-view">
-        <style>
-          #default-chart-view{padding-bottom:24px;}
-          .jv-sp{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px 20px;margin-bottom:12px;}
-          .jv-sp-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start;}
-          .jv-left{display:flex;flex-direction:column;gap:8px;}
-          .jv-search{position:relative;}
-          .jv-search input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:11px;color:#E2E8F0;padding:10px 40px 10px 16px;font-size:.85rem;outline:none;transition:border-color .2s;}
-          .jv-search input:focus{border-color:#3B82F6;background:rgba(59,130,246,.07);}
-          .jv-search input::placeholder{color:rgba(255,255,255,.2);}
-          .jv-s-ico{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.25);pointer-events:none;}
-          .jv-s-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.3);font-size:.8rem;cursor:pointer;background:none;border:none;display:none;}
-          .jv-search input:not(:placeholder-shown)~.jv-s-ico{display:none;}
-          .jv-search input:not(:placeholder-shown)~.jv-s-clear{display:block;}
-          .jv-sa-bar{display:none;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(135deg,rgba(37,99,235,.55),rgba(59,130,246,.4));border:1.5px solid rgba(96,165,250,.7);border-radius:10px;box-shadow:0 0 16px rgba(59,130,246,.35),inset 0 1px 0 rgba(255,255,255,.1);}
-          .jv-sa-bar label{display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;}
-          .jv-sa-bar input[type=checkbox]{width:16px;height:16px;accent-color:#3B82F6;cursor:pointer;}
-          .jv-sa-text{font-size:.75rem;color:#fff;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.4);}
-          .jv-sa-meta{font-size:.67rem;color:#fff;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:20px;white-space:nowrap;font-weight:600;}
-          .jv-btn-reset{padding:9px 0;border-radius:11px;font-size:.78rem;font-weight:700;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.1);cursor:pointer;width:100%;transition:all .15s;}
-          .jv-btn-reset:hover{background:rgba(255,255,255,.1);color:#E2E8F0;}
-          .jv-ac{position:absolute;top:calc(100% + 5px);left:0;right:0;background:#0B1E3A;border:1.5px solid rgba(96,165,250,.25);border-radius:11px;max-height:220px;overflow-y:auto;z-index:500;box-shadow:0 12px 32px rgba(0,0,0,.5);}
-          .jv-ac-item{padding:9px 14px;font-size:.78rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);color:#CBD5E1;display:flex;align-items:center;justify-content:space-between;}
-          .jv-ac-item:last-child{border-bottom:none;}
-          .jv-ac-item:hover,.jv-ac-item.sel{background:rgba(59,130,246,.18);color:#93C5FD;}
-          .jv-ac-cnt{font-size:.67rem;color:rgba(255,255,255,.3);background:rgba(255,255,255,.06);padding:2px 7px;border-radius:20px;}
-          .jv-ac-empty{padding:14px;text-align:center;font-size:.78rem;color:rgba(255,255,255,.25);}
-          .jv-right{border-left:1px solid rgba(255,255,255,.06);padding-left:16px;}
-          .jv-right-lbl{font-size:.67rem;color:rgba(255,255,255,.25);margin-bottom:6px;}
-          .jv-tag-box{height:130px;overflow-y:auto;overflow-x:hidden;}
-          .jv-tag-box::-webkit-scrollbar{width:3px;}
-          .jv-tag-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
-          .jv-tags{display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;}
-          .jv-tag{padding:3px 10px;border-radius:20px;font-size:.67rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.09);background:transparent;color:rgba(255,255,255,.4);transition:all .15s;white-space:nowrap;}
-          .jv-tag:hover{border-color:rgba(96,165,250,.5);color:#93C5FD;}
-          .jv-tag.on{border-color:#3B82F6;color:#60A5FA;background:rgba(59,130,246,.18);}
-          .jv-filter-bar{display:none;align-items:center;gap:8px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:11px;padding:8px 14px;margin-bottom:10px;}
-          .jv-filter-bar .lbl{font-size:.76rem;color:rgba(52,211,153,.7);font-weight:600;}
-          .jv-filter-bar .val{font-size:.78rem;color:#34D399;font-weight:700;flex:1;}
-          .jv-filter-bar .cnt{font-size:.7rem;color:rgba(255,255,255,.3);}
-          .jv-filter-bar .clr{background:none;border:1px solid rgba(52,211,153,.3);color:rgba(52,211,153,.7);border-radius:7px;padding:3px 9px;font-size:.7rem;cursor:pointer;}
-          .jv-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;}
-          .jv-scard{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:13px 12px;text-align:center;}
-          .jv-scard .val{font-size:1.35rem;font-weight:800;color:#60A5FA;letter-spacing:-.02em;}
-          .jv-scard .lbl{font-size:.65rem;color:rgba(255,255,255,.3);margin-top:3px;}
-          .jv-chart-card{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:18px 22px;margin-bottom:12px;}
-          .jv-chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-          .jv-chart-title{font-size:.85rem;font-weight:700;color:#93C5FD;}
-          .jv-chart-hint{font-size:.68rem;color:rgba(255,255,255,.25);}
-          .jv-chart-wrap{position:relative;height:320px;}
-          .jv-result-card{background:#0D1F3C;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:18px 22px;}
-          .jv-result-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
-          .jv-result-title{font-size:.85rem;font-weight:700;color:#93C5FD;}
-          .jv-result-cnt{font-size:.7rem;color:rgba(255,255,255,.3);background:rgba(255,255,255,.06);padding:2px 9px;border-radius:20px;}
-          .jv-sort{margin-left:auto;font-size:.7rem;color:rgba(255,255,255,.3);}
-          .jv-sort select{background:#0A1628;border:1px solid rgba(255,255,255,.1);color:#E2E8F0;border-radius:7px;padding:4px 8px;font-size:.7rem;outline:none;cursor:pointer;margin-left:4px;}
-          .jv-tbl-wrap{overflow-x:auto;}
-          .jv-tbl{width:100%;border-collapse:collapse;font-size:.76rem;}
-          .jv-tbl th{background:#081629;color:rgba(255,255,255,.4);font-weight:600;padding:9px 11px;text-align:left;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;}
-          .jv-tbl th.r{text-align:right;}
-          .jv-tbl td{padding:9px 11px;border-bottom:1px solid rgba(255,255,255,.04);color:#CBD5E1;white-space:nowrap;}
-          .jv-tbl tbody tr:hover td{background:rgba(59,130,246,.05);}
-          .jv-tbl tbody tr:nth-child(even) td{background:rgba(255,255,255,.01);}
-          .jv-tbl td.r{text-align:right;font-variant-numeric:tabular-nums;}
-          .jv-td-name{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#93C5FD;font-weight:600;text-decoration:none;display:block;}
-          .jv-td-name:hover{color:#60A5FA;text-decoration:underline;}
-          .jv-chip{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.69rem;font-weight:700;}
-          .jv-hot{background:rgba(251,113,133,.15);color:#FB7185;border:1px solid rgba(251,113,133,.25);}
-          .jv-mid{background:rgba(251,191,36,.1);color:#FBBF24;border:1px solid rgba(251,191,36,.2);}
-          .jv-low{background:rgba(52,211,153,.1);color:#34D399;border:1px solid rgba(52,211,153,.18);}
-          .jv-placeholder{text-align:center;padding:48px 20px;color:rgba(255,255,255,.2);font-size:.83rem;line-height:2;}
-          @media(max-width:900px){.jv-sp-grid{grid-template-columns:1fr;}.jv-right{border-left:none;border-top:1px solid rgba(255,255,255,.06);padding-left:0;padding-top:12px;}.jv-summary{grid-template-columns:repeat(3,1fr);}.jv-tag-box{height:90px;}}
-          @media(max-width:600px){.jv-summary{grid-template-columns:repeat(2,1fr);}}
-        </style>
-
-        <!-- 검색 패널 -->
-        <div class="jv-sp">
-          <div class="jv-sp-grid">
-            <div class="jv-left">
-              <p style="margin:0 0 8px;font-size:.78rem;line-height:1.4;background:linear-gradient(90deg,#93c5fd,#e2e8f0,#fbbf24,#e2e8f0,#93c5fd);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:jv-shimmer-txt 2.8s linear infinite;">✦ 관련 직무를 입력하시면, 기관별 경쟁률을 비교할 수 있습니다.</p>
-              <div class="jv-search">
-                <input type="text" id="jv-input" placeholder="직종 검색 (예: 전기, 기계, 사무…)"
-                  oninput="jvOnInput()" onkeydown="jvOnKey(event)" autocomplete="off"/>
-                <span class="jv-s-ico">🔍</span>
-                <button class="jv-s-clear" onclick="jvClearSearch()">✕</button>
-                <div class="jv-ac" id="jv-ac" style="display:none;"></div>
-              </div>
-              <div class="jv-sa-bar" id="jv-sa-bar">
-                <label>
-                  <input type="checkbox" id="jv-sa-cb" onchange="jvOnSaChange()">
-                  <span class="jv-sa-text" id="jv-sa-text">검색된 직종 전체 선택</span>
-                </label>
-                <span class="jv-sa-meta" id="jv-sa-meta"></span>
-              </div>
-              <button class="jv-btn-reset" onclick="jvResetAll()">↺ 필터 초기화</button>
-            </div>
-            <div class="jv-right">
-              <div class="jv-right-lbl">직종 필터 (클릭으로 선택)</div>
-              <div class="jv-tag-box"><div class="jv-tags" id="jv-tags"></div></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 활성 필터 -->
-        <div class="jv-filter-bar" id="jv-filter-bar">
-          <span class="lbl">필터</span>
-          <span class="val" id="jv-fb-val"></span>
-          <span class="cnt" id="jv-fb-cnt"></span>
-          <button class="clr" onclick="jvResetAll()">✕ 해제</button>
-        </div>
-
-        <!-- 요약 카드 -->
-        <div class="jv-summary">
-          <div class="jv-scard"><div class="val" id="jv-s-total">—</div><div class="lbl">전체 레코드</div></div>
-          <div class="jv-scard"><div class="val" id="jv-s-ds">—</div><div class="lbl">공고 수</div></div>
-          <div class="jv-scard"><div class="val" id="jv-s-jobs">—</div><div class="lbl">직종 수</div></div>
-          <div class="jv-scard"><div class="val" id="jv-s-avg">—</div><div class="lbl">평균 경쟁률</div></div>
-          <div class="jv-scard"><div class="val" id="jv-s-max">—</div><div class="lbl">최고 경쟁률</div></div>
-        </div>
-
-        <!-- 차트 -->
-        <div class="jv-chart-card">
-          <div class="jv-chart-head">
-            <div class="jv-chart-title" id="jv-chart-title">직종별 평균 경쟁률</div>
-            <div class="jv-chart-hint">막대 클릭 → 해당 직종 필터</div>
-          </div>
-          <div class="jv-chart-wrap"><canvas id="jv-chart"></canvas></div>
-        </div>
-
-        <!-- ── 합격선 안내 배너 ── -->
-        <div style="background:linear-gradient(135deg,#0f3460 0%,#16213e 60%,#0d1b2a 100%);border:1px solid rgba(96,165,250,.3);border-radius:16px;padding:28px 24px;margin-bottom:14px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.4);">
-          <div style="display:flex;flex-wrap:nowrap;justify-content:center;gap:10px;margin-bottom:14px;">
-            <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:10px 12px;min-width:0;flex-shrink:0;">
-              <p style="font-size:.65rem;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.08em;margin-bottom:6px;">합격 기준 점수</p>
-              <div style="display:flex;flex-direction:column;gap:5px;">
-                <span style="font-size:.82rem;color:#E2E8F0;font-weight:600;">✔ 토익&nbsp;&nbsp;<strong style="color:#60A5FA;font-size:.86rem;">약 750점 이상</strong></span>
-                <span style="font-size:.82rem;color:#E2E8F0;font-weight:600;">✔ 지텔프&nbsp;<strong style="color:#34D399;font-size:.86rem;">65점 이상</strong></span>
-              </div>
-            </div>
-            <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:10px 12px;min-width:0;flex-shrink:0;">
-              <p style="font-size:.65rem;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.08em;margin-bottom:6px;">⏱ 준비 기간</p>
-              <div style="display:flex;flex-direction:column;gap:5px;">
-                <span style="font-size:.82rem;color:rgba(255,255,255,.75);">토익&nbsp;&nbsp;&nbsp;&nbsp;2~3개월</span>
-                <span style="font-size:.82rem;color:rgba(255,255,255,.75);">지텔프&nbsp;<strong style="color:#FBBF24;font-size:.86rem;">2~3주</strong></span>
-              </div>
-            </div>
-            <div style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:12px;padding:10px 12px;min-width:0;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;">
-              <p style="font-size:.75rem;font-weight:800;color:#FBBF24;margin-bottom:4px;">오늘 방문자 한정</p>
-              <p style="font-size:.82rem;font-weight:600;color:#fff;">IBT 무료 응시 가능</p>
-            </div>
-            <div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.28);border-radius:12px;padding:10px 12px;min-width:0;flex:1;text-align:left;">
-              <p style="font-size:.65rem;font-weight:700;letter-spacing:.06em;margin-bottom:6px;background:linear-gradient(90deg,#93c5fd,#e2e8f0,#fbbf24,#e2e8f0,#93c5fd);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:jv-shimmer-txt 2.8s linear infinite;">공기업 영어 준비 전략</p>
-              <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;">
-                <span style="font-size:.78rem;color:#E2E8F0;font-weight:500;line-height:1.4;">토익만 인정 기관 <span style="color:#60A5FA;font-weight:700;">→ 토익 준비</span></span>
-                <span style="font-size:.78rem;color:#E2E8F0;font-weight:500;line-height:1.4;">지텔프 활용 가능 기관 <span style="color:#34D399;font-weight:700;">→ 단기간 기준 충족 가능</span><br><span style="font-size:.7rem;color:rgba(255,255,255,.5);font-weight:400;">(예: 국민건강보험공단 외 110개 공공기관)</span></span>
-              </div>
-              <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:6px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
-                <p style="font-size:.65rem;color:rgba(255,255,255,.45);line-height:1.5;margin:0;">목표 기관에 따라 가장 빠른 방법을 선택하는 것이 중요합니다</p>
-                <button onclick="document.getElementById('publicOrgModal').style.display='flex'" style="flex-shrink:0;font-size:.65rem;font-weight:700;color:#38BDF8;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);border-radius:6px;padding:3px 8px;cursor:pointer;white-space:nowrap;transition:background .15s;" onmouseover="this.style.background='rgba(56,189,248,.22)'" onmouseout="this.style.background='rgba(56,189,248,.12)'">110개 기관 보기</button>
-              </div>
-            </div>
-          </div>
-          <a href="https://ibtcc.kr/student.html" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:50px;font-size:1rem;font-weight:800;background:linear-gradient(135deg,#1D4ED8,#2563EB);color:#fff;text-decoration:none;white-space:nowrap;box-shadow:0 4px 20px rgba(37,99,235,.5);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(37,99,235,.65)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(37,99,235,.5)'">IBT 신청하기 →</a>
-        </div>
-
-        <!-- 결과 테이블 -->
-        <div class="jv-result-card">
-          <div class="jv-result-head">
-            <div class="jv-result-title" id="jv-result-title">검색 결과</div>
-            <span class="jv-result-cnt" id="jv-result-cnt" style="display:none;"></span>
-            <div class="jv-sort">정렬
-              <select id="jv-sort-sel" onchange="jvRenderTable()">
-                <option value="ratio_desc">경쟁률 높은순</option>
-                <option value="ratio_asc">경쟁률 낮은순</option>
-                <option value="name_asc">공고명순</option>
-                <option value="s1_total_desc">응시인원 많은순</option>
-                <option value="job_asc">직종명순</option>
-              </select>
-            </div>
-          </div>
-          <div class="jv-tbl-wrap">
-            <table class="jv-tbl">
-              <thead><tr>
-                <th>공고명</th><th>직종</th><th>지역</th><th>직급</th>
-                <th class="r">1차응시</th><th class="r">1차합격</th>
-                <th class="r">최종합격</th><th class="r">경쟁률</th>
-              </tr></thead>
-              <tbody id="jv-tbody">
-                <tr><td colspan="8" class="jv-placeholder">🔎<br>직종을 검색하거나 태그를 클릭하세요</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
       <div id="midal-default" style="display:none;">
         <div style="display:none;">
           <input id="midal-search" type="text"/>
@@ -736,13 +507,13 @@
 </div>
 
 <!-- 댓글 FAB -->
-<button class="comment-fab" id="commentFab" onclick="toggleCommentPanel()" title="댓글 보기/쓰기" style="display:none;">
+<button class="comment-fab" id="commentFab" onclick="toggleCommentPanel()" title="댓글 보기/쓰기">
   💬
   <span class="fab-cnt hidden" id="fabCnt">0</span>
 </button>
 
 <!-- 댓글 패널 -->
-<div class="comment-panel hidden" id="commentPanel" style="display:none!important;">
+<div class="comment-panel hidden" id="commentPanel">
   <div class="cp-head">
     <span class="cp-title" id="cpTitle">💬 댓글</span>
     <button class="cp-close" onclick="toggleCommentPanel()">✕</button>
@@ -756,6 +527,10 @@
       <textarea class="cp-text-input" id="cpText" rows="3" placeholder="의견을 남겨보세요..."></textarea>
       <button class="cp-submit" id="cpSubmit" onclick="submitComment()">등록</button>
     </div>
+    <button class="cp-kakao" onclick="shareKakaoCompetition()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
+      카카오 공유
+    </button>
   </div>
 </div>
 
@@ -821,275 +596,6 @@ async function init() {
   // 전체 순위 부여
   _allDatasets.forEach((ds, i) => { ds.rank = i + 1; });
   renderDatasetList(_allDatasets);
-  renderDefaultChart(allRows);
-
-  // URL ?ds=공고명 파라미터로 자동 선택
-  const dsParam = new URLSearchParams(window.location.search).get('ds');
-  if (dsParam) {
-    const matched = _allDatasets.find(d => d.name === dsParam);
-    if (matched) {
-      setTimeout(() => selectDataset(matched.name), 100);
-    }
-  }
-}
-
-// ── jobscript 내장 뷰 ──
-let _jvAllData = [], _jvDisplayData = [], _jvSelectedJob = null;
-let _jvSaJobs = null, _jvAcIdx = -1, _jvChart = null;
-
-function renderDefaultChart(allRows) {
-  _jvAllData = allRows;
-  jvRenderSummary();
-  jvRenderChart();
-  jvRenderTags();
-}
-
-function jvGetStats(src) {
-  const map = {};
-  (src || _jvAllData).forEach(r => {
-    const j = r.job || '기타';
-    if (!map[j]) map[j] = { ratios:[], count:0, datasets: new Set() };
-    const v = parseFloat(r.ratio);
-    if (v > 0) map[j].ratios.push(v);
-    map[j].count++;
-    if (r.dataset_name) map[j].datasets.add(r.dataset_name);
-  });
-  return Object.entries(map).map(([job,v]) => ({
-    job, count: v.count,
-    avg: v.ratios.length ? +(v.ratios.reduce((a,b)=>a+b,0)/v.ratios.length).toFixed(1) : 0,
-    max: v.ratios.length ? +Math.max(...v.ratios).toFixed(1) : 0,
-    datasets: [...v.datasets]
-  })).sort((a,b) => b.avg - a.avg);
-}
-
-function jvRenderSummary() {
-  const src = _jvDisplayData.length ? _jvDisplayData : _jvAllData;
-  const ds = new Set(src.map(r=>r.dataset_name)).size;
-  const jobs = new Set(src.map(r=>r.job).filter(Boolean)).size;
-  const ratios = src.map(r=>parseFloat(r.ratio)).filter(v=>v>0);
-  const avg = ratios.length ? (ratios.reduce((a,b)=>a+b,0)/ratios.length).toFixed(1) : '—';
-  const max = ratios.length ? Math.max(...ratios).toFixed(1) : '—';
-  document.getElementById('jv-s-total').textContent = src.length.toLocaleString();
-  document.getElementById('jv-s-ds').textContent = ds;
-  document.getElementById('jv-s-jobs').textContent = jobs;
-  document.getElementById('jv-s-avg').textContent = avg+':1';
-  document.getElementById('jv-s-max').textContent = max+':1';
-}
-
-function jvRenderChart(src) {
-  const stats = jvGetStats(src);
-  const labels = stats.map(s=>s.job);
-  const avgs   = stats.map(s=>s.avg);
-  const colors = avgs.map(v=>v>=80?'rgba(251,113,133,.85)':v>=30?'rgba(251,191,36,.85)':'rgba(52,211,153,.85)');
-  const bords  = avgs.map(v=>v>=80?'rgba(251,113,133,1)':v>=30?'rgba(251,191,36,1)':'rgba(52,211,153,1)');
-  if (_jvChart) { _jvChart.destroy(); _jvChart = null; }
-  document.querySelector('#default-chart-view .jv-chart-wrap').innerHTML = '<canvas id="jv-chart"></canvas>';
-  _jvChart = new Chart(document.getElementById('jv-chart').getContext('2d'), {
-    type:'bar',
-    data:{ labels, datasets:[{ data:avgs, backgroundColor:colors, borderColor:bords, borderWidth:1, borderRadius:6, borderSkipped:false }] },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      onClick:(e,els)=>{ if(!els.length)return; jvSelectJob(labels[els[0].index]===_jvSelectedJob?null:labels[els[0].index]); },
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          backgroundColor:'rgba(6,15,30,.95)',borderColor:'rgba(96,165,250,.3)',borderWidth:1,
-          titleColor:'#93C5FD',bodyColor:'rgba(255,255,255,.7)',padding:12,
-          callbacks:{
-            title:items=>items[0].label,
-            label:ctx=>`  평균 경쟁률: ${ctx.parsed.y}:1`,
-            afterBody:items=>{
-              const s=stats[items[0].dataIndex];
-              const lines=[`  응시 레코드: ${s.count}개`,`  최고 경쟁률: ${s.max}:1`];
-              if(s.datasets.length){lines.push('');lines.push('  📋 공고명');s.datasets.slice(0,5).forEach(d=>lines.push(`  · ${d}`));if(s.datasets.length>5)lines.push(`  · 외 ${s.datasets.length-5}개`);}
-              return lines;
-            }
-          }
-        }
-      },
-      scales:{
-        x:{ticks:{color:'rgba(255,255,255,.45)',font:{size:11},maxRotation:45},grid:{color:'rgba(255,255,255,.03)'}},
-        y:{ticks:{color:'rgba(255,255,255,.35)',callback:v=>v+':1'},grid:{color:'rgba(255,255,255,.05)'}}
-      }
-    }
-  });
-}
-
-function jvRenderTags() {
-  const stats = jvGetStats();
-  let html = `<span class="jv-tag on" data-job="" onclick="jvSelectJob(null)">전체 <small style="opacity:.5">${_jvAllData.length}</small></span>`;
-  stats.forEach(s => {
-    html += `<span class="jv-tag" data-job="${jvEsc(s.job)}" onclick="jvSelectJob('${s.job.replace(/'/g,"\\'")}')">${jvEsc(s.job)} <small style="opacity:.4">${s.count}</small></span>`;
-  });
-  document.getElementById('jv-tags').innerHTML = html;
-}
-
-function jvSelectJob(job) {
-  _jvSelectedJob = job;
-  document.querySelectorAll('.jv-tag').forEach(el=>el.classList.toggle('on',el.dataset.job===(job||'')));
-  if (job) {
-    _jvDisplayData = _jvAllData.filter(r=>r.job===job);
-    jvSetFilter(`직종: ${job}`, _jvDisplayData.length);
-    document.getElementById('jv-chart-title').textContent = `직종별 평균 경쟁률 — ${job} 선택`;
-    jvRenderChart(_jvDisplayData);
-    jvRenderTable();
-  } else {
-    _jvDisplayData = [];
-    jvClearFilter();
-    document.getElementById('jv-chart-title').textContent = '직종별 평균 경쟁률';
-    jvRenderChart();
-    jvClearTable();
-  }
-  jvRenderSummary();
-}
-
-function jvSetFilter(label, cnt) {
-  document.getElementById('jv-fb-val').textContent = label;
-  document.getElementById('jv-fb-cnt').textContent = cnt+'개 레코드';
-  document.getElementById('jv-filter-bar').style.display='flex';
-}
-function jvClearFilter() { document.getElementById('jv-filter-bar').style.display='none'; }
-
-function jvResetAll() {
-  _jvSelectedJob=null; _jvSaJobs=null; _jvDisplayData=[];
-  document.getElementById('jv-input').value='';
-  jvCloseAC(); jvHideSaBar(); jvClearFilter();
-  document.querySelectorAll('.jv-tag').forEach(el=>el.classList.toggle('on',el.dataset.job===''));
-  document.getElementById('jv-chart-title').textContent='직종별 평균 경쟁률';
-  jvRenderChart(); jvRenderSummary(); jvClearTable();
-}
-
-function jvOnInput() {
-  const q = document.getElementById('jv-input').value.trim();
-  _jvAcIdx=-1;
-  if (!q) { jvCloseAC(); jvHideSaBar(); return; }
-  const jobMap={};
-  _jvAllData.forEach(r=>{ const j=r.job||''; if(j.toLowerCase().includes(q.toLowerCase())) jobMap[j]=(jobMap[j]||0)+1; });
-  const matches=Object.entries(jobMap).sort((a,b)=>a[0].localeCompare(b[0])).slice(0,20);
-  if (!matches.length) {
-    document.getElementById('jv-ac').innerHTML='<div class="jv-ac-empty">검색 결과 없음</div>';
-    document.getElementById('jv-ac').style.display='block'; jvHideSaBar(); return;
-  }
-  const totalCnt=matches.reduce((s,[,c])=>s+c,0);
-  jvShowSaBar(matches.map(([j])=>j), totalCnt);
-  document.getElementById('jv-ac').innerHTML=matches.map(([job,cnt],i)=>
-    `<div class="jv-ac-item" data-i="${i}" onclick="jvPickJob('${job.replace(/'/g,"\\'")}')">`+
-    `<span>${jvHl(job,q)}</span><span class="jv-ac-cnt">${cnt}개</span></div>`
-  ).join('');
-  document.getElementById('jv-ac').style.display='block';
-}
-
-function jvHl(text,q){const i=text.toLowerCase().indexOf(q.toLowerCase());if(i<0)return jvEsc(text);return jvEsc(text.slice(0,i))+`<mark style="background:rgba(96,165,250,.3);color:#93C5FD;border-radius:2px;padding:0 1px;">${jvEsc(text.slice(i,i+q.length))}</mark>`+jvEsc(text.slice(i+q.length));}
-function jvClearSearch(){document.getElementById('jv-input').value='';jvCloseAC();jvHideSaBar();}
-function jvOnKey(e){const items=document.querySelectorAll('.jv-ac-item');if(!items.length)return;if(e.key==='ArrowDown'){_jvAcIdx=Math.min(_jvAcIdx+1,items.length-1);jvHlAC(items);e.preventDefault();}else if(e.key==='ArrowUp'){_jvAcIdx=Math.max(_jvAcIdx-1,0);jvHlAC(items);e.preventDefault();}else if(e.key==='Enter'&&_jvAcIdx>=0)items[_jvAcIdx].click();else if(e.key==='Escape')jvCloseAC();}
-function jvHlAC(items){items.forEach((el,i)=>el.classList.toggle('sel',i===_jvAcIdx));}
-function jvCloseAC(){document.getElementById('jv-ac').style.display='none';}
-
-document.addEventListener('click',e=>{ if(!e.target.closest('.jv-search'))jvCloseAC(); });
-
-function jvTrackPageView(page) {
-  if (localStorage.getItem('gtelp_notrack') === '1') return;
-  fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/page_views', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Prefer': 'return=minimal' },
-    body: JSON.stringify({ page })
-  }).catch(function(){});
-}
-
-function jvPickJob(job) {
-  document.getElementById('jv-input').value=job;
-  jvCloseAC();
-  _jvSelectedJob=job;
-  document.querySelectorAll('.jv-tag').forEach(el=>el.classList.toggle('on',el.dataset.job===job));
-  _jvDisplayData=_jvAllData.filter(r=>r.job===job);
-  jvSetFilter(`직종: ${job}`, _jvDisplayData.length);
-  document.getElementById('jv-chart-title').textContent=`직종별 평균 경쟁률 — ${job}`;
-  jvRenderChart(_jvDisplayData); jvRenderSummary(); jvRenderTable();
-  jvTrackPageView('competition-search:' + job);
-}
-
-function jvShowSaBar(jobs,totalCnt){
-  const bar=document.getElementById('jv-sa-bar'),cb=document.getElementById('jv-sa-cb');
-  _jvSaJobs=jobs;
-  document.getElementById('jv-sa-text').textContent=`검색된 직종 전체 선택 (${jobs.length}개 직종)`;
-  document.getElementById('jv-sa-meta').textContent=`${totalCnt}개 레코드`;
-  cb.checked=false; bar.style.display='flex';
-}
-function jvHideSaBar(){document.getElementById('jv-sa-bar').style.display='none';document.getElementById('jv-sa-cb').checked=false;_jvSaJobs=null;}
-
-function jvOnSaChange() {
-  const checked=document.getElementById('jv-sa-cb').checked,jobs=_jvSaJobs||[];
-  _jvSelectedJob=null; document.querySelectorAll('.jv-tag').forEach(el=>el.classList.remove('on'));
-  if (checked) {
-    _jvDisplayData=_jvAllData.filter(r=>jobs.includes(r.job));
-    jvSetFilter(`직종 전체 선택 (${jobs.length}개)`,_jvDisplayData.length);
-    document.getElementById('jv-chart-title').textContent=`직종별 평균 경쟁률 — ${jobs.length}개 직종 선택`;
-    jvRenderChart(_jvDisplayData); jvRenderTable();
-    const q = document.getElementById('jv-input').value.trim();
-    if (q) jvTrackPageView('competition-sa-click:' + q);
-  } else {
-    _jvDisplayData=[]; jvClearFilter();
-    document.getElementById('jv-chart-title').textContent='직종별 평균 경쟁률';
-    jvRenderChart(); jvClearTable();
-  }
-  jvRenderSummary();
-}
-
-function jvClearTable() {
-  document.getElementById('jv-result-title').textContent='검색 결과';
-  document.getElementById('jv-result-cnt').style.display='none';
-  document.getElementById('jv-tbody').innerHTML='<tr><td colspan="8" class="jv-placeholder">🔎<br>직종을 검색하거나 태그를 클릭하세요</td></tr>';
-}
-
-function jvRenderTable() {
-  const sortVal=document.getElementById('jv-sort-sel').value;
-  const sorted=[..._jvDisplayData].sort((a,b)=>{
-    if(sortVal==='name_asc')return(a.dataset_name||'').localeCompare(b.dataset_name||'');
-    if(sortVal==='ratio_asc')return(parseFloat(a.ratio)||0)-(parseFloat(b.ratio)||0);
-    if(sortVal==='ratio_desc')return(parseFloat(b.ratio)||0)-(parseFloat(a.ratio)||0);
-    if(sortVal==='s1_total_desc')return(b.s1_total||0)-(a.s1_total||0);
-    if(sortVal==='job_asc')return(a.job||'').localeCompare(b.job||'');
-    return 0;
-  });
-  const cnt=document.getElementById('jv-result-cnt');
-  cnt.textContent=sorted.length+'개'; cnt.style.display='';
-  if(!sorted.length){document.getElementById('jv-tbody').innerHTML='<tr><td colspan="8" class="jv-placeholder">결과가 없습니다</td></tr>';return;}
-  const dash='<span style="color:rgba(255,255,255,.15)">—</span>';
-  const fp=r=>r.s5_total?r.s5_pass:r.s4_total?r.s4_pass:r.s3_pass;
-  const ft=r=>r.s5_total?r.s5_total:r.s4_total?r.s4_total:r.s3_total;
-  document.getElementById('jv-tbody').innerHTML=sorted.map(r=>{
-    const rv=parseFloat(r.ratio)||0;
-    const cls=rv>=80?'jv-hot':rv>=30?'jv-mid':'jv-low';
-    return `<tr>
-      <td><a class="jv-td-name" href="https://ibtcc.kr/competition.html?ds=${encodeURIComponent(r.dataset_name)}" target="_blank" title="${jvEsc(r.dataset_name)}">${jvEsc(r.dataset_name)}</a></td>
-      <td style="font-weight:600;color:#E2E8F0;">${jvEsc(r.job||'—')}</td>
-      <td style="color:rgba(255,255,255,.4);font-size:.73rem;">${jvEsc(r.region||'—')}</td>
-      <td style="color:rgba(255,255,255,.3);font-size:.7rem;">${jvEsc(r.grade||'—')}</td>
-      <td class="r">${r.s1_total?.toLocaleString()||dash}</td>
-      <td class="r">${r.s1_pass?.toLocaleString()||dash}</td>
-      <td class="r">${fp(r)!=null?fp(r)+'<span style="color:rgba(255,255,255,.2)">/</span>'+(ft(r)||''):dash}</td>
-      <td class="r"><span class="jv-chip ${cls}">${r.ratio||'—'}:1</span></td>
-    </tr>`;
-  }).join('');
-}
-
-function jvEsc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-function jvShowDefault() {
-  // 기본 차트 뷰 다시 표시
-  document.getElementById('default-chart-view').style.display = '';
-  // 뒤로가기 버튼 숨기기
-  document.getElementById('btn-back-chart').style.display = 'none';
-  // 공고 선택 해제
-  document.querySelectorAll('.ds-item').forEach(el => el.classList.remove('active'));
-  document.getElementById('topbar-title').textContent = '공고를 선택하세요';
-  const cnt = document.getElementById('topbar-cnt');
-  cnt.textContent = ''; cnt.classList.add('hidden');
-  // content-area 내 공고 상세 내용 제거
-  const area = document.getElementById('content-area');
-  Array.from(area.children).forEach(el => {
-    if (el.id !== 'default-chart-view' && el.id !== 'midal-default') el.remove();
-  });
 }
 
 function renderDatasetList(list) {
@@ -1122,11 +628,6 @@ function selectDataset(name) {
     el.classList.toggle('active', el.querySelector('.ds-name')?.title === name));
   const ds = _allDatasets.find(d => d.name === name);
   if (!ds) return;
-  // 기본 차트 뷰 숨기고 뒤로가기 버튼 표시
-  const dcv = document.getElementById('default-chart-view');
-  if (dcv) dcv.style.display = 'none';
-  const btn = document.getElementById('btn-back-chart');
-  if (btn) btn.style.display = '';
   document.getElementById('topbar-title').textContent = ds.name;
   const c = document.getElementById('topbar-cnt');
   c.textContent = `직종 ${ds.count}개`; c.classList.remove('hidden');
@@ -1173,72 +674,21 @@ function renderVisualization(dsName, rows) {
       <div class="chart-card chart-col">
         <div class="chart-canvas-wrap"><canvas id="ratioChart"></canvas></div>
       </div>
-      <!-- IBT 신청 PUSH 패널 -->
-      <div class="ibt-push-col">
-        <div class="ibt-push-head">
-          <div class="ibt-push-title">🏫 우리대학 IBT신청 PUSH</div>
-          <div class="ibt-push-sub">학교를 선택하고 시험을 추천받으세요</div>
+      <div class="inline-comment-col">
+        <div class="ic-head">
+          <span class="ic-title">💬 댓글</span>
+          <span class="ic-cnt" id="icCnt"></span>
         </div>
-        <div class="ibt-push-body">
-          <div>
-            <div class="ibt-school-label">학교명</div>
-            <input class="ibt-school-input" id="ibtSchoolInput" type="text" placeholder="예) 성균관대학교" autocomplete="off"/>
-          </div>
-          <div>
-            <div class="ibt-school-label">학과</div>
-            <input class="ibt-school-input" id="ibtDeptInput" type="text" placeholder="예) 경영학과" autocomplete="off"/>
-          </div>
-          <div>
-            <div class="ibt-school-label">문의, 남기는 글</div>
-            <textarea class="ibt-school-input" id="ibtMemoInput" rows="3" placeholder="문의사항이나 남기실 말씀을 입력하세요" autocomplete="off" style="resize:none;line-height:1.5;"></textarea>
-          </div>
-          <button class="ibt-recommend-btn" onclick="ibtRecommend()">
-            IBT 시험추천
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </button>
-          <button class="cp-kakao" style="width:100%;margin-top:0;" onclick="ibtShareKakao()">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
-            카카오톡 공유
+        <div class="ic-list" id="icList"><div class="ic-empty">불러오는 중...</div></div>
+        <div class="ic-form">
+          <textarea class="ic-textarea" id="icText" rows="2" placeholder="의견을 남겨보세요..."></textarea>
+          <button class="ic-submit" onclick="submitInlineComment()">등록</button>
+          <button class="cp-kakao" style="margin-top:7px;" onclick="shareKakaoCompetition()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
+            카카오 공유
           </button>
         </div>
       </div>
-
-      <div class="inline-comment-col" style="display:none;"></div>
-    </div>
-    <!-- ── 합격선 안내 배너 ── -->
-    <div style="background:linear-gradient(135deg,#0f3460 0%,#16213e 60%,#0d1b2a 100%);border:1px solid rgba(96,165,250,.3);border-radius:16px;padding:28px 24px;margin-bottom:22px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.4);">
-      <div style="display:flex;flex-wrap:nowrap;justify-content:center;gap:10px;margin-bottom:14px;">
-        <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:10px 12px;min-width:0;flex-shrink:0;">
-          <p style="font-size:.65rem;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.08em;margin-bottom:6px;">합격 기준 점수</p>
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <span style="font-size:.82rem;color:#E2E8F0;font-weight:600;">✔ 토익&nbsp;&nbsp;<strong style="color:#60A5FA;font-size:.86rem;">약 750점 이상</strong></span>
-            <span style="font-size:.82rem;color:#E2E8F0;font-weight:600;">✔ 지텔프&nbsp;<strong style="color:#34D399;font-size:.86rem;">65점 이상</strong></span>
-          </div>
-        </div>
-        <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:10px 12px;min-width:0;flex-shrink:0;">
-          <p style="font-size:.65rem;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.08em;margin-bottom:6px;">⏱ 준비 기간</p>
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <span style="font-size:.82rem;color:rgba(255,255,255,.75);">토익&nbsp;&nbsp;&nbsp;&nbsp;2~3개월</span>
-            <span style="font-size:.82rem;color:rgba(255,255,255,.75);">지텔프&nbsp;<strong style="color:#FBBF24;font-size:.86rem;">2~3주</strong></span>
-          </div>
-        </div>
-        <div style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:12px;padding:10px 12px;min-width:0;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;">
-          <p style="font-size:.75rem;font-weight:800;color:#FBBF24;margin-bottom:4px;">오늘 방문자 한정</p>
-          <p style="font-size:.82rem;font-weight:600;color:#fff;">IBT 무료 응시 가능</p>
-        </div>
-        <div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.28);border-radius:12px;padding:10px 12px;min-width:0;flex:1;text-align:left;">
-          <p style="font-size:.65rem;font-weight:700;letter-spacing:.06em;margin-bottom:6px;background:linear-gradient(90deg,#93c5fd,#e2e8f0,#fbbf24,#e2e8f0,#93c5fd);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:jv-shimmer-txt 2.8s linear infinite;">공기업 영어 준비 전략</p>
-          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;">
-            <span style="font-size:.78rem;color:#E2E8F0;font-weight:500;line-height:1.4;">토익만 인정 기관 <span style="color:#60A5FA;font-weight:700;">→ 토익 준비</span></span>
-            <span style="font-size:.78rem;color:#E2E8F0;font-weight:500;line-height:1.4;">지텔프 활용 가능 기관 <span style="color:#34D399;font-weight:700;">→ 단기간 기준 충족 가능</span><br><span style="font-size:.7rem;color:rgba(255,255,255,.5);font-weight:400;">(예: 국민건강보험공단 외 110개 공공기관)</span></span>
-          </div>
-          <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:6px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
-            <p style="font-size:.65rem;color:rgba(255,255,255,.45);line-height:1.5;margin:0;">목표 기관에 따라 가장 빠른 방법을 선택하는 것이 중요합니다</p>
-            <button onclick="document.getElementById('publicOrgModal').style.display='flex'" style="flex-shrink:0;font-size:.65rem;font-weight:700;color:#38BDF8;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);border-radius:6px;padding:3px 8px;cursor:pointer;white-space:nowrap;transition:background .15s;" onmouseover="this.style.background='rgba(56,189,248,.22)'" onmouseout="this.style.background='rgba(56,189,248,.12)'">110개 기관 보기</button>
-          </div>
-        </div>
-      </div>
-      <a href="https://ibtcc.kr/student.html" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:50px;font-size:1rem;font-weight:800;background:linear-gradient(135deg,#1D4ED8,#2563EB);color:#fff;text-decoration:none;white-space:nowrap;box-shadow:0 4px 20px rgba(37,99,235,.5);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(37,99,235,.65)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(37,99,235,.5)'">IBT 신청하기 →</a>
     </div>
 
     <div class="sec-title">직종별 전형 단계 현황</div>
@@ -1426,31 +876,27 @@ function shareKakaoCompetition() {
   const desc  = _currentDs ? '직종별 경쟁률과 합격선을 확인해보세요!' : '공공기관 채용 경쟁률을 한눈에 확인하세요.';
   const url   = 'https://ibtcc.kr/competition.html';
   const img   = 'https://ibtcc.kr/partner-logos.png';
-
-  function _fallback() {
-    if (navigator.share) { navigator.share({ title, url }).catch(() => {}); return; }
-    navigator.clipboard.writeText(url)
-      .then(() => alert('링크가 복사됐습니다!\n카카오톡에서 붙여넣기 해주세요 😊'))
-      .catch(() => alert('공유 링크: ' + url));
+  try {
+    if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: title,
+        description: desc,
+        imageUrl: img,
+        link: { mobileWebUrl: url, webUrl: url }
+      },
+      buttons: [{ title: '경쟁률 보러가기', link: { mobileWebUrl: url, webUrl: url } }]
+    });
+    return;
+  } catch(e) {
+    console.warn('[카카오공유 오류]', e);
   }
-
-  if (typeof Kakao === 'undefined' || !Kakao.Share) { _fallback(); return; }
-  if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
-
-  const result = Kakao.Share.sendDefault({
-    objectType: 'feed',
-    content: {
-      title: title,
-      description: desc,
-      imageUrl: img,
-      link: { mobileWebUrl: url, webUrl: url }
-    },
-    buttons: [{ title: '경쟁률 보러가기', link: { mobileWebUrl: url, webUrl: url } }]
-  });
-
-  if (result && typeof result.catch === 'function') {
-    result.catch(e => { console.warn('[카카오공유 오류]', e); _fallback(); });
-  }
+  // 카카오 SDK 실패 시 네이티브 공유 → 링크 복사 fallback
+  if (navigator.share) { navigator.share({ title, url }).catch(() => {}); return; }
+  navigator.clipboard.writeText(url)
+    .then(() => alert('링크가 복사됐습니다!\n카카오톡에서 붙여넣기 해주세요 😊'))
+    .catch(() => alert('공유 링크: ' + url));
 }
 
 async function submitComment() {
@@ -1536,61 +982,6 @@ async function submitQuickApply() {
   document.getElementById('qmSuccess').style.display = 'block';
   setTimeout(() => document.getElementById('quickOverlay').classList.remove('open'), 3000);
 }
-
-function ibtShareKakao() {
-  const url = 'https://ibtcc.kr/competition.html';
-  try {
-    if (!Kakao.isInitialized()) Kakao.init('233759a22146d1c339ba19cfb1c257dc');
-    Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title: '우리대학 IBT신청 PUSH',
-        description: '지텔프IBT 시험 도입을 희망하는 학교를 추천해보세요!',
-        imageUrl: 'https://ibtcc.kr/partner-logos.png',
-        link: { mobileWebUrl: url, webUrl: url }
-      },
-      buttons: [{ title: '신청하러 가기', link: { mobileWebUrl: url, webUrl: url } }]
-    });
-  } catch(e) {
-    const ta = document.createElement('textarea');
-    ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-    alert('링크가 복사됐습니다!\n카카오톡을 열어 붙여넣기 해주세요 😊');
-  }
-}
-
-async function ibtRecommend() {
-  const schoolEl = document.getElementById('ibtSchoolInput');
-  const deptEl   = document.getElementById('ibtDeptInput');
-  const memoEl   = document.getElementById('ibtMemoInput');
-  const school = schoolEl ? schoolEl.value.trim() : '';
-  const dept   = deptEl   ? deptEl.value.trim()   : '';
-  const memo   = memoEl   ? memoEl.value.trim()   : '';
-  if (!school) { alert('학교명을 입력해주세요.'); schoolEl && schoolEl.focus(); return; }
-  const btn = document.querySelector('.ibt-recommend-btn');
-  if (btn) { btn.disabled = true; btn.textContent = '등록 중...'; }
-  try {
-    const SB  = 'https://byzulmxcuhsrjdphmuym.supabase.co';
-    const KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
-    const res = await fetch(SB + '/rest/v1/ibt_applications', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ school_name: school, department: dept || null, memo: memo || null, status: 'pending' })
-    });
-    if (!res.ok) throw new Error(res.status);
-    if (schoolEl) schoolEl.value = '';
-    if (deptEl)   deptEl.value   = '';
-    if (memoEl)   memoEl.value   = '';
-    // 버튼 잠깐 완료 표시 후 복원
-    btn.textContent = '✅ 등록완료!';
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.innerHTML = 'IBT 시험추천 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
-    }, 2000);
-  } catch(e) {
-    alert('등록 중 오류가 발생했습니다. 다시 시도해주세요.');
-    if (btn) { btn.disabled = false; btn.innerHTML = 'IBT 시험추천 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>'; }
-  }
-}
 </script>
 
 <!-- 방문 트래킹 -->
@@ -1611,38 +1002,5 @@ async function ibtRecommend() {
   })();
 </script>
 
-<!-- 110개 공공기관 모달 -->
-<div id="publicOrgModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);align-items:center;justify-content:center;padding:16px;" onclick="if(event.target===this)this.style.display='none'">
-  <div style="position:relative;max-width:900px;width:100%;max-height:90vh;background:#111827;border-radius:16px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.6);">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.1);">
-      <p style="margin:0;font-size:1rem;font-weight:700;color:#E2E8F0;">지텔프 인정 110개 공공기관</p>
-      <button onclick="document.getElementById('publicOrgModal').style.display='none'" style="background:rgba(255,255,255,.08);border:none;color:#94A3B8;font-size:1.2rem;width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;" onmouseover="this.style.background='rgba(255,255,255,.15)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">&times;</button>
-    </div>
-    <div style="overflow-y:auto;max-height:calc(90vh - 60px);">
-      <img src="./public.png" alt="지텔프 인정 110개 공공기관 목록" style="width:100%;display:block;">
-    </div>
-  </div>
-</div>
-
-
-  <script>
-  /* 체류시간 추적 */
-  (function() {
-    if (localStorage.getItem('gtelp_notrack') === '1') return;
-    var _s = Date.now(), _sent = false;
-    function _send() {
-      if (_sent) return; _sent = true;
-      var sec = Math.round((Date.now() - _s) / 1000);
-      if (sec < 3 || sec > 7200) return;
-      fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/page_views', {
-        method: 'POST', keepalive: true,
-        headers: { 'Content-Type': 'application/json', 'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ page: (window.location.pathname.split('/').pop() || 'index.html'), dwell_seconds: sec })
-      }).catch(function(){});
-    }
-    document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'hidden') _send(); });
-    window.addEventListener('pagehide', _send);
-  })();
-  </script>
 </body>
 </html>
