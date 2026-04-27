@@ -1308,6 +1308,11 @@
             </div>
             <!-- 페이지네이션 -->
             <div id="cc-pagination" class="flex items-center justify-center gap-2 mt-3 pt-3 border-t"></div>
+            <!-- 오늘 클릭 합산 -->
+            <div id="cc-today-sum" class="hidden mt-3 pt-3 border-t flex items-center justify-between">
+              <span class="text-xs text-slate-400">오늘 전체 클릭 합산</span>
+              <span class="text-sm font-bold text-emerald-600" id="cc-today-sum-val"></span>
+            </div>
           </div>
 
           <!-- 대학활동 페이지 학교별 클릭 통계 -->
@@ -5107,6 +5112,18 @@ ${internalSummary}
       }
       body.innerHTML = `<div>${leftHtml}</div><div>${rightHtml}</div>`;
       if (label) label.textContent = `전체 누적 기준 — ${page*PER_PAGE+1}~${Math.min((page+1)*PER_PAGE, data.length)} / ${data.length}개`;
+      // 오늘 클릭 합산 (전체 데이터 기준)
+      const todayTotal = data.reduce((s, d) => s + (d.todayCnt || 0), 0);
+      const sumEl = document.getElementById('cc-today-sum');
+      const sumVal = document.getElementById('cc-today-sum-val');
+      if (sumEl && sumVal) {
+        if (todayTotal > 0) {
+          sumEl.classList.remove('hidden');
+          sumVal.textContent = `+${todayTotal.toLocaleString()}건`;
+        } else {
+          sumEl.classList.add('hidden');
+        }
+      }
       // 페이지네이션
       if (totalPages <= 1) { pager.innerHTML = ''; return; }
       const btnBase = 'px-3 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer';
