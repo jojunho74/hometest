@@ -302,8 +302,8 @@
       <span class="topbar-cnt" id="topbar-cnt" style="display:none;"></span>
       <span class="topbar-hint" id="topbar-hint">← 왼쪽에서 대학교를 선택하세요</span>
       <div class="view-toggle" id="view-toggle" style="display:none;">
-        <button class="vbtn active" id="vbtn-table" onclick="setView('table')" title="목록형">☰</button>
-        <button class="vbtn" id="vbtn-card" onclick="setView('card')" title="카드형">⊞</button>
+        <button class="vbtn" id="vbtn-table" onclick="setView('table')" title="목록형">☰</button>
+        <button class="vbtn active" id="vbtn-card" onclick="setView('card')" title="카드형">⊞</button>
       </div>
     </div>
     <div class="board-wrap" id="board-wrap">
@@ -388,7 +388,7 @@
   let allData = [];
   let schoolMap = {};
   let selectedSchool = null;
-  let currentView = 'table';
+  let currentView = 'card';
   let _ratingMap = {};   // key: "school|title" → { sum, count }
   let _ubViewMap = {};   // key: school_name → view count
 
