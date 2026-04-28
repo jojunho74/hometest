@@ -61,6 +61,53 @@
       .info-cell{flex:1 1 calc(50% - 4px);min-width:0;}
       .info-cell-wide{flex:1 1 100%;min-width:0;}
     }
+    /* ── 해외취업 추천 ── */
+    .fjrec-wrap{background:linear-gradient(135deg,#0f1e3a 0%,#16213e 100%);border:1px solid rgba(124,58,237,.35);border-radius:16px;padding:18px 20px;margin-bottom:20px;}
+    .fjrec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px;}
+    .fjrec-title{font-size:.88rem;font-weight:800;color:#fff;}
+    .fjrec-subtitle{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:3px;}
+    .fjrec-link{font-size:.72rem;color:#A78BFA;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+    .fjrec-link:hover{color:#C4B5FD;}
+    .fjrec-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+    .fjrec-scroll::-webkit-scrollbar{display:none;}
+    @keyframes fjrec-flash{
+      0%,14%,100%{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.09);box-shadow:none;}
+      7%{background:rgba(124,58,237,.22);border-color:rgba(167,139,250,.55);box-shadow:0 0 22px rgba(124,58,237,.35);}
+    }
+    .fjrec-card{flex:0 0 auto;width:160px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:12px;text-decoration:none;display:block;animation:fjrec-flash 6s ease-in-out infinite;}
+    .fjrec-card:hover{transform:translateY(-3px);border-color:rgba(167,139,250,.4);box-shadow:0 8px 24px rgba(124,58,237,.2);animation-play-state:paused;}
+    .fjrec-logo{width:38px;height:38px;border-radius:8px;object-fit:cover;margin-bottom:8px;}
+    .fjrec-logo-ph{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;margin-bottom:8px;}
+    .fjrec-org{font-size:.68rem;color:rgba(255,255,255,.45);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .fjrec-job{font-size:.76rem;color:#E2E8F0;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .fjrec-co{font-size:.72rem;color:#93C5FD;font-weight:600;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .fjrec-tags{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap;}
+    .fjrec-tag{font-size:.6rem;font-weight:600;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.55);}
+    /* ── Fvisajobs 추천 모달 ── */
+    #fvrec-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px;}
+    #fvrec-overlay.open{display:flex;}
+    #fvrec-box{background:#0D1F3C;border:1px solid rgba(96,165,250,.25);border-radius:20px;max-width:460px;width:100%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 24px 80px rgba(0,0,0,.6);}
+    .fvrec-head{background:linear-gradient(135deg,#1a3c6b 0%,#0d1b2a 100%);padding:20px 52px 18px 22px;border-radius:20px 20px 0 0;}
+    .fvrec-nation{font-size:.78rem;color:rgba(255,255,255,.55);margin-bottom:6px;}
+    .fvrec-title-modal{font-size:1.05rem;font-weight:800;color:#fff;line-height:1.45;}
+    .fvrec-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+    .fvrec-close:hover{background:rgba(255,255,255,.2);}
+    .fvrec-body{padding:20px 22px;}
+    .fvrec-grid{display:grid;grid-template-columns:5.5rem 1fr;gap:9px 12px;font-size:.84rem;margin-bottom:18px;}
+    .fvrec-lbl{color:rgba(255,255,255,.45);font-weight:600;}
+    .fvrec-val{color:#E2E8F0;font-weight:500;}
+    .fvrec-val.bold{color:#93C5FD;font-weight:700;}
+    .fvrec-stars-row{display:flex;align-items:center;gap:6px;margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:10px;}
+    .fvrec-star{font-size:1.3rem;cursor:pointer;color:rgba(255,255,255,.2);transition:transform .1s,color .1s;line-height:1;user-select:none;}
+    .fvrec-star.on{color:#FBBF24;}
+    .fvrec-star:hover{transform:scale(1.25);}
+    .fvrec-star-lbl{font-size:.72rem;color:rgba(255,255,255,.4);margin-left:4px;}
+    .fvrec-notice{background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:10px 14px;font-size:.74rem;color:#93C5FD;margin-bottom:16px;line-height:1.65;}
+    .fvrec-actions{display:flex;gap:9px;}
+    .fvrec-btn-wj{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:13px;border-radius:12px;background:linear-gradient(135deg,#1a3c6b,#2554A0);color:#fff;font-size:.88rem;font-weight:700;text-decoration:none;transition:opacity .15s;}
+    .fvrec-btn-wj:hover{opacity:.85;}
+    .fvrec-btn-close{padding:13px 20px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);font-size:.88rem;font-weight:600;cursor:pointer;transition:background .15s;}
+    .fvrec-btn-close:hover{background:rgba(255,255,255,.12);}
     .qnav-inner{
       position:relative;z-index:1;
       display:flex;align-items:center;justify-content:center;
@@ -779,6 +826,156 @@ let _allDatasets = [];
 let _chartInst = null;
 let _currentDs = null;
 let _panelOpen = false;
+let _fvisaDataLoaded = false;
+
+function loadFvisaData() {
+  if (_fvisaDataLoaded || window.FVISA_DATA) { _fvisaDataLoaded = true; return Promise.resolve(); }
+  return new Promise(function(resolve) {
+    var s = document.createElement('script');
+    s.src = 'Fvisajobs/data.js';
+    s.onload = function() { _fvisaDataLoaded = true; resolve(); };
+    s.onerror = function() { _fvisaDataLoaded = true; resolve(); };
+    document.head.appendChild(s);
+  });
+}
+
+function getJobKeywords(jobStr) {
+  const j = (jobStr || '').toLowerCase();
+  const kws = [];
+  if (j.includes('기계')) kws.push('기계','설비','생산','정비');
+  if (j.includes('건축')) kws.push('건축','건설','시공','인테리어');
+  if (j.includes('토목')) kws.push('토목','건설','시공');
+  if (j.includes('전기')) kws.push('전기','배선','설비');
+  if (j.includes('전자')) kws.push('전자','반도체','회로');
+  if (j.includes('정보') || j.includes('전산') || j.includes('it') || j.includes('소프트')) kws.push('소프트웨어','개발','it','전산','시스템');
+  if (j.includes('사무') || j.includes('행정') || j.includes('총무')) kws.push('사무','행정','총무','관리');
+  if (j.includes('경영') || j.includes('경제')) kws.push('경영','영업','마케팅','기획');
+  if (j.includes('재무') || j.includes('회계') || j.includes('세무')) kws.push('재무','회계','세무','경리');
+  if (j.includes('환경')) kws.push('환경','화학','공해');
+  if (j.includes('화학')) kws.push('화학','제약','바이오');
+  if (j.includes('연구')) kws.push('연구','개발');
+  if (j.includes('의료') || j.includes('보건')) kws.push('의료','보건','간호');
+  if (j.includes('물류') || j.includes('수송') || j.includes('운송')) kws.push('물류','운송','유통');
+  if (j.includes('금융')) kws.push('금융','은행','보험','증권');
+  if (j.includes('농')) kws.push('농업','식품');
+  if (j.includes('식품')) kws.push('식품','제조','가공');
+  if (j.includes('안전') || j.includes('품질')) kws.push('안전','품질','검사');
+  return [...new Set(kws)];
+}
+
+const FV_FLAG = {'일본':'🇯🇵','미국':'🇺🇸','멕시코':'🇲🇽','베트남':'🇻🇳','독일':'🇩🇪','홍콩':'🇭🇰','중국':'🇨🇳','인도':'🇮🇳','폴란드':'🇵🇱','인도네시아':'🇮🇩','영국':'🇬🇧','캐나다':'🇨🇦','호주':'🇦🇺','싱가포르':'🇸🇬','태국':'🇹🇭','필리핀':'🇵🇭','말레이시아':'🇲🇾','프랑스':'🇫🇷','네덜란드':'🇳🇱','스페인':'🇪🇸','이탈리아':'🇮🇹','체코':'🇨🇿','헝가리':'🇭🇺','브라질':'🇧🇷','터키':'🇹🇷','UAE':'🇦🇪','사우디아라비아':'🇸🇦','아르헨티나':'🇦🇷','콜롬비아':'🇨🇴','루마니아':'🇷🇴'};
+const fvFlag = function(n) { return FV_FLAG[n] || '🌐'; };
+
+var _fvisaRecItems = [];
+var _curFvRec = null;
+var FVREC_STAR_LABELS = ['','별로예요','그저 그래요','괜찮아요','좋아요','강추해요! 🔥'];
+
+function fvRecStarKey(r) { return 'fvrec_star_' + encodeURIComponent((r.rctntcSj||'')+'_'+(r.entNm||'')); }
+function fvRecGetStar(r) { return parseInt(localStorage.getItem(fvRecStarKey(r))||'0'); }
+
+function rateFvRec(v) {
+  if (!_curFvRec) return;
+  var key = fvRecStarKey(_curFvRec);
+  var cur = fvRecGetStar(_curFvRec);
+  cur === v ? localStorage.removeItem(key) : localStorage.setItem(key, String(v));
+  renderFvRecStars(_curFvRec);
+}
+
+function renderFvRecStars(r) {
+  var v = fvRecGetStar(r);
+  document.querySelectorAll('.fvrec-star').forEach(function(s) {
+    s.classList.toggle('on', parseInt(s.dataset.v) <= v);
+  });
+  document.getElementById('fvrec-star-lbl').textContent = v ? FVREC_STAR_LABELS[v] : '추천도를 평가해 주세요';
+}
+
+function openFvRec(idx) {
+  var r = _fvisaRecItems[idx];
+  if (!r) return;
+  _curFvRec = r;
+  var nation = r.rctntcNationNm || '';
+  document.getElementById('fvrec-nation').innerHTML = fvFlag(nation) + ' ' + nation;
+  document.getElementById('fvrec-title').textContent = r.rctntcSj || '공고명 없음';
+  var fields = [
+    ['회사', r.entNm, true],
+    ['국가', nation, false],
+    ['직종', r.rctntcKscoNm, false],
+    ['업종', r.lplcKscoNm, false],
+    ['경력', r.careerStleNm, false],
+    ['언어', r.rctntcLang, false],
+    ['모집인원', r.rctntcNmprCo ? r.rctntcNmprCo+'명' : '', false],
+    ['마감일', r.rctntcEndDe ? r.rctntcEndDe.replace(/-/g,'.') : '', false],
+    ['비자', r.rctntcVisaNm, false],
+    ['모집지역', r.rctntcOriginNm, false],
+  ].filter(function(f) { return f[1]; });
+  document.getElementById('fvrec-grid').innerHTML = fields.map(function(f) {
+    return '<span class="fvrec-lbl">' + f[0] + '</span>'
+      + '<span class="fvrec-val' + (f[2]?' bold':'') + '">' + String(f[1]) + '</span>';
+  }).join('');
+  renderFvRecStars(r);
+  document.getElementById('fvrec-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFvRec(e) {
+  if (e && e.target !== document.getElementById('fvrec-overlay')) return;
+  document.getElementById('fvrec-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  _curFvRec = null;
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { document.getElementById('fvrec-overlay').classList.remove('open'); document.body.style.overflow=''; _curFvRec=null; } });
+
+function buildFvisaRecSection(rows) {
+  if (!window.FVISA_DATA || !window.FVISA_DATA.items) return '';
+  var items = window.FVISA_DATA.items;
+  var allKws = new Set();
+  rows.forEach(function(r) { getJobKeywords(r.job || '').forEach(function(k) { allKws.add(k); }); });
+  var kwsArr = [...allKws];
+  var topItems;
+  if (kwsArr.length) {
+    var scored = items.map(function(item) {
+      var searchStr = [item.rctntcKscoNm||'', item.lplcKscoNm||'', item.rctntcSj||''].join(' ').toLowerCase();
+      var score = kwsArr.filter(function(k) { return searchStr.includes(k); }).length;
+      return { item: item, score: score };
+    }).filter(function(x) { return x.score > 0; }).sort(function(a,b) { return b.score - a.score; });
+    topItems = scored.length >= 3 ? scored.slice(0,8).map(function(x) { return x.item; }) : items.slice(0,8);
+  } else {
+    topItems = items.slice(0,8);
+  }
+  _fvisaRecItems = topItems;
+  var jobLabels = rows.slice(0,3).map(function(r) { return r.job; }).filter(Boolean).join(' · ');
+  var cards = topItems.map(function(r, i) {
+    var nation = r.rctntcNationNm || '';
+    var diff = r.rctntcEndDe ? Math.ceil((new Date(r.rctntcEndDe) - new Date()) / 86400000) : null;
+    var ddayBadge = diff !== null
+      ? (diff >= 0
+        ? '<span class="fjrec-tag" style="background:rgba(251,191,36,.18);color:#FBBF24;">D-'+diff+'</span>'
+        : '<span class="fjrec-tag" style="background:rgba(239,68,68,.15);color:#F87171;">마감</span>')
+      : '';
+    var careerBadge = r.careerStleNm ? '<span class="fjrec-tag">' + r.careerStleNm + '</span>' : '';
+    var langHint = (r.rctntcLang||'').split(',')[0].trim();
+    var langBadge = langHint ? '<span class="fjrec-tag">' + langHint.replace('(필수)','').replace('(선택)','').trim() + '</span>' : '';
+    return '<div class="fjrec-card" onclick="openFvRec('+i+')" style="cursor:pointer;animation-delay:'+(i*0.75)+'s;">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">'
+      + '<span style="font-size:1.2rem;line-height:1;">' + fvFlag(nation) + '</span>'
+      + ddayBadge
+      + '</div>'
+      + '<div class="fjrec-job">' + (r.rctntcSj || '') + '</div>'
+      + '<div class="fjrec-co">' + (r.entNm || '') + '</div>'
+      + '<div class="fjrec-org">' + (r.rctntcKscoNm || '') + '</div>'
+      + '<div class="fjrec-org">' + nation + (r.lplcKscoNm ? ' · ' + r.lplcKscoNm.slice(0,10) : '') + '</div>'
+      + '<div class="fjrec-tags">' + careerBadge + langBadge + '</div>'
+      + '</div>';
+  }).join('');
+  return '<div class="fjrec-wrap">'
+    + '<div class="fjrec-header">'
+    + '<div><div class="fjrec-title">🌍 ' + (jobLabels ? jobLabels + ' 직군 ' : '') + '해외취업 추천공고</div>'
+    + '<div class="fjrec-subtitle">직종 키워드 매칭 · 전체 ' + (window.FVISA_DATA.totalCount || items.length) + '건 중 엄선 · 카드 클릭 시 상세보기</div></div>'
+    + '<a href="Fvisajobs/index.html" class="fjrec-link" target="_blank">전체 보기 →</a>'
+    + '</div>'
+    + '<div class="fjrec-scroll">' + cards + '</div>'
+    + '</div>';
+}
 
 function toggleMenu() {
   document.getElementById('hamburger').classList.toggle('open');
@@ -796,7 +993,8 @@ async function init() {
       .not('upload_data','is',null),
     db.from('page_views')
       .select('page')
-      .like('page', 'competition-click:%')
+      .like('page', 'competition-click:%'),
+    loadFvisaData()
   ]);
   if (jobsRes.error || !jobsRes.data) {
     document.getElementById('ds-list').innerHTML = '<div class="empty-list">데이터를 불러올 수 없습니다</div>';
@@ -1176,6 +1374,8 @@ function renderVisualization(dsName, rows) {
       <div class="sum-card ac-amber"><div class="sum-label">최저 경쟁률</div><div class="sum-val">${minR}<span>:1</span></div><div class="sum-sub">${minRow?minRow.job+'('+minRow.region+')':''}</div></div>
       <div class="sum-card ac-purple"><div class="sum-label">직종 수</div><div class="sum-val">${rows.length}<span>개</span></div><div class="sum-sub">평균 ${avgR}:1</div></div>
     </div>
+
+    ${buildFvisaRecSection(rows)}
 
     <div class="sec-title">직종별 경쟁률</div>
     <div class="chart-comment-row">
@@ -1653,5 +1853,33 @@ async function ibtRecommend() {
     window.addEventListener('pagehide', _send);
   })();
   </script>
+
+<!-- Fvisajobs 추천 공고 상세 모달 -->
+<div id="fvrec-overlay" onclick="closeFvRec(event)">
+  <div id="fvrec-box">
+    <div class="fvrec-head">
+      <div class="fvrec-nation" id="fvrec-nation"></div>
+      <div class="fvrec-title-modal" id="fvrec-title"></div>
+      <button class="fvrec-close" onclick="document.getElementById('fvrec-overlay').classList.remove('open');document.body.style.overflow='';_curFvRec=null;">✕</button>
+    </div>
+    <div class="fvrec-body">
+      <div class="fvrec-grid" id="fvrec-grid"></div>
+      <div class="fvrec-stars-row">
+        <span style="font-size:.72rem;color:rgba(255,255,255,.5);margin-right:2px;">⭐ 추천도</span>
+        <span class="fvrec-star" data-v="1" onclick="rateFvRec(1)">★</span>
+        <span class="fvrec-star" data-v="2" onclick="rateFvRec(2)">★</span>
+        <span class="fvrec-star" data-v="3" onclick="rateFvRec(3)">★</span>
+        <span class="fvrec-star" data-v="4" onclick="rateFvRec(4)">★</span>
+        <span class="fvrec-star" data-v="5" onclick="rateFvRec(5)">★</span>
+        <span class="fvrec-star-lbl" id="fvrec-star-lbl">추천도를 평가해 주세요</span>
+      </div>
+      <div class="fvrec-notice">💡 자세한 공고 확인 및 지원은 <strong>월드잡플러스</strong>에서 하실 수 있습니다.<br>아래 버튼을 클릭하면 월드잡플러스로 이동합니다.</div>
+      <div class="fvrec-actions">
+        <a href="https://www.worldjob.or.kr/new_index.do" target="_blank" rel="noopener" class="fvrec-btn-wj">🌏 월드잡플러스 바로가기 →</a>
+        <button class="fvrec-btn-close" onclick="document.getElementById('fvrec-overlay').classList.remove('open');document.body.style.overflow='';_curFvRec=null;">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
