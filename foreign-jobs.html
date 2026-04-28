@@ -69,23 +69,10 @@
     .empty-state svg{opacity:.35;margin:0 auto 16px;}
     .empty-state p{color:rgba(255,255,255,.45);font-size:.9rem;}
 
-    /* ── 슬라이더 ── */
-    .fj-slider-wrap{position:relative;display:flex;align-items:center;gap:10px;}
-    .fj-arrow{width:48px;height:48px;flex-shrink:0;border-radius:50%;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.18);color:#fff;font-size:1.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .1s;line-height:1;user-select:none;}
-    .fj-arrow:hover:not([disabled]){background:rgba(255,255,255,.22);transform:scale(1.06);}
-    .fj-arrow[disabled]{opacity:.22;cursor:not-allowed;transform:none;}
-    .fj-slider-viewport{flex:1;overflow:hidden;}
-    .fj-slide-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;transition:opacity .22s ease;}
-    .fj-slide-grid.fj-hide{opacity:0;}
-    @media(max-width:1000px){.fj-slide-grid{grid-template-columns:repeat(3,1fr);}}
-    @media(max-width:580px){.fj-slide-grid{grid-template-columns:repeat(2,1fr);}}
-    .fj-dots{display:flex;justify-content:center;gap:7px;margin-top:18px;}
-    .fj-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:background .2s,transform .2s;border:none;padding:0;}
-    .fj-dot.active{background:#3B82F6;transform:scale(1.35);}
-    .fj-slide-count{text-align:center;font-size:.72rem;color:rgba(255,255,255,.3);margin-top:8px;}
-
-    /* ── 카드 (회사명 개선) ── */
-    .fj-company{font-size:.72rem;font-weight:600;color:#64748B;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    /* ── 그리드 ── */
+    .fj-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+    @media(max-width:900px){.fj-grid{grid-template-columns:repeat(3,1fr);}}
+    @media(max-width:580px){.fj-grid{grid-template-columns:repeat(2,1fr);}}
   </style>
 </head>
 <body>
@@ -173,20 +160,12 @@
     <div class="text-sm font-semibold" style="color:rgba(255,255,255,.45);" id="result-count"></div>
   </div>
 
-  <!-- 슬라이더 배너 -->
-  <div class="fj-slider-wrap">
-    <button class="fj-arrow" id="fj-prev" onclick="render(curPage-1)" disabled>&#8249;</button>
-    <div class="fj-slider-viewport">
-      <div id="fj-grid" class="fj-slide-grid">
-        <!-- 스켈레톤 -->
-        <div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>
-        <div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>
-      </div>
-    </div>
-    <button class="fj-arrow" id="fj-next" onclick="render(curPage+1)" disabled>&#8250;</button>
+  <!-- 카드 그리드 -->
+  <div id="fj-grid" class="fj-grid">
+    <!-- 스켈레톤 -->
+    <div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>
+    <div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>
   </div>
-  <div id="fj-dots" class="fj-dots"></div>
-  <div class="fj-slide-count" id="fj-slide-count"></div>
 
   <!-- 빈 상태 -->
   <div id="fj-empty" class="empty-state hidden">
@@ -207,11 +186,8 @@
 <script>
   const SB = 'https://byzulmxcuhsrjdphmuym.supabase.co';
   const KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
-  const PER_PAGE = 10;
-
   let allJobs = [];
   let filtered = [];
-  let curPage  = 0;
 
   // 배지 색상 팔레트 (bg_color가 흰색/없을 때 기관명 배지 색상)
   const PALETTE = [
@@ -257,53 +233,20 @@
     </div>`;
   }
 
-  function render(page) {
+  function render() {
     const grid  = document.getElementById('fj-grid');
     const empty = document.getElementById('fj-empty');
-    const prev  = document.getElementById('fj-prev');
-    const next  = document.getElementById('fj-next');
-    const dots  = document.getElementById('fj-dots');
-    const cnt   = document.getElementById('fj-slide-count');
 
     if (!filtered.length) {
       grid.innerHTML = '';
       empty.classList.remove('hidden');
       document.getElementById('fj-empty-msg').textContent =
         document.getElementById('fj-search').value.trim() ? '검색 결과가 없습니다.' : '등록된 채용공고가 없습니다.';
-      prev.disabled = next.disabled = true;
-      dots.innerHTML = '';
-      cnt.textContent = '';
       return;
     }
 
     empty.classList.add('hidden');
-    const totalPages = Math.ceil(filtered.length / PER_PAGE);
-    page = Math.max(0, Math.min(page, totalPages - 1));
-    curPage = page;
-
-    const doSlide = grid.innerHTML && !grid.querySelector('.skel');
-    const swap = () => {
-      const slice = filtered.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
-      grid.innerHTML = slice.map((r, i) => cardHTML(r, filtered.indexOf(r))).join('');
-      grid.classList.remove('fj-hide');
-
-      prev.disabled = page === 0;
-      next.disabled = page === totalPages - 1;
-
-      // 닷 렌더
-      if (totalPages <= 1) { dots.innerHTML = ''; cnt.textContent = ''; return; }
-      dots.innerHTML = Array.from({length: totalPages}, (_, i) =>
-        `<button class="fj-dot${i===page?' active':''}" onclick="render(${i})"></button>`
-      ).join('');
-      cnt.textContent = `${page + 1} / ${totalPages}`;
-    };
-
-    if (doSlide) {
-      grid.classList.add('fj-hide');
-      setTimeout(swap, 220);
-    } else {
-      swap();
-    }
+    grid.innerHTML = filtered.map((r, i) => cardHTML(r, i)).join('');
   }
 
   function onSearch() {
@@ -313,7 +256,7 @@
       : [...allJobs];
     document.getElementById('result-count').textContent =
       q ? `${filtered.length}건 검색됨` : '';
-    render(0);
+    render();
   }
 
   async function load() {
@@ -332,7 +275,7 @@
         document.getElementById('stat-updated').textContent = formatDate(latest.created_at);
       }
 
-      render(0);
+      render();
     } catch(e) {
       document.getElementById('fj-grid').innerHTML =
         '<div style="grid-column:1/-1;text-align:center;padding:40px;color:rgba(255,255,255,.4);">데이터를 불러오는 중 오류가 발생했습니다.</div>';
