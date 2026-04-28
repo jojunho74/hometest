@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>해외유학생 채용정보 — 지텔프IBT</title>
+  <title>해외유학생 + 영어우대 채용 — 지텔프IBT</title>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-MLPBC6XMFC"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-MLPBC6XMFC');</script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -16,17 +16,21 @@
     /* ── 헤더 ── */
     .nav-link{padding:5px 9px;border-radius:8px;color:rgba(255,255,255,.75);text-decoration:none;transition:background .18s,color .18s;font-size:.78rem;font-weight:600;white-space:nowrap;}
     .nav-link:hover,.nav-link.active{background:rgba(255,255,255,.12);color:#fff;}
-    .mobile-menu{display:none;flex-direction:column;background:#0D1B2A;border-top:1px solid rgba(255,255,255,.1);padding:12px 16px 16px;position:sticky;top:64px;z-index:49;box-shadow:0 4px 12px rgba(0,0,0,.4);}
-    .mobile-menu a{padding:12px 4px;font-size:.9rem;font-weight:600;color:rgba(255,255,255,.85);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.08);}
-    .mobile-menu a:last-child{border-bottom:none;}
-    .mobile-menu .m-cta{margin-top:12px;display:block;text-align:center;padding:12px;border-radius:50px;background:linear-gradient(135deg,#1E4D8C,#0891B2);color:#fff;font-weight:700;text-decoration:none;}
-    .mobile-menu.open{display:flex;}
-    .hamburger{display:flex;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:rgba(255,255,255,.12);border:none;padding:6px;border-radius:8px;}
-    .hamburger span{display:block;height:2px;background:#fff;border-radius:2px;transition:transform .25s,opacity .25s;}
-    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
-    .hamburger.open span:nth-child(2){opacity:0;}
-    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-    @media(max-width:768px){.hamburger{display:flex;}}
+    .mobile-menu { display: none; flex-direction: column; background: #0D1B2A; border-top: 1px solid rgba(255,255,255,.1); padding: 12px 16px 16px; position: sticky; top: 64px; z-index: 49; box-shadow: 0 4px 12px rgba(0,0,0,.4); }
+    .mobile-menu a { padding: 12px 4px; font-size: 0.9rem; font-weight: 600; color: rgba(255,255,255,.85); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu .m-cta { margin-top: 12px; display: block; text-align: center; padding: 12px; border-radius: 50px; background: linear-gradient(135deg, #1E4D8C, #0891B2); color: #fff; font-weight: 700; text-decoration: none; }
+    .mobile-menu.open { display: flex; }
+    .hamburger { display: flex; flex-direction: column; justify-content: center; gap: 5px; width: 36px; height: 36px; cursor: pointer; background: rgba(255,255,255,.12); border: none; padding: 6px; border-radius: 8px; }
+    .hamburger span { display: block; height: 2px; background: #fff; border-radius: 2px; transition: transform .25s, opacity .25s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    @media (max-width: 767px) { .hamburger { display: flex; } }
+    .header-accent-line { height: 3px; background: linear-gradient(90deg, #0891B2, #1E4D8C, #0891B2); }
+    .mobile-app-btn { position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 20px; font-size: 12px; font-weight: 700; color: #fff; text-decoration: none; background: linear-gradient(135deg, #1E4D8C, #0891B2); white-space: nowrap; flex-shrink: 0; }
+    .mobile-app-btn::after { content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent); animation: mab-shimmer 2s ease-in-out infinite; }
+    @keyframes mab-shimmer { 0% { left: -100%; } 100% { left: 150%; } }
 
     /* ── 카드 ── */
     .fj-card{background:#fff;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .18s,box-shadow .18s;box-shadow:0 2px 12px rgba(0,0,0,.18);}
@@ -64,15 +68,40 @@
     .empty-state{text-align:center;padding:60px 20px;}
     .empty-state svg{opacity:.35;margin:0 auto 16px;}
     .empty-state p{color:rgba(255,255,255,.45);font-size:.9rem;}
+
+    /* ── 슬라이더 ── */
+    .fj-slider-wrap{position:relative;display:flex;align-items:center;gap:10px;}
+    .fj-arrow{width:48px;height:48px;flex-shrink:0;border-radius:50%;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.18);color:#fff;font-size:1.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .1s;line-height:1;user-select:none;}
+    .fj-arrow:hover:not([disabled]){background:rgba(255,255,255,.22);transform:scale(1.06);}
+    .fj-arrow[disabled]{opacity:.22;cursor:not-allowed;transform:none;}
+    .fj-slider-viewport{flex:1;overflow:hidden;}
+    .fj-slide-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;transition:opacity .22s ease;}
+    .fj-slide-grid.fj-hide{opacity:0;}
+    @media(max-width:1000px){.fj-slide-grid{grid-template-columns:repeat(3,1fr);}}
+    @media(max-width:580px){.fj-slide-grid{grid-template-columns:repeat(2,1fr);}}
+    .fj-dots{display:flex;justify-content:center;gap:7px;margin-top:18px;}
+    .fj-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:background .2s,transform .2s;border:none;padding:0;}
+    .fj-dot.active{background:#3B82F6;transform:scale(1.35);}
+    .fj-slide-count{text-align:center;font-size:.72rem;color:rgba(255,255,255,.3);margin-top:8px;}
+
+    /* ── 카드 (회사명 개선) ── */
+    .fj-company{font-size:.72rem;font-weight:600;color:#64748B;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   </style>
 </head>
 <body>
 
 <!-- ── 헤더 ── -->
 <header class="sticky top-0 z-50" style="background:#0D1B2A;box-shadow:0 1px 0 rgba(255,255,255,.06),0 4px 16px rgba(0,0,0,.3);">
+  <div class="header-accent-line"></div>
   <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-    <a href="index.html" style="color:#fff;font-weight:800;font-size:1rem;text-decoration:none;white-space:nowrap;">IBT C&amp;C</a>
-    <nav class="hidden md:flex items-center gap-1 font-semibold">
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+      <a href="index.html" class="font-display text-base font-bold tracking-tight" style="color:#fff;white-space:nowrap;">IBT C&amp;C</a>
+      <a href="mobile.html" class="mobile-app-btn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        모바일앱
+      </a>
+    </div>
+    <nav class="hidden items-center gap-1 font-semibold">
       <a href="index.html" class="nav-link">메인</a>
       <a href="package.html" class="nav-link">패키지</a>
       <a href="schedule.html" class="nav-link">정기시험 일정</a>
@@ -80,13 +109,15 @@
       <a href="library-pdf.html" class="nav-link">채용공고 자료실</a>
       <a href="job-board.html" class="nav-link">게시판</a>
       <a href="gtelp-score.html" class="nav-link">점수대비표</a>
-      <a href="foreign-jobs.html" class="nav-link active">해외유학생채용</a>
+      <a href="Fvisajobs/index.html" class="nav-link">해외취업공고</a>
     </nav>
     <div class="flex items-center gap-2">
-      <a href="admin-k9x3.html" title="관리자" class="flex items-center justify-center rounded-lg" style="width:36px;height:36px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);" onmouseover="this.style.background='rgba(255,255,255,.2)';this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,.1)';this.style.color='rgba(255,255,255,.6)';">
+      <a href="index.html#consultation-form" class="hidden btn-primary text-sm px-4" style="min-height:40px;padding-top:.45rem;padding-bottom:.45rem;">대학IBT무료신청</a>
+      <a href="student.html" class="hidden btn-primary text-sm px-4" style="min-height:40px;padding-top:.45rem;padding-bottom:.45rem;background:linear-gradient(135deg,#D97706,#F59E0B);">학생IBT무료신청</a>
+      <a href="admin-k9x3.html" title="관리자" class="flex items-center justify-center rounded-lg transition-colors" style="width:36px;height:36px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);" onmouseover="this.style.background='rgba(255,255,255,.2)';this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,.1)';this.style.color='rgba(255,255,255,.6)';">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </a>
-      <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="메뉴">
+      <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="메뉴">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -100,15 +131,18 @@
   <a href="library-pdf.html">채용공고 자료실</a>
   <a href="job-board.html">게시판</a>
   <a href="gtelp-score.html">점수대비표</a>
-  <a href="foreign-jobs.html">해외유학생채용</a>
-  <a href="student.html" class="m-cta" style="background:linear-gradient(135deg,#D97706,#F59E0B);">학생IBT무료신청</a>
-  <a href="index.html#consultation-form" class="m-cta">대학IBT무료신청</a>
+  <a href="competition.html">경쟁률</a>
+  <a href="Fvisajobs/index.html">해외취업공고</a>
+  <div style="display:flex;gap:8px;padding:0 4px;">
+    <a href="index.html#consultation-form" class="m-cta" style="flex:1;text-align:center;">대학IBT무료신청</a>
+    <a href="student.html" class="m-cta" style="flex:1;text-align:center;background:linear-gradient(135deg,#D97706,#F59E0B);">학생IBT무료신청</a>
+  </div>
 </div>
 
 <!-- ── 히어로 ── -->
 <section class="hero-wrap">
   <div class="hero-badge">해외유학생 · 취업정보</div>
-  <h1 class="hero-title">해외유학생 채용정보</h1>
+  <h1 class="hero-title">해외유학생 + 영어우대 채용</h1>
   <p class="hero-sub">국내외 기업·기관에서 해외유학생을 위한 채용공고를 모았습니다</p>
   <div class="flex flex-wrap justify-center gap-2 mt-5">
     <div class="stat-chip">
@@ -139,12 +173,20 @@
     <div class="text-sm font-semibold" style="color:rgba(255,255,255,.45);" id="result-count"></div>
   </div>
 
-  <!-- 카드 그리드 -->
-  <div id="fj-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-    <!-- 스켈레톤 -->
-    <div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>
-    <div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>
+  <!-- 슬라이더 배너 -->
+  <div class="fj-slider-wrap">
+    <button class="fj-arrow" id="fj-prev" onclick="render(curPage-1)" disabled>&#8249;</button>
+    <div class="fj-slider-viewport">
+      <div id="fj-grid" class="fj-slide-grid">
+        <!-- 스켈레톤 -->
+        <div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>
+        <div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>
+      </div>
+    </div>
+    <button class="fj-arrow" id="fj-next" onclick="render(curPage+1)" disabled>&#8250;</button>
   </div>
+  <div id="fj-dots" class="fj-dots"></div>
+  <div class="fj-slide-count" id="fj-slide-count"></div>
 
   <!-- 빈 상태 -->
   <div id="fj-empty" class="empty-state hidden">
@@ -152,15 +194,12 @@
     <p id="fj-empty-msg">등록된 채용공고가 없습니다.</p>
   </div>
 
-  <!-- 페이지네이션 -->
-  <div id="fj-pagination" class="flex items-center justify-center gap-2 mt-2"></div>
-
 </main>
 
 <!-- ── 푸터 ── -->
 <footer style="background:#060D1F;border-top:1px solid rgba(255,255,255,.07);padding:28px 24px;text-align:center;">
   <p style="font-size:.75rem;color:rgba(255,255,255,.3);line-height:1.8;">
-    해외유학생 채용정보 · G-TELP IBT 대학컨설팅<br>
+    해외유학생 + 영어우대 채용 · G-TELP IBT 대학컨설팅<br>
     <a href="index.html" style="color:rgba(255,255,255,.4);text-decoration:none;">ibtcc.kr</a>
   </p>
 </footer>
@@ -168,7 +207,7 @@
 <script>
   const SB = 'https://byzulmxcuhsrjdphmuym.supabase.co';
   const KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
-  const PER_PAGE = 12;
+  const PER_PAGE = 10;
 
   let allJobs = [];
   let filtered = [];
@@ -219,39 +258,52 @@
   }
 
   function render(page) {
-    curPage = page;
-    const grid = document.getElementById('fj-grid');
+    const grid  = document.getElementById('fj-grid');
     const empty = document.getElementById('fj-empty');
-    const emptyMsg = document.getElementById('fj-empty-msg');
-    const pagination = document.getElementById('fj-pagination');
+    const prev  = document.getElementById('fj-prev');
+    const next  = document.getElementById('fj-next');
+    const dots  = document.getElementById('fj-dots');
+    const cnt   = document.getElementById('fj-slide-count');
 
     if (!filtered.length) {
       grid.innerHTML = '';
       empty.classList.remove('hidden');
-      emptyMsg.textContent = document.getElementById('fj-search').value.trim()
-        ? '검색 결과가 없습니다.' : '등록된 채용공고가 없습니다.';
-      pagination.innerHTML = '';
+      document.getElementById('fj-empty-msg').textContent =
+        document.getElementById('fj-search').value.trim() ? '검색 결과가 없습니다.' : '등록된 채용공고가 없습니다.';
+      prev.disabled = next.disabled = true;
+      dots.innerHTML = '';
+      cnt.textContent = '';
       return;
     }
 
     empty.classList.add('hidden');
     const totalPages = Math.ceil(filtered.length / PER_PAGE);
-    const slice = filtered.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
-    grid.innerHTML = slice.map((r, i) => cardHTML(r, filtered.indexOf(r))).join('');
+    page = Math.max(0, Math.min(page, totalPages - 1));
+    curPage = page;
 
-    // 페이지네이션
-    if (totalPages <= 1) { pagination.innerHTML = ''; return; }
-    const btnBase = 'pg-btn';
-    let html = `<button class="${btnBase}" onclick="render(${page-1})" ${page===0?'disabled':''}>‹</button>`;
-    const start = Math.max(0, page - 2);
-    const end   = Math.min(totalPages - 1, page + 2);
-    if (start > 0) html += `<button class="${btnBase}" onclick="render(0)">1</button>${start>1?'<span style="color:rgba(255,255,255,.3);font-size:.75rem;">…</span>':''}`;
-    for (let i = start; i <= end; i++) {
-      html += `<button class="${btnBase}${i===page?' active':''}" onclick="render(${i})">${i+1}</button>`;
+    const doSlide = grid.innerHTML && !grid.querySelector('.skel');
+    const swap = () => {
+      const slice = filtered.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
+      grid.innerHTML = slice.map((r, i) => cardHTML(r, filtered.indexOf(r))).join('');
+      grid.classList.remove('fj-hide');
+
+      prev.disabled = page === 0;
+      next.disabled = page === totalPages - 1;
+
+      // 닷 렌더
+      if (totalPages <= 1) { dots.innerHTML = ''; cnt.textContent = ''; return; }
+      dots.innerHTML = Array.from({length: totalPages}, (_, i) =>
+        `<button class="fj-dot${i===page?' active':''}" onclick="render(${i})"></button>`
+      ).join('');
+      cnt.textContent = `${page + 1} / ${totalPages}`;
+    };
+
+    if (doSlide) {
+      grid.classList.add('fj-hide');
+      setTimeout(swap, 220);
+    } else {
+      swap();
     }
-    if (end < totalPages - 1) html += `${end<totalPages-2?'<span style="color:rgba(255,255,255,.3);font-size:.75rem;">…</span>':''}<button class="${btnBase}" onclick="render(${totalPages-1})">${totalPages}</button>`;
-    html += `<button class="${btnBase}" onclick="render(${page+1})" ${page===totalPages-1?'disabled':''}>›</button>`;
-    pagination.innerHTML = html;
   }
 
   function onSearch() {
@@ -296,12 +348,18 @@
     } catch(_) {}
   }
 
-  function toggleMenu() {
+  function toggleMobileMenu() {
     const m = document.getElementById('mobile-menu');
     const h = document.getElementById('hamburger');
     m.classList.toggle('open');
     h.classList.toggle('open');
   }
+  document.querySelectorAll('#mobile-menu a').forEach(a => {
+    a.addEventListener('click', () => {
+      document.getElementById('mobile-menu').classList.remove('open');
+      document.getElementById('hamburger').classList.remove('open');
+    });
+  });
 
   load();
 </script>
