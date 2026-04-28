@@ -2348,6 +2348,7 @@
               <span id="crawled-posts-count" class="text-xs text-slate-400"></span>
             </div>
             <div class="flex gap-1">
+              <button onclick="document.getElementById('old-check-all').checked=true;toggleAllOldChecks(document.getElementById('old-check-all'))" class="btn" style="font-size:11px;padding:3px 10px;color:#3B82F6;border:1px solid #BFDBFE;background:#EFF6FF;border-radius:8px;">전체 선택</button>
               <button onclick="bulkDeleteCrawledPosts()" class="btn btn-danger" style="font-size:11px;padding:3px 10px;">선택 삭제</button>
               <button onclick="deleteAllCrawledPosts()" class="btn" style="font-size:11px;padding:3px 10px;color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:8px;">전체 삭제</button>
             </div>
