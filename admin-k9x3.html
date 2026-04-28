@@ -7552,8 +7552,8 @@ ${d.hashtags}`;
 
     function trkNormPage(p) {
       if (!p) return 'index.html';
-      const name = p.split('/').pop().split('?')[0] || 'index.html';
-      return TRK_PAGE_LABELS[name] || name;
+      const full = p.split('?')[0];
+      return TRK_PAGE_LABELS[full] || TRK_PAGE_LABELS[full.split('/').pop()] || full;
     }
 
     function trkFmtDwell(sec) {
@@ -8319,8 +8319,8 @@ ${d.hashtags}`;
 
   function an1PageLabel(p) {
     if (!p) return 'index.html';
-    const n = p.split('/').pop().split('?')[0] || 'index.html';
-    return AN1_PAGE_LABELS[n] || n;
+    const full = p.split('?')[0];
+    return AN1_PAGE_LABELS[full] || AN1_PAGE_LABELS[full.split('/').pop()] || full;
   }
 
   function an1FmtDwell(sec) {
@@ -8544,13 +8544,13 @@ ${d.hashtags}`;
     'job-board.html':'채용공고', 'student.html':'IBT신청', 'package.html':'패키지',
     'mobile.html':'모바일허브', 'competition-m.html':'경쟁률(모바일)',
     'gtelp-score-m.html':'점수대비표(모바일)', 'student-m.html':'IBT신청(모바일)',
-    'cardnews-m.html':'카드뉴스(모바일)'
+    'cardnews-m.html':'카드뉴스(모바일)', 'Fvisajobs/index.html':'해외취업', 'foreign-jobs.html':'해외유학생채용'
   };
 
   function an2PageLabel(p) {
     if (!p) return 'index.html';
-    const n = p.split('/').pop().split('?')[0] || 'index.html';
-    return AN2_PAGE_LABELS[n] || n;
+    const full = p.split('?')[0];
+    return AN2_PAGE_LABELS[full] || AN2_PAGE_LABELS[full.split('/').pop()] || full;
   }
 
   function an2FmtDwell(sec) {
