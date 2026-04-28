@@ -1395,6 +1395,73 @@
             <div id="sa-pagination" class="flex items-center justify-center gap-2 mt-3 pt-3 border-t"></div>
           </div>
 
+          <!-- Fvisajobs 해외취업 방문 분석 -->
+          <div class="bg-white rounded-xl shadow-sm p-5 mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <h3 class="font-semibold text-slate-600 text-sm">🌍 Fvisajobs 해외취업 — 방문 분석
+                <span id="fvj-total-badge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-orange-50 text-orange-600"></span>
+              </h3>
+              <div class="flex items-center gap-1.5">
+                <button id="fvj-btn-today" onclick="applyFvjPeriod('today')" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">오늘</button>
+                <button id="fvj-btn-week"  onclick="applyFvjPeriod('week')"  class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-orange-500 text-orange-600 bg-orange-50">이번주</button>
+                <button id="fvj-btn-all"   onclick="applyFvjPeriod('all')"   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white">전체</button>
+              </div>
+            </div>
+            <!-- KPI 4개 -->
+            <div class="grid grid-cols-4 gap-3 mb-4">
+              <div class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
+                <div class="text-xl font-black text-orange-500" id="fvj-k-total">—</div>
+                <div class="text-xs text-slate-400 mt-1">누적 방문</div>
+              </div>
+              <div class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
+                <div class="text-xl font-black text-blue-600" id="fvj-k-today">—</div>
+                <div class="text-xs text-slate-400 mt-1">오늘 방문</div>
+              </div>
+              <div class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
+                <div class="text-xl font-black text-emerald-600" id="fvj-k-week">—</div>
+                <div class="text-xs text-slate-400 mt-1">이번주 방문</div>
+              </div>
+              <div class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
+                <div class="text-xl font-black text-purple-600" id="fvj-k-from-comp">—</div>
+                <div class="text-xs text-slate-400 mt-1">경쟁률→Fvisajobs</div>
+              </div>
+            </div>
+            <!-- 차트 + 유입경로 -->
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <div class="text-xs font-semibold text-slate-500 mb-2">📈 일별 방문 추이 (최근 14일)</div>
+                <div style="position:relative;height:160px;"><canvas id="fvj-trend-chart"></canvas></div>
+              </div>
+              <div>
+                <div class="text-xs font-semibold text-slate-500 mb-2">🔀 유입 경로 분석</div>
+                <div id="fvj-ref-table" class="text-xs text-slate-400">불러오는 중…</div>
+              </div>
+            </div>
+            <!-- 4개 상세 통계 -->
+            <div class="grid grid-cols-2 gap-4">
+              <!-- AI 인사이트 칩 클릭 -->
+              <div class="rounded-xl border border-slate-100 p-3">
+                <div class="text-xs font-semibold text-slate-500 mb-2">🤖 AI 인사이트 칩 클릭 순위</div>
+                <div id="fvj-insight-table" class="text-xs text-slate-400">불러오는 중…</div>
+              </div>
+              <!-- 탐색 패널 버튼 클릭 -->
+              <div class="rounded-xl border border-slate-100 p-3">
+                <div class="text-xs font-semibold text-slate-500 mb-2">📂 탐색 패널 버튼 클릭 순위</div>
+                <div id="fvj-panel-table" class="text-xs text-slate-400">불러오는 중…</div>
+              </div>
+              <!-- 국가별 채용현황 클릭 -->
+              <div class="rounded-xl border border-slate-100 p-3">
+                <div class="text-xs font-semibold text-slate-500 mb-2">🌍 국가별 채용현황 클릭 순위</div>
+                <div id="fvj-country-table" class="text-xs text-slate-400">불러오는 중…</div>
+              </div>
+              <!-- 키워드 검색 + 월드잡 클릭 -->
+              <div class="rounded-xl border border-slate-100 p-3">
+                <div class="text-xs font-semibold text-slate-500 mb-2">🔍 키워드 검색 순위 &nbsp;<span id="fvj-worldjob-badge" class="font-normal text-slate-400"></span></div>
+                <div id="fvj-search-table" class="text-xs text-slate-400">불러오는 중…</div>
+              </div>
+            </div>
+          </div>
+
           <!-- 페이지별 접속 현황 -->
           <div class="bg-white rounded-xl shadow-sm p-5">
             <div class="flex items-center justify-between mb-3">
@@ -1579,6 +1646,31 @@
                 </div>
               </div>
               <div id="trk-dwell-table"><div class="trk-loading"><div class="trk-spin"></div> 집계 중…</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑦ Fvisajobs 전용 분석 -->
+        <div class="trk-sec">
+          <div class="trk-sec-head"><div class="trk-sec-bar" style="background:#E8620A;"></div><div class="trk-sec-title">⑦ Fvisajobs 해외취업 전용 분석</div><div class="trk-sec-hint">유입 경로 · 일별 추이</div></div>
+          <div class="trk-grid2">
+            <div class="trk-card">
+              <div class="trk-card-title">📈 일별 방문 추이 (최근 14일)</div>
+              <div style="position:relative;height:160px;"><canvas id="fvj-trk-trend-chart"></canvas></div>
+            </div>
+            <div class="trk-card">
+              <div class="trk-card-title">🔀 어디서 Fvisajobs로 왔는가</div>
+              <div id="fvj-trk-ref-table"><div class="trk-loading"><div class="trk-spin"></div> 집계 중…</div></div>
+            </div>
+          </div>
+          <div class="trk-grid2" style="margin-top:14px;">
+            <div class="trk-card">
+              <div class="trk-card-title">🕐 시간대별 방문 (Fvisajobs 전용)</div>
+              <div style="position:relative;height:150px;"><canvas id="fvj-trk-hour-chart"></canvas></div>
+            </div>
+            <div class="trk-card">
+              <div class="trk-card-title">📅 요일별 방문 (Fvisajobs 전용)</div>
+              <div style="position:relative;height:150px;"><canvas id="fvj-trk-day-chart"></canvas></div>
             </div>
           </div>
         </div>
@@ -4425,6 +4517,9 @@
       // ── 대학활동 클릭 통계 ──
       loadUniversityClicks();
 
+      // ── Fvisajobs 방문 분석 ──
+      loadFvisajobsStats();
+
       // ── 인사이트 분석 ──
       generateInsights({ rows, dailyCounts, dailyLabels, pageMap, totalCount, todayCount, yesterdayCount, monthCount, kstNow });
 
@@ -4516,6 +4611,270 @@
       }
       pagerHtml += `<button onclick="renderPageStats(${page+1})" class="${btnBase} ${btnInactive}" ${page===totalPages-1?'disabled style="opacity:.35;cursor:not-allowed;"':''}>다음 ›</button>`;
       pager.innerHTML = pagerHtml;
+    }
+
+    // ─── Fvisajobs 방문 분석 ───
+    let _fvjAllRows = [];
+    let _fvjCharts = {};
+    let _fvjPeriod = 'week';
+
+    async function loadFvisajobsStats() {
+      const now = new Date();
+      const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+      const today = kstNow.toISOString().slice(0, 10);
+
+      // 전체 Fvisajobs 방문 데이터
+      const { data: allRows } = await db.from('page_views')
+        .select('visited_at, referrer')
+        .eq('page', 'Fvisajobs/index.html')
+        .order('visited_at', { ascending: false })
+        .limit(5000);
+      _fvjAllRows = allRows || [];
+
+      // KPI: 총 방문 (count)
+      const { count: fvjTotal } = await db.from('page_views')
+        .select('*', { count: 'exact', head: true })
+        .eq('page', 'Fvisajobs/index.html');
+      document.getElementById('fvj-total-badge').textContent = (fvjTotal || 0).toLocaleString() + '건';
+      document.getElementById('fvj-k-total').textContent = (fvjTotal || 0).toLocaleString();
+
+      // KPI: 오늘
+      const fvjToday = _fvjAllRows.filter(r => {
+        const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
+        return kst.toISOString().slice(0,10) === today;
+      }).length;
+      document.getElementById('fvj-k-today').textContent = fvjToday.toLocaleString();
+
+      // KPI: 이번주 (월요일부터)
+      const monKst = new Date(kstNow);
+      monKst.setDate(kstNow.getDate() - ((kstNow.getDay() + 6) % 7));
+      const monStr = monKst.toISOString().slice(0,10);
+      const fvjWeek = _fvjAllRows.filter(r => {
+        const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
+        return kst.toISOString().slice(0,10) >= monStr;
+      }).length;
+      document.getElementById('fvj-k-week').textContent = fvjWeek.toLocaleString();
+
+      // KPI: competition.html → Fvisajobs 유입
+      const fromComp = _fvjAllRows.filter(r => r.referrer && r.referrer.includes('competition')).length;
+      document.getElementById('fvj-k-from-comp').textContent = fromComp.toLocaleString();
+
+      renderFvjAnalytics();
+      loadFvjDetailStats();
+    }
+
+    async function loadFvjDetailStats() {
+      const INSIGHT_LABELS = { korea:'한국인 채용 많은 국가', entry:'초보자 진입 쉬움', it:'IT 직군 수요 많음' };
+      const PANEL_LABELS   = { major:'전공으로 찾기', country:'추천 국가 보기', top:'취업 쉬운 국가 TOP' };
+
+      // 모든 Fvisajobs 세부 이벤트 로드
+      const { data: evtRows } = await db.from('page_views')
+        .select('page, visited_at')
+        .like('page', 'fvisajobs-%')
+        .order('visited_at', { ascending: false })
+        .limit(5000);
+      const rows = evtRows || [];
+
+      function makeMiniTable(entries, labelFn) {
+        if (!entries.length) return '<div style="color:#CBD5E1;padding:12px 0;text-align:center;">데이터 없음</div>';
+        const max = entries[0][1] || 1;
+        return entries.slice(0, 8).map(([k, cnt], i) => {
+          const pct = Math.round(cnt / max * 100);
+          const label = labelFn ? labelFn(k) : k;
+          const colors = ['#E8620A','#1D4ED8','#059669','#7C3AED','#D97706','#0891B2','#DC2626','#0F766E'];
+          return `<div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;">
+            <span style="width:18px;text-align:right;font-weight:700;color:#94A3B8;font-size:.68rem;">${i+1}</span>
+            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#334155;font-size:.74rem;">${label}</span>
+            <span style="font-weight:700;color:#1E3A5F;font-size:.74rem;width:28px;text-align:right;">${cnt}</span>
+            <div style="width:60px;height:6px;background:#F1F5F9;border-radius:3px;overflow:hidden;flex-shrink:0;">
+              <div style="width:${pct}%;height:100%;background:${colors[i%8]};border-radius:3px;"></div>
+            </div>
+          </div>`;
+        }).join('');
+      }
+
+      // ① AI 인사이트 칩
+      const insightMap = {};
+      rows.filter(r => r.page.startsWith('fvisajobs-insight:')).forEach(r => {
+        const k = r.page.slice('fvisajobs-insight:'.length);
+        insightMap[k] = (insightMap[k]||0) + 1;
+      });
+      const insightEl = document.getElementById('fvj-insight-table');
+      if (insightEl) insightEl.innerHTML = makeMiniTable(
+        Object.entries(insightMap).sort((a,b)=>b[1]-a[1]),
+        k => INSIGHT_LABELS[k] || k
+      );
+
+      // ② 탐색 패널
+      const panelMap = {};
+      rows.filter(r => r.page.startsWith('fvisajobs-panel:')).forEach(r => {
+        const k = r.page.slice('fvisajobs-panel:'.length);
+        panelMap[k] = (panelMap[k]||0) + 1;
+      });
+      const panelEl = document.getElementById('fvj-panel-table');
+      if (panelEl) panelEl.innerHTML = makeMiniTable(
+        Object.entries(panelMap).sort((a,b)=>b[1]-a[1]),
+        k => PANEL_LABELS[k] || k
+      );
+
+      // ③ 국가별 클릭
+      const countryMap = {};
+      rows.filter(r => r.page.startsWith('fvisajobs-country:')).forEach(r => {
+        const k = r.page.slice('fvisajobs-country:'.length);
+        countryMap[k] = (countryMap[k]||0) + 1;
+      });
+      const countryEl = document.getElementById('fvj-country-table');
+      if (countryEl) countryEl.innerHTML = makeMiniTable(
+        Object.entries(countryMap).sort((a,b)=>b[1]-a[1]),
+        null
+      );
+
+      // ④ 키워드 검색
+      const searchMap = {};
+      rows.filter(r => r.page.startsWith('fvisajobs-search:')).forEach(r => {
+        const k = r.page.slice('fvisajobs-search:'.length);
+        searchMap[k] = (searchMap[k]||0) + 1;
+      });
+      const searchEl = document.getElementById('fvj-search-table');
+      if (searchEl) searchEl.innerHTML = makeMiniTable(
+        Object.entries(searchMap).sort((a,b)=>b[1]-a[1]),
+        null
+      );
+
+      // 월드잡플러스 클릭수 뱃지
+      const wjCnt = rows.filter(r => r.page === 'fvisajobs-worldjob').length;
+      const wjBadge = document.getElementById('fvj-worldjob-badge');
+      if (wjBadge) wjBadge.innerHTML = `&nbsp;·&nbsp;🌏 월드잡플러스 클릭 <strong style="color:#1D4ED8;">${wjCnt}회</strong>`;
+    }
+
+    function applyFvjPeriod(period) {
+      _fvjPeriod = period;
+      ['today','week','all'].forEach(p => {
+        const btn = document.getElementById('fvj-btn-' + p);
+        if (!btn) return;
+        const on = p === period;
+        btn.className = on
+          ? 'px-3 py-1.5 text-xs font-semibold rounded-lg border border-orange-500 text-orange-600 bg-orange-50'
+          : 'px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 bg-white';
+      });
+      renderFvjAnalytics();
+    }
+
+    function renderFvjAnalytics() {
+      const now = new Date();
+      const kstNow = new Date(now.getTime() + 9*3600000);
+      const today = kstNow.toISOString().slice(0,10);
+      const monKst = new Date(kstNow);
+      monKst.setDate(kstNow.getDate() - ((kstNow.getDay()+6)%7));
+      const monStr = monKst.toISOString().slice(0,10);
+
+      let rows = _fvjAllRows;
+      if (_fvjPeriod === 'today') {
+        rows = rows.filter(r => {
+          const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
+          return kst.toISOString().slice(0,10) === today;
+        });
+      } else if (_fvjPeriod === 'week') {
+        rows = rows.filter(r => {
+          const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
+          return kst.toISOString().slice(0,10) >= monStr;
+        });
+      }
+
+      // 일별 추이 차트 (최근 14일)
+      const dailyLabels = [], dailyCounts = [], trkDailyCounts = [];
+      for (let i = 13; i >= 0; i--) {
+        const d = new Date(kstNow.getTime() - i*864e5);
+        const key = d.toISOString().slice(0,10);
+        dailyLabels.push((d.getMonth()+1)+'/'+ d.getDate());
+        const cnt = _fvjAllRows.filter(r => {
+          const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
+          return kst.toISOString().slice(0,10) === key;
+        }).length;
+        dailyCounts.push(cnt);
+        trkDailyCounts.push(cnt);
+      }
+
+      ['fvj-trend-chart','fvj-trk-trend-chart'].forEach(id => {
+        const canvas = document.getElementById(id);
+        if (!canvas) return;
+        if (_fvjCharts[id]) { _fvjCharts[id].destroy(); }
+        _fvjCharts[id] = new Chart(canvas, {
+          type: 'bar',
+          data: { labels: dailyLabels, datasets: [{ data: dailyCounts, backgroundColor: 'rgba(232,98,10,.75)', borderRadius: 5, borderSkipped: false }] },
+          options: {
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#94A3B8' } },
+              y: { grid: { color: '#F1F5F9' }, ticks: { font: { size: 10 }, color: '#94A3B8', stepSize: 1 }, beginAtZero: true }
+            },
+            maintainAspectRatio: false
+          }
+        });
+      });
+
+      // 유입 경로 분류
+      const refMap = {};
+      rows.forEach(r => {
+        let label;
+        const ref = r.referrer || '';
+        if (!ref) { label = '직접 접속'; }
+        else if (ref.includes('competition')) { label = '경쟁률 페이지 추천'; }
+        else if (ref.includes('ibtcc.kr') || ref.includes('localhost') || ref.startsWith('file://') || ref.includes('index.html') || ref.includes('mobile.html') || ref.includes('university') || ref.includes('package') || ref.includes('job-board') || ref.includes('schedule') || ref.includes('foreign-jobs')) { label = '사이트 내 이동'; }
+        else if (ref.includes('naver') || ref.includes('google') || ref.includes('daum') || ref.includes('bing')) { label = '검색엔진'; }
+        else { label = ref.split('/')[2] || '기타 외부'; }
+        refMap[label] = (refMap[label] || 0) + 1;
+      });
+
+      const total = rows.length || 1;
+      const refSorted = Object.entries(refMap).sort((a,b) => b[1]-a[1]).slice(0,8);
+      const refHtml = refSorted.length
+        ? `<table style="width:100%;border-collapse:collapse;font-size:.74rem;">
+            <thead><tr><th style="text-align:left;color:#94A3B8;font-weight:600;padding:4px 0;border-bottom:1px solid #F1F5F9;">유입 경로</th><th style="text-align:right;color:#94A3B8;font-weight:600;padding:4px 0;border-bottom:1px solid #F1F5F9;">방문수</th><th style="text-align:right;color:#94A3B8;font-weight:600;padding:4px 0;border-bottom:1px solid #F1F5F9;padding-left:10px;">비율</th></tr></thead>
+            <tbody>${refSorted.map(([lbl,cnt]) =>
+              `<tr><td style="padding:6px 0 6px;border-bottom:1px solid #F8FAFC;color:#334155;">${lbl}</td>
+               <td style="text-align:right;padding:6px 0;border-bottom:1px solid #F8FAFC;font-weight:700;color:#1E3A5F;">${cnt}</td>
+               <td style="text-align:right;padding:6px 0 6px 10px;border-bottom:1px solid #F8FAFC;color:#94A3B8;">${Math.round(cnt/total*100)}%</td></tr>`
+            ).join('')}</tbody>
+           </table>`
+        : '<div style="text-align:center;padding:20px;color:#CBD5E1;font-size:.76rem;">데이터 없음</div>';
+
+      ['fvj-ref-table','fvj-trk-ref-table'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = refHtml;
+      });
+
+      // 시간대별 (추적 탭 전용)
+      const hourArr = Array(24).fill(0);
+      _fvjAllRows.forEach(r => {
+        const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
+        hourArr[kst.getUTCHours()]++;
+      });
+      const hourCanvas = document.getElementById('fvj-trk-hour-chart');
+      if (hourCanvas) {
+        if (_fvjCharts['fvj-trk-hour-chart']) _fvjCharts['fvj-trk-hour-chart'].destroy();
+        _fvjCharts['fvj-trk-hour-chart'] = new Chart(hourCanvas, {
+          type: 'bar',
+          data: { labels: Array.from({length:24},(_,i)=>i+'시'), datasets: [{ data: hourArr, backgroundColor: 'rgba(124,58,237,.7)', borderRadius: 3, borderSkipped: false }] },
+          options: { plugins:{legend:{display:false}}, scales:{x:{grid:{display:false},ticks:{font:{size:9},color:'#94A3B8'}},y:{grid:{color:'#F1F5F9'},ticks:{font:{size:9},color:'#94A3B8',stepSize:1},beginAtZero:true}}, maintainAspectRatio:false }
+        });
+      }
+
+      // 요일별 (추적 탭 전용)
+      const dayArr = Array(7).fill(0);
+      _fvjAllRows.forEach(r => {
+        const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
+        dayArr[kst.getUTCDay()]++;
+      });
+      const dayCanvas = document.getElementById('fvj-trk-day-chart');
+      if (dayCanvas) {
+        if (_fvjCharts['fvj-trk-day-chart']) _fvjCharts['fvj-trk-day-chart'].destroy();
+        _fvjCharts['fvj-trk-day-chart'] = new Chart(dayCanvas, {
+          type: 'bar',
+          data: { labels:['일','월','화','수','목','금','토'], datasets:[{data:dayArr,backgroundColor:'rgba(14,165,233,.7)',borderRadius:3,borderSkipped:false}] },
+          options:{plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{color:'#F1F5F9'},ticks:{font:{size:10},color:'#94A3B8',stepSize:1},beginAtZero:true}},maintainAspectRatio:false}
+        });
+      }
     }
 
     // ─── 인사이트 분석 ───

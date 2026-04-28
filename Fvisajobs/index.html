@@ -416,7 +416,7 @@
       </div>
     </div>
     <div class="fv-modal-actions">
-      <a href="https://www.worldjob.or.kr/new_index.do" target="_blank" rel="noopener" class="fv-btn-wj">
+      <a href="https://www.worldjob.or.kr/new_index.do" target="_blank" rel="noopener" class="fv-btn-wj" onclick="window.fvjTrack('fvisajobs-worldjob')">
         🌏 월드잡플러스 바로가기 →
       </a>
       <button class="fv-btn-close" onclick="closeFvModal()">닫기</button>
@@ -669,6 +669,7 @@ function renderPagination() {
 /* ── 이벤트 ── */
 function filterByCountry(name) {
   curCountry = name;
+  if (name !== 'all') window.fvjTrack('fvisajobs-country:' + name);
   renderSidebar();
   renderMobileFilters();
   applyFilters();
@@ -712,6 +713,7 @@ function updateStateBadge() {
 /* ── AI 인사이트 칩 ── */
 function applyInsight(type) {
   if (insightType === type) { clearAllFilters(); return; }
+  window.fvjTrack('fvisajobs-insight:' + type);
   insightType = type;
   document.querySelectorAll('.he-chip').forEach(c => c.classList.remove('selected'));
   document.getElementById('chip-' + type).classList.add('selected');
@@ -744,6 +746,7 @@ function toggleExpPanel(type) {
   const isOpen = el.classList.contains('open');
   closeAllPanels();
   if (!isOpen) {
+    window.fvjTrack('fvisajobs-panel:' + type);
     el.classList.add('open');
     document.getElementById(btns[type]).classList.add('open');
     renderExpPanel(type);
@@ -901,6 +904,35 @@ function esc(s) {
   if (!s) return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+/* ── 이벤트 트래킹 ── */
+(function() {
+  var SB = 'https://byzulmxcuhsrjdphmuym.supabase.co';
+  var KEY = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
+  window.fvjTrack = function(page) {
+    if (localStorage.getItem('gtelp_notrack') === '1') return;
+    fetch(SB + '/rest/v1/page_views', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'apikey':KEY, 'Authorization':'Bearer '+KEY, 'Prefer':'return=minimal' },
+      body: JSON.stringify({ page: page, referrer: location.href, ua: navigator.userAgent || null })
+    }).catch(function(){});
+  };
+})();
+
+/* ── 검색 키워드 트래킹 (디바운스 1.5s, 2자 이상) ── */
+(function() {
+  var timer = null;
+  document.addEventListener('DOMContentLoaded', function() {
+    var inp = document.getElementById('search-input');
+    if (!inp) return;
+    inp.addEventListener('input', function() {
+      clearTimeout(timer);
+      var q = inp.value.trim();
+      if (q.length < 2) return;
+      timer = setTimeout(function() { window.fvjTrack('fvisajobs-search:' + q); }, 1500);
+    });
+  });
+})();
 </script>
 
 <!-- 방문 트래킹 -->
