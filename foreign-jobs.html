@@ -343,7 +343,7 @@
       fetch(SB + '/rest/v1/page_views', {
         method: 'POST',
         headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ page: 'foreign-jobs.html', referrer: document.referrer || null })
+        body: JSON.stringify({ page: 'foreign-jobs.html', referrer: document.referrer || null, ua: navigator.userAgent || null })
       });
     } catch(_) {}
   }
@@ -362,6 +362,25 @@
   });
 
   load();
+</script>
+
+<script>
+/* 체류시간 추적 */
+(function() {
+  var _s = Date.now(), _sent = false;
+  function _send() {
+    if (_sent) return; _sent = true;
+    var sec = Math.round((Date.now() - _s) / 1000);
+    if (sec < 3 || sec > 7200) return;
+    fetch('https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/page_views', {
+      method: 'POST', keepalive: true,
+      headers: { 'Content-Type': 'application/json', 'apikey': 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Authorization': 'Bearer sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ page: 'foreign-jobs.html', dwell_seconds: sec })
+    }).catch(function(){});
+  }
+  document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'hidden') _send(); });
+  window.addEventListener('pagehide', _send);
+})();
 </script>
 </body>
 </html>
