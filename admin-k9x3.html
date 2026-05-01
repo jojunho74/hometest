@@ -3209,7 +3209,8 @@
       const { data, error } = await db
         .from('university_news')
         .select('*')
-        .order('sort_order', { ascending: true });
+        .order('sort_order', { ascending: true })
+        .limit(9999);
       if (error) { console.error(error); return; }
       newsData = data || [];
       renderSwatches('news-color-swatches', 'news-color', '#FFFFFF');
@@ -3559,7 +3560,7 @@
     let editingSjId = null;
 
     async function loadStaffJobs() {
-      const { data, error } = await db.from('staff_job_postings').select('*').order('sort_order', { ascending: true });
+      const { data, error } = await db.from('staff_job_postings').select('*').order('sort_order', { ascending: true }).limit(9999);
       if (error) { console.error(error); return; }
       sjData = data || [];
       renderSwatches('sj-color-swatches', 'sj-color', '#FFFFFF');
@@ -3703,7 +3704,7 @@
     let editingProgId = null;
 
     async function loadPrograms() {
-      const { data, error } = await db.from('school_programs').select('*').eq('is_deleted', false).order('sort_order', { ascending: true });
+      const { data, error } = await db.from('school_programs').select('*').eq('is_deleted', false).order('sort_order', { ascending: true }).limit(9999);
       if (error) { console.error('loadPrograms error:', error); progData = []; renderPrograms(); return; }
       progData = data || [];
       renderSwatches('prog-color-swatches', 'prog-color', '#FFFFFF');
@@ -3899,7 +3900,7 @@
     let editingFjId = null;
 
     async function loadForeignJobs() {
-      const { data, error } = await db.from('foreign_job_postings').select('*').order('sort_order', { ascending: true });
+      const { data, error } = await db.from('foreign_job_postings').select('*').order('sort_order', { ascending: true }).limit(9999);
       if (error) { console.error(error); return; }
       fjData = data || [];
       renderSwatches('fj-color-swatches', 'fj-color', '#FFFFFF');
@@ -4045,7 +4046,7 @@
     }
 
     async function loadJobs() {
-      const { data, error } = await db.from('job_postings').select('*').order('sort_order', { ascending: true });
+      const { data, error } = await db.from('job_postings').select('*').order('sort_order', { ascending: true }).limit(9999);
       if (error) { console.error(error); return; }
       jobData = data || [];
       renderSwatches('job-color-swatches', 'job-color', '#FFFFFF');
