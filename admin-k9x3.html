@@ -3704,7 +3704,7 @@
 
     async function loadPrograms() {
       const { data, error } = await db.from('school_programs').select('*').eq('is_deleted', false).order('sort_order', { ascending: true });
-      if (error) { console.error(error); return; }
+      if (error) { console.error('loadPrograms error:', error); progData = []; renderPrograms(); return; }
       progData = data || [];
       renderSwatches('prog-color-swatches', 'prog-color', '#FFFFFF');
       document.getElementById('prog-logo').onchange = function() {
@@ -3824,7 +3824,7 @@
       const logoInput = document.getElementById('prog-logo');
       const logo_url = await uploadProgLogo(logoInput);
       const maxOrder = progData.length > 0 ? Math.max(...progData.map(r => r.sort_order)) + 1 : 1;
-      const { error } = await db.from('school_programs').insert([{ school_name: school, title, link: link || null, sort_order: maxOrder, bg_color: color, logo_url }]);
+      const { error } = await db.from('school_programs').insert([{ school_name: school, title, link: link || null, sort_order: maxOrder, bg_color: color, logo_url, is_deleted: false }]);
       if (error) { alert('등록 실패: ' + error.message); return; }
       document.getElementById('prog-school').value = '';
       document.getElementById('prog-title').value  = '';
