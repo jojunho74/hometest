@@ -791,11 +791,6 @@
     const _SP_KEY  = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
     const _SP_HDR  = { 'Content-Type':'application/json', 'apikey':_SP_KEY, 'Authorization':'Bearer '+_SP_KEY, 'Prefer':'return=minimal' };
 
-    // 최초 방문 시 내 방문 제외 기본값 ON (명시적으로 OFF한 경우만 추적)
-    if (localStorage.getItem(_NT_KEY) === null) {
-      localStorage.setItem(_NT_KEY, '1');
-    }
-
     // 접속 기록 (페이지 로드 시)
     if (localStorage.getItem('gtelp_notrack') !== '1') {
       fetch(_SP_API, {
