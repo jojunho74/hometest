@@ -368,6 +368,25 @@
           <tbody id="result-body"></tbody>
         </table>
       </div>
+
+      <!-- 오픽/토스 등록 기관 섹션 -->
+      <div id="opic-toeics-wrap" class="hidden" style="border-top:1px solid var(--border);padding:14px 20px;">
+        <p style="font-size:12px;color:#A78BFA;font-weight:700;margin-bottom:4px;">🎙 오픽 / 토스(TOEIC Speaking) 등록 기관</p>
+        <p style="font-size:11px;color:#64748B;margin-bottom:10px;">아래 기관은 오픽 또는 토익스피킹 점수가 등록된 기관입니다.</p>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead>
+              <tr style="color:#64748B;border-bottom:1px solid var(--border);">
+                <th style="text-align:left;padding:6px 10px;font-weight:600;">기관명</th>
+                <th style="text-align:left;padding:6px 10px;font-weight:600;">오픽</th>
+                <th style="text-align:left;padding:6px 10px;font-weight:600;">토스(TOEIC S)</th>
+                <th style="text-align:left;padding:6px 10px;font-weight:600;" class="hidden md:table-cell">자격증</th>
+              </tr>
+            </thead>
+            <tbody id="opic-toeics-body"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <!-- Summary text -->
@@ -701,6 +720,47 @@
       document.getElementById('result-count').textContent = '';
     }
 
+    function parseOpicToeicsFromNotes(notes) {
+      if (!notes) return { opic: null, toeicS: null, certs: null };
+      const opicM  = notes.match(/오픽:\s*([^\s/,]+)/);
+      const toeicM = notes.match(/토스:\s*([^\s/,]+)/);
+      const certM  = notes.match(/자격증:\s*([^/]+)/);
+      return {
+        opic:  opicM  ? opicM[1].trim()  : null,
+        toeicS: toeicM ? toeicM[1].trim() : null,
+        certs: certM  ? certM[1].trim()  : null
+      };
+    }
+
+    function renderOpicToeicsSection() {
+      const sectionWrap = document.getElementById('opic-toeics-wrap');
+      const tbody = document.getElementById('opic-toeics-body');
+      const rows = allData.filter(r => {
+        const p = parseOpicToeicsFromNotes(r.notes);
+        return p.opic || p.toeicS;
+      }).sort((a, b) => a.institution_name.localeCompare(b.institution_name, 'ko'));
+
+      if (rows.length === 0) { sectionWrap.classList.add('hidden'); return; }
+
+      tbody.innerHTML = rows.map(r => {
+        const p = parseOpicToeicsFromNotes(r.notes);
+        const opicBadge = p.opic
+          ? `<span style="background:rgba(167,139,250,0.15);color:#A78BFA;border:1px solid rgba(167,139,250,0.3);border-radius:5px;padding:2px 8px;font-weight:600;font-size:11px;">${esc(p.opic)}</span>`
+          : '<span style="color:#334155;">-</span>';
+        const toeicBadge = p.toeicS
+          ? `<span style="background:rgba(56,189,248,0.12);color:#38BDF8;border:1px solid rgba(56,189,248,0.25);border-radius:5px;padding:2px 8px;font-weight:600;font-size:11px;">Lv.${esc(p.toeicS)}</span>`
+          : '<span style="color:#334155;">-</span>';
+        return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:7px 10px;color:#E2E8F0;font-weight:500;">${esc(r.institution_name)}</td>
+          <td style="padding:7px 10px;">${opicBadge}</td>
+          <td style="padding:7px 10px;">${toeicBadge}</td>
+          <td style="padding:7px 10px;color:#64748B;font-size:11px;" class="hidden md:table-cell">${esc(p.certs || '-')}</td>
+        </tr>`;
+      }).join('');
+
+      sectionWrap.classList.remove('hidden');
+    }
+
     function renderNoScore() {
       const badge = document.getElementById('noscore-count-badge');
       const list  = document.getElementById('noscore-list');
@@ -730,6 +790,7 @@
       // 이미 펼쳐진 상태 → 접기
       if (!wrap.classList.contains('hidden')) {
         wrap.classList.add('hidden');
+        document.getElementById('opic-toeics-wrap').classList.add('hidden');
         label.textContent = '합격권 진입 점수대';
         btn.style.animation = 'btnPulse 1.6s ease-in-out infinite';
         btn.style.color = '#FCD34D';
@@ -774,6 +835,7 @@
       const qualified = lastResult.filter(r => r.toeic_score != null && r.toeic_score >= userScore);
       document.getElementById('result-body').innerHTML = buildTableRows(qualified);
       document.getElementById('result-count').textContent = `합격 가능 ${qualified.length}개 기관`;
+      renderOpicToeicsSection();
       label.textContent = '접기';
       btn.style.animation = 'none';
       btn.style.color = '#94A3B8';
