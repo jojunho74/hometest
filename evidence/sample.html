@@ -791,6 +791,11 @@
     const _SP_KEY  = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
     const _SP_HDR  = { 'Content-Type':'application/json', 'apikey':_SP_KEY, 'Authorization':'Bearer '+_SP_KEY, 'Prefer':'return=minimal' };
 
+    // 최초 방문 시 내 방문 제외 기본값 ON
+    if (localStorage.getItem('gtelp_notrack') === null) {
+      localStorage.setItem('gtelp_notrack', '1');
+    }
+
     // 접속 기록 (페이지 로드 시)
     if (localStorage.getItem('gtelp_notrack') !== '1') {
       fetch(_SP_API, {
@@ -854,7 +859,7 @@
       updateNoTrackBtn();
     }
 
-    updateNoTrackBtn();
+    window.addEventListener('load', updateNoTrackBtn);
   </script>
 
 <!-- 내 방문 제외 토글 버튼 (하단 고정) -->
