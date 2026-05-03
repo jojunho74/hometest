@@ -10114,10 +10114,17 @@ ${d.hashtags}`;
         pass_score_avg: item.pass_score_avg ?? null,
         pass_year: item.pass_year ?? null
       };
+      // 토익점수: pass_score_min 우선, 없으면 pass_score_avg
+      const toeicFromAnalysis = item.pass_score_min ?? item.pass_score_avg ?? null;
       let error;
       if (existingMap[name]) {
-        // 기존 기관: pass_score 업데이트
-        ({ error } = await db.from('pass_statistics').update(payload).eq('id', existingMap[name]));
+        // 기존 기관: pass_score 업데이트 + toeic_score가 비어있으면 채움
+        const existing = psData.find(r => r.institution_name === name);
+        const updatePayload = { ...payload };
+        if (toeicFromAnalysis != null && existing?.toeic_score == null) {
+          updatePayload.toeic_score = toeicFromAnalysis;
+        }
+        ({ error } = await db.from('pass_statistics').update(updatePayload).eq('id', existingMap[name]));
         if (!error) {
           logEl.innerHTML += `<div style="color:#16a34a;">✓ [업데이트] ${esc(name)} — min:${payload.pass_score_min ?? '-'} avg:${payload.pass_score_avg ?? '-'} (${payload.pass_year ?? '-'})</div>`;
           successCount++;
@@ -10126,7 +10133,7 @@ ${d.hashtags}`;
         // 신규 기관: INSERT
         ({ error } = await db.from('pass_statistics').insert([{
           institution_name: name,
-          toeic_score: null,
+          toeic_score: toeicFromAnalysis,
           is_deleted: false,
           gtelp_applicable: false,
           notes: item.notes || '공식 기준 미확인 (합격자 보유점수 기반)',
