@@ -2866,6 +2866,9 @@
                     <th class="px-3 py-2 font-semibold">기관명</th>
                     <th class="px-3 py-2 font-semibold">합격자 최소점수</th>
                     <th class="px-3 py-2 font-semibold">합격자 평균점수</th>
+                    <th class="px-3 py-2 font-semibold">오픽</th>
+                    <th class="px-3 py-2 font-semibold">토스(TOEIC S)</th>
+                    <th class="px-3 py-2 font-semibold">자격증</th>
                     <th class="px-3 py-2 font-semibold">연도</th>
                     <th class="px-3 py-2 font-semibold">처리</th>
                     <th class="px-3 py-2 font-semibold">비고</th>
@@ -9976,6 +9979,46 @@ ${d.hashtags}`;
     return null;
   }
 
+  function pcExtractOpic(text) {
+    const lines = text.split('\n');
+    const grades = ['AL','IH','IM3','IM2','IM1','IL','NH','NM','NL'];
+    const pat = new RegExp('(?:오픽|OPIc)\\s*[:：]?\\s*(AL|IH|IM3|IM2|IM1|IL|NH|NM|NL)','i');
+    for (const line of lines) {
+      if (/이상|요구|기준|충족|필요|미만|커트라인|이하/.test(line)) continue;
+      const m = line.match(pat);
+      if (m) return m[1].toUpperCase();
+    }
+    return null;
+  }
+
+  function pcExtractToeicSpeaking(text) {
+    const lines = text.split('\n');
+    for (const line of lines) {
+      if (/이상|요구|기준|충족|필요|미만|커트라인|이하/.test(line)) continue;
+      // "토익스피킹 Lv.6", "토스 140점", "TOEIC Speaking 130"
+      let m = line.match(/(?:토익\s*스피킹|토스|TOEIC\s*Speaking)\s*[:：]?\s*(?:Lv\.?\s*)?(\d+)/i);
+      if (m) return m[1];
+    }
+    return null;
+  }
+
+  function pcExtractCertificates(text) {
+    const patterns = [
+      /정보처리기사/, /정보처리산업기사/, /컴퓨터활용능력\s*[12]급/, /워드프로세서/,
+      /전산세무회계/, /회계관리\s*[12]급/, /재경관리사/, /공인회계사|CPA/,
+      /세무사/, /변리사/, /행정사/, /사회조사분석사/, /유통관리사/, /물류관리사/,
+      /무역영어\s*[123]급/, /국제무역사/, /MOS/, /ADsP/, /빅데이터분석기사/,
+      /데이터분석준전문가|DASP/, /전기기사/, /소방설비기사/, /건축기사/, /토목기사/,
+      /자동차정비기사/, /한국사\s*(?:[123]급|능력검정)/, /운전면허\s*[12]종/
+    ];
+    const found = new Set();
+    for (const pat of patterns) {
+      const m = text.match(pat);
+      if (m) found.add(m[0].trim());
+    }
+    return found.size > 0 ? [...found].join(', ') : null;
+  }
+
   function pcExtractToeic(text) {
     const lines = text.split('\n');
     // 1순위: 어학/스펙 섹션 내 토익 패턴
@@ -10015,24 +10058,38 @@ ${d.hashtags}`;
         let institution = pcExtractInstitution(src, storyText);
         if (institution && PC_ALIAS[institution]) institution = PC_ALIAS[institution];
         if (institution) {
-          const score = pcExtractToeic(storyText);
-          const year  = pcExtractYear(src + ' ' + storyText.substring(0,300));
-          if (!map[institution]) map[institution] = { scores:[], year:null };
+          const score  = pcExtractToeic(storyText);
+          const opic   = pcExtractOpic(storyText);
+          const toeicS = pcExtractToeicSpeaking(storyText);
+          const certs  = pcExtractCertificates(storyText);
+          const year   = pcExtractYear(src + ' ' + storyText.substring(0,300));
+          if (!map[institution]) map[institution] = { scores:[], year:null, opics:[], toeicSpeakings:[], certs:[] };
           if (score !== null) map[institution].scores.push(score);
           if (year && !map[institution].year) map[institution].year = year;
+          if (opic)   map[institution].opics.push(opic);
+          if (toeicS) map[institution].toeicSpeakings.push(toeicS);
+          if (certs)  certs.split(', ').forEach(c => map[institution].certs.push(c));
         }
         story = [];
       } else {
         story.push(line);
       }
     }
-    return Object.entries(map).map(([name, d]) => ({
-      institution_name: name,
-      pass_score_min: d.scores.length ? Math.min(...d.scores) : null,
-      pass_score_avg: d.scores.length ? Math.round(d.scores.reduce((a,b)=>a+b,0)/d.scores.length) : null,
-      pass_year: d.year,
-      notes: d.scores.length > 1 ? `${d.scores.length}명 데이터` : (d.scores.length === 0 ? '점수 미확인' : null)
-    }));
+    return Object.entries(map).map(([name, d]) => {
+      const uniqueOpic  = [...new Set(d.opics || [])].join(', ') || null;
+      const uniqueToeicS = [...new Set(d.toeicSpeakings || [])].join(', ') || null;
+      const uniqueCerts = [...new Set(d.certs || [])].join(', ') || null;
+      return {
+        institution_name: name,
+        pass_score_min: d.scores.length ? Math.min(...d.scores) : null,
+        pass_score_avg: d.scores.length ? Math.round(d.scores.reduce((a,b)=>a+b,0)/d.scores.length) : null,
+        pass_year: d.year,
+        opic_grade: uniqueOpic,
+        toeic_speaking: uniqueToeicS,
+        certificates: uniqueCerts,
+        notes: d.scores.length > 1 ? `${d.scores.length}명 데이터` : (d.scores.length === 0 ? '점수 미확인' : null)
+      };
+    });
   }
 
   function analyzePassText() {
@@ -10081,6 +10138,15 @@ ${d.hashtags}`;
           <input type="number" value="${r.pass_score_avg ?? ''}" placeholder="-" onchange="pcResults[${i}].pass_score_avg=this.value?parseInt(this.value):null" class="border border-transparent hover:border-slate-200 rounded px-1 py-0.5 text-sm w-20 focus:outline-none focus:border-blue-400"/>
         </td>
         <td class="px-3 py-2">
+          <input type="text" value="${r.opic_grade ?? ''}" placeholder="-" onchange="pcResults[${i}].opic_grade=this.value||null" class="border border-transparent hover:border-slate-200 rounded px-1 py-0.5 text-sm w-16 focus:outline-none focus:border-blue-400"/>
+        </td>
+        <td class="px-3 py-2">
+          <input type="text" value="${r.toeic_speaking ?? ''}" placeholder="-" onchange="pcResults[${i}].toeic_speaking=this.value||null" class="border border-transparent hover:border-slate-200 rounded px-1 py-0.5 text-sm w-16 focus:outline-none focus:border-blue-400"/>
+        </td>
+        <td class="px-3 py-2">
+          <input type="text" value="${r.certificates ?? ''}" placeholder="-" onchange="pcResults[${i}].certificates=this.value||null" class="border border-transparent hover:border-slate-200 rounded px-1 py-0.5 text-sm w-28 focus:outline-none focus:border-blue-400"/>
+        </td>
+        <td class="px-3 py-2">
           <input type="text" value="${r.pass_year ?? ''}" placeholder="-" onchange="pcResults[${i}].pass_year=this.value||null" class="border border-transparent hover:border-slate-200 rounded px-1 py-0.5 text-sm w-16 focus:outline-none focus:border-blue-400"/>
         </td>
         <td class="px-3 py-2">${badge}</td>
@@ -10116,6 +10182,12 @@ ${d.hashtags}`;
       };
       // 토익점수: pass_score_min 우선, 없으면 pass_score_avg
       const toeicFromAnalysis = item.pass_score_min ?? item.pass_score_avg ?? null;
+      // 오픽/토스/자격증 → notes에 추가 정보로 병합
+      const extraParts = [];
+      if (item.opic_grade)    extraParts.push(`오픽: ${item.opic_grade}`);
+      if (item.toeic_speaking) extraParts.push(`토스: ${item.toeic_speaking}`);
+      if (item.certificates)  extraParts.push(`자격증: ${item.certificates}`);
+      const extraNote = extraParts.length > 0 ? extraParts.join(' / ') : null;
       let error;
       if (existingMap[name]) {
         // 기존 기관: pass_score 업데이트 + toeic_score가 비어있으면 채움
@@ -10123,6 +10195,10 @@ ${d.hashtags}`;
         const updatePayload = { ...payload };
         if (toeicFromAnalysis != null && existing?.toeic_score == null) {
           updatePayload.toeic_score = toeicFromAnalysis;
+        }
+        if (extraNote) {
+          const prevNotes = existing?.notes || '';
+          updatePayload.notes = prevNotes ? prevNotes + ' / ' + extraNote : extraNote;
         }
         ({ error } = await db.from('pass_statistics').update(updatePayload).eq('id', existingMap[name]));
         if (!error) {
@@ -10136,7 +10212,7 @@ ${d.hashtags}`;
           toeic_score: toeicFromAnalysis,
           is_deleted: false,
           gtelp_applicable: false,
-          notes: item.notes || '공식 기준 미확인 (합격자 보유점수 기반)',
+          notes: [item.notes || '공식 기준 미확인 (합격자 보유점수 기반)', extraNote].filter(Boolean).join(' / '),
           ...payload
         }]));
         if (!error) {
