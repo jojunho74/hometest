@@ -446,6 +446,11 @@
     .qm-success-title{font-size:1.05rem;font-weight:800;color:#6ee7b7;margin-bottom:6px;}
     .qm-success-msg{font-size:.82rem;color:rgba(255,255,255,.55);line-height:1.6;}
     .quick-modal{position:relative;}
+    /* 모바일 하단 고정 버튼 */
+    .mobile-score-btn{display:none;}
+    @media(max-width:768px){
+      .mobile-score-btn{display:block;position:fixed;bottom:0;left:0;right:0;z-index:999;background:linear-gradient(135deg,#D97706 0%,#F59E0B 100%);color:#fff;font-size:15px;font-weight:800;text-align:center;padding:16px;text-decoration:none;letter-spacing:-0.3px;box-shadow:0 -3px 12px rgba(217,119,6,0.4);}
+    }
   </style>
 </head>
 <body>
@@ -481,6 +486,7 @@
     <a href="competition.html">경쟁률</a>
     <a href="Fvisajobs/index.html">해외취업공고</a>
     <a href="index.html#consultation-form" class="mbtn">대학IBT무료신청</a>
+    <a href="evidence/sample.html" class="mbtn" style="margin-top:8px;background:linear-gradient(135deg,#D97706,#F59E0B);">내 점수로 지원 가능한 기관 확인하기</a>
   </div>
 </header>
 
@@ -507,6 +513,7 @@
         <input id="ds-search" type="text" placeholder="기관명 검색..." oninput="filterDatasets(this.value)"/>
         <span class="search-ico">🔍</span>
       </div>
+      <a href="evidence/sample.html" style="display:block;margin-top:8px;padding:10px 12px;background:linear-gradient(135deg,#D97706,#F59E0B);color:#fff;font-size:12px;font-weight:700;text-align:center;border-radius:8px;text-decoration:none;letter-spacing:-0.2px;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">내 점수로 지원 가능한 공공기관<br><span style="font-size:11px;font-weight:600;opacity:0.85;">(B테스트)</span></a>
     </div>
     <div class="ds-list" id="ds-list">
       <div class="empty-list">불러오는 중...</div>
@@ -1381,6 +1388,7 @@ function renderVisualization(dsName, rows) {
     <div class="chart-comment-row">
       <div class="chart-card chart-col">
         <div class="chart-canvas-wrap"><canvas id="ratioChart"></canvas></div>
+        <a href="evidence/sample.html" style="display:block;margin:14px 8px 4px;padding:14px 20px;background:linear-gradient(135deg,#D97706 0%,#F59E0B 100%);color:#fff;font-size:15px;font-weight:700;text-align:center;border-radius:10px;text-decoration:none;letter-spacing:-0.3px;box-shadow:0 4px 14px rgba(217,119,6,0.35);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 18px rgba(217,119,6,0.45)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(217,119,6,0.35)'">내 점수로 지원 가능한 공공기관<br><span style="font-size:14px;font-weight:700;opacity:0.9;">(B테스트)</span></a>
       </div>
       <!-- IBT 신청 PUSH 패널 -->
       <div class="ibt-push-col">
@@ -1881,5 +1889,6 @@ async function ibtRecommend() {
     </div>
   </div>
 </div>
+<a href="evidence/sample.html" class="mobile-score-btn">내 점수로 지원 가능한 기관 확인하기</a>
 </body>
 </html>

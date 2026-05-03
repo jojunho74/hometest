@@ -117,6 +117,32 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             self.wfile.write(json.dumps({'status': 'ok'}).encode())
+        elif self.path.startswith('/fvisa'):
+            import urllib.parse, urllib.request
+            try:
+                parsed = urllib.parse.urlparse(self.path)
+                params = urllib.parse.parse_qs(parsed.query)
+                page_no   = params.get('pageNo', ['1'])[0]
+                num_rows  = params.get('numOfRows', ['12'])[0]
+                api_key   = 'fd0e3d05449e164a7c3f2fc5a1c1853e48fbe19516aba543055b1eb60daafac3'
+                api_url   = f'https://apis.data.go.kr/B490007/Employment?serviceKey={api_key}&method=getApiEmployment&pageNo={page_no}&numOfRows={num_rows}'
+                req = urllib.request.Request(api_url, headers={
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    'Accept': 'application/xml, text/xml, */*',
+                })
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    data = resp.read()
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/xml; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(data)
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps({'error': str(e)}).encode())
         elif self.path.startswith('/proxy?url='):
             import urllib.parse, urllib.request
             try:
