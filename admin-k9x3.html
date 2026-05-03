@@ -1003,9 +1003,25 @@
               <label class="block text-xs font-semibold text-slate-500 mb-1">공공기관명 *</label>
               <input id="ps-edit-institution" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
             </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">토익점수</label>
-              <input id="ps-edit-toeic" type="number" min="0" max="990" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">토익점수</label>
+                <input id="ps-edit-toeic" type="number" min="0" max="990" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">오픽 등급</label>
+                <input id="ps-edit-opic" type="text" placeholder="예) IH, IM2, AL" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">토스(TOEIC Speaking)</label>
+                <input id="ps-edit-toeic-speaking" type="text" placeholder="예) Lv.6, 130" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">자격증</label>
+                <input id="ps-edit-certificates" type="text" placeholder="예) 정보처리기사" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+              </div>
             </div>
             <div class="flex items-center gap-3">
               <label class="block text-xs font-semibold text-slate-500">지텔프 반영여부</label>
@@ -2791,6 +2807,20 @@
               <input id="ps-gtelp-score" type="number" placeholder="예) 65" min="0" max="100" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
             </div>
           </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">오픽 등급</label>
+              <input id="ps-opic" type="text" placeholder="예) IH, IM2, AL" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">토스(TOEIC Speaking)</label>
+              <input id="ps-toeic-speaking" type="text" placeholder="예) Lv.6, 130" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">자격증</label>
+              <input id="ps-certificates" type="text" placeholder="예) 정보처리기사" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+          </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
             <div>
               <label class="block text-xs font-semibold text-slate-500 mb-1">비고</label>
@@ -2816,6 +2846,8 @@
               <tr class="text-left text-slate-400 text-xs border-b">
                 <th class="px-4 py-3 font-semibold">공공기관명</th>
                 <th class="px-4 py-3 font-semibold">토익점수</th>
+                <th class="px-4 py-3 font-semibold">오픽</th>
+                <th class="px-4 py-3 font-semibold">토스</th>
                 <th class="px-4 py-3 font-semibold">지텔프</th>
                 <th class="px-4 py-3 font-semibold">지텔프 기준</th>
                 <th class="px-4 py-3 font-semibold">비고</th>
@@ -9834,9 +9866,17 @@ ${d.hashtags}`;
       const gtelpScoreCell = r.gtelp_score != null
         ? `<span class="text-blue-600 font-semibold">${r.gtelp_score}점</span>`
         : `<span class="text-slate-300">-</span>`;
+      const opicCell = r.opic_grade
+        ? `<span class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700">${esc(r.opic_grade)}</span>`
+        : `<span class="text-slate-300">-</span>`;
+      const toeicSCell = r.toeic_speaking
+        ? `<span class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-sky-100 text-sky-700">${esc(r.toeic_speaking)}</span>`
+        : `<span class="text-slate-300">-</span>`;
       return `<tr class="border-b last:border-0 hover:bg-slate-50">
         <td class="px-4 py-3 font-medium text-slate-700">${esc(r.institution_name)}</td>
         <td class="px-4 py-3 text-slate-700">${r.toeic_score != null ? r.toeic_score + '점' : '-'}</td>
+        <td class="px-4 py-3">${opicCell}</td>
+        <td class="px-4 py-3">${toeicSCell}</td>
         <td class="px-4 py-3">${gtelpBadge}</td>
         <td class="px-4 py-3 text-xs">${gtelpScoreCell}</td>
         <td class="px-4 py-3 text-slate-500 text-xs">${esc(r.notes || '-')}</td>
@@ -9850,6 +9890,9 @@ ${d.hashtags}`;
   async function addPassEntry() {
     const institution = document.getElementById('ps-institution').value.trim();
     const toeic = document.getElementById('ps-toeic').value;
+    const opic = document.getElementById('ps-opic').value.trim();
+    const toeicSpeaking = document.getElementById('ps-toeic-speaking').value.trim();
+    const certificates = document.getElementById('ps-certificates').value.trim();
     const gtelp = document.getElementById('ps-gtelp').checked;
     const gtelpScore = document.getElementById('ps-gtelp-score').value;
     const notes = document.getElementById('ps-notes').value.trim();
@@ -9857,6 +9900,9 @@ ${d.hashtags}`;
     const { error } = await db.from('pass_statistics').insert([{
       institution_name: institution,
       toeic_score: toeic ? parseInt(toeic) : null,
+      opic_grade: opic || null,
+      toeic_speaking: toeicSpeaking || null,
+      certificates: certificates || null,
       gtelp_applicable: gtelp,
       gtelp_score: gtelpScore ? parseInt(gtelpScore) : null,
       notes: notes || null,
@@ -9865,6 +9911,9 @@ ${d.hashtags}`;
     if (error) { alert('등록 실패: ' + error.message); return; }
     document.getElementById('ps-institution').value = '';
     document.getElementById('ps-toeic').value = '';
+    document.getElementById('ps-opic').value = '';
+    document.getElementById('ps-toeic-speaking').value = '';
+    document.getElementById('ps-certificates').value = '';
     document.getElementById('ps-gtelp').checked = false;
     document.getElementById('ps-gtelp-score').value = '';
     document.getElementById('ps-notes').value = '';
@@ -9887,6 +9936,9 @@ ${d.hashtags}`;
     editingPsId = id;
     document.getElementById('ps-edit-institution').value = r.institution_name;
     document.getElementById('ps-edit-toeic').value = r.toeic_score ?? '';
+    document.getElementById('ps-edit-opic').value = r.opic_grade ?? '';
+    document.getElementById('ps-edit-toeic-speaking').value = r.toeic_speaking ?? '';
+    document.getElementById('ps-edit-certificates').value = r.certificates ?? '';
     document.getElementById('ps-edit-gtelp').checked = r.gtelp_applicable || false;
     document.getElementById('ps-edit-gtelp-score').value = r.gtelp_score ?? '';
     document.getElementById('ps-edit-notes').value = r.notes || '';
@@ -9905,6 +9957,9 @@ ${d.hashtags}`;
   async function savePsEdit() {
     const institution = document.getElementById('ps-edit-institution').value.trim();
     const toeic = document.getElementById('ps-edit-toeic').value;
+    const opic = document.getElementById('ps-edit-opic').value.trim();
+    const toeicSpeaking = document.getElementById('ps-edit-toeic-speaking').value.trim();
+    const certificates = document.getElementById('ps-edit-certificates').value.trim();
     const gtelp = document.getElementById('ps-edit-gtelp').checked;
     const gtelpScore = document.getElementById('ps-edit-gtelp-score').value;
     const notes = document.getElementById('ps-edit-notes').value.trim();
@@ -9912,6 +9967,9 @@ ${d.hashtags}`;
     const { error } = await db.from('pass_statistics').update({
       institution_name: institution,
       toeic_score: toeic ? parseInt(toeic) : null,
+      opic_grade: opic || null,
+      toeic_speaking: toeicSpeaking || null,
+      certificates: certificates || null,
       gtelp_applicable: gtelp,
       gtelp_score: gtelpScore ? parseInt(gtelpScore) : null,
       notes: notes || null
@@ -10182,12 +10240,7 @@ ${d.hashtags}`;
       };
       // 토익점수: pass_score_min 우선, 없으면 pass_score_avg
       const toeicFromAnalysis = item.pass_score_min ?? item.pass_score_avg ?? null;
-      // 오픽/토스/자격증 → notes에 추가 정보로 병합
-      const extraParts = [];
-      if (item.opic_grade)    extraParts.push(`오픽: ${item.opic_grade}`);
-      if (item.toeic_speaking) extraParts.push(`토스: ${item.toeic_speaking}`);
-      if (item.certificates)  extraParts.push(`자격증: ${item.certificates}`);
-      const extraNote = extraParts.length > 0 ? extraParts.join(' / ') : null;
+      const extraNote = null; // 오픽/토스/자격증은 전용 컬럼에 저장
       let error;
       if (existingMap[name]) {
         // 기존 기관: pass_score 업데이트 + toeic_score가 비어있으면 채움
@@ -10196,10 +10249,9 @@ ${d.hashtags}`;
         if (toeicFromAnalysis != null && existing?.toeic_score == null) {
           updatePayload.toeic_score = toeicFromAnalysis;
         }
-        if (extraNote) {
-          const prevNotes = existing?.notes || '';
-          updatePayload.notes = prevNotes ? prevNotes + ' / ' + extraNote : extraNote;
-        }
+        if (item.opic_grade && !existing?.opic_grade)       updatePayload.opic_grade = item.opic_grade;
+        if (item.toeic_speaking && !existing?.toeic_speaking) updatePayload.toeic_speaking = item.toeic_speaking;
+        if (item.certificates && !existing?.certificates)   updatePayload.certificates = item.certificates;
         ({ error } = await db.from('pass_statistics').update(updatePayload).eq('id', existingMap[name]));
         if (!error) {
           logEl.innerHTML += `<div style="color:#16a34a;">✓ [업데이트] ${esc(name)} — min:${payload.pass_score_min ?? '-'} avg:${payload.pass_score_avg ?? '-'} (${payload.pass_year ?? '-'})</div>`;
@@ -10210,9 +10262,12 @@ ${d.hashtags}`;
         ({ error } = await db.from('pass_statistics').insert([{
           institution_name: name,
           toeic_score: toeicFromAnalysis,
+          opic_grade: item.opic_grade || null,
+          toeic_speaking: item.toeic_speaking || null,
+          certificates: item.certificates || null,
           is_deleted: false,
           gtelp_applicable: false,
-          notes: [item.notes || '공식 기준 미확인 (합격자 보유점수 기반)', extraNote].filter(Boolean).join(' / '),
+          notes: item.notes || '공식 기준 미확인 (합격자 보유점수 기반)',
           ...payload
         }]));
         if (!error) {

@@ -720,41 +720,26 @@
       document.getElementById('result-count').textContent = '';
     }
 
-    function parseOpicToeicsFromNotes(notes) {
-      if (!notes) return { opic: null, toeicS: null, certs: null };
-      const opicM  = notes.match(/오픽:\s*([^\s/,]+)/);
-      const toeicM = notes.match(/토스:\s*([^\s/,]+)/);
-      const certM  = notes.match(/자격증:\s*([^/]+)/);
-      return {
-        opic:  opicM  ? opicM[1].trim()  : null,
-        toeicS: toeicM ? toeicM[1].trim() : null,
-        certs: certM  ? certM[1].trim()  : null
-      };
-    }
-
     function renderOpicToeicsSection() {
       const sectionWrap = document.getElementById('opic-toeics-wrap');
       const tbody = document.getElementById('opic-toeics-body');
-      const rows = allData.filter(r => {
-        const p = parseOpicToeicsFromNotes(r.notes);
-        return p.opic || p.toeicS;
-      }).sort((a, b) => a.institution_name.localeCompare(b.institution_name, 'ko'));
+      const rows = allData.filter(r => r.opic_grade || r.toeic_speaking)
+        .sort((a, b) => a.institution_name.localeCompare(b.institution_name, 'ko'));
 
       if (rows.length === 0) { sectionWrap.classList.add('hidden'); return; }
 
       tbody.innerHTML = rows.map(r => {
-        const p = parseOpicToeicsFromNotes(r.notes);
-        const opicBadge = p.opic
-          ? `<span style="background:rgba(167,139,250,0.15);color:#A78BFA;border:1px solid rgba(167,139,250,0.3);border-radius:5px;padding:2px 8px;font-weight:600;font-size:11px;">${esc(p.opic)}</span>`
+        const opicBadge = r.opic_grade
+          ? `<span style="background:rgba(167,139,250,0.15);color:#A78BFA;border:1px solid rgba(167,139,250,0.3);border-radius:5px;padding:2px 8px;font-weight:600;font-size:11px;">${esc(r.opic_grade)}</span>`
           : '<span style="color:#334155;">-</span>';
-        const toeicBadge = p.toeicS
-          ? `<span style="background:rgba(56,189,248,0.12);color:#38BDF8;border:1px solid rgba(56,189,248,0.25);border-radius:5px;padding:2px 8px;font-weight:600;font-size:11px;">Lv.${esc(p.toeicS)}</span>`
+        const toeicBadge = r.toeic_speaking
+          ? `<span style="background:rgba(56,189,248,0.12);color:#38BDF8;border:1px solid rgba(56,189,248,0.25);border-radius:5px;padding:2px 8px;font-weight:600;font-size:11px;">${esc(r.toeic_speaking)}</span>`
           : '<span style="color:#334155;">-</span>';
         return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
           <td style="padding:7px 10px;color:#E2E8F0;font-weight:500;">${esc(r.institution_name)}</td>
           <td style="padding:7px 10px;">${opicBadge}</td>
           <td style="padding:7px 10px;">${toeicBadge}</td>
-          <td style="padding:7px 10px;color:#64748B;font-size:11px;" class="hidden md:table-cell">${esc(p.certs || '-')}</td>
+          <td style="padding:7px 10px;color:#64748B;font-size:11px;" class="hidden md:table-cell">${esc(r.certificates || '-')}</td>
         </tr>`;
       }).join('');
 
