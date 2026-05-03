@@ -209,6 +209,8 @@
       <button onclick="switchTab('cnews')"    id="tab-cnews"    class="sb-item"><span class="sb-icon">🏢</span><span class="sb-label">기업소식</span></button>
       <button onclick="switchTab('shorts')"   id="tab-shorts"   class="sb-item"><span class="sb-icon">🎬</span><span class="sb-label">유튜브쇼츠</span></button>
       <button onclick="switchTab('calendar')" id="tab-calendar" class="sb-item"><span class="sb-icon">📅</span><span class="sb-label">채용달력</span></button>
+      <button onclick="switchTab('passdata')" id="tab-passdata" class="sb-item"><span class="sb-icon">🏆</span><span class="sb-label">합격데이터</span></button>
+      <button onclick="switchTab('passconvert')" id="tab-passconvert" class="sb-item"><span class="sb-icon">🔄</span><span class="sb-label">합격데이터 변환</span></button>
 
       <div class="sb-section-label">자동화</div>
       <button onclick="switchTab('cardnews')" id="tab-cardnews" class="sb-item"><span class="sb-icon">📰</span><span class="sb-label">카드뉴스제작</span></button>
@@ -989,6 +991,45 @@
         </div>
       </div>
 
+      <!-- ── 합격데이터 수정 모달 ── -->
+      <div id="ps-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:200;padding:16px;">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+          <div class="flex items-center justify-between px-6 py-4 border-b">
+            <h2 class="font-bold text-lg text-slate-800">합격데이터 수정</h2>
+            <button onclick="closePsModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+          </div>
+          <div class="px-6 py-5 space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">공공기관명 *</label>
+              <input id="ps-edit-institution" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">토익점수</label>
+              <input id="ps-edit-toeic" type="number" min="0" max="990" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div class="flex items-center gap-3">
+              <label class="block text-xs font-semibold text-slate-500">지텔프 반영여부</label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="ps-edit-gtelp" type="checkbox" class="w-4 h-4 accent-blue-600"/>
+                <span class="text-sm text-slate-600">반영</span>
+              </label>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">지텔프 기준점수 <span class="text-slate-400 font-normal">(Level 2)</span></label>
+              <input id="ps-edit-gtelp-score" type="number" min="0" max="100" placeholder="예) 65" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">비고</label>
+              <input id="ps-edit-notes" type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t flex justify-end gap-2">
+            <button onclick="closePsModal()" class="btn btn-secondary">취소</button>
+            <button onclick="savePsEdit()" class="btn btn-primary">저장</button>
+          </div>
+        </div>
+      </div>
+
       <!-- ── 유튜브 쇼츠 탭 ── -->
       <div id="section-shorts" class="hidden">
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
@@ -1462,6 +1503,39 @@
             </div>
           </div>
 
+          <!-- foreign-jobs.html 해외유학생채용 방문 분석 -->
+          <div class="bg-white rounded-xl shadow-sm p-5 mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <h3 class="font-semibold text-slate-600 text-sm">🌐 해외유학생 채용 (foreign-jobs) — 방문 분석
+                <span id="fj-total-badge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600"></span>
+              </h3>
+            </div>
+            <div class="grid grid-cols-3 gap-3 mb-4">
+              <div class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
+                <div class="text-xl font-black text-blue-600" id="fj-k-total">—</div>
+                <div class="text-xs text-slate-400 mt-1">누적 방문</div>
+              </div>
+              <div class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
+                <div class="text-xl font-black text-emerald-600" id="fj-k-today">—</div>
+                <div class="text-xs text-slate-400 mt-1">오늘 방문</div>
+              </div>
+              <div class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
+                <div class="text-xl font-black text-purple-600" id="fj-k-week">—</div>
+                <div class="text-xs text-slate-400 mt-1">이번주 방문</div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <div class="text-xs font-semibold text-slate-500 mb-2">📈 일별 방문 추이 (최근 14일)</div>
+                <div style="position:relative;height:160px;"><canvas id="fj-trend-chart"></canvas></div>
+              </div>
+              <div>
+                <div class="text-xs font-semibold text-slate-500 mb-2">🔀 유입 경로 분석</div>
+                <div id="fj-ref-table" class="text-xs text-slate-400">불러오는 중…</div>
+              </div>
+            </div>
+          </div>
+
           <!-- 페이지별 접속 현황 -->
           <div class="bg-white rounded-xl shadow-sm p-5">
             <div class="flex items-center justify-between mb-3">
@@ -1671,6 +1745,31 @@
             <div class="trk-card">
               <div class="trk-card-title">📅 요일별 방문 (Fvisajobs 전용)</div>
               <div style="position:relative;height:150px;"><canvas id="fvj-trk-day-chart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑧ foreign-jobs.html 전용 분석 -->
+        <div class="trk-sec">
+          <div class="trk-sec-head"><div class="trk-sec-bar" style="background:#2563EB;"></div><div class="trk-sec-title">⑧ 해외유학생 채용 (foreign-jobs) 전용 분석</div><div class="trk-sec-hint">유입 경로 · 일별 추이</div></div>
+          <div class="trk-grid2">
+            <div class="trk-card">
+              <div class="trk-card-title">📈 일별 방문 추이 (최근 14일)</div>
+              <div style="position:relative;height:160px;"><canvas id="fj-trk-trend-chart"></canvas></div>
+            </div>
+            <div class="trk-card">
+              <div class="trk-card-title">🔀 어디서 foreign-jobs로 왔는가</div>
+              <div id="fj-trk-ref-table"><div class="trk-loading"><div class="trk-spin"></div> 집계 중…</div></div>
+            </div>
+          </div>
+          <div class="trk-grid2" style="margin-top:14px;">
+            <div class="trk-card">
+              <div class="trk-card-title">🕐 시간대별 방문 (foreign-jobs 전용)</div>
+              <div style="position:relative;height:150px;"><canvas id="fj-trk-hour-chart"></canvas></div>
+            </div>
+            <div class="trk-card">
+              <div class="trk-card-title">📅 요일별 방문 (foreign-jobs 전용)</div>
+              <div style="position:relative;height:150px;"><canvas id="fj-trk-day-chart"></canvas></div>
             </div>
           </div>
         </div>
@@ -2579,6 +2678,119 @@
 
       </div>
 
+      <!-- ── 합격데이터 탭 ── -->
+      <div id="section-passdata" class="hidden">
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 class="font-bold text-slate-700 mb-4">합격통계 데이터 등록</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">공공기관명 *</label>
+              <input id="ps-institution" type="text" placeholder="예) 한국수자원공사" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">토익점수</label>
+              <input id="ps-toeic" type="number" placeholder="예) 800" min="0" max="990" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <div class="flex items-center gap-3">
+              <label class="block text-xs font-semibold text-slate-500">지텔프 반영여부</label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="ps-gtelp" type="checkbox" class="w-4 h-4 accent-blue-600"/>
+                <span class="text-sm text-slate-600">반영</span>
+              </label>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">지텔프 기준점수 <span class="text-slate-400 font-normal">(Level 2 점수)</span></label>
+              <input id="ps-gtelp-score" type="number" placeholder="예) 65" min="0" max="100" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">비고</label>
+              <input id="ps-notes" type="text" placeholder="추가 정보 입력" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"/>
+            </div>
+          </div>
+          <button onclick="addPassEntry()" class="btn btn-primary">+ 등록하기</button>
+          <p id="ps-msg" class="hidden text-sm text-green-600 mt-2 font-semibold">✓ 등록되었습니다.</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm mb-4 p-4 flex gap-2 items-center">
+          <input id="ps-search" type="text" placeholder="기관명 검색..." onkeyup="renderPassData()" class="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 w-64"/>
+          <button onclick="loadPassData()" class="btn btn-secondary text-sm px-4 py-2">새로고침</button>
+          <span id="ps-total" class="text-xs text-slate-400 ml-2"></span>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm table-wrap">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-slate-400 text-xs border-b">
+                <th class="px-4 py-3 font-semibold">공공기관명</th>
+                <th class="px-4 py-3 font-semibold">토익점수</th>
+                <th class="px-4 py-3 font-semibold">지텔프</th>
+                <th class="px-4 py-3 font-semibold">지텔프 기준</th>
+                <th class="px-4 py-3 font-semibold">비고</th>
+                <th class="px-4 py-3 font-semibold">등록일</th>
+                <th class="px-4 py-3 font-semibold">수정</th>
+                <th class="px-4 py-3 font-semibold">삭제</th>
+              </tr>
+            </thead>
+            <tbody id="ps-body">
+              <tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">불러오는 중...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p id="ps-empty-msg" class="hidden text-center text-slate-400 text-sm mt-6">등록된 데이터가 없습니다.</p>
+      </div>
+
+      <!-- ── 합격데이터 변환 탭 ── -->
+      <div id="section-passconvert" class="hidden">
+        <!-- 텍스트 입력 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-4">
+          <h3 class="font-bold text-slate-700 mb-1">📋 합격후기 텍스트 붙여넣기</h3>
+          <p class="text-xs text-slate-400 mb-3">공취사 등에서 복사한 텍스트를 붙여넣으면 기관명·토익점수·연도를 자동 추출합니다.</p>
+          <textarea id="pc-input" rows="12" placeholder="여러 합격후기를 한꺼번에 붙여넣어도 됩니다. [출처] 줄이 포함된 공취사 형식이면 자동 분리됩니다." class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 font-mono resize-y"></textarea>
+          <div class="flex gap-2 mt-3 items-center">
+            <button onclick="analyzePassText()" id="pc-analyze-btn" class="btn btn-primary">🔍 분석하기</button>
+            <button onclick="document.getElementById('pc-input').value='';document.getElementById('pc-result-wrap').classList.add('hidden');" class="btn btn-secondary text-sm">지우기</button>
+            <span id="pc-analyze-status" class="text-xs text-slate-500 ml-2"></span>
+          </div>
+        </div>
+
+        <!-- 분석 결과 -->
+        <div id="pc-result-wrap" class="hidden">
+          <div class="bg-white rounded-xl shadow-sm p-6 mb-4">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-slate-700">📊 분석 결과 <span id="pc-result-count" class="text-sm font-normal text-slate-400"></span></h3>
+              <div class="flex gap-2">
+                <button onclick="pcSelectAll(true)" class="btn btn-secondary text-xs px-3 py-1">전체 선택</button>
+                <button onclick="pcSelectAll(false)" class="btn btn-secondary text-xs px-3 py-1">전체 해제</button>
+                <button onclick="uploadPassConvert()" class="btn btn-primary text-sm px-4 py-2">✅ 선택항목 업로드</button>
+              </div>
+            </div>
+            <p class="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2 mb-4">⚠️ 업로드 전 내용을 반드시 검토하세요. 기존 기관은 pass_score가 업데이트되고, 신규 기관은 추가됩니다.</p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left text-slate-400 text-xs border-b">
+                    <th class="px-3 py-2 font-semibold">선택</th>
+                    <th class="px-3 py-2 font-semibold">기관명</th>
+                    <th class="px-3 py-2 font-semibold">합격자 최소점수</th>
+                    <th class="px-3 py-2 font-semibold">합격자 평균점수</th>
+                    <th class="px-3 py-2 font-semibold">연도</th>
+                    <th class="px-3 py-2 font-semibold">처리</th>
+                    <th class="px-3 py-2 font-semibold">비고</th>
+                  </tr>
+                </thead>
+                <tbody id="pc-result-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="pc-upload-result" class="hidden bg-white rounded-xl shadow-sm p-6">
+            <h3 class="font-bold text-slate-700 mb-3">업로드 결과</h3>
+            <div id="pc-upload-log" class="text-sm font-mono space-y-1"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- ══════ 카드뉴스제작 ══════ -->
       <div id="section-cardnews" class="hidden" style="flex:1;overflow:hidden;">
         <style>
@@ -2984,11 +3196,11 @@
       consult:'신청 관리', student:'학생접수', ibt:'IBT신청접수', news:'대학소식', programs:'대학활동',
       jobs:'채용공고', foreignjobs:'외국인채용공고', staffjobs:'직원채용공고', cnews:'기업소식', shorts:'유튜브쇼츠', stats:'통계',
       tracking:'추적', analysis1:'분석 1', analysis2:'분석 2', blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고', crawler:'대학활동 수집', alio:'채용AI DATA',
-      comments:'댓글 관리', cardnews:'카드뉴스 제작'
+      comments:'댓글 관리', cardnews:'카드뉴스 제작', passdata:'합격데이터', passconvert:'합격데이터 변환'
     };
 
     function switchTab(tab) {
-      ['consult', 'student', 'ibt', 'news', 'programs', 'jobs', 'foreignjobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'tracking', 'analysis1', 'analysis2', 'blog', 'calendar', 'popupads', 'crawler', 'alio', 'comments', 'cardnews'].forEach(t => {
+      ['consult', 'student', 'ibt', 'news', 'programs', 'jobs', 'foreignjobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'tracking', 'analysis1', 'analysis2', 'blog', 'calendar', 'popupads', 'crawler', 'alio', 'comments', 'cardnews', 'passdata', 'passconvert'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (btn) { if (t === tab) btn.classList.add('active'); else btn.classList.remove('active'); }
@@ -3015,6 +3227,7 @@
       if (tab === 'analysis2') { an2Loaded = false; an2Init(); }
       if (tab === 'blog')     loadBlogDrafts();
       if (tab === 'calendar') loadCalendarAdmin();
+      if (tab === 'passdata') loadPassData();
       if (tab === 'popupads') loadPopupAds();
       if (tab === 'crawler') { loadUnivSites(); restoreDetectResults(); }
       if (tab === 'cardnews') cnInit();
@@ -4521,6 +4734,9 @@
       // ── Fvisajobs 방문 분석 ──
       loadFvisajobsStats();
 
+      // ── foreign-jobs.html 방문 분석 ──
+      loadForeignJobsStats();
+
       // ── 인사이트 분석 ──
       generateInsights({ rows, dailyCounts, dailyLabels, pageMap, totalCount, todayCount, yesterdayCount, monthCount, kstNow });
 
@@ -4874,6 +5090,124 @@
           type: 'bar',
           data: { labels:['일','월','화','수','목','금','토'], datasets:[{data:dayArr,backgroundColor:'rgba(14,165,233,.7)',borderRadius:3,borderSkipped:false}] },
           options:{plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{color:'#F1F5F9'},ticks:{font:{size:10},color:'#94A3B8',stepSize:1},beginAtZero:true}},maintainAspectRatio:false}
+        });
+      }
+    }
+
+    // ─── foreign-jobs.html 방문 분석 ───
+    let _fjAllRows = [];
+    let _fjCharts = {};
+
+    async function loadForeignJobsStats() {
+      const now = new Date();
+      const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+      const today = kstNow.toISOString().slice(0, 10);
+
+      const { data: allRows } = await db.from('page_views')
+        .select('visited_at, referrer')
+        .eq('page', 'foreign-jobs.html')
+        .order('visited_at', { ascending: false })
+        .limit(5000);
+      _fjAllRows = allRows || [];
+
+      const { count: fjTotal } = await db.from('page_views')
+        .select('*', { count: 'exact', head: true })
+        .eq('page', 'foreign-jobs.html');
+      document.getElementById('fj-total-badge').textContent = (fjTotal || 0).toLocaleString() + '건';
+      document.getElementById('fj-k-total').textContent = (fjTotal || 0).toLocaleString();
+
+      const fjToday = _fjAllRows.filter(r => {
+        const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
+        return kst.toISOString().slice(0,10) === today;
+      }).length;
+      document.getElementById('fj-k-today').textContent = fjToday.toLocaleString();
+
+      const monKst = new Date(kstNow);
+      monKst.setDate(kstNow.getDate() - ((kstNow.getDay() + 6) % 7));
+      const monStr = monKst.toISOString().slice(0,10);
+      const fjWeek = _fjAllRows.filter(r => {
+        const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
+        return kst.toISOString().slice(0,10) >= monStr;
+      }).length;
+      document.getElementById('fj-k-week').textContent = fjWeek.toLocaleString();
+
+      renderForeignJobsAnalytics();
+    }
+
+    function renderForeignJobsAnalytics() {
+      const now = new Date();
+      const kstNow = new Date(now.getTime() + 9*3600000);
+      const rows = _fjAllRows;
+
+      // 일별 추이 (최근 14일)
+      const days = [], dayCounts = [];
+      for (let i = 13; i >= 0; i--) {
+        const d = new Date(kstNow.getTime() - i*864e5);
+        days.push((d.getMonth()+1)+'/'+d.getDate());
+        const dk = d.toISOString().slice(0,10);
+        dayCounts.push(rows.filter(r => {
+          const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
+          return kst.toISOString().slice(0,10) === dk;
+        }).length);
+      }
+      ['fj-trend-chart','fj-trk-trend-chart'].forEach(id => {
+        const canvas = document.getElementById(id);
+        if (!canvas) return;
+        if (_fjCharts[id]) _fjCharts[id].destroy();
+        _fjCharts[id] = new Chart(canvas, {
+          type: 'line',
+          data: { labels: days, datasets: [{ data: dayCounts, borderColor:'#2563EB', backgroundColor:'rgba(37,99,235,0.1)', borderWidth:2, pointRadius:3, fill:true, tension:0.3 }] },
+          options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,ticks:{precision:0}}} }
+        });
+      });
+
+      // 유입 경로
+      const refMap = {};
+      rows.forEach(r => {
+        let ref = r.referrer || '직접접속';
+        try { const u = new URL(ref); ref = u.hostname.replace(/^www\./, ''); } catch(e) {}
+        if (ref === 'ibtcc.kr' || ref === location.hostname) ref = '내부이동';
+        refMap[ref] = (refMap[ref] || 0) + 1;
+      });
+      const sorted = Object.entries(refMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+      const total = rows.length || 1;
+      const refHtml = sorted.length
+        ? sorted.map(([k,v]) => `<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+            <span style="flex:1;font-size:.73rem;color:#334155;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${k}</span>
+            <span style="font-weight:700;font-size:.73rem;color:#1E3A5F;width:28px;text-align:right;">${v}</span>
+            <div style="width:55px;height:5px;background:#F1F5F9;border-radius:3px;overflow:hidden;flex-shrink:0;">
+              <div style="width:${Math.round(v/total*100)}%;height:100%;background:#2563EB;border-radius:3px;"></div>
+            </div>
+          </div>`).join('')
+        : '<div style="color:#CBD5E1;padding:10px 0;text-align:center;">데이터 없음</div>';
+      ['fj-ref-table','fj-trk-ref-table'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = refHtml;
+      });
+
+      // 시간대별
+      const hourArr = Array(24).fill(0);
+      rows.forEach(r => { const kst = new Date(new Date(r.visited_at).getTime()+9*3600000); hourArr[kst.getUTCHours()]++; });
+      const hourCanvas = document.getElementById('fj-trk-hour-chart');
+      if (hourCanvas) {
+        if (_fjCharts['fj-trk-hour-chart']) _fjCharts['fj-trk-hour-chart'].destroy();
+        _fjCharts['fj-trk-hour-chart'] = new Chart(hourCanvas, {
+          type:'bar',
+          data:{ labels:Array.from({length:24},(_,i)=>i+'시'), datasets:[{data:hourArr,backgroundColor:'rgba(37,99,235,.7)',borderRadius:3,borderSkipped:false}] },
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}}},y:{beginAtZero:true,ticks:{precision:0}}}}
+        });
+      }
+
+      // 요일별
+      const dayArr = Array(7).fill(0);
+      rows.forEach(r => { const kst = new Date(new Date(r.visited_at).getTime()+9*3600000); dayArr[kst.getUTCDay()]++; });
+      const dayCanvas = document.getElementById('fj-trk-day-chart');
+      if (dayCanvas) {
+        if (_fjCharts['fj-trk-day-chart']) _fjCharts['fj-trk-day-chart'].destroy();
+        _fjCharts['fj-trk-day-chart'] = new Chart(dayCanvas, {
+          type:'bar',
+          data:{ labels:['일','월','화','수','목','금','토'], datasets:[{data:dayArr,backgroundColor:dayArr.map((_,i)=>(i===0||i===6)?'rgba(248,113,113,.7)':'rgba(37,99,235,.7)'),borderRadius:3,borderSkipped:false}] },
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}
         });
       }
     }
@@ -7892,6 +8226,8 @@ ${d.hashtags}`;
       trkRows = (data || []).filter(r => r.page);
       document.getElementById('trk-status').textContent = `전체 ${(trkTotalCount||trkRows.length).toLocaleString()}건 (최신 ${trkRows.length.toLocaleString()}개 분석)`;
       trkRender(trkFilterRows(trkRows, trkPeriod));
+      // foreign-jobs 전용 차트 (데이터 로드 후 렌더)
+      if (_fjAllRows.length === 0) loadForeignJobsStats(); else renderForeignJobsAnalytics();
     }
 
     function trkClassifyRef(referrer) {
@@ -9130,6 +9466,353 @@ ${d.hashtags}`;
   const _origSwitchTab = window.switchTab;
   if (typeof switchTab === 'function') {
     // switchTab already defined above; cardnews display handled via class toggling
+  }
+
+  // ─── 합격데이터 ───
+  let psData = [];
+  let editingPsId = null;
+
+  async function loadPassData() {
+    const { data, error } = await db.from('pass_statistics')
+      .select('*').eq('is_deleted', false)
+      .order('institution_name', { ascending: true }).limit(9999);
+    if (error) { console.error('loadPassData error:', error); psData = []; renderPassData(); return; }
+    psData = data || [];
+    renderPassData();
+  }
+
+  function renderPassData() {
+    const keyword = (document.getElementById('ps-search')?.value || '').toLowerCase();
+    const tbody = document.getElementById('ps-body');
+    const empty = document.getElementById('ps-empty-msg');
+    const total = document.getElementById('ps-total');
+    const filtered = keyword ? psData.filter(r => (r.institution_name||'').toLowerCase().includes(keyword)) : psData;
+    if (total) total.textContent = `총 ${filtered.length}건`;
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">데이터가 없습니다.</td></tr>`;
+      empty.classList.add('hidden'); return;
+    }
+    empty.classList.add('hidden');
+    tbody.innerHTML = filtered.map(r => {
+      const d = r.created_at ? new Date(r.created_at).toLocaleDateString('ko-KR') : '-';
+      const gtelpBadge = r.gtelp_applicable
+        ? `<span class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-700">반영</span>`
+        : `<span class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-500">미반영</span>`;
+      const gtelpScoreCell = r.gtelp_score != null
+        ? `<span class="text-blue-600 font-semibold">${r.gtelp_score}점</span>`
+        : `<span class="text-slate-300">-</span>`;
+      return `<tr class="border-b last:border-0 hover:bg-slate-50">
+        <td class="px-4 py-3 font-medium text-slate-700">${esc(r.institution_name)}</td>
+        <td class="px-4 py-3 text-slate-700">${r.toeic_score != null ? r.toeic_score + '점' : '-'}</td>
+        <td class="px-4 py-3">${gtelpBadge}</td>
+        <td class="px-4 py-3 text-xs">${gtelpScoreCell}</td>
+        <td class="px-4 py-3 text-slate-500 text-xs">${esc(r.notes || '-')}</td>
+        <td class="px-4 py-3 text-slate-400 text-xs">${d}</td>
+        <td class="px-4 py-3"><button onclick="openPsEdit('${r.id}')" class="btn text-xs px-3 py-1.5 btn-secondary">수정</button></td>
+        <td class="px-4 py-3"><button onclick="deletePassEntry('${r.id}')" class="btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FFF5F5'">삭제</button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  async function addPassEntry() {
+    const institution = document.getElementById('ps-institution').value.trim();
+    const toeic = document.getElementById('ps-toeic').value;
+    const gtelp = document.getElementById('ps-gtelp').checked;
+    const gtelpScore = document.getElementById('ps-gtelp-score').value;
+    const notes = document.getElementById('ps-notes').value.trim();
+    if (!institution) { alert('공공기관명을 입력해주세요.'); return; }
+    const { error } = await db.from('pass_statistics').insert([{
+      institution_name: institution,
+      toeic_score: toeic ? parseInt(toeic) : null,
+      gtelp_applicable: gtelp,
+      gtelp_score: gtelpScore ? parseInt(gtelpScore) : null,
+      notes: notes || null,
+      is_deleted: false
+    }]);
+    if (error) { alert('등록 실패: ' + error.message); return; }
+    document.getElementById('ps-institution').value = '';
+    document.getElementById('ps-toeic').value = '';
+    document.getElementById('ps-gtelp').checked = false;
+    document.getElementById('ps-gtelp-score').value = '';
+    document.getElementById('ps-notes').value = '';
+    const msg = document.getElementById('ps-msg');
+    msg.classList.remove('hidden');
+    setTimeout(() => msg.classList.add('hidden'), 2000);
+    loadPassData();
+  }
+
+  async function deletePassEntry(id) {
+    if (!confirm('이 데이터를 삭제하시겠습니까?')) return;
+    const { error } = await db.from('pass_statistics').update({ is_deleted: true }).eq('id', id);
+    if (error) { alert('삭제 실패: ' + error.message); return; }
+    loadPassData();
+  }
+
+  function openPsEdit(id) {
+    const r = psData.find(p => String(p.id) === String(id));
+    if (!r) return;
+    editingPsId = id;
+    document.getElementById('ps-edit-institution').value = r.institution_name;
+    document.getElementById('ps-edit-toeic').value = r.toeic_score ?? '';
+    document.getElementById('ps-edit-gtelp').checked = r.gtelp_applicable || false;
+    document.getElementById('ps-edit-gtelp-score').value = r.gtelp_score ?? '';
+    document.getElementById('ps-edit-notes').value = r.notes || '';
+    const modal = document.getElementById('ps-modal');
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+  }
+
+  function closePsModal() {
+    const modal = document.getElementById('ps-modal');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+    editingPsId = null;
+  }
+
+  async function savePsEdit() {
+    const institution = document.getElementById('ps-edit-institution').value.trim();
+    const toeic = document.getElementById('ps-edit-toeic').value;
+    const gtelp = document.getElementById('ps-edit-gtelp').checked;
+    const gtelpScore = document.getElementById('ps-edit-gtelp-score').value;
+    const notes = document.getElementById('ps-edit-notes').value.trim();
+    if (!institution) { alert('공공기관명을 입력해주세요.'); return; }
+    const { error } = await db.from('pass_statistics').update({
+      institution_name: institution,
+      toeic_score: toeic ? parseInt(toeic) : null,
+      gtelp_applicable: gtelp,
+      gtelp_score: gtelpScore ? parseInt(gtelpScore) : null,
+      notes: notes || null
+    }).eq('id', editingPsId);
+    if (error) { alert('수정 실패: ' + error.message); return; }
+    closePsModal();
+    loadPassData();
+  }
+  </script>
+
+  <!-- ── 합격데이터 변환 JS ── -->
+  <script>
+  let pcResults = [];
+
+  // ── 규칙 기반 파서 ──
+  const PC_INSTITUTIONS = [
+    '건강보험심사평가원','국가철도공단','국민건강보험공단','국민연금공단',
+    '국민체육진흥공단','근로복지공단','대구공공시설관리공단','대한체육회',
+    '도로교통공단','서울교통공사','서울시설공단','소상공인시장진흥공단',
+    '인천국제공항공사','중소벤처기업진흥공단','코레일유통','코레일테크','코레일네트웍스',
+    '한전KPS','한전KDN','한전원자력연료',
+    '한국가스공사','한국가스기술공사','한국공항공사','한국관광공사',
+    '한국교통안전공단','한국국토정보공사','한국남동발전','한국남부발전',
+    '한국농수산식품유통공사','한국농어촌공사','한국도로공사','한국동서발전',
+    '한국마사회','한국무역보험공사','한국방송광고진흥공사','한국보훈복지의료공단',
+    '한국산업단지공단','한국산업인력공단','한국서부발전','한국석유공사',
+    '한국수력원자력','한국수자원공사','한국양성평등교육진흥원','한국자산관리공사',
+    '한국전기안전공사','한국전력공사','한국전력기술',
+    '한국조폐공사','한국지역난방공사','한국중부발전',
+    '한국철도공사','한국토지주택공사','한국폴리텍대학','한국환경공단',
+    '한국해양교통안전공단','해양환경공단','한국주택금융공사','한국동서발전',
+  ];
+  const PC_ALIAS = { '코레일':'한국철도공사', '한수원':'한국수력원자력', 'LH':'한국토지주택공사' };
+
+  function pcExtractInstitution(src, story) {
+    // [기관명] 패턴
+    const bracket = src.match(/^\[([^\]]+)\]/);
+    if (bracket && bracket[1] !== '출처') return bracket[1].trim();
+
+    // 알려진 기관명 목록 탐색 (긴 이름 우선)
+    const sorted = [...PC_INSTITUTIONS].sort((a,b) => b.length - a.length);
+    for (const name of sorted) {
+      if (src.includes(name)) return name;
+    }
+    // 별칭
+    for (const [alias, real] of Object.entries(PC_ALIAS)) {
+      if (src.includes(alias)) return real;
+    }
+    // 스토리 내 "기업명 : XXX" 패턴
+    const storyPatterns = [
+      /기업명\s*[:：]\s*([가-힣\w]+)/m,
+      /합격한\s*기업명\s*[:：]\s*([가-힣\w]+)/m,
+      /지원회사\s*[:：]\s*([가-힣\w]+)/m,
+      /▶\s*지원회사\s*[:：]\s*([가-힣\w]+)/m,
+    ];
+    for (const p of storyPatterns) {
+      const m = story.match(p);
+      if (m) return m[1].trim();
+    }
+    // "[연도] 기관명 합격후기" 패턴
+    const titleMatch = src.replace(/\(공취사[^)]*\)/, '').match(
+      /(?:20\d{2}년?\s*(?:상|하)반기\s+|정규직\s+임용.+?\s+)?([가-힣()]+(?:공사|공단|재단|원자력|발전|철도|교통|보험|연금|마사회|조폐|지역난방|자산관리|주택금융|폴리텍|환경공단))\s/
+    );
+    if (titleMatch) return titleMatch[1].replace(/\s*(기계직|사무직|전기직|토목직|사무영업|차량|건축|운전|행정직|기술직|발전전기|G\d기계직)$/, '').trim();
+    return null;
+  }
+
+  function pcExtractToeic(text) {
+    const lines = text.split('\n');
+    // 1순위: 어학/스펙 섹션 내 토익 패턴
+    for (const line of lines) {
+      if (/어학|스펙/.test(line)) {
+        const m = line.match(/토익\s*[:：]?\s*(\d{3})점?(?!\d)/);
+        if (m) { const s=parseInt(m[1]); if(s>=400&&s<=990) return s; }
+      }
+    }
+    // 2순위: "토익 XXX점" 패턴 (요구사항 맥락 제외)
+    for (const line of lines) {
+      if (/이상|요구|기준|충족|환산|필요|미만|커트라인|취득|이하/.test(line)) continue;
+      const m = line.match(/토익\s*[:：]?\s*(\d{3})점?(?!\d)/);
+      if (m) { const s=parseInt(m[1]); if(s>=400&&s<=990) return s; }
+      // "700점대" → 700
+      const dae = line.match(/토익\s+(\d{3})점대/);
+      if (dae) return parseInt(dae[1]);
+    }
+    return null;
+  }
+
+  function pcExtractYear(text) {
+    const m = text.match(/20(\d{2})년?/);
+    return m ? '20'+m[1] : null;
+  }
+
+  function runRuleParser(text) {
+    const map = {};
+    const lines = text.split('\n');
+    let story = [];
+
+    for (const line of lines) {
+      const t = line.trim();
+      if (t.startsWith('[출처]')) {
+        const src = t.replace('[출처]', '').replace(/\|\s*작성자.+/, '').trim();
+        const storyText = story.join('\n');
+        let institution = pcExtractInstitution(src, storyText);
+        if (institution && PC_ALIAS[institution]) institution = PC_ALIAS[institution];
+        if (institution) {
+          const score = pcExtractToeic(storyText);
+          const year  = pcExtractYear(src + ' ' + storyText.substring(0,300));
+          if (!map[institution]) map[institution] = { scores:[], year:null };
+          if (score !== null) map[institution].scores.push(score);
+          if (year && !map[institution].year) map[institution].year = year;
+        }
+        story = [];
+      } else {
+        story.push(line);
+      }
+    }
+    return Object.entries(map).map(([name, d]) => ({
+      institution_name: name,
+      pass_score_min: d.scores.length ? Math.min(...d.scores) : null,
+      pass_score_avg: d.scores.length ? Math.round(d.scores.reduce((a,b)=>a+b,0)/d.scores.length) : null,
+      pass_year: d.year,
+      notes: d.scores.length > 1 ? `${d.scores.length}명 데이터` : (d.scores.length === 0 ? '점수 미확인' : null)
+    }));
+  }
+
+  function analyzePassText() {
+    const text = document.getElementById('pc-input').value.trim();
+    if (!text) { alert('분석할 텍스트를 입력해주세요.'); return; }
+    const status = document.getElementById('pc-analyze-status');
+    try {
+      pcResults = runRuleParser(text);
+      if (pcResults.length === 0) {
+        status.textContent = '[출처] 줄이 포함된 공취사 형식 텍스트를 붙여넣어 주세요.';
+        status.style.color = '#dc2626';
+        return;
+      }
+      renderPcResults();
+      status.textContent = `✓ ${pcResults.length}개 기관 추출`;
+      status.style.color = '#16a34a';
+    } catch(e) {
+      status.textContent = '파싱 오류: ' + e.message;
+      status.style.color = '#dc2626';
+    }
+  }
+
+  async function renderPcResults() {
+    // 기존 DB 데이터와 비교
+    const { data: existing } = await db.from('pass_statistics').select('institution_name').eq('is_deleted', false);
+    const existingNames = new Set((existing || []).map(r => r.institution_name));
+
+    const tbody = document.getElementById('pc-result-body');
+    document.getElementById('pc-result-count').textContent = `${pcResults.length}개 추출`;
+    document.getElementById('pc-result-wrap').classList.remove('hidden');
+
+    tbody.innerHTML = pcResults.map((r, i) => {
+      const isNew = !existingNames.has(r.institution_name);
+      const badge = isNew
+        ? `<span style="background:#dcfce7;color:#16a34a;padding:1px 7px;border-radius:20px;font-size:11px;font-weight:600;">신규</span>`
+        : `<span style="background:#dbeafe;color:#2563eb;padding:1px 7px;border-radius:20px;font-size:11px;font-weight:600;">업데이트</span>`;
+      return `<tr class="border-b hover:bg-slate-50" id="pc-row-${i}">
+        <td class="px-3 py-2"><input type="checkbox" class="pc-chk w-4 h-4 accent-blue-600" data-idx="${i}" checked /></td>
+        <td class="px-3 py-2 font-medium text-slate-700">
+          <input type="text" value="${esc(r.institution_name)}" onchange="pcResults[${i}].institution_name=this.value" class="border border-transparent hover:border-slate-200 rounded px-1 py-0.5 text-sm w-full focus:outline-none focus:border-blue-400"/>
+        </td>
+        <td class="px-3 py-2">
+          <input type="number" value="${r.pass_score_min ?? ''}" placeholder="-" onchange="pcResults[${i}].pass_score_min=this.value?parseInt(this.value):null" class="border border-transparent hover:border-slate-200 rounded px-1 py-0.5 text-sm w-20 focus:outline-none focus:border-blue-400"/>
+        </td>
+        <td class="px-3 py-2">
+          <input type="number" value="${r.pass_score_avg ?? ''}" placeholder="-" onchange="pcResults[${i}].pass_score_avg=this.value?parseInt(this.value):null" class="border border-transparent hover:border-slate-200 rounded px-1 py-0.5 text-sm w-20 focus:outline-none focus:border-blue-400"/>
+        </td>
+        <td class="px-3 py-2">
+          <input type="text" value="${r.pass_year ?? ''}" placeholder="-" onchange="pcResults[${i}].pass_year=this.value||null" class="border border-transparent hover:border-slate-200 rounded px-1 py-0.5 text-sm w-16 focus:outline-none focus:border-blue-400"/>
+        </td>
+        <td class="px-3 py-2">${badge}</td>
+        <td class="px-3 py-2 text-slate-400 text-xs">${esc(r.notes || '')}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function pcSelectAll(val) {
+    document.querySelectorAll('.pc-chk').forEach(c => c.checked = val);
+  }
+
+  async function uploadPassConvert() {
+    const selected = [...document.querySelectorAll('.pc-chk:checked')].map(c => pcResults[parseInt(c.dataset.idx)]);
+    if (selected.length === 0) { alert('업로드할 항목을 선택하세요.'); return; }
+    if (!confirm(`${selected.length}개 항목을 Supabase에 업로드하시겠습니까?`)) return;
+
+    const logEl = document.getElementById('pc-upload-log');
+    document.getElementById('pc-upload-result').classList.remove('hidden');
+    logEl.innerHTML = '';
+
+    // 기존 기관 목록 조회
+    const { data: existing } = await db.from('pass_statistics').select('id,institution_name').eq('is_deleted', false);
+    const existingMap = Object.fromEntries((existing || []).map(r => [r.institution_name, r.id]));
+
+    let successCount = 0, failCount = 0;
+    for (const item of selected) {
+      const name = item.institution_name;
+      const payload = {
+        pass_score_min: item.pass_score_min ?? null,
+        pass_score_avg: item.pass_score_avg ?? null,
+        pass_year: item.pass_year ?? null
+      };
+      let error;
+      if (existingMap[name]) {
+        // 기존 기관: pass_score 업데이트
+        ({ error } = await db.from('pass_statistics').update(payload).eq('id', existingMap[name]));
+        if (!error) {
+          logEl.innerHTML += `<div style="color:#16a34a;">✓ [업데이트] ${esc(name)} — min:${payload.pass_score_min ?? '-'} avg:${payload.pass_score_avg ?? '-'} (${payload.pass_year ?? '-'})</div>`;
+          successCount++;
+        }
+      } else {
+        // 신규 기관: INSERT
+        ({ error } = await db.from('pass_statistics').insert([{
+          institution_name: name,
+          toeic_score: null,
+          is_deleted: false,
+          gtelp_applicable: false,
+          notes: item.notes || '공식 기준 미확인 (합격자 보유점수 기반)',
+          ...payload
+        }]));
+        if (!error) {
+          logEl.innerHTML += `<div style="color:#2563eb;">+ [신규추가] ${esc(name)} — min:${payload.pass_score_min ?? '-'} avg:${payload.pass_score_avg ?? '-'} (${payload.pass_year ?? '-'})</div>`;
+          successCount++;
+        }
+      }
+      if (error) {
+        logEl.innerHTML += `<div style="color:#dc2626;">✗ [실패] ${esc(name)} — ${error.message}</div>`;
+        failCount++;
+      }
+    }
+    logEl.innerHTML += `<div style="margin-top:8px;font-weight:600;color:#1e293b;">완료: 성공 ${successCount}건 / 실패 ${failCount}건</div>`;
   }
   </script>
 </body>
