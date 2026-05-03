@@ -122,10 +122,43 @@ def parse_board_rows(soup, base_url: str, selector: str = None) -> list[dict]:
 
     return results
 
+def _requests_get_safe(url: str, **kwargs):
+    """SSL 오류에 강한 requests.get: 인증서 오류 → verify=False, 핸드셰이크 실패 → 레거시 TLS 어댑터"""
+    import ssl, urllib3
+    from requests.adapters import HTTPAdapter
+    from urllib3.util.ssl_ import create_urllib3_context
+
+    try:
+        return requests.get(url, verify=True, **kwargs)
+    except requests.exceptions.SSLError as e:
+        err = str(e)
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+        # 핸드셰이크 실패 → 레거시 TLS 컨텍스트 (TLS 1.0~1.2 허용, 오래된 서버 호환)
+        ctx = create_urllib3_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        if 'HANDSHAKE_FAILURE' in err or 'handshake' in err.lower():
+            try:
+                ctx.set_ciphers('DEFAULT:@SECLEVEL=1')
+                ctx.minimum_version = ssl.TLSVersion.TLSv1
+            except Exception:
+                pass
+
+        class _LegacyTLSAdapter(HTTPAdapter):
+            def init_poolmanager(self, *args, **kw):
+                kw['ssl_context'] = ctx
+                super().init_poolmanager(*args, **kw)
+
+        s = requests.Session()
+        s.mount('https://', _LegacyTLSAdapter())
+        kw = {k: v for k, v in kwargs.items() if k != 'verify'}
+        return s.get(url, verify=False, **kw)
+
 def collect_static(url: str, selector: str = None) -> list[dict]:
-    """requests + BeautifulSoup으로 정적 페이지 수집"""
+    """requests + BeautifulSoup으로 정적 페이지 수집 (SSL 오류 자동 처리)"""
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-    res = requests.get(url, headers=headers, timeout=15)
+    res = _requests_get_safe(url, headers=headers, timeout=15)
     res.raise_for_status()
     res.encoding = res.apparent_encoding
     soup = BeautifulSoup(res.text, 'html.parser')
@@ -169,12 +202,11 @@ def collect_rss(url: str) -> list[dict]:
     return results
 
 def detect_rss_from_page(url: str) -> str | None:
-    """HTML 페이지에서 RSS 링크 자동 감지"""
+    """HTML 페이지에서 RSS 링크 자동 감지 (SSL 오류 자동 처리)"""
     try:
         headers = {'User-Agent': 'Mozilla/5.0'}
-        res = requests.get(url, headers=headers, timeout=10)
+        res = _requests_get_safe(url, headers=headers, timeout=10)
         soup = BeautifulSoup(res.text, 'html.parser')
-        # <link rel="alternate" type="application/rss+xml">
         tag = soup.find('link', type=lambda t: t and 'rss' in t.lower())
         if tag and tag.get('href'):
             return make_absolute(tag['href'], url)

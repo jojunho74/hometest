@@ -105,9 +105,10 @@ def detect_selector_for_site(site: dict) -> dict:
         except Exception:
             pass
 
-    # 2. HTML 페이지 로드
+    # 2. HTML 페이지 로드 (SSL 오류 자동 처리)
     try:
-        res = requests.get(url, headers=HEADERS, timeout=8)
+        from agent_collector import _requests_get_safe
+        res = _requests_get_safe(url, headers=HEADERS, timeout=8)
         res.encoding = res.apparent_encoding
         soup = BeautifulSoup(res.text, 'html.parser')
     except Exception as e:

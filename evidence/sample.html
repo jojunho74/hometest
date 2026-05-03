@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>내 점수로 지원 가능한 기관 확인하기 | IBT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <style>
+    :root {
+      --bg: #0B1A2E;
+      --card: #152440;
+      --card2: #1A2E50;
+      --border: rgba(255,255,255,0.08);
+      --text1: #E2E8F0;
+      --text2: #94A3B8;
+      --text3: #64748B;
+      --accent: #38BDF8;
+      --green: #4ADE80;
+      --red: #F87171;
+    }
+    body { background: var(--bg); font-family: 'Noto Sans KR', sans-serif; color: var(--text1); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; }
+    .btn-pill {
+      padding: 5px 14px; font-size: 12px; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--text2); background: var(--card2);
+      cursor: pointer; font-weight: 500; transition: all .15s;
+    }
+    .btn-pill:hover { background: #1E3A60; color: var(--text1); }
+    .btn-pill.active { background: #2563EB; color: #fff; border-color: #3B82F6; }
+    .badge-gtelp { display:inline-block; padding:2px 8px; font-size:11px; border-radius:999px; background:rgba(56,189,248,0.15); color:#38BDF8; font-weight:600; }
+    input[type=number] {
+      background: var(--card2); border: 1px solid var(--border); color: var(--text1);
+      border-radius: 10px; padding: 8px 14px; font-size: 14px; outline: none;
+      transition: border .15s;
+    }
+    input[type=number]:focus { border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+    input[type=number]::placeholder { color: var(--text3); }
+    #graph-container * { transition: none; }
+    @keyframes btnPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(252,211,77,0); opacity:1; }
+      50%      { box-shadow: 0 0 8px 2px rgba(252,211,77,0.35); opacity:0.75; }
+    }
+    @keyframes pulseGreen {
+      0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.5), 0 2px 8px rgba(0,0,0,0.3); }
+      50%      { box-shadow: 0 0 0 6px rgba(74,222,128,0.15), 0 2px 8px rgba(0,0,0,0.3); }
+    }
+    @keyframes pulseRed {
+      0%,100% { box-shadow: 0 0 0 0 rgba(248,113,113,0.5), 0 2px 8px rgba(0,0,0,0.3); }
+      50%      { box-shadow: 0 0 0 6px rgba(248,113,113,0.15), 0 2px 8px rgba(0,0,0,0.3); }
+    }
+    @keyframes pulseBig {
+      0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.6), 0 4px 16px rgba(74,222,128,0.2); }
+      50%      { box-shadow: 0 0 0 10px rgba(74,222,128,0.1), 0 4px 16px rgba(74,222,128,0.3); }
+    }
+    .bubble-q   { animation: pulseGreen 2.4s ease-in-out infinite; }
+    .bubble-nq  { animation: pulseRed   2.4s ease-in-out infinite; }
+    .bubble-big { animation: pulseBig   1.8s ease-in-out infinite; }
+    table { border-collapse: collapse; width: 100%; }
+    thead tr { background: var(--card2); }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    th { color: var(--text3); font-size: 11px; font-weight: 600; padding: 10px 20px; text-align: left; }
+    td { color: var(--text2); font-size: 13px; padding: 12px 20px; }
+
+    /* ── 헤더 ── */
+    header{position:sticky;top:0;z-index:50;background:rgba(10,22,40,.95);border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px);}
+    .hinner{max-width:1200px;margin:0 auto;padding:0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+    .hlogo{font-size:1rem;font-weight:800;color:#60A5FA;text-decoration:none;letter-spacing:-.01em;}
+    .hnav{display:none;align-items:center;gap:2px;font-size:.78rem;font-weight:600;}
+    .hnav a{color:rgba(255,255,255,.55);text-decoration:none;transition:background .18s,color .18s;padding:5px 10px;border-radius:8px;}
+    .hnav a:hover{background:rgba(255,255,255,.07);color:#fff;}
+    .hbtn{display:none;padding:8px 18px;border-radius:8px;font-size:.8rem;font-weight:700;background:linear-gradient(135deg,#1D4ED8,#2563EB);color:#fff;text-decoration:none;transition:opacity .15s;}
+    .hamburger{display:flex;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:7px;border-radius:8px;}
+    .hamburger span{display:block;height:2px;background:#fff;border-radius:2px;transition:transform .25s,opacity .25s;}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+    .mobile-menu{display:none;flex-direction:column;background:#0D1F3C;border-top:1px solid rgba(255,255,255,.08);padding:12px 16px 16px;}
+    .mobile-menu a{padding:12px 4px;font-size:.9rem;font-weight:600;color:rgba(255,255,255,.7);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.06);}
+    .mobile-menu a:last-child{border-bottom:none;}
+    .mobile-menu a:hover{color:#60A5FA;}
+    .mobile-menu .mbtn{margin-top:12px;display:block;text-align:center;padding:12px;border-radius:8px;background:linear-gradient(135deg,#1D4ED8,#2563EB);color:#fff;font-weight:700;text-decoration:none;}
+    .mobile-menu.open{display:flex;}
+
+    /* ── 퀵 네비게이션 배너 ── */
+    .qnav-banner{position:relative;display:flex;align-items:center;background:linear-gradient(135deg,#0D1F3C 0%,#1a3a6b 40%,#0f2d55 70%,#0A1628 100%);overflow:hidden;flex-shrink:0;}
+    .qnav-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,180,180,.08) 0%,rgba(96,165,250,.05) 100%);pointer-events:none;}
+    .qnav-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;flex-wrap:wrap;}
+    .qnav-btn{display:inline-flex;align-items:center;padding:5px 13px;border-radius:999px;font-size:.72rem;font-weight:700;text-decoration:none;border:none;color:#fff;transition:all .2s;white-space:nowrap;letter-spacing:.01em;}
+    .qnav-btn:nth-child(1){background:linear-gradient(135deg,#0891b2,#06b6d4);}
+    .qnav-btn:nth-child(2){background:linear-gradient(135deg,#7C3AED,#A78BFA);}
+    .qnav-btn:nth-child(3){background:linear-gradient(135deg,#059669,#34D399);}
+    .qnav-btn:nth-child(4){background:linear-gradient(135deg,#D97706,#FBBF24);}
+    .qnav-btn:nth-child(5){background:linear-gradient(90deg,#92400e,#f59e0b,#fde68a,#f59e0b,#92400e);background-size:300% 100%;animation:scoreShimmer 2s linear infinite;box-shadow:0 0 16px rgba(251,191,36,.6);}
+    .qnav-btn:nth-child(6){background:linear-gradient(135deg,#0F766E,#14B8A6);}
+    @keyframes scoreShimmer{0%{background-position:100% center}100%{background-position:-100% center}}
+    .qnav-btn:hover{filter:brightness(1.25)!important;transform:translateY(-3px)!important;box-shadow:0 10px 28px rgba(0,0,0,.4)!important;}
+    @media(max-width:768px){
+      .qnav-inner{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;justify-content:flex-start;gap:5px;padding:8px 10px;scrollbar-width:none;}
+      .qnav-inner::-webkit-scrollbar{display:none;}
+      .qnav-btn{font-size:.62rem;padding:4px 10px;}
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="hinner">
+    <a href="../index.html" class="hlogo">IBT C&amp;C</a>
+    <nav class="hnav">
+      <a href="../index.html#about">서비스 소개</a>
+      <a href="../package.html">패키지</a>
+      <a href="../schedule.html">정기시험 일정</a>
+      <a href="../university-board.html">대학활동</a>
+      <a href="../library-pdf.html">채용공고 자료실</a>
+      <a href="../job-board.html">게시판</a>
+      <a href="../gtelp-score.html">점수대비표</a>
+      <a href="../competition.html">경쟁률</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <a href="../index.html#consultation-form" class="hbtn">대학IBT무료신청</a>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="메뉴">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="../index.html#about">서비스 소개</a>
+    <a href="../package.html">패키지</a>
+    <a href="../schedule.html">정기시험 일정</a>
+    <a href="../university-board.html">대학활동</a>
+    <a href="../library-pdf.html">채용공고 자료실</a>
+    <a href="../job-board.html">게시판</a>
+    <a href="../gtelp-score.html">점수대비표</a>
+    <a href="../competition.html">경쟁률</a>
+    <a href="../Fvisajobs/index.html">해외취업공고</a>
+    <a href="../index.html#consultation-form" class="mbtn">대학IBT무료신청</a>
+  </div>
+</header>
+
+<!-- 퀵 네비게이션 배너 -->
+<div class="qnav-banner">
+  <div class="qnav-overlay"></div>
+  <div class="qnav-inner">
+    <a href="https://ibtcc.kr/student.html"         class="qnav-btn">학생용</a>
+    <a href="https://ibtcc.kr/package.html"          class="qnav-btn">대학 및 관계자용</a>
+    <a href="https://ibtcc.kr/library-pdf.html"      class="qnav-btn">채용공고 자료실</a>
+    <a href="https://ibtcc.kr/university-board.html" class="qnav-btn">대학소식</a>
+    <a href="https://ibtcc.kr/gtelp-score.html"      class="qnav-btn">TOEIC·GTELP 점수대비표</a>
+    <a href="../competition.html"                     class="qnav-btn">경쟁률</a>
+    <a href="https://ibtcc.kr/Fvisajobs/index.html"  class="qnav-btn">해외취업</a>
+  </div>
+</div>
+
+  <div class="max-w-4xl mx-auto px-4 py-8">
+
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 style="font-size:22px;font-weight:700;color:#E2E8F0;margin:0 0 4px;">내 점수로 지원 가능한 기관 확인하기</h1>
+      <p style="font-size:13px;color:#fff;margin-top:4px;">공인어학점수(토*)를 입력하면 공공기관별 합격 가능성을 분석합니다.</p>
+      <div style="font-size:11px;color:#fff;margin-top:8px;line-height:1.9;opacity:0.7;">
+        ※ 점수 기준은 공개 채용 기준 또는 일반적인 커트라인 기반 추정값입니다.<br>
+        ※ 지텔프 표시는 해당 기관에서 대체 영어시험 활용 가능 여부입니다.<br>
+        ※ 실제 채용공고별 기준은 변동될 수 있습니다.
+      </div>
+      <div style="margin-top:10px;">
+        <span onclick="openNotice()" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#FCD34D;cursor:pointer;animation:btnPulse 1.4s ease-in-out infinite;padding:6px 14px;border:1px solid rgba(252,211,77,0.4);border-radius:8px;background:rgba(252,211,77,0.08);">
+          ⚠ 이용 전 주의사항을 먼저 읽어주세요.
+        </span>
+      </div>
+    </div>
+
+    <!-- 주의사항 모달 -->
+    <div id="notice-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);overflow-y:auto;padding:24px 16px;">
+      <div style="max-width:600px;margin:0 auto;background:#152440;border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;">
+        <!-- 모달 헤더 -->
+        <div style="padding:20px 24px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px;">
+          <span style="font-size:18px;">⚠</span>
+          <h2 style="font-size:16px;font-weight:700;color:#E2E8F0;margin:0;">주의사항</h2>
+        </div>
+        <!-- 모달 본문 -->
+        <div style="padding:20px 24px;max-height:60vh;overflow-y:auto;font-size:13px;color:#94A3B8;line-height:1.85;">
+          <div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:14px 16px;">
+            <p style="margin:0 0 6px;font-weight:700;color:#F87171;font-size:12px;">⚠ 주의사항</p>
+            <p style="margin:0;font-size:12px;color:#94A3B8;">지금 제공된 정보는 <strong style="color:#CBD5E1;">참고용</strong>이며, 공공기관별로 어학 성적 반영 기준은 매 채용마다 달라질 수 있습니다. 따라서 반드시 지원하려는 해당 기관의 <strong style="color:#CBD5E1;">최신 채용 공고</strong>를 통해 어학 성적 반영 기준을 직접 확인하시기 바랍니다.</p>
+          </div>
+        </div>
+        <!-- 체크박스 + 확인 버튼 -->
+        <div style="padding:16px 24px 20px;border-top:1px solid rgba(255,255,255,0.08);">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:14px;">
+            <input type="checkbox" id="notice-checkbox" onchange="updateConfirmBtn()"
+              style="width:16px;height:16px;accent-color:#2563EB;cursor:pointer;flex-shrink:0;">
+            <span style="font-size:13px;color:#CBD5E1;">위 내용을 모두 읽었으며, 참고용 정보임을 확인하였습니다.</span>
+          </label>
+          <button id="notice-confirm-btn" onclick="confirmNotice()" disabled
+            style="width:100%;padding:11px;font-size:14px;font-weight:600;border-radius:10px;border:none;cursor:not-allowed;background:#1E3A60;color:#475569;transition:all .2s;">
+            확인
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- G-TELP 4주 플랜 모달 -->
+    <div id="gtelp-plan-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);overflow-y:auto;padding:24px 16px;">
+      <div style="max-width:640px;margin:0 auto;background:#152440;border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;">
+        <!-- 헤더 -->
+        <div style="padding:22px 24px 16px;border-bottom:1px solid rgba(255,255,255,0.08);">
+          <div style="font-size:20px;font-weight:800;color:#FCD34D;letter-spacing:-.3px;margin-bottom:6px;animation:btnPulse 1.6s ease-in-out infinite;">G-TELP 4주 완성 플랜</div>
+          <p style="font-size:15px;font-weight:600;color:#FCD34D;margin:0 0 8px;animation:btnPulse 1.6s ease-in-out infinite;animation-delay:.3s;">목표점수 달성을 위한 4주(28일) 단계별 학습 전략을 전달해 드립니다.</p>
+          <p style="font-size:13px;font-weight:600;color:#FCD34D;margin:0;animation:btnPulse 1.6s ease-in-out infinite;animation-delay:.6s;">이 분석에서 목표 기관을 확인하셨다면 필요한 G-TELP 점수에 맞는 전략을 선택하세요.</p>
+        </div>
+        <!-- 본문 -->
+        <div style="padding:20px 24px;max-height:65vh;overflow-y:auto;">
+          <!-- 4주 카드 그리드 -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+            <!-- W1 -->
+            <div style="background:linear-gradient(135deg,rgba(56,189,248,0.18) 0%,rgba(56,189,248,0.06) 100%);border:1px solid rgba(56,189,248,0.45);border-radius:12px;padding:14px;position:relative;">
+              <div style="position:absolute;top:10px;right:12px;font-size:22px;font-weight:900;color:rgba(56,189,248,0.15);line-height:1;">1</div>
+              <div style="font-size:12px;font-weight:800;color:#38BDF8;margin-bottom:8px;">W1 문법 정형</div>
+              <ul style="list-style:none;padding:0;margin:0;font-size:12px;color:#CBD5E1;line-height:2;">
+                <li>문법 관련 시간 파악</li><li>출제 유형 공식 익히기</li>
+                <li>시제 / 법 파마 만습</li><li>복복: 15분 내 풀이</li>
+              </ul>
+            </div>
+            <!-- W2 -->
+            <div style="background:linear-gradient(135deg,rgba(167,139,250,0.22) 0%,rgba(167,139,250,0.08) 100%);border:1px solid rgba(167,139,250,0.5);border-radius:12px;padding:14px;position:relative;">
+              <div style="position:absolute;top:10px;right:12px;font-size:22px;font-weight:900;color:rgba(167,139,250,0.18);line-height:1;">2</div>
+              <div style="font-size:12px;font-weight:800;color:#A78BFA;margin-bottom:8px;">W2 단어 + 독해</div>
+              <ul style="list-style:none;padding:0;margin:0;font-size:12px;color:#CBD5E1;line-height:2;">
+                <li>보카 1회독</li><li>독해 패턴 학습</li>
+                <li>풀이 순서 전략 (4→1→2→3)</li>
+              </ul>
+            </div>
+            <!-- W3 -->
+            <div style="background:linear-gradient(135deg,rgba(52,211,153,0.22) 0%,rgba(52,211,153,0.08) 100%);border:1px solid rgba(52,211,153,0.5);border-radius:12px;padding:14px;position:relative;">
+              <div style="position:absolute;top:10px;right:12px;font-size:22px;font-weight:900;color:rgba(52,211,153,0.18);line-height:1;">3</div>
+              <div style="font-size:12px;font-weight:800;color:#34D399;margin-bottom:8px;">W3 정리 + 실전</div>
+              <ul style="list-style:none;padding:0;margin:0;font-size:12px;color:#CBD5E1;line-height:2;">
+                <li>모의테마징 훈련</li><li>정 / 가치적 문제 집중</li>
+                <li>모의고사 만습</li>
+              </ul>
+            </div>
+            <!-- W4 -->
+            <div style="background:linear-gradient(135deg,rgba(252,211,77,0.22) 0%,rgba(252,211,77,0.08) 100%);border:1px solid rgba(252,211,77,0.5);border-radius:12px;padding:14px;position:relative;">
+              <div style="position:absolute;top:10px;right:12px;font-size:22px;font-weight:900;color:rgba(252,211,77,0.18);line-height:1;">4</div>
+              <div style="font-size:12px;font-weight:800;color:#FCD34D;margin-bottom:8px;">W4 기술 반복</div>
+              <ul style="list-style:none;padding:0;margin:0;font-size:12px;color:#CBD5E1;line-height:2;">
+                <li>메인 표현고사</li><li>모임노트 정리</li>
+                <li>시험 전 1Day 총정리</li>
+              </ul>
+            </div>
+          </div>
+          <!-- 점수별 전략 표 -->
+          <div style="font-size:12px;font-weight:700;color:#E2E8F0;margin-bottom:8px;">점수별 전략</div>
+          <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
+            <thead><tr style="background:rgba(255,255,255,0.05);">
+              <th style="padding:8px 12px;font-size:11px;color:#64748B;font-weight:600;text-align:left;width:90px;">목표 점수</th>
+              <th style="padding:8px 12px;font-size:11px;color:#64748B;font-weight:600;text-align:left;">전략</th>
+            </tr></thead>
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                <td style="padding:9px 12px;font-size:13px;font-weight:700;color:#38BDF8;">43 ~ 50</td>
+                <td style="padding:9px 12px;font-size:12px;color:#94A3B8;">문법 집중</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                <td style="padding:9px 12px;font-size:13px;font-weight:700;color:#38BDF8;">65</td>
+                <td style="padding:9px 12px;font-size:12px;color:#94A3B8;">문법 + 독해</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                <td style="padding:9px 12px;font-size:13px;font-weight:700;color:#38BDF8;">75</td>
+                <td style="padding:9px 12px;font-size:12px;color:#94A3B8;">문법 안정 + 독해 집중</td>
+              </tr>
+              <tr>
+                <td style="padding:9px 12px;font-size:13px;font-weight:700;color:#38BDF8;">80 이상</td>
+                <td style="padding:9px 12px;font-size:12px;color:#94A3B8;">전 섹션 균형 학습</td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- 하단 팁 -->
+          <div style="background:rgba(252,211,77,0.06);border:1px solid rgba(252,211,77,0.2);border-radius:10px;padding:11px 14px;font-size:11px;color:#FCD34D;display:flex;flex-wrap:wrap;gap:6px;">
+            <span>OMR 마킹 시간 확보 필수</span><span style="color:rgba(252,211,77,0.3);">|</span>
+            <span>문법 15분 내 풀기 목표</span><span style="color:rgba(252,211,77,0.3);">|</span>
+            <span>단어 매일 누적</span>
+          </div>
+        </div>
+        <!-- 체크박스 + 결과보기 -->
+        <div style="padding:16px 24px 20px;border-top:1px solid rgba(255,255,255,0.08);">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:14px;">
+            <input type="checkbox" id="plan-checkbox" onchange="updatePlanBtn()"
+              style="width:16px;height:16px;accent-color:#2563EB;cursor:pointer;flex-shrink:0;">
+            <span style="font-size:13px;color:#CBD5E1;">위 전략을 확인하였으며, 결과를 확인하겠습니다.</span>
+          </label>
+          <button id="plan-confirm-btn" onclick="confirmPlan()" disabled
+            style="width:100%;padding:12px;font-size:14px;font-weight:700;border-radius:10px;border:none;cursor:not-allowed;background:#1E3A60;color:#475569;transition:all .2s;">
+            결과 보기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input card -->
+    <div class="card p-6 mb-4">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:16px;">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:600;color:#64748B;margin-bottom:6px;">공인어학점수(토*)</label>
+          <input id="toeic-input" type="number" placeholder="예) 750" min="0" max="990"
+            onkeydown="if(event.key==='Enter' && noticeConfirmed) analyze()" style="width:130px;"/>
+        </div>
+        <button id="analyze-btn" onclick="analyze()" disabled
+          style="padding:9px 24px;background:#1E3A60;color:#475569;font-size:13px;font-weight:600;border-radius:10px;border:none;cursor:not-allowed;transition:all .2s;">
+          분석하기
+        </button>
+        <button onclick="openNotice()"
+          style="padding:9px 14px;font-size:12px;font-weight:600;color:#FCD34D;background:rgba(252,211,77,0.1);border:1px solid rgba(252,211,77,0.4);border-radius:10px;cursor:pointer;transition:all .15s;white-space:nowrap;"
+          onmouseover="this.style.background='rgba(252,211,77,0.2)'" onmouseout="this.style.background='rgba(252,211,77,0.1)'">
+          ⚠ 주의사항
+        </button>
+      </div>
+      <div id="notice-hint" style="font-size:12px;color:#FCD34D;margin-top:2px;display:flex;align-items:center;gap:5px;">
+        <span style="font-size:13px;">👆</span> 주의사항을 먼저 클릭해주세요.
+      </div>
+      <div id="filter-row" class="flex flex-wrap gap-2 hidden">
+        <button id="btn-sort-diff"  onclick="setSortType('diff')"  class="btn-pill active">합격가능순</button>
+        <button id="btn-sort-score" onclick="setSortType('score')" class="btn-pill">점수순</button>
+        <button id="btn-gtelp"      onclick="toggleGtelp()"        class="btn-pill">지텔프만</button>
+      </div>
+      <div id="data-status" style="font-size:11px;color:#475569;margin-top:8px;"></div>
+    </div>
+
+    <!-- Graph card -->
+    <div id="graph-card" class="card p-6 mb-4 hidden">
+      <h3 style="font-size:11px;font-weight:600;color:#64748B;letter-spacing:.05em;text-transform:uppercase;margin-bottom:16px;">내 점수 기준 기관 분포</h3>
+      <div id="graph-container" style="position:relative;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:16px;min-height:160px;overflow:visible;"></div>
+    </div>
+
+    <!-- Result table card -->
+    <div id="result-card" class="card mb-4 hidden">
+      <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <h3 style="font-size:15px;font-weight:700;color:#E2E8F0;">분석 결과</h3>
+          <span id="result-count" style="font-size:12px;color:#64748B;"></span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="toggleNoScore(event)" id="noscore-toggle-btn" style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:#94A3B8;padding:8px 16px;border-radius:10px;border:1px solid var(--border);background:var(--card2);cursor:pointer;">
+            미반영기관 <span id="noscore-count-badge" style="background:rgba(255,255,255,0.12);border-radius:20px;padding:2px 8px;font-size:11px;"></span>
+            <span id="noscore-icon" style="display:inline-block;transition:transform 0.2s;">▼</span>
+          </button>
+          <button id="result-toggle-btn" onclick="toggleResultTable()" style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:#FCD34D;padding:8px 18px;border-radius:10px;border:1px solid rgba(252,211,77,0.45);background:rgba(252,211,77,0.1);cursor:pointer;animation:btnPulse 1.6s ease-in-out infinite;">
+            <span id="result-toggle-label">합격권 진입 점수대</span>
+            <span id="result-toggle-icon" style="display:inline-block;transition:transform 0.2s;">▼</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 미반영기관 리스트 -->
+      <div id="noscore-wrap" class="hidden" style="border-top:1px solid var(--border);padding:14px 20px;">
+        <p style="font-size:11px;color:#38BDF8;font-weight:600;margin-bottom:4px;">어학성적 미반영 또는 영어보다 직무/NCS 중요시</p>
+        <p style="font-size:11px;color:#64748B;margin-bottom:10px;">아래 기관은 채용 시 토익·지텔프 점수를 요구하지 않거나, 직무역량(NCS) 중심으로 선발합니다.</p>
+        <div id="noscore-list" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+      </div>
+
+      <div id="result-table-wrap" class="hidden" style="border-top:1px solid var(--border);overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>기관명</th><th>최저점수</th><th>차이</th><th style="color:#FCD34D;" title="합격자 실제 보유 점수 (공식 요구점수 아님)">합격자점수</th><th>지텔프</th><th class="hidden md:table-cell">비고</th></tr>
+          </thead>
+          <tbody id="result-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Summary text -->
+    <div id="summary-text" style="display:none;font-size:13px;color:#64748B;padding:12px 4px;line-height:2;"></div>
+
+
+  </div>
+
+  <script>
+    const { createClient } = supabase;
+    const db = createClient(
+      'https://byzulmxcuhsrjdphmuym.supabase.co',
+      'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
+    );
+
+    // 어학성적 미반영 또는 직무/NCS 중심 채용 기관 (하드코딩)
+    const NO_SCORE_INSTITUTIONS = [
+      '건강보험심사평가원', '게임물관리위원회',
+      '국립공원공단', '국립낙동강생물자원관', '국립재난안전연구원', '국립재활원',
+      '국립전파연구원', '국립중앙과학관', '국립직업능력개발원',
+      '국방기술진흥연구재단', '국방전직교육원', '국악방송',
+      '농림식품기술기획평가원', '녹색기술센터',
+      '대한체육회',
+      '새만금개발공사', '서민금융진흥원', '서울시립교향악단',
+      '소프트웨어정책연구소', '신용보증재단중앙회',
+      '아리랑국제방송', '연구개발특구진흥재단',
+      '우체국금융개발원', '우체국물류지원단', '유아정책연구소',
+      '자동차부품연구원', '정보통신산업진흥원', '중소벤처기업연구원', '창업진흥원',
+      '코레일유통', '코레일테크',
+      '한국건강증진개발원', '한국건축도시공간연구소',
+      '한국고용정보원', '한국과학기술정보연구원', '한국교통연구원',
+      '한국무역보험공사', '한국문화예술위원회',
+      '한국방송광고진흥공사', '한국법제연구원', '한국보훈복지의료공단',
+      '한국사학진흥재단', '한국산업단지공단', '한국세라믹기술원',
+      '한국소방산업기술원', '한국수목원관리원',
+      '한국식품연구원', '한국언론진흥재단', '한국예술인복지재단',
+      '한국의약품안전관리원', '한국장애인고용공단', '한국재정정보원',
+      '한국지방행정연구원', '한국지질자원연구원',
+      '한국직업능력개발원', '한국조세재정연구원', '한국조폐공사',
+      '한국체육산업개발원', '한국청소년정책연구원', '한국투자공사',
+      '해양환경공단',
+    ];
+
+    let noticeConfirmed = false;
+    let allData = [];
+    let sortType = 'diff';
+    let filterGtelp = false;
+    let userScore = 0;
+    let analyzed = false;
+    let lastResult = [];
+
+    function openNotice() {
+      document.getElementById('notice-modal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+    function updateConfirmBtn() {
+      const checked = document.getElementById('notice-checkbox').checked;
+      const btn = document.getElementById('notice-confirm-btn');
+      btn.disabled = !checked;
+      btn.style.background    = checked ? '#2563EB' : '#1E3A60';
+      btn.style.color         = checked ? '#fff'    : '#475569';
+      btn.style.cursor        = checked ? 'pointer' : 'not-allowed';
+    }
+    function confirmNotice() {
+      noticeConfirmed = true;
+      document.getElementById('notice-modal').style.display = 'none';
+      document.body.style.overflow = '';
+      const btn = document.getElementById('analyze-btn');
+      btn.disabled = false;
+      btn.style.background = '#2563EB';
+      btn.style.color      = '#fff';
+      btn.style.cursor     = 'pointer';
+      btn.onmouseover = () => btn.style.background = '#1D4ED8';
+      btn.onmouseout  = () => btn.style.background = '#2563EB';
+      const hint = document.getElementById('notice-hint');
+      if (hint) hint.style.display = 'none';
+    }
+
+    function esc(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    async function loadData() {
+      const status = document.getElementById('data-status');
+      status.textContent = '데이터 불러오는 중...';
+      const { data, error } = await db.from('pass_statistics')
+        .select('*').eq('is_deleted', false)
+        .order('institution_name', { ascending: true }).limit(9999);
+      if (error) { status.textContent = '데이터 로드 실패: ' + error.message; return false; }
+      allData = data || [];
+      status.textContent = allData.length > 0 ? `${allData.length}개 기관 데이터 로드 완료` : '등록된 기관 데이터가 없습니다. 관리자 페이지에서 데이터를 먼저 등록해주세요.';
+      return allData.length > 0;
+    }
+
+    async function analyze() {
+      if (!noticeConfirmed) { openNotice(); return; }
+      const val = document.getElementById('toeic-input').value;
+      userScore = parseInt(val);
+      if (!val || isNaN(userScore) || userScore < 0 || userScore > 990) {
+        alert('올바른 토익 점수를 입력해주세요 (0~990)');
+        return;
+      }
+      if (allData.length === 0) {
+        const ok = await loadData();
+        if (!ok) return;
+      }
+      analyzed = true;
+      renderResults();
+      spTrack('analyze:' + userScore);
+    }
+
+    function setSortType(type) {
+      sortType = type;
+      document.getElementById('btn-sort-diff').classList.toggle('active', type === 'diff');
+      document.getElementById('btn-sort-score').classList.toggle('active', type === 'score');
+      if (analyzed) renderResults();
+    }
+
+    function toggleGtelp() {
+      filterGtelp = !filterGtelp;
+      document.getElementById('btn-gtelp').classList.toggle('active', filterGtelp);
+      if (analyzed) renderResults();
+    }
+
+    function renderResults() {
+      let result = allData.map(item => ({
+        ...item,
+        diff: userScore - (item.toeic_score || 0)
+      }));
+
+      if (filterGtelp) result = result.filter(i => i.gtelp_applicable);
+
+      if (sortType === 'diff') {
+        result.sort((a, b) => {
+          const aHas = a.toeic_score != null, bHas = b.toeic_score != null;
+          if (aHas !== bHas) return aHas ? -1 : 1;
+          return b.diff - a.diff;
+        });
+      } else {
+        result.sort((a, b) => {
+          const aHas = a.toeic_score != null, bHas = b.toeic_score != null;
+          if (aHas !== bHas) return aHas ? -1 : 1;
+          return (a.toeic_score || 0) - (b.toeic_score || 0);
+        });
+      }
+
+      document.getElementById('filter-row').classList.remove('hidden');
+      document.getElementById('graph-card').classList.remove('hidden');
+      document.getElementById('result-card').classList.remove('hidden');
+
+      renderGraph(result);
+      renderTable(result);
+      renderNoScore();
+    }
+
+    function renderGraph(result) {
+      const container = document.getElementById('graph-container');
+      // ── 요약 집계 ──
+      const qualified    = result.filter(r => r.toeic_score != null && userScore >= r.toeic_score);
+      const notQualified = result.filter(r => r.toeic_score != null && userScore < r.toeic_score);
+      const noScore      = result.filter(r => r.toeic_score == null);
+      const nearMiss     = notQualified.filter(r => r.toeic_score - userScore <= 50);
+
+      // ── 요약 텍스트 (분석결과 아래) ──
+      const summaryText = document.getElementById('summary-text');
+      summaryText.style.display = 'block';
+      summaryText.innerHTML =
+        `<span style="color:#4ADE80;font-weight:600;">✓ 합격 가능 ${qualified.length}개 기관</span>` +
+        `&ensp;·&ensp;<span style="color:#F87171;font-weight:600;">✗ 점수 부족 ${notQualified.length}개 기관</span>` +
+        (nearMiss.length > 0 ? `&ensp;·&ensp;<span style="color:#FCD34D;font-weight:600;">⚡ 50점 이내 ${nearMiss.length}개 기관</span>` : '') +
+        (noScore.length > 0  ? `&ensp;·&ensp;<span style="color:#475569;">점수 미공개 ${noScore.length}개 기관</span>` : '');
+
+      // ── 좌표 점 그래프 ──
+      const allScored = result.filter(r => r.toeic_score != null);
+      if (allScored.length === 0) { container.innerHTML = ''; return; }
+
+      // 점수별 그룹핑
+      const scoreGroups = {};
+      allScored.forEach(r => {
+        if (!scoreGroups[r.toeic_score]) scoreGroups[r.toeic_score] = [];
+        scoreGroups[r.toeic_score].push(r);
+      });
+      const uniqueScores = Object.keys(scoreGroups).map(Number).sort((a, b) => a - b);
+      const displayMin = Math.min(...uniqueScores, userScore) - 40;
+      const displayMax = Math.max(...uniqueScores, userScore) + 40;
+      const displayRange = displayMax - displayMin;
+      const PL = 5, PR = 5;
+
+      const pct = s => PL + ((s - displayMin) / displayRange) * (100 - PL - PR);
+      const userPct = pct(userScore);
+
+      const maxCount = Math.max(...uniqueScores.map(s => scoreGroups[s].length));
+      const bubbleSize = count => {
+        if (count === maxCount && count >= 10) return 68; // 최대값 버블은 더 크게
+        return Math.round(26 + (count / maxCount) * 30);
+      };
+
+      // ── 충돌 감지: 겹치는 버블을 위 행으로 배치 ──
+      const APPROX_W = 680;   // 컨테이너 추정 폭(px)
+      const GAP = 5;           // 버블 간 최소 여백
+      const ROW_H = 54;        // 행 높이
+
+      const bubbles = uniqueScores.map(score => ({
+        score,
+        items: scoreGroups[score],
+        xPx: (pct(score) / 100) * APPROX_W,
+        sz: bubbleSize(scoreGroups[score].length),
+        row: -1
+      }));
+
+      // 그리디 행 배정 (row 0 = 축에 가장 가까운 행)
+      const rowSlots = [];
+      bubbles.forEach(b => {
+        for (let r = 0; r < rowSlots.length + 1; r++) {
+          if (!rowSlots[r]) rowSlots[r] = [];
+          const fits = rowSlots[r].every(o => Math.abs(b.xPx - o.xPx) > (b.sz / 2 + o.sz / 2 + GAP));
+          if (fits) { rowSlots[r].push(b); b.row = r; break; }
+        }
+      });
+
+      const numRows = rowSlots.length || 1;
+      const AXIS_Y = numRows * ROW_H + 10;
+      const TOTAL_H = AXIS_Y + 44;
+
+      let html = `<div style="position:relative;height:${TOTAL_H}px;">`;
+
+      // 배경
+      html += `<div style="position:absolute;top:0;bottom:44px;left:0;width:${userPct}%;background:rgba(74,222,128,0.08);border-radius:8px 0 0 8px;"></div>`;
+      html += `<div style="position:absolute;top:0;bottom:44px;left:${userPct}%;right:0;background:rgba(248,113,113,0.07);border-radius:0 8px 8px 0;"></div>`;
+
+      // 축선
+      html += `<div style="position:absolute;top:${AXIS_Y}px;left:${PL}%;right:${PR}%;height:1px;background:rgba(255,255,255,0.1);"></div>`;
+
+      // 내 점수 라인 + 라벨
+      html += `<div style="position:absolute;left:${userPct}%;top:6px;height:${AXIS_Y - 6}px;width:2px;background:#2563EB;opacity:0.7;z-index:6;"></div>`;
+      html += `<div style="position:absolute;left:${userPct}%;top:${AXIS_Y + 6}px;transform:translateX(-50%);background:#2563EB;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;z-index:7;">${userScore}점</div>`;
+
+      // 버블 렌더링
+      bubbles.forEach(b => {
+        const { score, items, row, sz } = b;
+        const lp = pct(score);
+        const isQ = userScore >= score;
+        const centerY = AXIS_Y - (row + 0.5) * ROW_H;
+        const topY = centerY - sz / 2;
+        const isBig = items.length === maxCount && items.length >= 10;
+        const bg        = isQ ? 'rgba(74,222,128,0.18)'  : 'rgba(248,113,113,0.18)';
+        const border    = isQ ? '#4ADE80' : '#F87171';
+        const textColor = isQ ? '#4ADE80' : '#F87171';
+        const bubbleClass = isBig ? 'bubble-big' : (isQ ? 'bubble-q' : 'bubble-nq');
+        const gtelp = items.filter(i => i.gtelp_applicable).length;
+        const diff = userScore - score;
+        const diffStr = diff >= 0 ? `+${diff}` : `${diff}`;
+        const names = items.map(i => `• ${i.institution_name}`).join('\n');
+        const tooltip = `기준 ${score}점 (${diffStr}점)\n기관 수: ${items.length}개${gtelp > 0 ? ` (지텔프 ${gtelp}개)` : ''}\n\n${names}`;
+        const numFontSize = isBig ? 18 : (items.length > 9 ? 12 : 13);
+
+        // 축 연결선 (row > 0)
+        if (row > 0) {
+          html += `<div style="position:absolute;left:${lp}%;top:${centerY + sz / 2}px;width:1px;height:${AXIS_Y - (centerY + sz / 2)}px;background:rgba(255,255,255,0.12);transform:translateX(-50%);z-index:2;"></div>`;
+        }
+
+        html += `<div class="${bubbleClass}" style="position:absolute;left:${lp}%;top:${topY}px;transform:translateX(-50%);
+          width:${sz}px;height:${sz}px;border-radius:50%;
+          background:${bg};border:${isBig ? '2px' : '1.5px'} solid ${border};
+          display:flex;flex-direction:column;align-items:center;justify-content:center;
+          cursor:pointer;z-index:4;"
+          title="${tooltip}">
+          <span style="font-size:${numFontSize}px;font-weight:700;color:${textColor};line-height:1;">${items.length}</span>
+          ${gtelp > 0 ? `<span style="font-size:${isBig ? 10 : 8}px;color:#38BDF8;line-height:1.2;">G</span>` : ''}
+        </div>`;
+
+        // 점수 라벨
+        html += `<div style="position:absolute;left:${lp}%;top:${AXIS_Y + 6}px;transform:translateX(-50%);font-size:${isBig ? 10 : 9}px;font-weight:${isBig ? 700 : 400};color:${isQ ? '#4ADE80' : '#F87171'};white-space:nowrap;">${score}</div>`;
+      });
+
+      // 범례
+      html += `<div style="position:absolute;bottom:-28px;left:${PL}%;display:flex;gap:16px;font-size:11px;color:#94A3B8;align-items:center;">
+        <span style="display:flex;align-items:center;gap:5px;">
+          <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:rgba(74,222,128,0.18);border:1.5px solid #4ADE80;"></span>합격 가능
+        </span>
+        <span style="display:flex;align-items:center;gap:5px;">
+          <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:rgba(248,113,113,0.18);border:1.5px solid #F87171;"></span>점수 부족
+        </span>
+        <span style="display:flex;align-items:center;gap:5px;">
+          <span style="color:#38BDF8;font-weight:700;font-size:10px;">G</span>지텔프 반영 기관 포함
+        </span>
+        <span style="color:#475569;">버블 크기 = 기관 수</span>
+      </div>`;
+
+      html += `</div>`;
+      container.style.minHeight = (TOTAL_H + 40) + 'px';
+      container.innerHTML = html;
+    }
+
+    function buildTableRows(rows) {
+      return rows.map(r => {
+        const diff = r.diff;
+        const hasReq = r.toeic_score != null;
+        const diffStr = hasReq ? (diff >= 0 ? `+${diff}` : `${diff}`) : '-';
+        const diffColor = hasReq ? (diff >= 0 ? '#4ADE80' : '#F87171') : '#475569';
+        const passMin = r.pass_score_min;
+        const passAvg = r.pass_score_avg;
+        const passYear = r.pass_year ? `'${r.pass_year.slice(-2)}` : '';
+        let passCell = '-';
+        if (passMin != null && passAvg != null) {
+          if (passMin === passAvg) {
+            passCell = `<span style="color:#FCD34D;font-weight:600;">${passAvg}</span><span style="color:#64748B;font-size:10px;"> ${passYear}</span>`;
+          } else {
+            passCell = `<span style="color:#FCD34D;font-weight:600;">${passMin}~${passAvg}</span><span style="color:#64748B;font-size:10px;"> ${passYear}</span>`;
+          }
+        } else if (passAvg != null) {
+          passCell = `<span style="color:#FCD34D;font-weight:600;">${passAvg}</span><span style="color:#64748B;font-size:10px;"> ${passYear}</span>`;
+        }
+        return `<tr>
+          <td style="color:#E2E8F0;font-weight:500;">${esc(r.institution_name)}</td>
+          <td style="color:#94A3B8;">${r.toeic_score != null ? r.toeic_score + '점' : '-'}</td>
+          <td style="color:${diffColor};font-weight:700;">${diffStr}</td>
+          <td style="font-size:12px;white-space:nowrap;">${passCell}</td>
+          <td>${r.gtelp_applicable
+            ? `<span class="badge-gtelp">반영${r.gtelp_score != null ? '<span style="font-size:10px;opacity:0.8;margin-left:3px;">' + r.gtelp_score + '점</span>' : ''}</span>`
+            : '<span style="color:#334155;font-size:11px;">-</span>'}</td>
+          <td style="font-size:11px;color:#475569;" class="hidden md:table-cell">${esc(r.notes || '')}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderTable(result) {
+      lastResult = result;
+      // 테이블은 기본적으로 숨겨진 상태 — toggleResultTable에서 필터링 후 렌더
+      document.getElementById('result-body').innerHTML = '';
+      document.getElementById('result-count').textContent = '';
+    }
+
+    function renderNoScore() {
+      const badge = document.getElementById('noscore-count-badge');
+      const list  = document.getElementById('noscore-list');
+      if (badge) badge.textContent = NO_SCORE_INSTITUTIONS.length + '개';
+      if (!list) return;
+      list.innerHTML = NO_SCORE_INSTITUTIONS.map(name =>
+        `<div style="display:inline-flex;align-items:center;background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.15);border-radius:6px;padding:4px 10px;font-size:12px;color:#94A3B8;">
+          ${esc(name)}
+        </div>`
+      ).join('');
+    }
+
+    function toggleNoScore(e) {
+      e.stopPropagation();
+      const wrap = document.getElementById('noscore-wrap');
+      const icon = document.getElementById('noscore-icon');
+      const isHidden = wrap.classList.toggle('hidden');
+      icon.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    function toggleResultTable() {
+      const wrap = document.getElementById('result-table-wrap');
+      const label = document.getElementById('result-toggle-label');
+      const icon  = document.getElementById('result-toggle-icon');
+      const btn   = document.getElementById('result-toggle-btn');
+
+      // 이미 펼쳐진 상태 → 접기
+      if (!wrap.classList.contains('hidden')) {
+        wrap.classList.add('hidden');
+        label.textContent = '합격권 진입 점수대';
+        btn.style.animation = 'btnPulse 1.6s ease-in-out infinite';
+        btn.style.color = '#FCD34D';
+        btn.style.border = '1px solid rgba(252,211,77,0.35)';
+        btn.style.background = 'rgba(252,211,77,0.07)';
+        document.getElementById('result-count').textContent = '';
+        icon.style.transform = 'rotate(0deg)';
+        return;
+      }
+
+      // 접힌 상태 → 플랜 모달 먼저 표시
+      spTrack('plan-open:' + (userScore || 0));
+      const planModal = document.getElementById('gtelp-plan-modal');
+      const planCb = document.getElementById('plan-checkbox');
+      planCb.checked = false;
+      updatePlanBtn();
+      planModal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function updatePlanBtn() {
+      const btn = document.getElementById('plan-confirm-btn');
+      const on = document.getElementById('plan-checkbox').checked;
+      btn.disabled = !on;
+      btn.style.cursor = on ? 'pointer' : 'not-allowed';
+      btn.style.background = on ? 'linear-gradient(135deg,#1D4ED8,#2563EB)' : '#1E3A60';
+      btn.style.color = on ? '#fff' : '#475569';
+    }
+
+    function confirmPlan() {
+      const planModal = document.getElementById('gtelp-plan-modal');
+      planModal.style.display = 'none';
+      document.body.style.overflow = '';
+
+      const wrap  = document.getElementById('result-table-wrap');
+      const label = document.getElementById('result-toggle-label');
+      const icon  = document.getElementById('result-toggle-icon');
+      const btn   = document.getElementById('result-toggle-btn');
+
+      wrap.classList.remove('hidden');
+      spTrack('result-confirm:' + (userScore || 0));
+      const qualified = lastResult.filter(r => r.toeic_score != null && r.toeic_score >= userScore);
+      document.getElementById('result-body').innerHTML = buildTableRows(qualified);
+      document.getElementById('result-count').textContent = `합격 가능 ${qualified.length}개 기관`;
+      label.textContent = '접기';
+      btn.style.animation = 'none';
+      btn.style.color = '#94A3B8';
+      btn.style.border = '1px solid var(--border)';
+      btn.style.background = 'var(--card2)';
+      icon.style.transform = 'rotate(180deg)';
+    }
+
+    // 페이지 로드 시 데이터 미리 로드
+    loadData();
+
+    // ── 방문 추적 ──
+    const _SP_PAGE = 'evidence/sample.html';
+    const _SP_API  = 'https://byzulmxcuhsrjdphmuym.supabase.co/rest/v1/page_views';
+    const _SP_KEY  = 'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs';
+    const _SP_HDR  = { 'Content-Type':'application/json', 'apikey':_SP_KEY, 'Authorization':'Bearer '+_SP_KEY, 'Prefer':'return=minimal' };
+
+    // 접속 기록 (페이지 로드 시)
+    if (localStorage.getItem('gtelp_notrack') !== '1') {
+      fetch(_SP_API, {
+        method:'POST', headers:_SP_HDR,
+        body: JSON.stringify({ page: _SP_PAGE, referrer: document.referrer || null })
+      }).catch(function(){});
+    }
+
+    // 클릭 이벤트 추적
+    function spTrack(action) {
+      if (localStorage.getItem('gtelp_notrack') === '1') return;
+      fetch(_SP_API, {
+        method:'POST', headers:_SP_HDR,
+        body: JSON.stringify({ page: _SP_PAGE + ':' + action, referrer: document.referrer || null })
+      }).catch(function(){});
+    }
+
+    // 체류시간 추적
+    (function() {
+      if (localStorage.getItem('gtelp_notrack') === '1') return;
+      var _s = Date.now(), _sent = false;
+      function _send() {
+        if (_sent) return; _sent = true;
+        var sec = Math.round((Date.now() - _s) / 1000);
+        if (sec < 3 || sec > 7200) return;
+        fetch(_SP_API, {
+          method:'POST', keepalive:true, headers:_SP_HDR,
+          body: JSON.stringify({ page: _SP_PAGE, dwell_seconds: sec, referrer: document.referrer || null })
+        }).catch(function(){});
+      }
+      document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'hidden') _send(); });
+      window.addEventListener('pagehide', _send);
+    })();
+
+    function toggleMenu() {
+      document.getElementById('hamburger').classList.toggle('open');
+      document.getElementById('mobile-menu').classList.toggle('open');
+    }
+
+    // ── 내 방문 제외 토글 ──
+    const _NT_KEY = 'gtelp_notrack';
+
+    function updateNoTrackBtn() {
+      const btn = document.getElementById('sp-notrack-btn');
+      if (!btn) return;
+      const on = localStorage.getItem(_NT_KEY) === '1';
+      btn.textContent = on ? '🙈 내 방문 제외 ON ✅' : '🙈 내 방문 제외 OFF';
+      btn.style.color = on ? '#4ADE80' : '#64748B';
+      btn.style.borderColor = on ? 'rgba(74,222,128,0.4)' : 'rgba(255,255,255,0.1)';
+    }
+
+    function toggleNoTrack() {
+      const on = localStorage.getItem(_NT_KEY) === '1';
+      if (on) {
+        localStorage.removeItem(_NT_KEY);
+        alert('내 방문 제외 OFF\n이 브라우저의 방문도 통계에 포함됩니다.');
+      } else {
+        localStorage.setItem(_NT_KEY, '1');
+        alert('내 방문 제외 ON ✅\n이 브라우저의 방문은 통계에 포함되지 않습니다.');
+      }
+      updateNoTrackBtn();
+    }
+
+    updateNoTrackBtn();
+  </script>
+
+<!-- 내 방문 제외 토글 버튼 (하단 고정) -->
+<div style="position:fixed;bottom:16px;right:16px;z-index:900;">
+  <button id="sp-notrack-btn" onclick="toggleNoTrack()"
+    style="font-size:11px;font-weight:600;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(15,30,55,0.92);color:#64748B;cursor:pointer;backdrop-filter:blur(6px);transition:all .2s;">
+    🙈 내 방문 제외 OFF
+  </button>
+</div>
+</body>
+</html>

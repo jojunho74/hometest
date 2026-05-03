@@ -1536,6 +1536,64 @@
             </div>
           </div>
 
+          <!-- evidence/sample.html 합격기관 조회 방문 분석 -->
+          <div class="bg-white rounded-xl shadow-sm p-5 mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <h3 class="font-semibold text-slate-600 text-sm">🏆 합격기관 조회 (sample) — 방문 분석
+                <span id="sp-total-badge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600"></span>
+              </h3>
+            </div>
+            <div class="grid grid-cols-3 gap-3 mb-3">
+              <div class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
+                <div class="text-xl font-black text-amber-600" id="sp-k-total">—</div>
+                <div class="text-xs text-slate-400 mt-1">누적 방문</div>
+              </div>
+              <div class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
+                <div class="text-xl font-black text-emerald-600" id="sp-k-today">—</div>
+                <div class="text-xs text-slate-400 mt-1">오늘 방문</div>
+              </div>
+              <div class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
+                <div class="text-xl font-black text-purple-600" id="sp-k-week">—</div>
+                <div class="text-xs text-slate-400 mt-1">이번주 방문</div>
+              </div>
+            </div>
+            <!-- 행동 KPI 3종 -->
+            <div class="grid grid-cols-3 gap-3 mb-4">
+              <div class="rounded-xl border border-blue-100 bg-blue-50 p-3 text-center">
+                <div class="text-xl font-black text-blue-600" id="sp-k-analyze">—</div>
+                <div class="text-xs text-slate-400 mt-1">점수 입력 (분석하기)</div>
+              </div>
+              <div class="rounded-xl border border-yellow-100 bg-yellow-50 p-3 text-center">
+                <div class="text-xl font-black text-yellow-600" id="sp-k-planopen">—</div>
+                <div class="text-xs text-slate-400 mt-1">합격권 버튼 클릭</div>
+              </div>
+              <div class="rounded-xl border border-rose-100 bg-rose-50 p-3 text-center">
+                <div class="text-xl font-black text-rose-600" id="sp-k-confirm">—</div>
+                <div class="text-xs text-slate-400 mt-1">결과 보기 클릭</div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <div class="text-xs font-semibold text-slate-500 mb-2">📈 일별 방문 추이 (최근 14일)</div>
+                <div style="position:relative;height:160px;"><canvas id="sp-trend-chart"></canvas></div>
+              </div>
+              <div>
+                <div class="text-xs font-semibold text-slate-500 mb-2">🔀 유입 경로 분석</div>
+                <div id="sp-ref-table" class="text-xs text-slate-400">불러오는 중…</div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mt-4">
+              <div>
+                <div class="text-xs font-semibold text-slate-500 mb-2">🎯 입력 점수 분포 (구간별)</div>
+                <div style="position:relative;height:160px;"><canvas id="sp-score-chart"></canvas></div>
+              </div>
+              <div>
+                <div class="text-xs font-semibold text-slate-500 mb-2">📊 행동 단계별 전환율</div>
+                <div id="sp-funnel-table" class="text-xs text-slate-400">불러오는 중…</div>
+              </div>
+            </div>
+          </div>
+
           <!-- 페이지별 접속 현황 -->
           <div class="bg-white rounded-xl shadow-sm p-5">
             <div class="flex items-center justify-between mb-3">
@@ -1745,6 +1803,31 @@
             <div class="trk-card">
               <div class="trk-card-title">📅 요일별 방문 (Fvisajobs 전용)</div>
               <div style="position:relative;height:150px;"><canvas id="fvj-trk-day-chart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑨ evidence/sample.html 전용 분석 -->
+        <div class="trk-sec">
+          <div class="trk-sec-head"><div class="trk-sec-bar" style="background:#D97706;"></div><div class="trk-sec-title">⑨ 합격기관 조회 (sample) 전용 분석</div><div class="trk-sec-hint">유입 경로 · 일별 추이</div></div>
+          <div class="trk-grid2">
+            <div class="trk-card">
+              <div class="trk-card-title">📈 일별 방문 추이 (최근 14일)</div>
+              <div style="position:relative;height:160px;"><canvas id="sp-trk-trend-chart"></canvas></div>
+            </div>
+            <div class="trk-card">
+              <div class="trk-card-title">🔀 어디서 sample로 왔는가</div>
+              <div id="sp-trk-ref-table"><div class="trk-loading"><div class="trk-spin"></div> 집계 중…</div></div>
+            </div>
+          </div>
+          <div class="trk-grid2" style="margin-top:14px;">
+            <div class="trk-card">
+              <div class="trk-card-title">🕐 시간대별 방문 (sample 전용)</div>
+              <div style="position:relative;height:150px;"><canvas id="sp-trk-hour-chart"></canvas></div>
+            </div>
+            <div class="trk-card">
+              <div class="trk-card-title">📅 요일별 방문 (sample 전용)</div>
+              <div style="position:relative;height:150px;"><canvas id="sp-trk-day-chart"></canvas></div>
             </div>
           </div>
         </div>
@@ -2440,6 +2523,9 @@
       <!-- ── 대학활동 수집 대시보드 탭 ── -->
       <div id="section-crawler" class="hidden">
 
+        <!-- 서버 연결 상태 배너 -->
+        <div id="srv-status-bar" class="hidden mb-4 px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-semibold"></div>
+
         <!-- 진행 중 오버레이 -->
         <div id="crawler-overlay" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center" style="background:rgba(15,23,42,0.55);backdrop-filter:blur(4px);">
           <div class="bg-white rounded-2xl shadow-2xl px-10 py-8 flex flex-col items-center gap-4 min-w-[280px]">
@@ -2714,10 +2800,15 @@
           <button onclick="addPassEntry()" class="btn btn-primary">+ 등록하기</button>
           <p id="ps-msg" class="hidden text-sm text-green-600 mt-2 font-semibold">✓ 등록되었습니다.</p>
         </div>
-        <div class="bg-white rounded-xl shadow-sm mb-4 p-4 flex gap-2 items-center">
+        <div class="bg-white rounded-xl shadow-sm mb-4 p-4 flex flex-wrap gap-2 items-center">
           <input id="ps-search" type="text" placeholder="기관명 검색..." onkeyup="renderPassData()" class="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 w-64"/>
+          <div class="flex gap-1 ml-1">
+            <button id="ps-filter-all"     onclick="setPsFilter('all')"     class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-blue-500 bg-blue-500 text-white transition-all">전체</button>
+            <button id="ps-filter-yes"     onclick="setPsFilter('yes')"     class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-500 transition-all">지텔프 반영</button>
+            <button id="ps-filter-no"      onclick="setPsFilter('no')"      class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-500 transition-all">지텔프 미반영</button>
+          </div>
           <button onclick="loadPassData()" class="btn btn-secondary text-sm px-4 py-2">새로고침</button>
-          <span id="ps-total" class="text-xs text-slate-400 ml-2"></span>
+          <span id="ps-total" class="text-xs text-slate-400 ml-1"></span>
         </div>
         <div class="bg-white rounded-xl shadow-sm table-wrap">
           <table class="w-full text-sm">
@@ -4734,6 +4825,9 @@
       // ── Fvisajobs 방문 분석 ──
       loadFvisajobsStats();
 
+      // ── evidence/sample.html 합격기관 조회 방문 분석 ──
+      loadSamplePageStats();
+
       // ── foreign-jobs.html 방문 분석 ──
       loadForeignJobsStats();
 
@@ -5091,6 +5185,203 @@
           data: { labels:['일','월','화','수','목','금','토'], datasets:[{data:dayArr,backgroundColor:'rgba(14,165,233,.7)',borderRadius:3,borderSkipped:false}] },
           options:{plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#94A3B8'}},y:{grid:{color:'#F1F5F9'},ticks:{font:{size:10},color:'#94A3B8',stepSize:1},beginAtZero:true}},maintainAspectRatio:false}
         });
+      }
+    }
+
+    // ─── evidence/sample.html 합격기관 조회 방문 분석 ───
+    let _spAllRows = [];    // 순수 페이지뷰 rows
+    let _spActRows = [];    // 이벤트 액션 rows (analyze/plan-open/result-confirm)
+    let _spCharts = {};
+
+    async function loadSamplePageStats() {
+      const now = new Date();
+      const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+      const today = kstNow.toISOString().slice(0, 10);
+
+      // 순수 페이지뷰
+      const { data: allRows } = await db.from('page_views')
+        .select('visited_at, referrer')
+        .eq('page', 'evidence/sample.html')
+        .order('visited_at', { ascending: false })
+        .limit(5000);
+      _spAllRows = allRows || [];
+
+      // 이벤트 액션 rows (analyze:*, plan-open:*, result-confirm:*)
+      const { data: actRows } = await db.from('page_views')
+        .select('page, visited_at')
+        .like('page', 'evidence/sample.html:%')
+        .order('visited_at', { ascending: false })
+        .limit(10000);
+      _spActRows = actRows || [];
+
+      const { count: spTotal } = await db.from('page_views')
+        .select('*', { count: 'exact', head: true })
+        .eq('page', 'evidence/sample.html');
+      document.getElementById('sp-total-badge').textContent = (spTotal || 0).toLocaleString() + '건';
+      document.getElementById('sp-k-total').textContent = (spTotal || 0).toLocaleString();
+
+      const spToday = _spAllRows.filter(r => {
+        const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
+        return kst.toISOString().slice(0,10) === today;
+      }).length;
+      document.getElementById('sp-k-today').textContent = spToday.toLocaleString();
+
+      const monKst = new Date(kstNow);
+      monKst.setDate(kstNow.getDate() - ((kstNow.getDay() + 6) % 7));
+      const monStr = monKst.toISOString().slice(0,10);
+      const spWeek = _spAllRows.filter(r => {
+        const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
+        return kst.toISOString().slice(0,10) >= monStr;
+      }).length;
+      document.getElementById('sp-k-week').textContent = spWeek.toLocaleString();
+
+      // 행동 KPI
+      const analyzeRows  = _spActRows.filter(r => r.page.startsWith('evidence/sample.html:analyze:'));
+      const planOpenRows = _spActRows.filter(r => r.page.startsWith('evidence/sample.html:plan-open:'));
+      const confirmRows  = _spActRows.filter(r => r.page.startsWith('evidence/sample.html:result-confirm:'));
+      document.getElementById('sp-k-analyze').textContent  = analyzeRows.length.toLocaleString();
+      document.getElementById('sp-k-planopen').textContent = planOpenRows.length.toLocaleString();
+      document.getElementById('sp-k-confirm').textContent  = confirmRows.length.toLocaleString();
+
+      renderSamplePageAnalytics();
+    }
+
+    function renderSamplePageAnalytics() {
+      const now = new Date();
+      const kstNow = new Date(now.getTime() + 9*3600000);
+      const rows = _spAllRows;
+
+      // 일별 추이 (최근 14일)
+      const days = [], dayCounts = [];
+      for (let i = 13; i >= 0; i--) {
+        const d = new Date(kstNow.getTime() - i*864e5);
+        days.push((d.getMonth()+1)+'/'+d.getDate());
+        const dk = d.toISOString().slice(0,10);
+        dayCounts.push(rows.filter(r => {
+          const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
+          return kst.toISOString().slice(0,10) === dk;
+        }).length);
+      }
+      ['sp-trend-chart','sp-trk-trend-chart'].forEach(id => {
+        const canvas = document.getElementById(id);
+        if (!canvas) return;
+        if (_spCharts[id]) _spCharts[id].destroy();
+        _spCharts[id] = new Chart(canvas, {
+          type: 'line',
+          data: { labels: days, datasets: [{ data: dayCounts, borderColor:'#D97706', backgroundColor:'rgba(217,119,6,0.1)', borderWidth:2, pointRadius:3, fill:true, tension:0.3 }] },
+          options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,ticks:{precision:0}}} }
+        });
+      });
+
+      // 유입 경로
+      const refMap = {};
+      rows.forEach(r => {
+        let ref = r.referrer || '직접접속';
+        try { const u = new URL(ref); ref = u.hostname.replace(/^www\./, ''); } catch(e) {}
+        if (ref === 'ibtcc.kr' || ref === location.hostname) ref = '내부이동';
+        refMap[ref] = (refMap[ref] || 0) + 1;
+      });
+      const sorted = Object.entries(refMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+      const total = rows.length || 1;
+      const refHtml = sorted.length
+        ? sorted.map(([k,v]) => `<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+            <span style="flex:1;font-size:.73rem;color:#334155;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${k}</span>
+            <span style="font-weight:700;font-size:.73rem;color:#1E3A5F;width:28px;text-align:right;">${v}</span>
+            <div style="width:55px;height:5px;background:#F1F5F9;border-radius:3px;overflow:hidden;flex-shrink:0;">
+              <div style="width:${Math.round(v/total*100)}%;height:100%;background:#D97706;border-radius:3px;"></div>
+            </div>
+          </div>`).join('')
+        : '<div style="color:#CBD5E1;padding:10px 0;text-align:center;">데이터 없음</div>';
+      ['sp-ref-table','sp-trk-ref-table'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = refHtml;
+      });
+
+      // 시간대별
+      const hourArr = Array(24).fill(0);
+      rows.forEach(r => { const kst = new Date(new Date(r.visited_at).getTime()+9*3600000); hourArr[kst.getUTCHours()]++; });
+      const hourCanvas = document.getElementById('sp-trk-hour-chart');
+      if (hourCanvas) {
+        if (_spCharts['sp-trk-hour-chart']) _spCharts['sp-trk-hour-chart'].destroy();
+        _spCharts['sp-trk-hour-chart'] = new Chart(hourCanvas, {
+          type:'bar',
+          data:{ labels:Array.from({length:24},(_,i)=>i+'시'), datasets:[{data:hourArr,backgroundColor:'rgba(217,119,6,.7)',borderRadius:3,borderSkipped:false}] },
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}}},y:{beginAtZero:true,ticks:{precision:0}}}}
+        });
+      }
+
+      // 요일별
+      const dayArr = Array(7).fill(0);
+      rows.forEach(r => { const kst = new Date(new Date(r.visited_at).getTime()+9*3600000); dayArr[kst.getUTCDay()]++; });
+      const dayCanvas = document.getElementById('sp-trk-day-chart');
+      if (dayCanvas) {
+        if (_spCharts['sp-trk-day-chart']) _spCharts['sp-trk-day-chart'].destroy();
+        _spCharts['sp-trk-day-chart'] = new Chart(dayCanvas, {
+          type:'bar',
+          data:{ labels:['일','월','화','수','목','금','토'], datasets:[{data:dayArr,backgroundColor:dayArr.map((_,i)=>(i===0||i===6)?'rgba(248,113,113,.7)':'rgba(217,119,6,.7)'),borderRadius:3,borderSkipped:false}] },
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}
+        });
+      }
+
+      // ── 점수 분포 차트 ──
+      const scoreCanvas = document.getElementById('sp-score-chart');
+      if (scoreCanvas) {
+        const scoreBuckets = { '~499':0,'500~599':0,'600~699':0,'700~749':0,'750~799':0,'800~849':0,'850~899':0,'900~':0 };
+        _spActRows.filter(r => r.page.startsWith('evidence/sample.html:analyze:')).forEach(r => {
+          const sc = parseInt(r.page.split(':').pop(), 10);
+          if (isNaN(sc)) return;
+          if (sc < 500)       scoreBuckets['~499']++;
+          else if (sc < 600)  scoreBuckets['500~599']++;
+          else if (sc < 700)  scoreBuckets['600~699']++;
+          else if (sc < 750)  scoreBuckets['700~749']++;
+          else if (sc < 800)  scoreBuckets['750~799']++;
+          else if (sc < 850)  scoreBuckets['800~849']++;
+          else if (sc < 900)  scoreBuckets['850~899']++;
+          else                scoreBuckets['900~']++;
+        });
+        const scoreLabels = Object.keys(scoreBuckets);
+        const scoreData   = Object.values(scoreBuckets);
+        const maxSc = Math.max(...scoreData, 1);
+        const scoreColors = scoreLabels.map((_, i) => {
+          const palette = ['rgba(99,102,241,.75)','rgba(59,130,246,.75)','rgba(16,185,129,.75)','rgba(245,158,11,.75)','rgba(239,68,68,.75)','rgba(168,85,247,.75)','rgba(236,72,153,.75)','rgba(14,165,233,.75)'];
+          return palette[i % palette.length];
+        });
+        if (_spCharts['sp-score-chart']) _spCharts['sp-score-chart'].destroy();
+        _spCharts['sp-score-chart'] = new Chart(scoreCanvas, {
+          type: 'bar',
+          data: { labels: scoreLabels, datasets: [{ data: scoreData, backgroundColor: scoreColors, borderRadius: 4, borderSkipped: false }] },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw}회` } } },
+            scales: {
+              x: { grid: { display: false }, ticks: { font: { size: 9 }, color: '#64748B' } },
+              y: { beginAtZero: true, ticks: { precision: 0, font: { size: 9 } }, grid: { color: '#F1F5F9' } }
+            }
+          }
+        });
+      }
+
+      // ── 전환율 퍼널 ──
+      const funnelEl = document.getElementById('sp-funnel-table');
+      if (funnelEl) {
+        const visitCnt  = _spAllRows.length || 0;
+        const analyzeCnt = _spActRows.filter(r => r.page.startsWith('evidence/sample.html:analyze:')).length;
+        const planCnt    = _spActRows.filter(r => r.page.startsWith('evidence/sample.html:plan-open:')).length;
+        const confirmCnt = _spActRows.filter(r => r.page.startsWith('evidence/sample.html:result-confirm:')).length;
+        const pct = (a, b) => b > 0 ? Math.round(a / b * 100) + '%' : '—';
+        const funnelSteps = [
+          { label: '📥 페이지 방문', count: visitCnt,    rate: '—' },
+          { label: '🔢 점수 입력',   count: analyzeCnt,  rate: pct(analyzeCnt, visitCnt) },
+          { label: '🏆 합격권 버튼', count: planCnt,     rate: pct(planCnt, analyzeCnt) },
+          { label: '✅ 결과 확인',   count: confirmCnt,  rate: pct(confirmCnt, planCnt) },
+        ];
+        const clr = ['#64748B','#3B82F6','#F59E0B','#10B981'];
+        funnelEl.innerHTML = funnelSteps.map((s, i) => `
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #F1F5F9;">
+            <span style="font-size:.73rem;flex:1;color:#334155;">${s.label}</span>
+            <span style="font-weight:700;font-size:.8rem;color:${clr[i]};min-width:32px;text-align:right;">${s.count.toLocaleString()}</span>
+            <span style="font-size:.7rem;color:#94A3B8;min-width:36px;text-align:right;">${s.rate}</span>
+          </div>`).join('');
       }
     }
 
@@ -7809,7 +8100,25 @@ ${d.hashtags}`;
       loadUnivSites();
     }
 
+    async function checkServerStatus() {
+      const bar = document.getElementById('srv-status-bar');
+      if (!bar) return;
+      try {
+        const r = await fetch('http://127.0.0.1:8765/health', { signal: AbortSignal.timeout(3000) });
+        if (r.ok) {
+          bar.className = 'mb-4 px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200';
+          bar.innerHTML = '<span style="font-size:1.1em;">✅</span> server.py 실행 중 — 수집/감지 버튼을 사용할 수 있습니다.';
+        } else {
+          throw new Error('non-ok');
+        }
+      } catch(e) {
+        bar.className = 'mb-4 px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-semibold bg-red-50 text-red-700 border border-red-200';
+        bar.innerHTML = '<span style="font-size:1.1em;">❌</span> server.py 미실행 — 바탕화면의 <b style="margin:0 4px;">수집시작.bat</b>을 실행한 후 새로고침하세요.';
+      }
+    }
+
     async function loadUnivSites() {
+      checkServerStatus();
       const { data, error } = await db.from('university_sites').select('*').order('school_name');
       if (error) { console.error('university_sites 로드 오류:', error); return; }
       const rows = data || [];
@@ -8027,9 +8336,10 @@ ${d.hashtags}`;
         detectEl.innerHTML = results.map(r => {
           const icon = methodIcon[r.method] || '?';
           const color = r.count > 0 ? 'text-green-600' : 'text-red-400';
+          const dotColor = r.count > 0 ? '#16A34A' : '#EF4444';
           return `<div class="flex justify-between items-center py-0.5 border-b border-slate-50">
             <span class="flex items-center gap-1 font-medium text-slate-700">
-              <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#EF4444;flex-shrink:0;"></span>
+              <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${dotColor};flex-shrink:0;"></span>
               ${icon} ${esc(r.school_name)}
             </span>
             <span class="${color} font-bold">${r.count}개</span>
@@ -8042,11 +8352,12 @@ ${d.hashtags}`;
         const icon = methodIcon[r.method] || '?';
         const countColor = r.count > 0 ? 'color:#16A34A;font-weight:700' : 'color:#EF4444';
         const method = r.method === 'RSS' ? 'RSS' : (r.selector || '자동추출');
+        const dotColor = r.count > 0 ? '#16A34A' : '#EF4444';
         const updatedBadge = r.changed
           ? `<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:#FEF9C3;color:#A16207;margin-left:4px;flex-shrink:0;">업데이트</span>`
           : '';
         return `<div class="flex items-center gap-2 py-1.5" style="${r.changed ? 'background:#FEFCE8;margin:0 -16px;padding-left:16px;padding-right:16px;' : ''}">
-          <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#EF4444;flex-shrink:0;"></span>
+          <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${dotColor};flex-shrink:0;"></span>
           <span style="width:16px;text-align:center;flex-shrink:0;">${icon}</span>
           <span style="width:100px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${r.changed ? '#92400E' : '#334155'};font-weight:${r.changed ? '700' : '400'};" title="${esc(r.school_name)}">${esc(r.school_name)}</span>
           ${updatedBadge}
@@ -8171,7 +8482,8 @@ ${d.hashtags}`;
       'library-pdf.html':'채용공고 자료실','package.html':'패키지','gtelp-score.html':'점수대비표',
       'competition.html':'경쟁률','university-board.html':'대학활동','job-board.html':'게시판','library.html':'홍보자료',
       'mobile.html':'모바일 허브','competition-m.html':'경쟁률(모바일)','gtelp-score-m.html':'점수대비표(모바일)','student-m.html':'IBT신청(모바일)','cardnews-m.html':'카드뉴스(모바일)',
-      'Fvisajobs/index.html':'해외취업', 'foreign-jobs.html':'해외유학생채용'
+      'Fvisajobs/index.html':'해외취업', 'foreign-jobs.html':'해외유학생채용',
+      'evidence/sample.html':'합격기관조회'
     };
     const TRK_DAYS = ['일','월','화','수','목','금','토'];
     let trkRows = [], trkPeriod = 'month', trkDwellPeriod = 'all', trkLoaded = false;
@@ -8226,6 +8538,8 @@ ${d.hashtags}`;
       trkRows = (data || []).filter(r => r.page);
       document.getElementById('trk-status').textContent = `전체 ${(trkTotalCount||trkRows.length).toLocaleString()}건 (최신 ${trkRows.length.toLocaleString()}개 분석)`;
       trkRender(trkFilterRows(trkRows, trkPeriod));
+      // sample 전용 차트 (데이터 로드 후 렌더)
+      if (_spAllRows.length === 0) loadSamplePageStats(); else renderSamplePageAnalytics();
       // foreign-jobs 전용 차트 (데이터 로드 후 렌더)
       if (_fjAllRows.length === 0) loadForeignJobsStats(); else renderForeignJobsAnalytics();
     }
@@ -9011,7 +9325,8 @@ ${d.hashtags}`;
     'job-board.html':'채용공고', 'student.html':'IBT신청', 'package.html':'패키지',
     'mobile.html':'모바일허브', 'competition-m.html':'경쟁률(모바일)',
     'gtelp-score-m.html':'점수대비표(모바일)', 'student-m.html':'IBT신청(모바일)',
-    'cardnews-m.html':'카드뉴스(모바일)', 'Fvisajobs/index.html':'해외취업', 'foreign-jobs.html':'해외유학생채용'
+    'cardnews-m.html':'카드뉴스(모바일)', 'Fvisajobs/index.html':'해외취업', 'foreign-jobs.html':'해외유학생채용',
+    'evidence/sample.html':'합격기관조회'
   };
 
   function an1PageLabel(p) {
@@ -9241,7 +9556,8 @@ ${d.hashtags}`;
     'job-board.html':'채용공고', 'student.html':'IBT신청', 'package.html':'패키지',
     'mobile.html':'모바일허브', 'competition-m.html':'경쟁률(모바일)',
     'gtelp-score-m.html':'점수대비표(모바일)', 'student-m.html':'IBT신청(모바일)',
-    'cardnews-m.html':'카드뉴스(모바일)', 'Fvisajobs/index.html':'해외취업', 'foreign-jobs.html':'해외유학생채용'
+    'cardnews-m.html':'카드뉴스(모바일)', 'Fvisajobs/index.html':'해외취업', 'foreign-jobs.html':'해외유학생채용',
+    'evidence/sample.html':'합격기관조회'
   };
 
   function an2PageLabel(p) {
@@ -9471,6 +9787,18 @@ ${d.hashtags}`;
   // ─── 합격데이터 ───
   let psData = [];
   let editingPsId = null;
+  let psGtelpFilter = 'all'; // 'all' | 'yes' | 'no'
+
+  function setPsFilter(val) {
+    psGtelpFilter = val;
+    ['all','yes','no'].forEach(k => {
+      const btn = document.getElementById('ps-filter-' + k);
+      if (!btn) return;
+      const on = k === val;
+      btn.className = `px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${on ? 'border-blue-500 bg-blue-500 text-white' : 'border-slate-200 bg-white text-slate-500'}`;
+    });
+    renderPassData();
+  }
 
   async function loadPassData() {
     const { data, error } = await db.from('pass_statistics')
@@ -9486,7 +9814,9 @@ ${d.hashtags}`;
     const tbody = document.getElementById('ps-body');
     const empty = document.getElementById('ps-empty-msg');
     const total = document.getElementById('ps-total');
-    const filtered = keyword ? psData.filter(r => (r.institution_name||'').toLowerCase().includes(keyword)) : psData;
+    let filtered = keyword ? psData.filter(r => (r.institution_name||'').toLowerCase().includes(keyword)) : [...psData];
+    if (psGtelpFilter === 'yes') filtered = filtered.filter(r => r.gtelp_applicable === true);
+    else if (psGtelpFilter === 'no') filtered = filtered.filter(r => !r.gtelp_applicable);
     if (total) total.textContent = `총 ${filtered.length}건`;
     if (filtered.length === 0) {
       tbody.innerHTML = `<tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">데이터가 없습니다.</td></tr>`;
