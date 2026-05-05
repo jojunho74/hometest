@@ -1,46 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
+  <!-- 메인 -->
+  <url>
+    <loc>https://ibtcc.kr/</loc>
+    <lastmod>2026-05-05</lastmod>
+    <priority>1.0</priority>
+    <changefreq>weekly</changefreq>
+  </url>
   <url>
     <loc>https://ibtcc.kr/index.html</loc>
+    <lastmod>2026-05-05</lastmod>
     <priority>1.0</priority>
     <changefreq>weekly</changefreq>
   </url>
 
+  <!-- 핵심 서비스 -->
   <url>
-    <loc>https://ibtcc.kr/package.html</loc>
-    <priority>0.8</priority>
-    <changefreq>weekly</changefreq>
+    <loc>https://ibtcc.kr/competition.html</loc>
+    <lastmod>2026-05-05</lastmod>
+    <priority>0.95</priority>
+    <changefreq>daily</changefreq>
   </url>
-
   <url>
-    <loc>https://ibtcc.kr/schedule.html</loc>
-    <priority>0.8</priority>
-    <changefreq>weekly</changefreq>
-  </url>
-
-  <url>
-    <loc>https://ibtcc.kr/student.html</loc>
-    <priority>0.8</priority>
-    <changefreq>weekly</changefreq>
-  </url>
-
-  <url>
-    <loc>https://ibtcc.kr/library-pdf.html</loc>
-    <priority>0.7</priority>
+    <loc>https://ibtcc.kr/evidence/sample.html</loc>
+    <lastmod>2026-05-05</lastmod>
+    <priority>0.9</priority>
     <changefreq>monthly</changefreq>
   </url>
-
-  <url>
-    <loc>https://ibtcc.kr/job-board.html</loc>
-    <priority>0.7</priority>
-    <changefreq>weekly</changefreq>
-  </url>
-
   <url>
     <loc>https://ibtcc.kr/gtelp-score.html</loc>
-    <priority>0.8</priority>
+    <lastmod>2026-05-05</lastmod>
+    <priority>0.85</priority>
     <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://ibtcc.kr/library-pdf.html</loc>
+    <lastmod>2026-05-05</lastmod>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://ibtcc.kr/schedule.html</loc>
+    <lastmod>2026-05-05</lastmod>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+
+  <!-- 콘텐츠 -->
+  <url>
+    <loc>https://ibtcc.kr/university-board.html</loc>
+    <lastmod>2026-05-05</lastmod>
+    <priority>0.75</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  <url>
+    <loc>https://ibtcc.kr/foreign-jobs.html</loc>
+    <lastmod>2026-05-05</lastmod>
+    <priority>0.75</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  <url>
+    <loc>https://ibtcc.kr/package.html</loc>
+    <lastmod>2026-05-05</lastmod>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://ibtcc.kr/job-board.html</loc>
+    <lastmod>2026-05-05</lastmod>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://ibtcc.kr/student.html</loc>
+    <lastmod>2026-05-05</lastmod>
+    <priority>0.65</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+
+  <!-- 모바일 -->
+  <url>
+    <loc>https://ibtcc.kr/mobile.html</loc>
+    <lastmod>2026-05-05</lastmod>
+    <priority>0.6</priority>
+    <changefreq>weekly</changefreq>
   </url>
 
 </urlset>
