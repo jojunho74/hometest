@@ -5248,8 +5248,7 @@
       return rows;
     }
 
-    function spSetPeriod(p) {
-      _spPeriod = p;
+    function spRenderKpi(p) {
       const labels = {today:'오늘',yesterday:'어제',week:'주간',month:'월간',all:'전체'};
       document.querySelectorAll('#sp-period-btns button').forEach(btn => {
         const on = btn.dataset.p === p;
@@ -5263,7 +5262,12 @@
       document.getElementById('sp-k-analyze').textContent  = filteredAct.filter(r=>r.page.startsWith('evidence/sample.html:analyze:')).length.toLocaleString();
       document.getElementById('sp-k-planopen').textContent = filteredAct.filter(r=>r.page.startsWith('evidence/sample.html:plan-open:')).length.toLocaleString();
       document.getElementById('sp-k-confirm').textContent  = filteredAct.filter(r=>r.page.startsWith('evidence/sample.html:result-confirm:')).length.toLocaleString();
-      renderSamplePageAnalytics();
+    }
+
+    async function spSetPeriod(p) {
+      _spPeriod = p;
+      // 버튼 클릭 시 DB 재조회 → 최신 데이터 즉시 반영
+      await loadSamplePageStats();
     }
 
     async function loadSamplePageStats() {
@@ -5302,9 +5306,8 @@
       }).length;
       document.getElementById('sp-k-week').textContent = spWeek.toLocaleString();
 
-      // 기간 필터 적용하여 KPI 초기화 (기본: 전체)
-      spSetPeriod(_spPeriod);
-
+      // 기간 필터 적용하여 KPI 갱신 (spSetPeriod는 DB 재조회하므로 직접 렌더)
+      spRenderKpi(_spPeriod);
       renderSamplePageAnalytics();
     }
 
