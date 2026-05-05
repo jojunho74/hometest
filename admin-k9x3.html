@@ -1558,6 +1558,13 @@
               <h3 class="font-semibold text-slate-600 text-sm">🏆 합격기관 조회 (sample) — 방문 분석
                 <span id="sp-total-badge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600"></span>
               </h3>
+              <div class="flex gap-1" id="sp-period-btns">
+                <button data-p="today"     onclick="spSetPeriod('today')"     class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-amber-600 bg-white">오늘</button>
+                <button data-p="yesterday" onclick="spSetPeriod('yesterday')" class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-amber-600 bg-white">어제</button>
+                <button data-p="week"      onclick="spSetPeriod('week')"      class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-amber-600 bg-white">주간</button>
+                <button data-p="month"     onclick="spSetPeriod('month')"     class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 text-slate-400 hover:text-amber-600 bg-white">월간</button>
+                <button data-p="all"       onclick="spSetPeriod('all')"       class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-amber-500 text-amber-600 bg-amber-50">전체</button>
+              </div>
             </div>
             <div class="grid grid-cols-3 gap-3 mb-3">
               <div class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
@@ -1565,8 +1572,8 @@
                 <div class="text-xs text-slate-400 mt-1">누적 방문</div>
               </div>
               <div class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
-                <div class="text-xl font-black text-emerald-600" id="sp-k-today">—</div>
-                <div class="text-xs text-slate-400 mt-1">오늘 방문</div>
+                <div class="text-xl font-black text-emerald-600" id="sp-k-period">—</div>
+                <div class="text-xs text-slate-400 mt-1" id="sp-period-label">전체 방문</div>
               </div>
               <div class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
                 <div class="text-xl font-black text-purple-600" id="sp-k-week">—</div>
@@ -5227,6 +5234,37 @@
     let _spAllRows = [];    // 순수 페이지뷰 rows
     let _spActRows = [];    // 이벤트 액션 rows (analyze/plan-open/result-confirm)
     let _spCharts = {};
+    let _spPeriod = 'all';
+
+    function spFilterRows(rows, period) {
+      const kstNow = new Date(new Date().getTime() + 9*3600000);
+      const toKey = d => new Date(new Date(d).getTime()+9*3600000).toISOString().slice(0,10);
+      const today = kstNow.toISOString().slice(0,10);
+      const yesterday = new Date(kstNow.getTime()-864e5).toISOString().slice(0,10);
+      if (period === 'today')     return rows.filter(r => toKey(r.visited_at) === today);
+      if (period === 'yesterday') return rows.filter(r => toKey(r.visited_at) === yesterday);
+      if (period === 'week')  { const since = new Date(kstNow.getTime()-6*864e5).toISOString().slice(0,10); return rows.filter(r => toKey(r.visited_at) >= since); }
+      if (period === 'month') { const since = new Date(kstNow.getTime()-29*864e5).toISOString().slice(0,10); return rows.filter(r => toKey(r.visited_at) >= since); }
+      return rows;
+    }
+
+    function spSetPeriod(p) {
+      _spPeriod = p;
+      const labels = {today:'오늘',yesterday:'어제',week:'주간',month:'월간',all:'전체'};
+      document.querySelectorAll('#sp-period-btns button').forEach(btn => {
+        const on = btn.dataset.p === p;
+        btn.className = 'px-2.5 py-1 text-xs font-semibold rounded-lg border ' +
+          (on ? 'border-amber-500 text-amber-600 bg-amber-50' : 'border-slate-200 text-slate-400 hover:text-amber-600 bg-white');
+      });
+      const filteredVisits = spFilterRows(_spAllRows, p);
+      const filteredAct    = spFilterRows(_spActRows, p);
+      document.getElementById('sp-period-label').textContent = labels[p] + ' 방문';
+      document.getElementById('sp-k-period').textContent = filteredVisits.length.toLocaleString();
+      document.getElementById('sp-k-analyze').textContent  = filteredAct.filter(r=>r.page.startsWith('evidence/sample.html:analyze:')).length.toLocaleString();
+      document.getElementById('sp-k-planopen').textContent = filteredAct.filter(r=>r.page.startsWith('evidence/sample.html:plan-open:')).length.toLocaleString();
+      document.getElementById('sp-k-confirm').textContent  = filteredAct.filter(r=>r.page.startsWith('evidence/sample.html:result-confirm:')).length.toLocaleString();
+      renderSamplePageAnalytics();
+    }
 
     async function loadSamplePageStats() {
       const now = new Date();
@@ -5255,12 +5293,6 @@
       document.getElementById('sp-total-badge').textContent = (spTotal || 0).toLocaleString() + '건';
       document.getElementById('sp-k-total').textContent = (spTotal || 0).toLocaleString();
 
-      const spToday = _spAllRows.filter(r => {
-        const kst = new Date(new Date(r.visited_at).getTime() + 9*3600000);
-        return kst.toISOString().slice(0,10) === today;
-      }).length;
-      document.getElementById('sp-k-today').textContent = spToday.toLocaleString();
-
       const monKst = new Date(kstNow);
       monKst.setDate(kstNow.getDate() - ((kstNow.getDay() + 6) % 7));
       const monStr = monKst.toISOString().slice(0,10);
@@ -5270,13 +5302,8 @@
       }).length;
       document.getElementById('sp-k-week').textContent = spWeek.toLocaleString();
 
-      // 행동 KPI
-      const analyzeRows  = _spActRows.filter(r => r.page.startsWith('evidence/sample.html:analyze:'));
-      const planOpenRows = _spActRows.filter(r => r.page.startsWith('evidence/sample.html:plan-open:'));
-      const confirmRows  = _spActRows.filter(r => r.page.startsWith('evidence/sample.html:result-confirm:'));
-      document.getElementById('sp-k-analyze').textContent  = analyzeRows.length.toLocaleString();
-      document.getElementById('sp-k-planopen').textContent = planOpenRows.length.toLocaleString();
-      document.getElementById('sp-k-confirm').textContent  = confirmRows.length.toLocaleString();
+      // 기간 필터 적용하여 KPI 초기화 (기본: 전체)
+      spSetPeriod(_spPeriod);
 
       renderSamplePageAnalytics();
     }
@@ -5284,7 +5311,8 @@
     function renderSamplePageAnalytics() {
       const now = new Date();
       const kstNow = new Date(now.getTime() + 9*3600000);
-      const rows = _spAllRows;
+      const rows = spFilterRows(_spAllRows, _spPeriod);
+      const actRows = spFilterRows(_spActRows, _spPeriod);
 
       // 일별 추이 (최근 14일)
       const days = [], dayCounts = [];
@@ -5362,7 +5390,7 @@
       const scoreCanvas = document.getElementById('sp-score-chart');
       if (scoreCanvas) {
         const scoreBuckets = { '~499':0,'500~599':0,'600~699':0,'700~749':0,'750~799':0,'800~849':0,'850~899':0,'900~':0 };
-        _spActRows.filter(r => r.page.startsWith('evidence/sample.html:analyze:')).forEach(r => {
+        actRows.filter(r => r.page.startsWith('evidence/sample.html:analyze:')).forEach(r => {
           const sc = parseInt(r.page.split(':').pop(), 10);
           if (isNaN(sc)) return;
           if (sc < 500)       scoreBuckets['~499']++;
@@ -5399,10 +5427,10 @@
       // ── 전환율 퍼널 ──
       const funnelEl = document.getElementById('sp-funnel-table');
       if (funnelEl) {
-        const visitCnt  = _spAllRows.length || 0;
-        const analyzeCnt = _spActRows.filter(r => r.page.startsWith('evidence/sample.html:analyze:')).length;
-        const planCnt    = _spActRows.filter(r => r.page.startsWith('evidence/sample.html:plan-open:')).length;
-        const confirmCnt = _spActRows.filter(r => r.page.startsWith('evidence/sample.html:result-confirm:')).length;
+        const visitCnt   = rows.length || 0;
+        const analyzeCnt = actRows.filter(r => r.page.startsWith('evidence/sample.html:analyze:')).length;
+        const planCnt    = actRows.filter(r => r.page.startsWith('evidence/sample.html:plan-open:')).length;
+        const confirmCnt = actRows.filter(r => r.page.startsWith('evidence/sample.html:result-confirm:')).length;
         const pct = (a, b) => b > 0 ? Math.round(a / b * 100) + '%' : '—';
         const funnelSteps = [
           { label: '📥 페이지 방문', count: visitCnt,    rate: '—' },
