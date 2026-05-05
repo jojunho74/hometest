@@ -10053,9 +10053,12 @@ ${d.hashtags}`;
     const lines = text.split('\n');
     for (const line of lines) {
       if (/이상|요구|기준|충족|필요|미만|커트라인|이하/.test(line)) continue;
-      // "토익스피킹 Lv.6", "토스 140점", "TOEIC Speaking 130"
+      // 숫자 레벨: "토익스피킹 Lv.6", "토스 140점", "TOEIC Speaking 130"
       let m = line.match(/(?:토익\s*스피킹|토스|TOEIC\s*Speaking)\s*[:：]?\s*(?:Lv\.?\s*)?(\d+)/i);
       if (m) return m[1];
+      // 문자 레벨: "토익스피킹 IM3", "토스 IH", "TOEIC Speaking AL"
+      m = line.match(/(?:토익\s*스피킹|토스|TOEIC\s*Speaking)\s*[:：]?\s*(AL|IH|IM3|IM2|IM1|IL|NH|NM|NL)/i);
+      if (m) return m[1].toUpperCase();
     }
     return null;
   }
