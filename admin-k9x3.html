@@ -8683,8 +8683,9 @@ ${d.hashtags}`;
       const allMap = {}, periodMap = {}, todayMap = {}, yestMap = {};
       allDwell.forEach(r => {
         const pg = trkNormPage(r.page);
-        if (!allMap[pg]) allMap[pg] = { sum: 0, cnt: 0 };
+        if (!allMap[pg]) allMap[pg] = { sum: 0, cnt: 0, max: 0 };
         allMap[pg].sum += r.dwell_seconds; allMap[pg].cnt++;
+        if (r.dwell_seconds > allMap[pg].max) allMap[pg].max = r.dwell_seconds;
         const d = new Date(r.visited_at);
         if (d >= todayStart) {
           if (!todayMap[pg]) todayMap[pg] = { sum: 0, cnt: 0 };
@@ -8716,11 +8717,11 @@ ${d.hashtags}`;
         </tr></thead>
         <tbody>${sorted.map(([pg, s], i) => {
           const ps = periodMap[pg];
-          const avg    = ps ? Math.round(ps.sum / ps.cnt) : null;
-          const maxSec = ps ? ps.max : null;
+          // 평균·최대는 항상 전체 누적 기준(allMap), 기간 필터에 무관하게 표시
+          const allAvg   = Math.round(s.sum / s.cnt);
+          const allMax   = s.max || null;
           const todayAvg = todayMap[pg] ? Math.round(todayMap[pg].sum / todayMap[pg].cnt) : null;
           const yestAvg  = yestMap[pg]  ? Math.round(yestMap[pg].sum  / yestMap[pg].cnt)  : null;
-          const allAvg   = Math.round(s.sum / s.cnt);
           const pct = Math.round(allAvg / maxAvg * 100);
 
           let delta = '<span style="color:#cbd5e1;">—</span>';
@@ -8735,11 +8736,11 @@ ${d.hashtags}`;
 
           return `<tr style="border-bottom:1px solid #f1f5f9;${i%2===1?'background:#f8fafc;':''}">
             <td style="padding:9px 12px;font-weight:600;color:#1e293b;">${pg}</td>
-            <td style="padding:9px 12px;text-align:right;font-weight:700;color:#7C3AED;">${avg !== null ? trkFmtDwell(avg) : '—'}</td>
-            <td style="padding:9px 12px;text-align:right;color:#64748b;">${maxSec ? trkFmtDwell(maxSec) : '—'}</td>
+            <td style="padding:9px 12px;text-align:right;font-weight:700;color:#7C3AED;" title="전체 누적 평균">${trkFmtDwell(allAvg)}</td>
+            <td style="padding:9px 12px;text-align:right;color:#64748b;" title="전체 누적 최대">${allMax ? trkFmtDwell(allMax) : '—'}</td>
             <td style="padding:9px 12px;text-align:right;font-weight:700;color:#0369a1;">${todayAvg !== null ? trkFmtDwell(todayAvg) : '—'}</td>
             <td style="padding:9px 12px;text-align:right;">${delta}</td>
-            <td style="padding:9px 12px;text-align:right;color:#94a3b8;">${ps ? ps.cnt+'건' : '—'}</td>
+            <td style="padding:9px 12px;text-align:right;color:#94a3b8;">${s.cnt}건</td>
             <td style="padding:9px 12px;"><div style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#7C3AED,#a78bfa);border-radius:4px;"></div></div></td>
           </tr>`;
         }).join('')}</tbody></table>`;
