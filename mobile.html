@@ -69,6 +69,10 @@
     .pc-btn::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:pc-shimmer 2s ease-in-out infinite;}
     @keyframes pc-shimmer{0%{left:-100%}60%,100%{left:160%}}
     .pc-btn:active{opacity:.7;}
+    @keyframes hotPulse{0%,100%{opacity:1;transform:scale(1);box-shadow:0 0 0 0 rgba(255,140,0,.7)}50%{opacity:.85;transform:scale(1.12);box-shadow:0 0 0 5px rgba(255,140,0,0)}}
+    @keyframes newPulse{0%,100%{opacity:1;transform:scale(1);box-shadow:0 0 0 0 rgba(255,59,59,.7)}50%{opacity:.85;transform:scale(1.12);box-shadow:0 0 0 5px rgba(255,59,59,0)}}
+    .badge-hot{display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#FF6B00,#FF3B3B);color:#fff;font-size:0.72rem;font-weight:900;letter-spacing:.05em;padding:2px 7px;border-radius:20px;line-height:1.3;vertical-align:middle;animation:hotPulse 1.4s ease-in-out infinite;}
+    .badge-new{display:inline-flex;align-items:center;justify-content:center;background:#FF3B3B;color:#fff;font-size:0.72rem;font-weight:900;letter-spacing:.05em;padding:2px 7px;border-radius:20px;line-height:1.3;vertical-align:middle;animation:newPulse 1.4s ease-in-out infinite;}
 
     /* ── 바텀 홈 버튼 ── */
     .home-btn{display:block;text-align:center;margin-top:20px;padding:14px;background:var(--white);border-radius:14px;font-size:15px;font-weight:700;color:var(--text);text-decoration:none;transition:opacity .15s;}
@@ -104,7 +108,7 @@
     <div class="sc-inner">
       <div class="sc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F04452" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 6 2 6 2 18 8 18"/><polyline points="16 6 22 6 22 18 16 18"/><rect x="8" y="2" width="8" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></div>
       <div class="sc-text">
-        <div class="sc-name">공공기관 경쟁률</div>
+        <div class="sc-name" style="display:flex;align-items:center;gap:6px;">공공기관 경쟁률 <span class="badge-hot">HOT</span></div>
         <div class="sc-desc">공공기관·기업별 채용 경쟁률을 검색하고 비교해보세요</div>
         <div class="sc-badge">기관별 상세 조회</div>
       </div>
@@ -116,7 +120,7 @@
     <div class="sc-inner">
       <div class="sc-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 0 0 5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 1 0 5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></div>
       <div class="sc-text">
-        <div class="sc-name">최종합격 어학점수</div>
+        <div class="sc-name" style="display:flex;align-items:center;gap:6px;">최종합격 어학점수 <span class="badge-new">NEW</span></div>
         <div class="sc-desc">110개 공공기관 합격자의 토익·오픽 점수를 확인하고, 내 점수로 지원 가능한 기관을 알아보세요</div>
         <div class="sc-badge">토익 합격선 조회</div>
       </div>
