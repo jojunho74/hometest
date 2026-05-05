@@ -916,39 +916,10 @@
       document.getElementById('mobile-menu').classList.toggle('open');
     }
 
-    // ── 내 방문 제외 토글 ──
+    // ── 내 방문 제외: 항상 ON 고정 ──
     const _NT_KEY = 'gtelp_notrack';
-
-    function updateNoTrackBtn() {
-      const btn = document.getElementById('sp-notrack-btn');
-      if (!btn) return;
-      const on = localStorage.getItem(_NT_KEY) === '1';
-      btn.textContent = on ? '🙈 내 방문 제외 ON ✅' : '🙈 내 방문 제외 OFF';
-      btn.style.color = on ? '#4ADE80' : '#64748B';
-      btn.style.borderColor = on ? 'rgba(74,222,128,0.4)' : 'rgba(255,255,255,0.1)';
-    }
-
-    function toggleNoTrack() {
-      const on = localStorage.getItem(_NT_KEY) === '1';
-      if (on) {
-        localStorage.removeItem(_NT_KEY);
-        alert('내 방문 제외 OFF\n이 브라우저의 방문이 통계에 포함됩니다.');
-      } else {
-        localStorage.setItem(_NT_KEY, '1');
-        alert('내 방문 제외 ON ✅\n이 브라우저의 방문은 통계에서 제외됩니다.\n(이 설정은 브라우저에 저장됩니다)');
-      }
-      updateNoTrackBtn();
-    }
-
-    window.addEventListener('load', updateNoTrackBtn);
+    localStorage.setItem(_NT_KEY, '1');
   </script>
 
-<!-- 내 방문 제외 토글 버튼 (하단 고정) -->
-<div style="position:fixed;bottom:16px;right:16px;z-index:900;">
-  <button id="sp-notrack-btn" onclick="toggleNoTrack()"
-    style="font-size:11px;font-weight:600;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(15,30,55,0.92);color:#64748B;cursor:pointer;backdrop-filter:blur(6px);transition:all .2s;">
-    🙈 내 방문 제외 OFF
-  </button>
-</div>
 </body>
 </html>
