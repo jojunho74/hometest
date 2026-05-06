@@ -234,10 +234,19 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
           </div>
           <div style="position:relative;">
             <input type="text" id="source-search" class="form-input" placeholder="🔍 기업명으로 검색..."
-              style="padding-left:12px;font-size:.82rem;"
+              style="padding-left:12px;font-size:.82rem;padding-right:70px;"
               oninput="filterSourceList(this.value)"/>
-            <button onclick="document.getElementById('source-search').value='';filterSourceList('');"
-              style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94A3B8;font-size:.75rem;display:none;" id="source-search-clear">✕</button>
+            <div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:4px;">
+              <button onclick="pinCurrentSearch()"
+                style="background:#3B82F6;border:none;cursor:pointer;color:#fff;font-size:.7rem;font-weight:700;padding:3px 7px;border-radius:5px;white-space:nowrap;" title="현재 검색어 고정">📌 고정</button>
+              <button onclick="document.getElementById('source-search').value='';filterSourceList('');"
+                style="background:none;border:none;cursor:pointer;color:#94A3B8;font-size:.75rem;display:none;" id="source-search-clear">✕</button>
+            </div>
+          </div>
+          <!-- 고정검색어 -->
+          <div id="pinned-search-area" style="display:none;flex-wrap:wrap;gap:5px;margin-top:6px;align-items:center;">
+            <span style="font-size:.68rem;color:#94A3B8;font-weight:600;white-space:nowrap;">고정:</span>
+            <div id="pinned-chips" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
           </div>
         </div>
         <div class="overflow-x-auto">
@@ -299,6 +308,7 @@ const db = createClient(
 );
 
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtKST(iso){if(!iso)return'-';const d=new Date(new Date(iso).getTime()+9*3600000);return d.toISOString().slice(0,16).replace('T',' ');}
 function toast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'#1E293B':'#DC2626';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
 // ── 인증 ──
@@ -633,6 +643,7 @@ async function loadSourceList() {
   document.getElementById('section-source-list').classList.remove('hidden');
   document.getElementById('source-search').value = '';
   document.getElementById('source-search-clear').style.display = 'none';
+  renderPinnedChips();
   const tbody = document.getElementById('source-list-tbody');
   tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr>';
 
@@ -670,7 +681,7 @@ function renderSourceRows(rows, highlight) {
     const statusChip = r.status === 'published'
       ? '<span class="text-xs font-bold text-emerald-600 px-2 py-0.5 rounded-full" style="background:#D1FAE5;">게시됨</span>'
       : '<span class="text-xs font-bold text-slate-400 px-2 py-0.5 rounded-full" style="background:#F1F5F9;">임시저장</span>';
-    const dt = r.created_at ? r.created_at.slice(0,16).replace('T',' ') : '-';
+    const dt = fmtKST(r.created_at);
     const shortUrl = (r.url||'').length > 40 ? (r.url||'').slice(0,40)+'…' : (r.url||'-');
     const nameRaw = r.dataset_name || '(미입력)';
     const nameHtml = highlight
@@ -812,6 +823,56 @@ async function deleteSource(id) {
   if (error) { toast('삭제 실패: ' + error.message, false); return; }
   toast('삭제됨');
   loadSourceList();
+}
+
+// ── 고정검색어 ──
+const PINNED_KEY = 'alioSourcePinnedSearches';
+
+function getPinned() {
+  try { return JSON.parse(localStorage.getItem(PINNED_KEY) || '[]'); } catch { return []; }
+}
+function savePinned(arr) {
+  localStorage.setItem(PINNED_KEY, JSON.stringify(arr));
+}
+
+function renderPinnedChips() {
+  const pinned = getPinned();
+  const area = document.getElementById('pinned-search-area');
+  const container = document.getElementById('pinned-chips');
+  if (!pinned.length) { area.style.display = 'none'; return; }
+  area.style.display = 'flex';
+  container.innerHTML = pinned.map(kw => `
+    <button onclick="applyPinnedSearch(${JSON.stringify(kw)})"
+      style="display:inline-flex;align-items:center;gap:4px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;font-size:.75rem;font-weight:600;padding:3px 9px;border-radius:20px;cursor:pointer;white-space:nowrap;">
+      ${esc(kw)}
+      <span onclick="event.stopPropagation();removePinned(${JSON.stringify(kw)})"
+        style="color:#93C5FD;font-size:.7rem;margin-left:2px;cursor:pointer;" title="제거">✕</span>
+    </button>`).join('');
+}
+
+function pinCurrentSearch() {
+  const kw = document.getElementById('source-search').value.trim();
+  if (!kw) { toast('검색어를 입력하세요', false); return; }
+  const pinned = getPinned();
+  if (pinned.includes(kw)) { toast('이미 고정된 검색어입니다', false); return; }
+  pinned.unshift(kw);
+  savePinned(pinned);
+  renderPinnedChips();
+  toast(`"${kw}" 고정됨`);
+}
+
+function removePinned(kw) {
+  const pinned = getPinned().filter(p => p !== kw);
+  savePinned(pinned);
+  renderPinnedChips();
+  const cur = document.getElementById('source-search').value;
+  if (cur === kw) { document.getElementById('source-search').value = ''; filterSourceList(''); }
+}
+
+function applyPinnedSearch(kw) {
+  document.getElementById('source-search').value = kw;
+  document.getElementById('source-search-clear').style.display = 'block';
+  filterSourceList(kw);
 }
 
 // ── SQL 가이드 ──

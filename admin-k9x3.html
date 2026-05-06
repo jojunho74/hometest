@@ -3199,11 +3199,11 @@
     }
 
     function updateStats() {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = new Date(Date.now() + 9*3600000).toISOString().slice(0, 10);
       document.getElementById('stat-total').textContent   = allData.length;
       document.getElementById('stat-pending').textContent = allData.filter(r => r.status === 'pending').length;
       document.getElementById('stat-done').textContent    = allData.filter(r => r.status === 'done').length;
-      document.getElementById('stat-today').textContent   = allData.filter(r => r.created_at.slice(0, 10) === today).length;
+      document.getElementById('stat-today').textContent   = allData.filter(r => new Date(new Date(r.created_at).getTime() + 9*3600000).toISOString().slice(0,10) === today).length;
     }
 
     function setFilter(f) {
