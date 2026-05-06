@@ -20,10 +20,10 @@
     .hinner{max-width:1100px;margin:0 auto;padding:0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;}
     .hlogo{font-size:1rem;font-weight:800;color:#fff;text-decoration:none;}
     .hnav{display:none;align-items:center;gap:4px;font-size:0.8rem;font-weight:600;}
-    .hnav a{color:rgba(255,255,255,.75);text-decoration:none;transition:background .18s,color .18s;padding:5px 9px;border-radius:8px;font-size:0.78rem;}
+    .hnav a{color:rgba(255,255,255,.75);text-decoration:none;transition:background .18s,color .18s;padding:8px 12px;border-radius:8px;font-size:0.85rem;}
     .hnav a:hover{background:rgba(255,255,255,.12);color:#fff;}
     .hnav a.active{background:rgba(255,255,255,.12);color:#fff;}
-    .hbtn{display:none;padding:8px 18px;border-radius:8px;font-size:0.8rem;font-weight:700;background:rgba(255,255,255,.15);color:#fff;text-decoration:none;transition:background .15s;}
+    .hbtn{display:none;padding:10px 18px;border-radius:8px;font-size:0.85rem;font-weight:700;background:rgba(255,255,255,.15);color:#fff;text-decoration:none;transition:background .15s;min-height:44px;display:inline-flex;align-items:center;}
     .hbtn:hover{background:rgba(255,255,255,.25);}
     .hamburger{display:flex;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:rgba(255,255,255,.12);border:none;padding:6px;border-radius:8px;}
     .hamburger span{display:block;height:2px;background:#fff;border-radius:2px;transition:transform .25s,opacity .25s;}
@@ -31,7 +31,7 @@
     .hamburger.open span:nth-child(2){opacity:0;}
     .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
     .mobile-menu{display:none;flex-direction:column;background:#0D1B2A;border-top:1px solid rgba(255,255,255,.1);padding:12px 16px 16px;position:sticky;top:64px;z-index:49;box-shadow:0 4px 12px rgba(0,0,0,.4);}
-    .mobile-menu a{padding:12px 4px;font-size:0.9rem;font-weight:600;color:rgba(255,255,255,.85);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.08);}
+    .mobile-menu a{padding:14px 12px;font-size:0.95rem;font-weight:600;color:rgba(255,255,255,.85);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.08);}
     .mobile-menu a:last-child{border-bottom:none;}
     .mobile-menu .mbtn{margin-top:12px;display:block;text-align:center;padding:12px;border-radius:8px;background:linear-gradient(135deg,#1E4D8C,#0891B2);color:#fff;font-weight:700;text-decoration:none;}
     .mobile-menu.open{display:flex;}
@@ -51,14 +51,16 @@
     tbody tr{border-bottom:1px solid #F1F5F9;transition:background .15s;}
     tbody tr:hover{background:#FFF8F0;}
     tbody tr:last-child{border-bottom:none;}
-    tbody td{padding:11px 10px;text-align:center;color:#1E293B;white-space:nowrap;}
+    tbody td{padding:14px 10px;text-align:center;color:#1E293B;white-space:nowrap;}
+    @media(max-width:640px){tbody td{padding:12px 8px;font-size:12px;}}
     tbody td:first-child{font-weight:700;color:#7B1D2E;}
     .highlight{font-weight:700;color:#7B1D2E;}
     .note{font-size:12px;color:#64748B;margin-top:16px;padding:12px 16px;background:#FFF5F5;border-radius:8px;border-left:3px solid #7B1D2E;}
       .nav-link { padding: 5px 9px; border-radius: 8px; color: var(--ink-mid, #475569); text-decoration: none; transition: background .18s, color .18s; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
     .nav-link:hover { background: #1E4D8C; color: #fff; }
-      .btn-primary { display: inline-flex; align-items: center; justify-content: center; padding: 0.6rem 1.25rem; border-radius: 50px; font-weight: 700; font-size: 0.875rem; background: linear-gradient(135deg,#1E4D8C,#0891B2); color: #fff; text-decoration: none; border: none; cursor: pointer; transition: opacity .2s, transform .15s; }
+      .btn-primary { display: inline-flex; align-items: center; justify-content: center; padding: 1rem 1.5rem; border-radius: 50px; font-weight: 700; font-size: 0.95rem; background: linear-gradient(135deg,#1E4D8C,#0891B2); color: #fff; text-decoration: none; border: none; cursor: pointer; transition: opacity .2s, transform .15s; min-height: 44px; }
     .btn-primary:hover { opacity: .88; transform: scale(1.02); }
+    @media (max-width: 640px) { .btn-primary { padding: 0.875rem 1.25rem; font-size: 0.875rem; } }
   </style>
 </head>
 <body>

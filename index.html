@@ -40,8 +40,8 @@
     /* ── 버튼 ── */
     .btn-primary {
       background: linear-gradient(135deg, #1E4D8C, #0891B2); color: #fff;
-      padding: .875rem 2rem; border-radius: 50px;
-      font-weight: 700; font-size: .95rem; min-height: 52px;
+      padding: 1rem 2rem; border-radius: 50px;
+      font-weight: 700; font-size: 0.95rem; min-height: 48px;
       display: inline-flex; align-items: center; justify-content: center;
       cursor: pointer; border: none;
       transition: opacity .2s, transform .15s, box-shadow .3s;
@@ -52,11 +52,12 @@
     .btn-primary:active { transform: scale(0.97); }
     .btn-primary:focus  { outline: none; box-shadow: 0 0 0 3px rgba(30,77,140,.3); }
     .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    @media (max-width: 640px) { .btn-primary { padding: 0.875rem 1.5rem; font-size: 0.875rem; min-height: 44px; } }
 
     .btn-outline {
       background: transparent; color: var(--blue-mid);
-      padding: .875rem 2rem; border-radius: 50px;
-      font-weight: 700; font-size: .95rem; min-height: 52px;
+      padding: 1rem 2rem; border-radius: 50px;
+      font-weight: 700; font-size: 0.95rem; min-height: 48px;
       display: inline-flex; align-items: center; justify-content: center;
       cursor: pointer; border: 2px solid var(--blue-mid);
       transition: background .2s, color .2s, border-color .2s, transform .15s, box-shadow .2s;
@@ -64,11 +65,12 @@
     }
     .btn-outline:hover  { background: var(--blue-mid); color: #fff; transform: scale(1.02); }
     .btn-outline:active { transform: scale(0.97); }
+    @media (max-width: 640px) { .btn-outline { padding: 0.875rem 1.5rem; font-size: 0.875rem; min-height: 44px; } }
 
     .btn-gold {
       background: linear-gradient(135deg, #D97706, #F59E0B); color: #fff;
-      padding: .875rem 2rem; border-radius: 50px;
-      font-weight: 700; font-size: .95rem; min-height: 52px;
+      padding: 1rem 2rem; border-radius: 50px;
+      font-weight: 700; font-size: 0.95rem; min-height: 48px;
       display: inline-flex; align-items: center; justify-content: center;
       cursor: pointer; border: none;
       transition: opacity .18s, transform .15s, box-shadow .2s;
@@ -77,6 +79,7 @@
     }
     .btn-gold:hover  { opacity: .9; transform: scale(1.02); }
     .btn-gold:active { transform: scale(0.97); }
+    @media (max-width: 640px) { .btn-gold { padding: 0.875rem 1.5rem; font-size: 0.875rem; min-height: 44px; } }
 
     /* ── 폼 ── */
     .form-step { display: none; }
@@ -100,12 +103,12 @@
     }
     .custom-checkbox:checked { background: var(--blue-mid); border-color: var(--blue-mid); }
     .custom-checkbox:checked::after { content: '✓'; position: absolute; color: #fff; font-size: 13px; top: 1px; left: 3px; }
-    .check-row { min-height: 48px; display: flex; align-items: center; gap: 12px; padding: 4px 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .check-row { min-height: 48px; display: flex; align-items: center; gap: 12px; padding: 10px 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
     /* ── FAQ ── */
     details summary { list-style: none; }
     details summary::-webkit-details-marker { display: none; }
-    details summary { min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    details summary { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
     .faq-icon { transition: transform .2s; flex-shrink: 0; }
     details[open] .faq-icon { transform: rotate(180deg); }
 
@@ -216,10 +219,11 @@
     .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-    .nav-link { padding: 5px 9px; border-radius: 8px; color: rgba(255,255,255,.75); text-decoration: none; transition: background .18s, color .18s; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+    .nav-link { padding: 8px 12px; border-radius: 8px; color: rgba(255,255,255,.75); text-decoration: none; transition: background .18s, color .18s; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+    @media (max-width: 768px) { .nav-link { font-size: 0.8rem; padding: 6px 10px; } }
     .nav-link:hover { background: rgba(255,255,255,.12); color: #fff; }
     .mobile-menu { display: none; flex-direction: column; background: #0D1B2A; border-top: 1px solid rgba(255,255,255,.1); padding: 12px 16px 16px; position: sticky; top: 64px; z-index: 49; box-shadow: 0 4px 12px rgba(0,0,0,.4); }
-    .mobile-menu a { padding: 12px 4px; font-size: 0.9rem; font-weight: 600; color: rgba(255,255,255,.85); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .mobile-menu a { padding: 14px 12px; font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,.85); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.08); }
     .mobile-menu a:last-child { border-bottom: none; }
     .mobile-menu .m-cta { margin-top: 12px; display: block; text-align: center; padding: 12px; border-radius: 50px; background: linear-gradient(135deg, #1E4D8C, #0891B2); color: #fff; font-weight: 700; text-decoration: none; }
     .mobile-menu.open { display: flex; }
