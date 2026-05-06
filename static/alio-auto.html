@@ -850,17 +850,19 @@ function renderPinnedChips() {
   const active = localStorage.getItem('alioActiveSearch');
   container.innerHTML = pinned.map(kw => {
     const isActive = kw === active;
-    const chipStyle = isActive
-      ? 'background:#1D4ED8;border:1px solid #1D4ED8;color:#fff;'
-      : 'background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;';
-    const xColor = isActive ? 'rgba(255,255,255,.7)' : '#93C5FD';
+    const chipBg  = isActive ? '#1D4ED8' : '#EFF6FF';
+    const chipBdr = isActive ? '#1D4ED8' : '#BFDBFE';
+    const chipClr = isActive ? '#fff'    : '#1D4ED8';
+    const xClr    = isActive ? 'rgba(255,255,255,.8)' : '#93C5FD';
     return `
-    <button onclick="applyPinnedSearch(${JSON.stringify(kw)})"
-      style="display:inline-flex;align-items:center;gap:4px;${chipStyle}font-size:.75rem;font-weight:600;padding:3px 9px;border-radius:20px;cursor:pointer;white-space:nowrap;">
-      ${isActive ? '✔ ' : ''}${esc(kw)}
-      <span onclick="event.stopPropagation();removePinned(${JSON.stringify(kw)})"
-        style="color:${xColor};font-size:.7rem;margin-left:2px;cursor:pointer;" title="고정 취소">✕</span>
-    </button>`;
+    <span style="display:inline-flex;align-items:center;gap:0;border-radius:20px;overflow:hidden;border:1px solid ${chipBdr};">
+      <button onclick="applyPinnedSearch(${JSON.stringify(kw)})"
+        style="background:${chipBg};color:${chipClr};font-size:.75rem;font-weight:600;padding:3px 8px;border:none;cursor:pointer;white-space:nowrap;">
+        ${isActive ? '✔ ' : ''}${esc(kw)}
+      </button>
+      <button onclick="removePinned(${JSON.stringify(kw)})"
+        style="background:${chipBg};color:${xClr};font-size:.75rem;font-weight:700;padding:3px 7px 3px 2px;border:none;cursor:pointer;line-height:1;" title="고정 취소">✕</button>
+    </span>`;
   }).join('');
 }
 
