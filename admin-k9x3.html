@@ -479,6 +479,7 @@
             class="hidden btn text-xs px-3 py-1.5" style="color:#EF4444;border:1px solid #FCA5A5;background:#FFF5F5;border-radius:6px;">
             선택 삭제
           </button>
+          <button onclick="trimOldPrograms()" class="btn text-xs px-3 py-1.5" style="background:#FEF3C7;color:#B45309;border:1px solid #FCD34D;border-radius:6px;" title="학교별 100개 초과 오래된 게시글 소프트삭제">✂️ 100개 초과 정리</button>
           <button onclick="selectAllPrograms()" class="btn text-xs px-3 py-1.5 btn-secondary ml-auto">전체 선택</button>
           <button onclick="deselectAllPrograms()" class="btn text-xs px-3 py-1.5 btn-secondary">전체 해제</button>
         </div>
@@ -4133,6 +4134,46 @@
       const ids = Array.from(checked).map(c => c.value);
       const { error } = await db.from('school_programs').update({ is_deleted: true }).in('id', ids);
       if (error) { alert('삭제 실패: ' + error.message); return; }
+      loadPrograms();
+    }
+
+    async function trimOldPrograms() {
+      const LIMIT = 100;
+      // 현재 로드된 데이터에서 학교명 목록 추출
+      const { data: allRows, error } = await db
+        .from('school_programs')
+        .select('id, school_name, created_at')
+        .eq('is_deleted', false)
+        .order('created_at', { ascending: true }); // 오래된 순
+      if (error) { alert('데이터 조회 실패: ' + error.message); return; }
+
+      // 학교별 그룹핑
+      const bySchool = {};
+      for (const r of allRows) {
+        if (!bySchool[r.school_name]) bySchool[r.school_name] = [];
+        bySchool[r.school_name].push(r.id);
+      }
+
+      // 100개 초과분 ID 수집
+      const excessIds = [];
+      for (const [school, ids] of Object.entries(bySchool)) {
+        if (ids.length > LIMIT) {
+          excessIds.push(...ids.slice(0, ids.length - LIMIT)); // 오래된 것부터
+        }
+      }
+
+      if (!excessIds.length) { alert('정리할 게시글이 없습니다.\n모든 학교가 100개 이하입니다.'); return; }
+      if (!confirm(`${excessIds.length}개의 오래된 게시글을 소프트삭제합니다.\n(학교별 최신 100개만 유지)\n계속하시겠습니까?`)) return;
+
+      // 50개씩 배치 소프트삭제
+      let deleted = 0;
+      for (let i = 0; i < excessIds.length; i += 50) {
+        const batch = excessIds.slice(i, i + 50);
+        const { error: delErr } = await db.from('school_programs').update({ is_deleted: true }).in('id', batch);
+        if (delErr) { alert('삭제 실패: ' + delErr.message); return; }
+        deleted += batch.length;
+      }
+      alert(`✅ 정리 완료: ${deleted}개 소프트삭제\n학교별 최신 100개가 유지됩니다.`);
       loadPrograms();
     }
 

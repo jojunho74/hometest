@@ -57,8 +57,44 @@ def publish_posts(new_posts: list[dict]) -> dict:
     # 마지막 수집 시간 업데이트
     update_last_crawled(new_posts, sb)
 
+    # 학교별 100개 초과분 정리
+    school_names = list({p['school_name'] for p in new_posts})
+    trimmed_total = trim_old_posts(school_names, sb)
+    if trimmed_total:
+        log.info(f"오래된 게시글 정리: {trimmed_total}개 삭제 (학교별 100개 초과분)")
+
     log.info(f"게시 완료: 성공 {success}개 / 실패 {failed}개")
     return {'success': success, 'failed': failed, 'errors': errors}
+
+LIMIT_PER_SCHOOL = 100
+
+def trim_old_posts(school_names: list[str], sb) -> int:
+    """학교별 게시글을 최대 LIMIT_PER_SCHOOL개로 제한, 초과분은 오래된 순 삭제"""
+    total_deleted = 0
+    for school_name in school_names:
+        try:
+            # is_deleted=false 인 게시글만 대상 (소프트삭제 제외)
+            res = sb.table('school_programs') \
+                .select('id, created_at') \
+                .eq('school_name', school_name) \
+                .eq('is_deleted', False) \
+                .order('created_at', desc=False) \
+                .execute()
+            rows = res.data or []
+            if len(rows) <= LIMIT_PER_SCHOOL:
+                continue
+            # 오래된 순으로 초과분 ID 수집
+            excess_ids = [r['id'] for r in rows[:len(rows) - LIMIT_PER_SCHOOL]]
+            # 소프트 삭제
+            sb.table('school_programs') \
+                .update({'is_deleted': True}) \
+                .in_('id', excess_ids) \
+                .execute()
+            total_deleted += len(excess_ids)
+            log.info(f"  [{school_name}] {len(excess_ids)}개 오래된 게시글 소프트삭제")
+        except Exception as e:
+            log.warning(f"  [{school_name}] 정리 실패: {e}")
+    return total_deleted
 
 def update_last_crawled(posts: list[dict], sb):
     """university_sites 테이블의 last_crawled_at 업데이트"""

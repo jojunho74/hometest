@@ -227,7 +227,9 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
               <span class="text-xs font-bold text-slate-500">🗂️ 저장된 HTML 소스 목록</span>
               <span id="source-list-count" class="text-xs text-slate-400"></span>
             </div>
-            <div style="display:flex;gap:6px;">
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button onclick="updateSelected()" id="update-selected-btn" class="btn btn-success" style="font-size:.72rem;padding:4px 10px;display:none;">⚡ 선택 업데이트 (<span id="selected-count2">0</span>)</button>
+              <button onclick="deleteSelected()" id="delete-selected-btn" class="btn btn-danger" style="font-size:.72rem;padding:4px 10px;display:none;">🗑️ 선택 삭제 (<span id="selected-count">0</span>)</button>
               <button onclick="bulkReparse()" class="btn btn-purple" style="font-size:.72rem;padding:4px 10px;" id="bulk-btn">⚡ 전체 일괄 재파싱</button>
               <button onclick="loadSourceList()" class="btn btn-secondary" style="font-size:.72rem;padding:4px 8px;">🔄 새로고침</button>
             </div>
@@ -252,13 +254,14 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
         <div class="overflow-x-auto">
           <table class="data-tbl">
             <thead><tr>
+              <th style="width:36px;text-align:center;"><input type="checkbox" id="chk-all" onchange="toggleAllChecks(this.checked)" style="cursor:pointer;width:15px;height:15px;"/></th>
               <th>URL</th>
               <th>기업명</th>
               <th>상태</th>
               <th>저장일</th>
               <th>관리</th>
             </tr></thead>
-            <tbody id="source-list-tbody"><tr><td colspan="5" class="py-6 text-center text-sm text-slate-400">새로고침을 클릭하세요</td></tr></tbody>
+            <tbody id="source-list-tbody"><tr><td colspan="6" class="py-6 text-center text-sm text-slate-400">새로고침을 클릭하세요</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -680,7 +683,7 @@ function renderSourceRows(rows, highlight) {
     rows.length === total ? total + '개' : `${rows.length} / ${total}개`;
   const tbody = document.getElementById('source-list-tbody');
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-sm text-slate-400">${highlight ? '검색 결과가 없습니다.' : '저장된 소스가 없습니다.'}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-sm text-slate-400">${highlight ? '검색 결과가 없습니다.' : '저장된 소스가 없습니다.'}</td></tr>`;
     return;
   }
   tbody.innerHTML = rows.map(r => {
@@ -695,6 +698,7 @@ function renderSourceRows(rows, highlight) {
           m => `<mark style="background:#FEF08A;color:#1E293B;border-radius:2px;">${m}</mark>`)
       : esc(nameRaw);
     return `<tr>
+      <td style="text-align:center;width:36px;"><input type="checkbox" class="row-chk" data-id="${r.id}" onchange="updateCheckState()" style="cursor:pointer;width:15px;height:15px;"/></td>
       <td class="text-xs text-blue-600 max-w-[200px]" title="${esc(r.url)}"><a href="${esc(r.url)}" target="_blank" style="text-decoration:underline;">${esc(shortUrl)}</a></td>
       <td class="text-xs font-semibold text-slate-700">${nameHtml}</td>
       <td>${statusChip}</td>
@@ -705,6 +709,7 @@ function renderSourceRows(rows, highlight) {
       </td>
     </tr>`;
   }).join('');
+  updateCheckState();
 }
 
 async function loadSourceById(id) {
@@ -820,6 +825,118 @@ async function bulkReparse() {
 
   btn.disabled = false; btn.textContent = '⚡ 전체 일괄 재파싱';
   toast(`완료! 성공 ${ok}개 / 실패 ${fail}개`);
+  loadSourceList();
+}
+
+function updateCheckState() {
+  const all = [...document.querySelectorAll('.row-chk')];
+  const checked = all.filter(c => c.checked);
+  const chkAll = document.getElementById('chk-all');
+  if (chkAll) {
+    chkAll.checked = all.length > 0 && checked.length === all.length;
+    chkAll.indeterminate = checked.length > 0 && checked.length < all.length;
+  }
+  const btn = document.getElementById('delete-selected-btn');
+  const cnt = document.getElementById('selected-count');
+  if (btn) btn.style.display = checked.length ? 'inline-flex' : 'none';
+  if (cnt) cnt.textContent = checked.length;
+  const ubtn = document.getElementById('update-selected-btn');
+  const ucnt = document.getElementById('selected-count2');
+  if (ubtn) ubtn.style.display = checked.length ? 'inline-flex' : 'none';
+  if (ucnt) ucnt.textContent = checked.length;
+}
+
+function toggleAllChecks(checked) {
+  document.querySelectorAll('.row-chk').forEach(c => { c.checked = checked; });
+  updateCheckState();
+}
+
+async function updateSelected() {
+  const ids = [...document.querySelectorAll('.row-chk:checked')].map(c => c.dataset.id);
+  if (!ids.length) return;
+  if (!confirm(`선택한 ${ids.length}개를 순차 업데이트합니다.\n항목 간 2초씩 대기합니다. 계속하시겠습니까?`)) return;
+
+  const ubtn = document.getElementById('update-selected-btn');
+  const dbtn = document.getElementById('delete-selected-btn');
+  if (ubtn) { ubtn.disabled = true; ubtn.textContent = '⏳ 업데이트 중...'; }
+  if (dbtn) dbtn.disabled = true;
+
+  let ok = 0, fail = 0, skip = 0;
+
+  for (let i = 0; i < ids.length; i++) {
+    const id = ids[i];
+    if (ubtn) ubtn.textContent = `⏳ ${i+1}/${ids.length} 처리 중...`;
+
+    const url = _sourceMap[id];
+    if (!url || url === '(직접 입력)') { skip++; continue; }
+
+    // 개별 업데이트 버튼 상태 표시
+    const btn = document.getElementById('update-btn-' + id);
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ 수집 중...'; }
+
+    // HTML 재수집
+    let html = null;
+    for (let p = 0; p < PROXY_LIST.length; p++) {
+      html = await PROXY_LIST[p].fetch(url);
+      if (html && html.length > 500) break;
+      html = null;
+    }
+
+    if (!html) {
+      if (btn) { btn.disabled = false; btn.textContent = '🔄 업데이트'; }
+      fail++;
+    } else {
+      // 파싱
+      let parsedData = null, dsName = null;
+      try {
+        const result = parseAlioHtml(html);
+        if (result.records.length) {
+          const { data: existing } = await db.from('alio_source_cache').select('dataset_name').eq('id', id).single();
+          dsName = existing?.dataset_name || result.datasetName;
+          parsedData = result.records.map(r => ({ ...r, dataset_name: dsName }));
+        }
+      } catch(e) {}
+
+      const payload = { html_source: html };
+      if (parsedData) payload.upload_data = parsedData;
+      const { error } = await db.from('alio_source_cache').update(payload).eq('id', id);
+
+      if (error) {
+        fail++;
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 업데이트'; }
+      } else {
+        if (parsedData && dsName) {
+          await db.from('alio_jobs').delete().eq('dataset_name', dsName);
+          await db.from('alio_jobs').insert(parsedData);
+        }
+        _updatedDates[id] = new Date().toISOString().slice(0,10);
+        ok++;
+        if (btn) { btn.disabled = false; btn.textContent = `✅ ${_updatedDates[id].slice(5)}`; }
+      }
+    }
+
+    // 마지막이 아니면 2초 대기
+    if (i < ids.length - 1) {
+      for (let s = 2; s > 0; s--) {
+        if (ubtn) ubtn.textContent = `⏳ ${i+1}/${ids.length} 완료 — ${s}초 후 다음...`;
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    }
+  }
+
+  if (ubtn) { ubtn.disabled = false; ubtn.textContent = `⚡ 선택 업데이트 (${ids.length})`; }
+  if (dbtn) dbtn.disabled = false;
+  toast(`완료! 성공 ${ok} / 실패 ${fail}${skip ? ` / URL없음 ${skip}` : ''}`);
+  loadSourceList();
+}
+
+async function deleteSelected() {
+  const ids = [...document.querySelectorAll('.row-chk:checked')].map(c => c.dataset.id);
+  if (!ids.length) return;
+  if (!confirm(`선택한 ${ids.length}개를 삭제하시겠습니까?`)) return;
+  const { error } = await db.from('alio_source_cache').delete().in('id', ids);
+  if (error) { toast('삭제 실패: ' + error.message, false); return; }
+  toast(`${ids.length}개 삭제됨`);
   loadSourceList();
 }
 
