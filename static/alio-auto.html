@@ -239,7 +239,7 @@ body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F1F
             <div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:4px;">
               <button onclick="pinCurrentSearch()"
                 style="background:#3B82F6;border:none;cursor:pointer;color:#fff;font-size:.7rem;font-weight:700;padding:3px 7px;border-radius:5px;white-space:nowrap;" title="현재 검색어 고정">📌 고정</button>
-              <button onclick="document.getElementById('source-search').value='';filterSourceList('');"
+              <button onclick="document.getElementById('source-search').value='';localStorage.removeItem('alioActiveSearch');filterSourceList('');"
                 style="background:none;border:none;cursor:pointer;color:#94A3B8;font-size:.75rem;display:none;" id="source-search-clear">✕</button>
             </div>
           </div>
@@ -641,9 +641,15 @@ function renderUpdateBtn(id) {
 
 async function loadSourceList() {
   document.getElementById('section-source-list').classList.remove('hidden');
-  document.getElementById('source-search').value = '';
-  document.getElementById('source-search-clear').style.display = 'none';
   renderPinnedChips();
+
+  // 저장된 활성 검색어 복원
+  const activeSearch = localStorage.getItem('alioActiveSearch');
+  const pinned = getPinned();
+  const restoredKw = (activeSearch && pinned.includes(activeSearch)) ? activeSearch : '';
+  document.getElementById('source-search').value = restoredKw;
+  document.getElementById('source-search-clear').style.display = restoredKw ? 'block' : 'none';
+
   const tbody = document.getElementById('source-list-tbody');
   tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-sm text-slate-400">불러오는 중...</td></tr>';
 
@@ -656,7 +662,7 @@ async function loadSourceList() {
   _sourceMap = {};
   _allSources.forEach(r => { _sourceMap[r.id] = r.url; });
 
-  renderSourceRows(_allSources);
+  renderSourceRows(restoredKw ? _allSources.filter(r => (r.dataset_name||'').toLowerCase().includes(restoredKw.toLowerCase())) : _allSources, restoredKw || undefined);
 }
 
 function filterSourceList(kw) {
@@ -866,12 +872,17 @@ function removePinned(kw) {
   savePinned(pinned);
   renderPinnedChips();
   const cur = document.getElementById('source-search').value;
-  if (cur === kw) { document.getElementById('source-search').value = ''; filterSourceList(''); }
+  if (cur === kw) {
+    document.getElementById('source-search').value = '';
+    localStorage.removeItem('alioActiveSearch');
+    filterSourceList('');
+  }
 }
 
 function applyPinnedSearch(kw) {
   document.getElementById('source-search').value = kw;
   document.getElementById('source-search-clear').style.display = 'block';
+  localStorage.setItem('alioActiveSearch', kw);
   filterSourceList(kw);
 }
 
