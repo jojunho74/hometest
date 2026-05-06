@@ -847,13 +847,21 @@ function renderPinnedChips() {
   const container = document.getElementById('pinned-chips');
   if (!pinned.length) { area.style.display = 'none'; return; }
   area.style.display = 'flex';
-  container.innerHTML = pinned.map(kw => `
+  const active = localStorage.getItem('alioActiveSearch');
+  container.innerHTML = pinned.map(kw => {
+    const isActive = kw === active;
+    const chipStyle = isActive
+      ? 'background:#1D4ED8;border:1px solid #1D4ED8;color:#fff;'
+      : 'background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;';
+    const xColor = isActive ? 'rgba(255,255,255,.7)' : '#93C5FD';
+    return `
     <button onclick="applyPinnedSearch(${JSON.stringify(kw)})"
-      style="display:inline-flex;align-items:center;gap:4px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;font-size:.75rem;font-weight:600;padding:3px 9px;border-radius:20px;cursor:pointer;white-space:nowrap;">
-      ${esc(kw)}
+      style="display:inline-flex;align-items:center;gap:4px;${chipStyle}font-size:.75rem;font-weight:600;padding:3px 9px;border-radius:20px;cursor:pointer;white-space:nowrap;">
+      ${isActive ? '✔ ' : ''}${esc(kw)}
       <span onclick="event.stopPropagation();removePinned(${JSON.stringify(kw)})"
-        style="color:#93C5FD;font-size:.7rem;margin-left:2px;cursor:pointer;" title="제거">✕</span>
-    </button>`).join('');
+        style="color:${xColor};font-size:.7rem;margin-left:2px;cursor:pointer;" title="고정 취소">✕</span>
+    </button>`;
+  }).join('');
 }
 
 function pinCurrentSearch() {
@@ -863,6 +871,8 @@ function pinCurrentSearch() {
   if (pinned.includes(kw)) { toast('이미 고정된 검색어입니다', false); return; }
   pinned.unshift(kw);
   savePinned(pinned);
+  // 핀하면 즉시 활성 필터로 적용
+  localStorage.setItem('alioActiveSearch', kw);
   renderPinnedChips();
   toast(`"${kw}" 고정됨`);
 }
@@ -883,6 +893,7 @@ function applyPinnedSearch(kw) {
   document.getElementById('source-search').value = kw;
   document.getElementById('source-search-clear').style.display = 'block';
   localStorage.setItem('alioActiveSearch', kw);
+  renderPinnedChips();
   filterSourceList(kw);
 }
 
