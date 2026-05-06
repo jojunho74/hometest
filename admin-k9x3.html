@@ -9426,6 +9426,7 @@ ${d.hashtags}`;
   let an1IbtCnt = 0;
   let an1ConsultCnt = 0;
   let an1HasUa = false;
+  let an1SampleActAll = null;
 
   const AN1_PAGE_LABELS = {
     'index.html':'메인', 'competition.html':'경쟁률', 'university-board.html':'대학활동',
@@ -9508,6 +9509,7 @@ ${d.hashtags}`;
   async function an1Reload() {
     an1Loaded = false;
     an1PvAll = null;
+    an1SampleActAll = null;
     document.getElementById('an1-update-btn').disabled = true;
     document.getElementById('an1-status').textContent = '업데이트 중…';
     await an1Load();
@@ -9523,12 +9525,14 @@ ${d.hashtags}`;
         .limit(2000);
       an1PvAll = pvRes.data || [];
       an1HasUa = an1PvAll.length > 0 && 'ua' in an1PvAll[0];
-      const [ibtRes, consultRes] = await Promise.all([
+      const [ibtRes, consultRes, sampleActRes] = await Promise.all([
         db.from('ibt_applications').select('*', { count: 'exact', head: true }),
-        db.from('consultations').select('*', { count: 'exact', head: true })
+        db.from('consultations').select('*', { count: 'exact', head: true }),
+        db.from('page_views').select('page, visited_at').like('page', 'evidence/sample.html:%').order('visited_at', { ascending: false }).limit(5000)
       ]);
       an1IbtCnt = ibtRes.count || 0;
       an1ConsultCnt = consultRes.count || 0;
+      an1SampleActAll = sampleActRes.data || [];
     }
     document.getElementById('an1-status').textContent = '업데이트: ' + now.toLocaleTimeString('ko-KR');
     an1Render(an1FilterPv(an1PvAll));
@@ -9657,6 +9661,7 @@ ${d.hashtags}`;
   let an2Period = '월간';
   let an2PvAll = null;
   let an2ClickAll = null;
+  let an2SampleActAll = null;
 
   const AN2_PAGE_LABELS = {
     'index.html':'메인', 'competition.html':'경쟁률', 'university-board.html':'대학활동',

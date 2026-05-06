@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>취업 시뮬레이터 — IBT C&C</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:#080F1E;--bg2:#0D1B2A;--bg3:#112240;
+      --border:rgba(255,255,255,.07);
+      --text:#E2E8F0;--text2:rgba(255,255,255,.5);
+      --blue:#60A5FA;--green:#34D399;--amber:#FBBF24;--rose:#FB7185;--purple:#A78BFA;
+    }
+    body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+    /* Header */
+    .hdr{background:rgba(8,15,30,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(8px);padding:0 20px;height:60px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50;}
+    .hdr-logo{font-size:.95rem;font-weight:800;color:var(--blue);text-decoration:none;}
+    .hdr-sep{color:rgba(255,255,255,.2);}
+    .hdr-title{font-size:.85rem;color:var(--text2);font-weight:600;}
+
+    /* Main */
+    .main{max-width:760px;margin:0 auto;padding:36px 20px 80px;}
+
+    /* Step bar */
+    .step-bar{display:flex;align-items:center;margin-bottom:36px;}
+    .step-item{display:flex;align-items:center;gap:7px;flex:1;}
+    .step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;background:var(--bg3);color:var(--text2);border:1px solid var(--border);flex-shrink:0;transition:all .3s;}
+    .step-item.active .step-num{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 0 14px rgba(96,165,250,.4);}
+    .step-item.done .step-num{background:var(--green);color:#fff;border-color:var(--green);}
+    .step-lbl{font-size:.7rem;color:var(--text2);font-weight:600;white-space:nowrap;}
+    .step-item.active .step-lbl{color:var(--text);}
+    .step-line{flex:1;height:1px;background:var(--border);margin:0 6px;}
+    @media(max-width:480px){.step-lbl{display:none;}}
+
+    /* Sections */
+    .section{display:none;}.section.active{display:block;}
+
+    /* Section head */
+    .sec-head{margin-bottom:26px;}
+    .sec-head h2{font-size:1.35rem;font-weight:900;color:#fff;line-height:1.35;margin-bottom:7px;}
+    .sec-head p{font-size:.82rem;color:var(--text2);line-height:1.65;}
+
+    /* Goal cards */
+    .goal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:28px;}
+    .goal-card{background:var(--bg3);border:2px solid var(--border);border-radius:14px;padding:22px 18px;cursor:pointer;text-align:center;transition:all .2s;user-select:none;}
+    .goal-card:hover{border-color:rgba(96,165,250,.35);transform:translateY(-2px);}
+    .goal-card.selected{border-color:var(--blue);background:rgba(96,165,250,.08);}
+    .goal-tag{display:inline-block;font-size:.6rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:4px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.4);margin-bottom:10px;}
+    .goal-card.selected .goal-tag{background:rgba(96,165,250,.2);color:var(--blue);}
+    .goal-name{font-size:.9rem;font-weight:800;color:#fff;margin-bottom:5px;}
+    .goal-desc{font-size:.72rem;color:var(--text2);line-height:1.5;}
+
+    /* English note */
+    .eng-note{background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.18);border-radius:10px;padding:14px 16px;margin-bottom:20px;}
+    .eng-note-title{font-size:.72rem;font-weight:800;color:var(--blue);margin-bottom:7px;letter-spacing:.02em;}
+    .eng-note-row{display:flex;gap:8px;margin-bottom:5px;align-items:flex-start;}
+    .eng-note-row:last-child{margin-bottom:0;}
+    .eng-note-dot{width:4px;height:4px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:6px;}
+    .eng-note-text{font-size:.73rem;color:var(--text2);line-height:1.6;}
+
+    /* Input group */
+    .inp-group{margin-bottom:22px;}
+    .inp-label{font-size:.78rem;font-weight:700;color:var(--text2);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
+    .inp-label span{background:rgba(96,165,250,.15);color:var(--blue);padding:2px 7px;border-radius:4px;font-size:.65rem;}
+
+    /* Slider */
+    .slider-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:13px;padding:18px 20px;}
+    .slider-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px;}
+    .slider-score{font-size:2.8rem;font-weight:900;color:var(--blue);line-height:1;}
+    .slider-score span{font-size:.9rem;color:var(--text2);margin-left:3px;}
+    .toeic-val{font-size:1.2rem;font-weight:800;color:var(--green);}
+    .toeic-lbl{font-size:.65rem;color:var(--text2);display:block;text-align:right;}
+    input[type=range]{width:100%;height:6px;border-radius:3px;background:rgba(255,255,255,.1);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;}
+    input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--blue);cursor:pointer;box-shadow:0 0 10px rgba(96,165,250,.5);}
+    .score-band{display:flex;margin-top:9px;gap:2px;font-size:.6rem;font-weight:600;text-align:center;}
+    .band-item{flex:1;padding:4px 2px;border-radius:3px;}
+    .b-low{background:rgba(251,113,133,.2);color:#FCA5A5;}
+    .b-mid{background:rgba(251,191,36,.18);color:#FDE68A;}
+    .b-good{background:rgba(52,211,153,.18);color:#6EE7B7;}
+    .b-high{background:rgba(96,165,250,.18);color:#93C5FD;}
+    .band-indicator{font-size:.7rem;color:var(--text2);margin-top:7px;}
+
+    /* Radio */
+    .radio-group{display:flex;gap:9px;flex-wrap:wrap;}
+    .radio-btn{flex:1;min-width:90px;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;font-size:.8rem;font-weight:700;color:var(--text2);background:var(--bg3);transition:all .2s;user-select:none;}
+    .radio-btn:hover{border-color:rgba(96,165,250,.3);color:var(--text);}
+    .radio-btn.selected{border-color:var(--blue);background:rgba(96,165,250,.1);color:var(--blue);}
+
+    /* Select */
+    .sel-inp{width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:11px 15px;font-size:.83rem;color:var(--text);outline:none;cursor:pointer;font-family:inherit;transition:border-color .2s;}
+    .sel-inp:focus{border-color:rgba(96,165,250,.5);}
+    option{background:#0D1B2A;}
+
+    /* Buttons */
+    .btn-next{width:100%;padding:15px;border-radius:11px;border:none;background:linear-gradient(135deg,#1D4ED8,#2563EB);color:#fff;font-size:.92rem;font-weight:800;cursor:pointer;transition:all .2s;margin-top:6px;font-family:inherit;}
+    .btn-next:hover{opacity:.9;transform:translateY(-1px);}
+    .btn-next:active{transform:scale(.98);}
+    .btn-next:disabled{opacity:.38;cursor:not-allowed;transform:none;}
+    .btn-back{background:transparent;border:1px solid var(--border);color:var(--text2);font-size:.8rem;padding:10px 18px;border-radius:10px;cursor:pointer;transition:all .15s;font-family:inherit;font-weight:600;}
+    .btn-back:hover{border-color:rgba(255,255,255,.2);color:var(--text);}
+
+    /* Notice */
+    .notice{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:9px;padding:11px 15px;font-size:.73rem;color:#FDE68A;line-height:1.65;margin-bottom:18px;}
+
+    /* Loading */
+    .loading-wrap{text-align:center;padding:60px 20px;}
+    .spinner{width:38px;height:38px;border:3px solid rgba(255,255,255,.08);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* Result hero */
+    .result-hero{text-align:center;padding:30px 20px;background:linear-gradient(135deg,var(--bg3),#1a1060);border:1px solid var(--border);border-radius:18px;margin-bottom:20px;position:relative;overflow:hidden;}
+    .result-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:110px;height:110px;background:radial-gradient(circle,rgba(96,165,250,.15),transparent);border-radius:50%;}
+    .rh-label{font-size:.72rem;font-weight:700;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+    .rh-score{font-size:4.5rem;font-weight:900;line-height:1;margin-bottom:7px;}
+    .rh-grade{font-size:.95rem;font-weight:800;padding:3px 14px;border-radius:18px;display:inline-block;margin-bottom:10px;}
+    .grade-A{background:rgba(52,211,153,.2);color:var(--green);border:1px solid rgba(52,211,153,.3);}
+    .grade-B{background:rgba(96,165,250,.2);color:var(--blue);border:1px solid rgba(96,165,250,.3);}
+    .grade-C{background:rgba(251,191,36,.2);color:var(--amber);border:1px solid rgba(251,191,36,.3);}
+    .grade-D{background:rgba(251,113,133,.2);color:var(--rose);border:1px solid rgba(251,113,133,.3);}
+    .rh-desc{font-size:.8rem;color:var(--text2);line-height:1.65;}
+
+    /* Stats */
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px;}
+    .stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:13px;padding:15px 13px;}
+    .sc-label{font-size:.62rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;}
+    .sc-val{font-size:1.55rem;font-weight:900;line-height:1;margin-bottom:3px;}
+    .sc-sub{font-size:.68rem;color:var(--text2);}
+
+    /* Res card */
+    .res-card{background:var(--bg3);border:1px solid var(--border);border-radius:15px;padding:18px;margin-bottom:14px;}
+    .res-card-title{font-size:.78rem;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:13px;display:flex;align-items:center;gap:7px;}
+    .res-card-title::before{content:'';width:3px;height:13px;background:var(--blue);border-radius:2px;flex-shrink:0;}
+
+    /* Stage bars */
+    .stage-list{display:flex;flex-direction:column;gap:9px;}
+    .stage-row{display:flex;align-items:center;gap:10px;}
+    .stage-name{font-size:.75rem;color:var(--text2);width:70px;flex-shrink:0;}
+    .stage-bar-bg{flex:1;height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;}
+    .stage-bar-fill{height:100%;border-radius:4px;width:0%;transition:width 1s cubic-bezier(.4,0,.2,1);}
+    .stage-pct{font-size:.75rem;font-weight:700;width:38px;text-align:right;flex-shrink:0;}
+
+    /* Job list */
+    .job-list{display:flex;flex-direction:column;gap:7px;}
+    .job-row{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:rgba(255,255,255,.03);border-radius:9px;border:1px solid rgba(255,255,255,.04);}
+    .job-name{font-size:.8rem;color:var(--text);font-weight:600;flex:1;}
+    .job-ratio{font-size:.75rem;font-weight:700;padding:3px 9px;border-radius:6px;}
+    .ratio-low{background:rgba(52,211,153,.15);color:var(--green);}
+    .ratio-mid{background:rgba(251,191,36,.15);color:var(--amber);}
+    .ratio-high{background:rgba(251,113,133,.15);color:var(--rose);}
+
+    /* Rec list */
+    .rec-list{display:flex;flex-direction:column;gap:7px;}
+    .rec-row{padding:11px 13px;background:rgba(255,255,255,.03);border-radius:9px;border:1px solid rgba(255,255,255,.04);}
+    .rec-title{font-size:.8rem;color:var(--text);font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .rec-meta{font-size:.7rem;color:var(--text2);}
+
+    /* Improve */
+    .improve-list{display:flex;flex-direction:column;gap:7px;}
+    .improve-row{display:flex;align-items:flex-start;gap:9px;padding:11px 13px;background:rgba(96,165,250,.05);border-radius:9px;border:1px solid rgba(96,165,250,.12);}
+    .improve-icon{font-size:.88rem;flex-shrink:0;margin-top:1px;}
+    .improve-text{font-size:.78rem;color:var(--text2);line-height:1.55;}
+    .improve-text strong{color:var(--text);}
+
+    /* Result action */
+    .result-action{display:flex;gap:10px;margin-top:24px;}
+
+    /* Validity */
+    .validity-note{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:13px 15px;font-size:.7rem;color:rgba(255,255,255,.28);line-height:1.7;margin-top:20px;}
+
+    @media(max-width:480px){
+      .goal-grid{grid-template-columns:1fr;}
+      .stat-grid{grid-template-columns:repeat(2,1fr);}
+    }
+  </style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="../index.html" class="hdr-logo">IBT C&amp;C</a>
+  <span class="hdr-sep">›</span>
+  <span class="hdr-title">취업 시뮬레이터</span>
+</header>
+
+<div class="main">
+
+  <!-- Step indicator -->
+  <div class="step-bar">
+    <div class="step-item active" id="si0"><div class="step-num">1</div><span class="step-lbl">목표 선택</span></div>
+    <div class="step-line"></div>
+    <div class="step-item" id="si1"><div class="step-num">2</div><span class="step-lbl">기본 정보</span></div>
+    <div class="step-line"></div>
+    <div class="step-item" id="si2"><div class="step-num">3</div><span class="step-lbl">상세 조건</span></div>
+    <div class="step-line"></div>
+    <div class="step-item" id="si3"><div class="step-num">4</div><span class="step-lbl">결과</span></div>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="section active" id="sec0">
+    <div class="sec-head">
+      <h2>어떤 취업을 목표로 하세요?</h2>
+      <p>선택하신 목표에 맞는 실제 데이터로 취업 가능성을 분석합니다.</p>
+    </div>
+    <div class="goal-grid">
+      <div class="goal-card" data-goal="domestic" onclick="selectGoal(this)">
+        <div class="goal-icon">🏛️</div>
+        <div class="goal-name">국내 공공기관</div>
+        <div class="goal-desc">공기업·공공기관 직무별 경쟁률 기반 합격 가능성 분석</div>
+      </div>
+      <div class="goal-card" data-goal="overseas" onclick="selectGoal(this)">
+        <div class="goal-icon">✈️</div>
+        <div class="goal-name">해외취업</div>
+        <div class="goal-desc">F-visa 해외취업 공고 585건 기반 영어·직종 매칭 분석</div>
+      </div>
+      <div class="goal-card" data-goal="both" onclick="selectGoal(this)">
+        <div class="goal-icon">🌏</div>
+        <div class="goal-name">둘 다 비교</div>
+        <div class="goal-desc">국내 vs 해외 취업 가능성을 동시에 비교 분석</div>
+      </div>
+    </div>
+    <button class="btn-next" id="btn0" disabled onclick="goStep(1)">다음 →</button>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="section" id="sec1">
+    <div class="sec-head">
+      <h2>영어 점수와 경력을 입력해주세요</h2>
+      <p>G-TELP Level 2 기준입니다. 예상 점수로 입력하셔도 됩니다.</p>
+    </div>
+    <div class="inp-group">
+      <div class="inp-label">G-TELP Level 2 점수 <span>필수</span></div>
+      <div class="slider-wrap">
+        <div class="slider-top">
+          <div><div class="slider-score" id="gtelp-display">65<span>점</span></div></div>
+          <div><span class="toeic-lbl">TOEIC Level 2 환산</span><div class="toeic-val" id="toeic-display">713점</div></div>
+        </div>
+        <input type="range" id="gtelpSlider" min="50" max="99" value="65" oninput="updateSlider(this.value)">
+        <div class="score-band">
+          <div class="band-item b-low">50-54<br>하</div>
+          <div class="band-item b-mid">55-64<br>중</div>
+          <div class="band-item b-good">65-74<br>중상</div>
+          <div class="band-item b-high">75-99<br>상·최상</div>
+        </div>
+        <div class="band-indicator" id="band-text">
+          <strong>65점:</strong> 공공기관 영어 기준 <span style="color:var(--green)">✅ 충족</span> (TOEIC 713점 이상)
+        </div>
+      </div>
+    </div>
+    <div class="inp-group">
+      <div class="inp-label">경력 구분 <span>필수</span></div>
+      <div class="radio-group">
+        <div class="radio-btn" data-career="신입" onclick="selectRadio(this,'career')">신입</div>
+        <div class="radio-btn selected" data-career="무관" onclick="selectRadio(this,'career')">무관</div>
+        <div class="radio-btn" data-career="경력" onclick="selectRadio(this,'career')">경력</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn-back" onclick="goStep(0)">← 이전</button>
+      <button class="btn-next" style="flex:1;" onclick="goStep(2)">다음 →</button>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="section" id="sec2">
+    <div class="sec-head">
+      <h2 id="step3-title">취업 조건을 선택해주세요</h2>
+      <p>선택하지 않으면 전체 조건으로 분석합니다.</p>
+    </div>
+    <div id="dom-cond" style="display:none;">
+      <div class="inp-group">
+        <div class="inp-label">직종 선택 <span>선택</span></div>
+        <select class="sel-inp" id="dom-job"><option value="">전체 직종</option></select>
+      </div>
+      <div class="inp-group">
+        <div class="inp-label">지역 선택 <span>선택</span></div>
+        <select class="sel-inp" id="dom-region"><option value="">전체 지역</option></select>
+      </div>
+      <div class="inp-group">
+        <div class="inp-label">직급 <span>선택</span></div>
+        <div class="radio-group">
+          <div class="radio-btn selected" data-grade="" onclick="selectRadio(this,'grade')">전체</div>
+          <div class="radio-btn" data-grade="6급" onclick="selectRadio(this,'grade')">6급</div>
+          <div class="radio-btn" data-grade="7급" onclick="selectRadio(this,'grade')">7급</div>
+          <div class="radio-btn" data-grade="별정" onclick="selectRadio(this,'grade')">별정</div>
+        </div>
+      </div>
+    </div>
+    <div id="ovs-cond" style="display:none;">
+      <div class="inp-group">
+        <div class="inp-label">선호 국가 <span>선택</span></div>
+        <select class="sel-inp" id="ovs-country"><option value="">전체 국가</option></select>
+      </div>
+      <div class="inp-group">
+        <div class="inp-label">직종 키워드 <span>선택</span></div>
+        <select class="sel-inp" id="ovs-job">
+          <option value="">전체 직종</option>
+          <option value="영업">영업/마케팅</option>
+          <option value="IT">IT/기술</option>
+          <option value="관리">관리/경영</option>
+          <option value="제조">제조/생산</option>
+          <option value="교육">교육/강사</option>
+          <option value="서비스">서비스</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn-back" onclick="goStep(1)">← 이전</button>
+      <button class="btn-next" style="flex:1;" onclick="runSimulator()">분석 시작 →</button>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="section" id="sec3">
+    <div class="loading-wrap" id="loading-wrap">
+      <div class="spinner"></div>
+      <div style="font-size:.83rem;color:var(--text2);margin-top:6px;">데이터 분석 중...</div>
+    </div>
+    <div id="result-wrap" style="display:none;"></div>
+  </div>
+
+</div><!-- /.main -->
+
+<script>
+const { createClient } = supabase;
+const db = createClient(
+  'https://byzulmxcuhsrjdphmuym.supabase.co',
+  'sb_publishable_2PyrmnCuS9tZkoyp8tadwQ_mmA9BeLs'
+);
+
+/* ── G-TELP → TOEIC Level 2 ── */
+const GT2 = {99:969,98:962,97:954,96:947,95:940,94:932,93:925,92:918,91:910,90:903,
+  89:896,88:889,87:881,86:874,85:867,84:859,83:852,82:845,81:837,80:830,
+  79:823,78:815,77:808,76:801,75:793,74:786,73:779,72:771,71:764,70:757,
+  69:749,68:742,67:735,66:720,65:713,64:706,63:698,62:691,61:684,60:676,
+  59:669,58:662,57:654,56:647,55:640,54:632,53:625,52:618,51:610,50:603};
+
+function toToeic(g){return GT2[g]||603;}
+function lvOf(g){if(g>=80)return{lv:'최상',c:'#34D399'};if(g>=70)return{lv:'상',c:'#60A5FA'};if(g>=65)return{lv:'중상',c:'#60A5FA'};if(g>=55)return{lv:'중',c:'#FBBF24'};return{lv:'하',c:'#FB7185'};}
+
+/* ── State ── */
+let S={goal:null,gtelp:65,career:'무관',domJob:'',domRegion:'',domGrade:'',ovsCountry:'',ovsJob:''};
+let aliojobs=[], fvisaItems=[];
+
+/* ── Load data ── */
+async function loadAlio(){
+  if(aliojobs.length)return;
+  const{data,error}=await db.from('alio_jobs')
+    .select('dataset_name,grade,job,region,s1_pass,s1_total,s2_pass,s2_total,s3_pass,s3_total,s4_pass,s4_total,s5_pass,s5_total,ratio,stage_count')
+    .order('dataset_name');
+  if(!error&&data){
+    aliojobs=data;
+    const jobs=[...new Set(data.map(r=>r.job).filter(Boolean))].sort();
+    const regs=[...new Set(data.map(r=>r.region).filter(Boolean))].sort();
+    const jSel=document.getElementById('dom-job');
+    const rSel=document.getElementById('dom-region');
+    jobs.forEach(j=>{const o=document.createElement('option');o.value=j;o.textContent=j;jSel.appendChild(o);});
+    regs.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;rSel.appendChild(o);});
+  }
+}
+
+function loadFvisa(){
+  return new Promise(res=>{
+    if(window.FVISA_DATA){fvisaItems=window.FVISA_DATA.items||[];res();return;}
+    const s=document.createElement('script');
+    s.src='../Fvisajobs/data.js';
+    s.onload=()=>{fvisaItems=window.FVISA_DATA?(window.FVISA_DATA.items||[]):[];
+      const cs=[...new Set(fvisaItems.map(r=>r.rctntcNationNm).filter(Boolean))].sort();
+      const cSel=document.getElementById('ovs-country');
+      cs.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;cSel.appendChild(o);});
+      res();};
+    s.onerror=()=>res();
+    document.head.appendChild(s);
+  });
+}
+
+/* ── UI helpers ── */
+function selectGoal(el){
+  document.querySelectorAll('.goal-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  S.goal=el.dataset.goal;
+  document.getElementById('btn0').disabled=false;
+}
+
+function selectRadio(el,group){
+  el.closest('.radio-group').querySelectorAll('.radio-btn').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+  if(group==='career')S.career=el.dataset.career;
+  if(group==='grade')S.domGrade=el.dataset.grade;
+}
+
+function updateSlider(v){
+  v=parseInt(v);S.gtelp=v;
+  document.getElementById('gtelp-display').innerHTML=v+'<span>점</span>';
+  document.getElementById('toeic-display').textContent=toToeic(v)+'점';
+  const lv=lvOf(v);
+  document.getElementById('band-text').innerHTML=v>=65
+    ?`<strong>${v}점 (${lv.lv}):</strong> 공공기관 기준 <span style="color:var(--green)">✅ 충족</span> — TOEIC ${toToeic(v)}점 이상`
+    :`<strong>${v}점 (${lv.lv}):</strong> 공공기관 기준 <span style="color:var(--rose)">❌ 미달</span> (기준: 65점 / TOEIC 713점)`;
+}
+
+function goStep(n){
+  [0,1,2,3].forEach(i=>{
+    document.getElementById('sec'+i).classList.remove('active');
+    const si=document.getElementById('si'+i);
+    si.classList.remove('active','done');
+  });
+  for(let i=0;i<n;i++)document.getElementById('si'+i).classList.add('done');
+  document.getElementById('si'+n).classList.add('active');
+  document.getElementById('sec'+n).classList.add('active');
+  if(n===2)setupStep3();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function setupStep3(){
+  const g=S.goal;
+  const domEl=document.getElementById('dom-cond');
+  const ovsEl=document.getElementById('ovs-cond');
+  if(g==='domestic'){domEl.style.display='block';ovsEl.style.display='none';document.getElementById('step3-title').textContent='국내 공공기관 조건';loadAlio();}
+  else if(g==='overseas'){domEl.style.display='none';ovsEl.style.display='block';document.getElementById('step3-title').textContent='해외취업 조건';loadFvisa();}
+  else{domEl.style.display='block';ovsEl.style.display='block';document.getElementById('step3-title').textContent='국내 + 해외 조건';loadAlio();loadFvisa();}
+}
+
+/* ── Run ── */
+async function runSimulator(){
+  goStep(3);
+  document.getElementById('loading-wrap').style.display='block';
+  document.getElementById('result-wrap').style.display='none';
+  S.domJob=document.getElementById('dom-job')?.value||'';
+  S.domRegion=document.getElementById('dom-region')?.value||'';
+  S.ovsCountry=document.getElementById('ovs-country')?.value||'';
+  S.ovsJob=document.getElementById('ovs-job')?.value||'';
+  if((S.goal==='domestic'||S.goal==='both')&&!aliojobs.length)await loadAlio();
+  if((S.goal==='overseas'||S.goal==='both')&&!fvisaItems.length)await loadFvisa();
+  await new Promise(r=>setTimeout(r,1000));
+  const res={};
+  if(S.goal==='domestic'||S.goal==='both')res.dom=calcDom();
+  if(S.goal==='overseas'||S.goal==='both')res.ovs=calcOvs();
+  document.getElementById('loading-wrap').style.display='none';
+  document.getElementById('result-wrap').style.display='block';
+  document.getElementById('result-wrap').innerHTML=buildResult(res);
+  setTimeout(()=>{document.querySelectorAll('.stage-bar-fill').forEach(el=>{el.style.width=el.dataset.pct+'%';});},120);
+}
+
+/* ── Compute domestic ── */
+function calcDom(){
+  let rows=[...aliojobs];
+  if(S.domJob)rows=rows.filter(r=>r.job===S.domJob);
+  if(S.domRegion)rows=rows.filter(r=>r.region===S.domRegion);
+  if(S.domGrade)rows=rows.filter(r=>r.grade&&r.grade.includes(S.domGrade));
+  if(!rows.length)rows=[...aliojobs];
+
+  const ratios=rows.map(r=>parseFloat(r.ratio)).filter(v=>v>0);
+  const avgR=ratios.length?ratios.reduce((a,b)=>a+b,0)/ratios.length:50;
+  const minR=ratios.length?Math.min(...ratios):0;
+
+  const engPass=S.gtelp>=65;
+  const engPts=engPass?30:Math.round((S.gtelp-50)/15*22);
+  let ratioPts=avgR<=5?50:avgR<=10?44:avgR<=20?35:avgR<=30?25:avgR<=50?15:avgR<=100?10:5;
+  const isLocal=S.domRegion&&!['서울','경기','인천'].includes(S.domRegion);
+  const regPts=isLocal?18:10;
+  const score=Math.min(100,Math.round(engPts+ratioPts+regPts));
+
+  const stages=[];
+  ['s1','s2','s3','s4','s5'].forEach(s=>{
+    const arr=rows.filter(r=>r[s+'_total']>0).map(r=>r[s+'_pass']/r[s+'_total']).filter(v=>v>0&&v<=1);
+    if(arr.length)stages.push({name:s.toUpperCase(),pct:Math.round(arr.reduce((a,b)=>a+b)/arr.length*100)});
+  });
+
+  const jobMap={};
+  rows.forEach(r=>{if(!r.job)return;if(!jobMap[r.job])jobMap[r.job]=[];const v=parseFloat(r.ratio);if(v>0)jobMap[r.job].push(v);});
+  const jobStats=Object.entries(jobMap).map(([j,v])=>({job:j,avg:v.reduce((a,b)=>a+b)/v.length})).sort((a,b)=>a.avg-b.avg).slice(0,5);
+
+  const topInst=[...rows].filter(r=>parseFloat(r.ratio)>0).sort((a,b)=>parseFloat(a.ratio)-parseFloat(b.ratio)).slice(0,5);
+
+  return{score,engPass,avgR:avgR.toFixed(1),minR:minR.toFixed(1),
+    passRate:(1/avgR*100).toFixed(1),matchCnt:rows.length,totalCnt:aliojobs.length,
+    stages,jobStats,topInst};
+}
+
+/* ── Compute overseas ── */
+function calcOvs(){
+  const LV={'하':1,'중':2,'중상':3,'상':4,'최상':5};
+  const userLv=lvOf(S.gtelp).lv;
+  const userNum=LV[userLv]||3;
+
+  function parseEng(lang){if(!lang)return null;const m=lang.match(/영어\(필수\)\s*(최상|상|중상|중|하)/);return m?m[1]:null;}
+
+  let rows=[...fvisaItems];
+  if(S.ovsCountry)rows=rows.filter(r=>r.rctntcNationNm===S.ovsCountry);
+  if(S.career!=='무관')rows=rows.filter(r=>r.careerStleNm===S.career||r.careerStleNm==='무관');
+  if(S.ovsJob)rows=rows.filter(r=>r.rctntcKscoNm&&r.rctntcKscoNm.includes(S.ovsJob));
+
+  const matched=rows.filter(r=>{const req=parseEng(r.rctntcLang);return!req||(LV[req]||0)<=userNum;});
+
+  const cMap={};
+  matched.forEach(r=>{if(r.rctntcNationNm)cMap[r.rctntcNationNm]=(cMap[r.rctntcNationNm]||0)+1;});
+  const topC=Object.entries(cMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+
+  const matchRate=fvisaItems.length?matched.length/fvisaItems.length*100:0;
+  const score=Math.min(100,Math.round(Math.min(matchRate*1.5,70)+(matched.length>50?20:matched.length>20?12:5)));
+  const samples=matched.slice(0,5);
+
+  return{score,userLv,totalJobs:fvisaItems.length,countryFiltered:rows.length,
+    matched:matched.length,matchRate:matchRate.toFixed(1),topC,samples};
+}
+
+/* ── Grade ── */
+function grade(s){
+  if(s>=75)return{g:'A',c:'#34D399',d:'현재 조건으로 취업 가능성이 높습니다. 꾸준한 준비로 목표 달성이 가능합니다.'};
+  if(s>=60)return{g:'B',c:'#60A5FA',d:'취업 가능성이 있습니다. 영어 점수 향상과 직종 전략 수립이 도움이 됩니다.'};
+  if(s>=40)return{g:'C',c:'#FBBF24',d:'준비가 더 필요합니다. 영어 기준 충족과 경쟁 낮은 직종 선택을 추천합니다.'};
+  return{g:'D',c:'#FB7185',d:'영어 점수 향상이 최우선 과제입니다. G-TELP 65점 취득부터 시작하세요.'};
+}
+
+/* ── Build result HTML ── */
+function buildResult(res){
+  let h='';
+  if(S.goal==='both'){
+    const avg=Math.round(((res.dom?.score||0)+(res.ovs?.score||0))/2);
+    const gr=grade(avg);
+    h+=`<div class="result-hero"><div class="rh-label">국내·해외 통합 취업 가능성</div>
+      <div class="rh-score" style="color:${gr.c}">${avg}<span style="font-size:1.4rem;color:rgba(255,255,255,.35)">점</span></div>
+      <div class="rh-grade grade-${gr.g}">${gr.g}등급</div>
+      <div class="rh-desc">${gr.d}</div></div>`;
+  }
+  if(res.dom)h+=buildDom(res.dom,S.goal!=='both');
+  if(res.ovs)h+=buildOvs(res.ovs,S.goal!=='both');
+  h+=buildImprove(res);
+  h+=`<div class="validity-note">⚠️ <strong>타당성 고지</strong>: 본 시뮬레이터는 공공기관 경쟁률 통계(공공기관 경영정보 공개시스템)와 해외취업 공고 매칭(월드잡플러스 585건) 기반의 이론적 가능성을 나타냅니다. 실제 합격 여부는 학점, NCS 필기, 자기소개서, 면접 역량 등 다수의 미반영 변수에 영향을 받습니다.</div>`;
+  h+=`<div class="result-action"><button class="btn-back" onclick="goStep(0)">← 다시 시작</button><button class="btn-next" style="flex:1;" onclick="location.href='../package.html'">IBT 패키지 알아보기 →</button></div>`;
+  return h;
+}
+
+function buildDom(d,hero){
+  const gr=grade(d.score);let h='';
+  if(hero)h+=`<div class="result-hero"><div class="rh-label">국내 공공기관 취업 가능성</div>
+    <div class="rh-score" style="color:${gr.c}">${d.score}<span style="font-size:1.4rem;color:rgba(255,255,255,.35)">점</span></div>
+    <div class="rh-grade grade-${gr.g}">${gr.g}등급</div><div class="rh-desc">${gr.d}</div></div>`;
+  else h+=`<div class="res-card"><div class="res-card-title">🏛️ 국내 공공기관 분석</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+      <div style="font-size:2.2rem;font-weight:900;color:${gr.c}">${d.score}점</div>
+      <div class="rh-grade grade-${gr.g}" style="font-size:.8rem;">${gr.g}등급</div>
+    </div>`;
+
+  h+=`<div class="stat-grid">
+    <div class="stat-card"><div class="sc-label">영어 기준</div><div class="sc-val" style="color:${d.engPass?'#34D399':'#FB7185'}">${d.engPass?'✅':'❌'}</div><div class="sc-sub">${d.engPass?'65점 이상 충족':'65점 미달'}</div></div>
+    <div class="stat-card"><div class="sc-label">평균 경쟁률</div><div class="sc-val" style="color:#FBBF24">${d.avgR}:1</div><div class="sc-sub">이론 합격률 ${d.passRate}%</div></div>
+    <div class="stat-card"><div class="sc-label">분석 기관</div><div class="sc-val" style="color:#60A5FA">${d.matchCnt}</div><div class="sc-sub">전체 ${d.totalCnt}건 중</div></div>
+    <div class="stat-card"><div class="sc-label">최저 경쟁률</div><div class="sc-val" style="color:#34D399">${d.minR}:1</div><div class="sc-sub">가장 낮은 기관</div></div>
+  </div>`;
+
+  if(d.stages.length){
+    h+=`<div class="res-card"><div class="res-card-title">단계별 평균 합격률</div><div class="stage-list">`;
+    d.stages.forEach(s=>{const c=s.pct>=50?'#34D399':s.pct>=30?'#FBBF24':'#FB7185';
+      h+=`<div class="stage-row"><div class="stage-name">${s.name}</div><div class="stage-bar-bg"><div class="stage-bar-fill" style="background:${c}" data-pct="${Math.min(s.pct,100)}"></div></div><div class="stage-pct" style="color:${c}">${s.pct}%</div></div>`;});
+    h+=`</div></div>`;
+  }
+
+  if(d.jobStats.length){
+    h+=`<div class="res-card"><div class="res-card-title">경쟁률 낮은 직종 TOP ${d.jobStats.length}</div><div class="job-list">`;
+    d.jobStats.forEach(j=>{const cls=j.avg<=15?'ratio-low':j.avg<=30?'ratio-mid':'ratio-high';
+      h+=`<div class="job-row"><div class="job-name">${j.job}</div><div class="job-ratio ${cls}">${j.avg.toFixed(1)}:1</div></div>`;});
+    h+=`</div></div>`;
+  }
+
+  if(d.topInst.length){
+    h+=`<div class="res-card"><div class="res-card-title">합격 가능성 높은 기관 (경쟁률 낮은 순)</div><div class="rec-list">`;
+    d.topInst.forEach(r=>{
+      h+=`<div class="rec-row"><div class="rec-title">${r.dataset_name||'—'}</div><div class="rec-meta">${r.job||''}${r.region?' · '+r.region:''}${r.grade?' · '+r.grade:''} · 경쟁률 <strong>${r.ratio}:1</strong></div></div>`;});
+    h+=`</div></div>`;
+  }
+
+  if(!hero)h+=`</div>`;
+  return h;
+}
+
+function buildOvs(d,hero){
+  const gr=grade(d.score);let h='';
+  if(hero)h+=`<div class="result-hero"><div class="rh-label">해외취업 공고 매칭도</div>
+    <div class="rh-score" style="color:${gr.c}">${d.score}<span style="font-size:1.4rem;color:rgba(255,255,255,.35)">점</span></div>
+    <div class="rh-grade grade-${gr.g}">${gr.g}등급</div><div class="rh-desc">${gr.d}</div></div>`;
+  else h+=`<div class="res-card"><div class="res-card-title">✈️ 해외취업 분석</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+      <div style="font-size:2.2rem;font-weight:900;color:${gr.c}">${d.score}점</div>
+      <div class="rh-grade grade-${gr.g}" style="font-size:.8rem;">${gr.g}등급</div>
+    </div>`;
+
+  h+=`<div class="stat-grid">
+    <div class="stat-card"><div class="sc-label">매칭 공고</div><div class="sc-val" style="color:#34D399">${d.matched}</div><div class="sc-sub">전체 ${d.totalJobs}건 중</div></div>
+    <div class="stat-card"><div class="sc-label">매칭률</div><div class="sc-val" style="color:#60A5FA">${d.matchRate}%</div><div class="sc-sub">영어 기준 충족</div></div>
+    <div class="stat-card"><div class="sc-label">영어 수준</div><div class="sc-val" style="font-size:1.1rem;color:#FBBF24">${d.userLv}</div><div class="sc-sub">G-TELP ${S.gtelp}점</div></div>
+    <div class="stat-card"><div class="sc-label">조건 필터</div><div class="sc-val" style="color:#A78BFA">${d.countryFiltered}</div><div class="sc-sub">${S.ovsCountry||'전체 국가'}</div></div>
+  </div>`;
+
+  if(d.topC.length){
+    const max=d.topC[0][1];
+    h+=`<div class="res-card"><div class="res-card-title">매칭 공고 많은 국가</div><div class="stage-list">`;
+    d.topC.forEach(([c,n])=>{const p=Math.round(n/max*100);
+      h+=`<div class="stage-row"><div class="stage-name">${c}</div><div class="stage-bar-bg"><div class="stage-bar-fill" style="background:#60A5FA" data-pct="${p}"></div></div><div class="stage-pct">${n}건</div></div>`;});
+    h+=`</div></div>`;
+  }
+
+  if(d.samples.length){
+    h+=`<div class="res-card"><div class="res-card-title">매칭 공고 샘플</div><div class="rec-list">`;
+    d.samples.forEach(r=>{
+      h+=`<div class="rec-row"><div class="rec-title">${r.rctntcSj||'—'}</div><div class="rec-meta">${r.rctntcNationNm||''} · ${r.rctntcKscoNm||''} · 마감 ${r.rctntcEndDe||''}</div></div>`;});
+    h+=`</div></div>`;
+  }
+
+  if(!hero)h+=`</div>`;
+  return h;
+}
+
+function buildImprove(res){
+  const items=[];
+  if(res.dom){
+    if(!res.dom.engPass)items.push({i:'📚',t:`<strong>G-TELP 65점 이상 취득이 시급합니다.</strong> 현재 ${S.gtelp}점으로 주요 공공기관 영어 기준 미달입니다. G-TELP는 2~3주 단기 준비로 기준 충족이 가능합니다.`});
+    if(parseFloat(res.dom.avgR)>30)items.push({i:'🎯',t:`<strong>경쟁이 낮은 직종을 타겟하세요.</strong> 선택 조건 평균 경쟁률 ${res.dom.avgR}:1로 높습니다. 지방 기관·기술직군은 경쟁률이 낮은 경향이 있습니다.`});
+    if(!S.domRegion||['서울','경기','인천'].includes(S.domRegion))items.push({i:'📍',t:`<strong>지방 기관을 고려해보세요.</strong> 지방 소재 공공기관은 수도권 대비 평균 경쟁률이 낮습니다.`});
+  }
+  if(res.ovs){
+    if(S.gtelp<70)items.push({i:'🌏',t:`<strong>해외취업 영어 수준 향상이 필요합니다.</strong> G-TELP 70점(영어 "상") 이상 취득 시 매칭 공고 수가 크게 늘어납니다.`});
+    if(res.ovs.matched<30)items.push({i:'🔍',t:`<strong>검색 조건을 넓혀보세요.</strong> 현재 조건 매칭 공고 ${res.ovs.matched}건. 국가·직종 조건을 완화하면 더 많은 공고를 발견할 수 있습니다.`});
+  }
+  if(!items.length)items.push({i:'✅',t:`<strong>현재 조건이 양호합니다.</strong> 영어 기준을 충족하고 있으며 꾸준한 NCS·직무 역량 향상으로 합격 가능성을 높이세요.`});
+  let h=`<div class="res-card"><div class="res-card-title">💡 개선 방안</div><div class="improve-list">`;
+  items.forEach(it=>{h+=`<div class="improve-row"><div class="improve-icon">${it.i}</div><div class="improve-text">${it.t}</div></div>`;});
+  return h+`</div></div>`;
+}
+</script>
+</body>
+</html>

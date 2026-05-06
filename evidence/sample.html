@@ -563,10 +563,11 @@
       const tierEl = document.getElementById('advice-tiers');
       if (tierEl) {
         const tiers = scoreSteps.map(gap => {
-          const target = userScore + gap;
+          const target = Math.min(userScore + gap, 990);
+          const actualGap = target - userScore;
           const unlocked = result.filter(r => r.toeic_score != null && target >= r.toeic_score && userScore < r.toeic_score);
-          return { target, gap, unlocked: unlocked.length };
-        }).filter(t => t.unlocked > 0);
+          return { target, gap: actualGap, unlocked: unlocked.length };
+        }).filter((t, i, arr) => t.unlocked > 0 && t.gap > 0 && arr.findIndex(x => x.target === t.target) === i);
         tierEl.innerHTML = tiers.slice(0,4).map((t,i) => `
           <div style="flex:1;min-width:110px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:7px 10px;">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">

@@ -1,0 +1,1784 @@
+[
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "5급(행정)",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "5급(과학기술)",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "7급",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "외교관 후보자",
+    "TOEIC 기준": 870,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "지역인재 7급",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "민간경력자 5급",
+    "TOEIC 기준": 870,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "민간경력자 7급",
+    "TOEIC 기준": 790,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "인사혁신처 5급 공채",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "인사혁신처 7급 공채(외무영사직 제외)",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "인사혁신처 7급 공채(외무영사직)",
+    "TOEIC 기준": 790,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "외교관후보자 선발시험",
+    "TOEIC 기준": 870,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국회사무처 입법고시",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "대법원 법원행정고등고시",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "소방청 소방간부후보생",
+    "TOEIC 기준": 625,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "경찰간부후보생",
+    "TOEIC 기준": 625,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "대통령경호처 특정직 7급",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "농촌진흥청 연구직·지도직",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "해양경찰청 간부후보생",
+    "TOEIC 기준": 625,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "게임물관리위원회",
+    "TOEIC 기준": 900,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "경기관광공사",
+    "TOEIC 기준": 800,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "경기평택항만공사",
+    "TOEIC 기준": 600,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국민건강보험공단",
+    "TOEIC 기준": "신입 700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국민건강보험공단",
+    "TOEIC 기준": "인턴 성적 필수",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립부산과학관",
+    "TOEIC 기준": "720 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립국제교육원",
+    "TOEIC 기준": 750,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립국제교육원 WEST 장기",
+    "TOEIC 기준": 750,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립국제교육원 WEST 중기",
+    "TOEIC 기준": 800,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립국제교육원 WEST 단기",
+    "TOEIC 기준": 850,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "군인공제회",
+    "TOEIC 기준": "성적 필수",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "기술보증기금",
+    "TOEIC 기준": "760 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "기초과학연구원",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "대한무역투자진흥공사 (KOTRA)",
+    "TOEIC 기준": "신입 850 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "대한무역투자진흥공사 (KOTRA)",
+    "TOEIC 기준": "인턴 우대",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "대한체육회",
+    "TOEIC 기준": "-",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "부산항만공사",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "부산항보안공사",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "서울관광재단",
+    "TOEIC 기준": "800 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "서울시립교향악단",
+    "TOEIC 기준": "-",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "세종학당재단",
+    "TOEIC 기준": "850 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "에너지경제연구원",
+    "TOEIC 기준": "750 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "여수광양항만공사",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "영화진흥위원회",
+    "TOEIC 기준": "750 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "우체국물류지원단",
+    "TOEIC 기준": "성적 필수",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "울산항만공사",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "인천국제공항공사",
+    "TOEIC 기준": "신입 800 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "인천국제공항공사",
+    "TOEIC 기준": "인턴 700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "인천항만공사",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "전략물자연구원",
+    "TOEIC 기준": "성적 필수",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "중소기업유통센터",
+    "TOEIC 기준": "인턴 700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "중소벤처기업진흥공단",
+    "TOEIC 기준": "850 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국가스공사",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국가스안전공사",
+    "TOEIC 기준": "650 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국공정거래조정원",
+    "TOEIC 기준": "800 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국공항공사",
+    "TOEIC 기준": "신입 750",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국공항공사",
+    "TOEIC 기준": "경력 700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국과학기술평가원",
+    "TOEIC 기준": "800 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국과학기술정보연구원",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국관광공사",
+    "TOEIC 기준": "800 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국국방연구원",
+    "TOEIC 기준": "750 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국국제보건의료재단",
+    "TOEIC 기준": "인턴 830 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국국제협력단",
+    "TOEIC 기준": "730 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국기계전기전자시험연구원",
+    "TOEIC 기준": "750 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국기초과학지원연구원",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국남동발전",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국농촌경제연구원",
+    "TOEIC 기준": "850 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국도로공사",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국도로공사",
+    "TOEIC 기준": "750 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국디자인진흥원",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국석유공사",
+    "TOEIC 기준": "720 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국소방산업기술원",
+    "TOEIC 기준": "750 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국수력원자력",
+    "TOEIC 기준": "750 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국수자원공사",
+    "TOEIC 기준": "600 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국수자원공사",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국수자원조사기술원",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국통계정보원",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국순환자원유통센터",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국언론진흥재단",
+    "TOEIC 기준": "신입 900 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국언론진흥재단",
+    "TOEIC 기준": "인턴 850 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국원자력산업회의",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국원자력안전기술원",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국원자력통제기술원",
+    "TOEIC 기준": "750 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국전기연구원",
+    "TOEIC 기준": 900,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국전력공사",
+    "TOEIC 기준": "신입 700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국전력공사",
+    "TOEIC 기준": "보훈 500 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국전자통신연구원",
+    "TOEIC 기준": "성적 필수",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국정보화진흥원",
+    "TOEIC 기준": "900 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국천문연구원",
+    "TOEIC 기준": "750 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국철도기술원",
+    "TOEIC 기준": "성적 필수",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국투자공사",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국항공우주산업",
+    "TOEIC 기준": "815 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국해양과학기술원",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국해양진흥공사",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국화학융합시험연구원",
+    "TOEIC 기준": "650 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국환경공단",
+    "TOEIC 기준": "750 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국환경산업기술원",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한전 KDN",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한전 KPS",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "항공안전기술원",
+    "TOEIC 기준": "700 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "FITI시험연구원",
+    "TOEIC 기준": "750 이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "건강보험심사평가원",
+    "TOEIC 기준": "환산점수반영",
+    "Unnamed: 3": "독해성적×200%"
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국철도공사",
+    "TOEIC 기준": 800,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "서울주택도시공사",
+    "TOEIC 기준": "사무직 800 / 기술직 700",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국남부발전",
+    "TOEIC 기준": 850,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국서부발전",
+    "TOEIC 기준": 900,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국수자원공사",
+    "TOEIC 기준": 775,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국농수산식품유통공사",
+    "TOEIC 기준": 750,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국산업단지공단",
+    "TOEIC 기준": 750,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국산업은행",
+    "TOEIC 기준": 750,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국농어촌공사",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국거래소",
+    "TOEIC 기준": 900,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "강원대학병원",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국가철도공단",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국민연금공단",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "대한적십자사",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국가스기술공사",
+    "TOEIC 기준": "반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국민체육진흥공단",
+    "TOEIC 기준": 750,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "신용보증기금",
+    "TOEIC 기준": 750,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국교육개발원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "예금보험공사",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국전력거래소",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "선박해양플랜트연구소",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "중소기업기술정보진흥원",
+    "TOEIC 기준": 765,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국무역보험공사",
+    "TOEIC 기준": "반영",
+    "Unnamed: 3": "공인영어성적(TOEIC, TOEFL(IBT), TEPS)으로 대체"
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "동서발전㈜",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립공원공단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립생태원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립해양박물관",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "농업정책보험금융원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "대한무역투자진흥공사",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "서민금융진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "연구개발특구진흥재단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "정보통신산업진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "주식회사 에스알",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "창업진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국건강가정진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국교육학술정보원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국국토정보공사",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국등산·트레킹지원센터",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국법제연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국부동산원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국사학진흥재단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국사회보장정보원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국산림복지진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국산업단지공단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국산업인력공단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국세라믹기술원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국승강기안전공단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국인터넷진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국임업진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국자산관리공사",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국조세재정연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국주택금융공사",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국지역난방공사",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국철도공사",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "해양환경공단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국가수리과학연구소",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "새마금개발공사",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "코레일테크㈜",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "우체국금융개발원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "농업기술실용화재단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국광해관리공단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "강원랜드",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국제방송교류재단(아리랑국제방송)",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국체육산업개발㈜",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국소방산업기술원 ",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국우편사업진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국동서발전㈜",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국중부발전㈜",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "녹색기술센터",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국과학기술정보연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국생산기술연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국식품연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "(재)축산환경관리원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "(재)한국우편사업진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "경기주택도시공사",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국보건복지인재원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "(주)공영홈쇼핑",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "88관광개발㈜",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "건설근로자공제회",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "게임물관리위원회",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "경북대학교치과병원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "공간정보품질관리원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "과학기술정책연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국가생명윤리정책원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국가평생교육진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립낙동강생물자원관",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립대구과학관",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립부산과학관",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립아시아문화전당재단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립울진해양과학관",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국립호남권생물자원관",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국방전직교육원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국악방송",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "기초과학연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "농림식품기술기획평가원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "대한석탄공사",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "북한이탈주민지원재단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "새만금개발공사",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "서울대학교치과병원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "스포츠윤리센터",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "시청자미디어재단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "신용보증재단중앙회",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "아시아·태평양경제협력체 기후센터",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "의료기관평가인증원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "자동차손해배상진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "재단법인 건설기술교육원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "재단법인 대한건설기계안전관리원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "재단법인 장애인기업종합지원센터",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국공공조직은행",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "노사발전재단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "재단법인 한국공공조직은행",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "재단법인 한국에너지재단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "재단법인 한국자활복지개발원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "재외동포협력센터",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "정부법무공단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "주택관리공단㈜",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "IBK기업은행",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "중소벤처기업연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "코레일로지스(주)",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "코레일유통㈜",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "코레일테크(주)",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국건강증진개발원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국고용노동교육원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국고용정보원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국고전번역원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국과학기술기획평가원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국기술교육대학교",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국나노기술원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국노동연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국노인인력개발원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국농업기술진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국데이터산업진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국도로공사서비스(주)",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국로봇산업진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국마약퇴치운동본부",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국문화예술위원회",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국문화정보원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국문화진흥주식회사",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국방송통신전파진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국법무보호복지공단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국보건의료인국가시험원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국보훈복지의료공단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국사회적기업진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국생명존중희망재단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국소비자보호원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국식품산업클러스터진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국양성평등교육진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국어촌어항공단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국여성인권진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국영상자료원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국예술인복지재단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국원자력안전재단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국의료기기안전정보원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국의약품안전관리원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국잡월드",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국장애인고용공단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국저작권보호원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국저작권위원회",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국중소벤처기업유통원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국지식재산보호원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국직업능력연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국청소년상담복지개발원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국청소년정책연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국체육산업개발(주)",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국출판문화산업진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국치산기술협회",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국특허전략개발원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국특허정보원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국학중앙연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국한의약진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국항로표지기술원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국해양과학기술원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국해양수산개발원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국해양조사협회",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국형사·법무정책연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국환경연구원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한전MCS㈜",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "해양수산과학기술진흥원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "소프트웨어정책연구소",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "동남권원자력의학원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "서울요양원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "육아정책연구소",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "병무청",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국산업은행",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국투자공사",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국연구재단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국예탁결제원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국토안전관리원",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "대한법률구조공단",
+    "TOEIC 기준": "미반영",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "근로복지공단",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "도로교통공단",
+    "TOEIC 기준": 445,
+    "Unnamed: 3": "이상 환산점수 반영"
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "코레일관광개발",
+    "TOEIC 기준": 620,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국마사회",
+    "TOEIC 기준": "토익스피킹IH이상",
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "국방기술진흥연구소",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "소상공인시장진흥공단",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": "이상 개별점수부여"
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "한국조폐공사",
+    "TOEIC 기준": 360,
+    "Unnamed: 3": "975점까지 환산점수적용"
+  },
+  {
+    "Unnamed: 0": null,
+    "기관/시험명": "극지연구소(기술직)",
+    "TOEIC 기준": 700,
+    "Unnamed: 3": null
+  }
+]

@@ -1,0 +1,164 @@
+[
+  {
+    "id": "518f3164-ee93-498f-a1d8-25817bd41bbb",
+    "school_name": "한양여자대학교",
+    "url": "https://www.hywoman.ac.kr/ko/cms/FrCon/index.do?MENU_ID=4170",
+    "selector": "rss",
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T06:22:26.912236+00:00",
+    "created_at": "2026-04-14T06:20:34.723245+00:00"
+  },
+  {
+    "id": "888d6e84-e2e2-47f5-b503-e9fe19f8021a",
+    "school_name": "중앙대학교",
+    "url": "https://news.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=10#page1",
+    "selector": "a[href*=\"BoardView.do\"]",
+    "is_active": true,
+    "last_crawled_at": null,
+    "created_at": "2026-04-14T04:33:51.604442+00:00"
+  },
+  {
+    "id": "ac3da2fe-dd62-4c0f-99a1-400036e67510",
+    "school_name": "한양대학교",
+    "url": "https://www.newshyu.com/rss/allArticle.xml",
+    "selector": null,
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T08:17:27.443265+00:00",
+    "created_at": "2026-04-14T07:56:33.280869+00:00"
+  },
+  {
+    "id": "6b497f02-42be-4088-a278-82955d4bf5b0",
+    "school_name": "건국대학교",
+    "url": "https://www.konkuk.ac.kr/konkuk/2096/subview.do",
+    "selector": null,
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T08:29:21.074997+00:00",
+    "created_at": "2026-04-14T08:26:02.754295+00:00"
+  },
+  {
+    "id": "c8440ef1-add0-4eee-9723-67b469e8b8f9",
+    "school_name": "충남대학교",
+    "url": "https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0703&site_dvs_cd=kr&menu_dvs_cd=0703",
+    "selector": null,
+    "is_active": true,
+    "last_crawled_at": null,
+    "created_at": "2026-04-14T06:42:04.193971+00:00"
+  },
+  {
+    "id": "cad68fca-f971-40a8-b3a2-da280c1e863a",
+    "school_name": "가천대학교",
+    "url": "https://www.gachon.ac.kr/pr/1443/subview.do",
+    "selector": null,
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T04:23:19.374498+00:00",
+    "created_at": "2026-04-14T04:23:00.066604+00:00"
+  },
+  {
+    "id": "2292fc81-f33f-4298-891b-cdb109fabe22",
+    "school_name": "순천향대학교",
+    "url": "https://home.sch.ac.kr/sch/01/040800.jsp",
+    "selector": "table a[href*=\"mode=view\"]",
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T06:48:39.878428+00:00",
+    "created_at": "2026-04-14T01:45:09.084423+00:00"
+  },
+  {
+    "id": "bb77c328-c1f0-4864-9148-2e3348a5b478",
+    "school_name": "한림대학교",
+    "url": "https://www.hallym.ac.kr/pr/5865/subview.do",
+    "selector": ".board-list a",
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T06:48:39.878428+00:00",
+    "created_at": "2026-04-14T06:06:50.057559+00:00"
+  },
+  {
+    "id": "ebc825d7-5c3f-4082-bd48-677d17526734",
+    "school_name": "아주대학교",
+    "url": "https://www.ajou.ac.kr/kr/ajou/news.do?mode=list&article.offset=0",
+    "selector": null,
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T06:48:39.878428+00:00",
+    "created_at": "2026-04-14T06:44:24.40065+00:00"
+  },
+  {
+    "id": "d556f9c8-6652-45ec-bd50-be023353fcfb",
+    "school_name": "동의대학교",
+    "url": "https://www.deu.ac.kr/www/deu-today.do",
+    "selector": null,
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T04:50:31.862197+00:00",
+    "created_at": "2026-04-14T02:18:29.184644+00:00"
+  },
+  {
+    "id": "5f57d320-bfd9-4db5-b0a2-f448d6339d61",
+    "school_name": "충남대학교",
+    "url": "https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0703&site_dvs_cd=kr&menu_dvs_cd=0703",
+    "selector": "a[href*=\"BoardView.do\"]",
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T04:50:31.862197+00:00",
+    "created_at": "2026-04-14T04:49:28.155945+00:00"
+  },
+  {
+    "id": "542c8c3a-ee06-4833-a822-62847a172aca",
+    "school_name": "고려대학교 세종캠퍼스",
+    "url": "https://sejongnews.korea.ac.kr/koreaSejong/7903/subview.do",
+    "selector": ".board-list a",
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T06:48:39.878428+00:00",
+    "created_at": "2026-04-14T06:15:24.752801+00:00"
+  },
+  {
+    "id": "b5cfd9c9-9fe4-44c9-8fc0-3945945f8f9b",
+    "school_name": "삼육대학교",
+    "url": "https://www.syu.ac.kr/university-square/syu-news/latest-news/",
+    "selector": "a[href*=\"BoardView.do\"]",
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T06:48:39.878428+00:00",
+    "created_at": "2026-04-14T05:00:37.639807+00:00"
+  },
+  {
+    "id": "aaf03f31-6db4-483a-ad11-0be6691aaea8",
+    "school_name": "인하대학교",
+    "url": "https://www.inha.ac.kr/kr/950/subview.do",
+    "selector": "a[href*=\"BoardView.do\"]",
+    "is_active": true,
+    "last_crawled_at": null,
+    "created_at": "2026-04-14T05:03:43.174611+00:00"
+  },
+  {
+    "id": "1e4659ea-fdcd-4e14-9452-a9f91e0b4f0c",
+    "school_name": "부천대학교",
+    "url": "https://www.bc.ac.kr/bcu/pr/news.do",
+    "selector": null,
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T07:10:17.717209+00:00",
+    "created_at": "2026-04-14T07:10:12.072009+00:00"
+  },
+  {
+    "id": "66b6e451-8c0e-4645-be40-358333307fcb",
+    "school_name": "경북대학교",
+    "url": "https://knujob.knu.ac.kr/HOME/knujob/sub.htm?nav_code=knu1623817159",
+    "selector": "table a[href*=\"mode=view\"]",
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T08:04:09.915981+00:00",
+    "created_at": "2026-04-14T07:14:40.901289+00:00"
+  },
+  {
+    "id": "619cb614-bd90-4103-a16d-3b08d9af8a9e",
+    "school_name": "울산대학교",
+    "url": "https://clover.uc.ac.kr/notice/a/m/getBoardList.do",
+    "selector": null,
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T08:04:09.915981+00:00",
+    "created_at": "2026-04-14T06:28:54.710565+00:00"
+  },
+  {
+    "id": "0d56b6f8-d267-4855-9f26-9cbdaf75913c",
+    "school_name": "서울여자대학교",
+    "url": "https://www.swu.ac.kr/ad/swufocus.html",
+    "selector": null,
+    "is_active": true,
+    "last_crawled_at": "2026-04-14T08:04:09.915981+00:00",
+    "created_at": "2026-04-14T07:48:17.628146+00:00"
+  }
+]

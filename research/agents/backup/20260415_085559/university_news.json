@@ -1,0 +1,162 @@
+[
+  {
+    "id": 12,
+    "school_name": "순천향대학교",
+    "title": "대학일자리플러스센터",
+    "link": "https://id.sch.ac.kr/",
+    "created_at": "2026-03-31T01:52:56.539556+00:00",
+    "sort_order": 13,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1774936666064.jpg"
+  },
+  {
+    "id": 19,
+    "school_name": "울산대학교",
+    "title": "울산대학교 대학일자리플러스센터",
+    "link": "https://ucareer.ulsan.ac.kr/main/",
+    "created_at": "2026-03-31T14:46:45.974061+00:00",
+    "sort_order": 18,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1774968405203.png"
+  },
+  {
+    "id": 22,
+    "school_name": "건국대학교",
+    "title": "'AI 미래혁신원' 신설한 건국대, AI 분야 창업 확 키운다",
+    "link": "https://www.konkuk.ac.kr/konkuk/2096/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGa29ua3VrJTJGMjU3JTJGMTE3MTM0OSUyRmFydGNsVmlldy5kbyUzRnBhZ2UlM0QxJTI2c3JjaENvbHVtbiUzRCUyNnNyY2hXcmQlM0QlMjZiYnNDbFNlcSUzRCUyNmJic09wZW5XcmRTZXElM0QlMjZyZ3NCZ25kZVN0ciUzRCUyNnJnc0VuZGRlU3RyJTNEJTI2aXNWaWV3TWluZSUzRGZhbHNlJTI2cGFzc3dvcmQlM0QlMjY=",
+    "created_at": "2026-04-10T02:48:09.610538+00:00",
+    "sort_order": 20,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1775789291007.jpg"
+  },
+  {
+    "id": 16,
+    "school_name": "서울여자대학교",
+    "title": "대학일자리플러스사업",
+    "link": "https://job.swu.ac.kr/job/main/main_form.acl",
+    "created_at": "2026-03-31T07:05:46.114357+00:00",
+    "sort_order": 15,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1774940745280.jpg"
+  },
+  {
+    "id": 6,
+    "school_name": "교육부",
+    "title": "첨단산업 인재양성 부트캠프로 인공지능(AI) 융합인재를 양성- 5억원 지원",
+    "link": "https://www.moe.go.kr/boardCnts/viewRenew.do?boardID=294&boardSeq=105764&lev=0&searchType=null&statusYN=W&page=1&s=moe&m=020402&opType=N",
+    "created_at": "2026-03-31T01:11:03.011416+00:00",
+    "sort_order": 2,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1775103953176.jpg"
+  },
+  {
+    "id": 1,
+    "school_name": "인하대학교",
+    "title": "인하대학교 대학일자리플러스센터",
+    "link": "https://job.inha.ac.kr/",
+    "created_at": "2026-03-31T00:44:46.490859+00:00",
+    "sort_order": 7,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1774936416816.jpg"
+  },
+  {
+    "id": 9,
+    "school_name": "가천대학교",
+    "title": "대학일자리플러스센터",
+    "link": "https://work.gachon.ac.kr/",
+    "created_at": "2026-03-31T01:18:12.337028+00:00",
+    "sort_order": 10,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1774936567143.jpg"
+  },
+  {
+    "id": 5,
+    "school_name": "충남대학교",
+    "title": "충남대학교 대학일자리플러스센터",
+    "link": "https://job.cnu.ac.kr/job/index.do#",
+    "created_at": "2026-03-31T01:09:03.838973+00:00",
+    "sort_order": 9,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1774936531424.jpg"
+  },
+  {
+    "id": 11,
+    "school_name": "강원대학교",
+    "title": "취업지원과.교육지원과 강원대학교 대학일자리플러스센터",
+    "link": "https://job.kangwon.ac.kr/mid/0130000000",
+    "created_at": "2026-03-31T01:49:45.483935+00:00",
+    "sort_order": 12,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1774936637736.jpg"
+  },
+  {
+    "id": 18,
+    "school_name": "경북대학교",
+    "title": "경북대학교 취업진로과",
+    "link": "https://home.knu.ac.kr/HOME/knujob/sub.htm?nav_code=knu1623817159",
+    "created_at": "2026-03-31T14:41:07.890742+00:00",
+    "sort_order": 17,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1774968067300.png"
+  },
+  {
+    "id": 20,
+    "school_name": "한림대학교",
+    "title": "한림대학교 대학일자리플러스센터",
+    "link": "https://job.hallym.ac.kr/job/4350/subview.do",
+    "created_at": "2026-03-31T14:49:27.805753+00:00",
+    "sort_order": 19,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1774968567243.png"
+  },
+  {
+    "id": 15,
+    "school_name": "명지대학교",
+    "title": "명지대 대학일자리플러스센터 MJ청년취업포",
+    "link": "https://www.mjujob.ac.kr/main/index.jsp",
+    "created_at": "2026-03-31T06:50:31.800043+00:00",
+    "sort_order": 14,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1774939843952.jpg"
+  },
+  {
+    "id": 17,
+    "school_name": "청주대학교",
+    "title": "대학일자리플러스센터",
+    "link": "https://job.cju.ac.kr/?platform=app",
+    "created_at": "2026-03-31T07:09:16.410872+00:00",
+    "sort_order": 16,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1774940956362.jpg"
+  },
+  {
+    "id": 10,
+    "school_name": "고려대학교 세종캠퍼스",
+    "title": "대학일자리플러스센터(세종경력개발센터)",
+    "link": "https://csg.korea.ac.kr/sites/cdc/index.do",
+    "created_at": "2026-03-31T01:37:08.872959+00:00",
+    "sort_order": 11,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1774936606024.jpg"
+  },
+  {
+    "id": 4,
+    "school_name": "아주대학교",
+    "title": "아주대학교 대학일자리플러스센터",
+    "link": "https://job.ajou.ac.kr/main/Default.aspx",
+    "created_at": "2026-03-31T00:56:18.513329+00:00",
+    "sort_order": 8,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1774936480039.jpg"
+  },
+  {
+    "id": 21,
+    "school_name": "부천대학교",
+    "title": "대학일자리플러스센터",
+    "link": "https://job4u.bc.ac.kr/",
+    "created_at": "2026-04-02T05:46:32.964687+00:00",
+    "sort_order": 6,
+    "bg_color": "#FFFFFF",
+    "logo_url": "https://byzulmxcuhsrjdphmuym.supabase.co/storage/v1/object/public/logo/1775108792539.jpg"
+  }
+]
