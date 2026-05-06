@@ -1593,7 +1593,7 @@
               </div>
               <div class="rounded-xl border border-rose-100 bg-rose-50 p-3 text-center">
                 <div class="text-xl font-black text-rose-600" id="sp-k-confirm">—</div>
-                <div class="text-xs text-slate-400 mt-1">결과 보기 클릭</div>
+                <div class="text-xs text-slate-400 mt-1">4주 플랜 버튼 클릭</div>
               </div>
             </div>
             <div class="grid grid-cols-2 gap-4">
@@ -5301,8 +5301,8 @@
       document.getElementById('sp-period-label').textContent = labels[p] + ' 방문';
       document.getElementById('sp-k-period').textContent = filteredVisits.length.toLocaleString();
       document.getElementById('sp-k-analyze').textContent  = filteredAct.filter(r=>r.page.startsWith('evidence/sample.html:analyze:')).length.toLocaleString();
-      document.getElementById('sp-k-planopen').textContent = filteredAct.filter(r=>r.page.startsWith('evidence/sample.html:plan-open:')).length.toLocaleString();
-      document.getElementById('sp-k-confirm').textContent  = filteredAct.filter(r=>r.page.startsWith('evidence/sample.html:result-confirm:')).length.toLocaleString();
+      document.getElementById('sp-k-planopen').textContent = filteredAct.filter(r=>r.page.startsWith('evidence/sample.html:plan-open:')||r.page.startsWith('evidence/sample.html:result-open:')).length.toLocaleString();
+      document.getElementById('sp-k-confirm').textContent  = filteredAct.filter(r=>r.page.startsWith('evidence/sample.html:plan-btn:')).length.toLocaleString();
     }
 
     async function spSetPeriod(p) {
@@ -5473,14 +5473,14 @@
       if (funnelEl) {
         const visitCnt   = rows.length || 0;
         const analyzeCnt = actRows.filter(r => r.page.startsWith('evidence/sample.html:analyze:')).length;
-        const planCnt    = actRows.filter(r => r.page.startsWith('evidence/sample.html:plan-open:')).length;
-        const confirmCnt = actRows.filter(r => r.page.startsWith('evidence/sample.html:result-confirm:')).length;
+        const planCnt    = actRows.filter(r => r.page.startsWith('evidence/sample.html:plan-open:')||r.page.startsWith('evidence/sample.html:result-open:')).length;
+        const confirmCnt = actRows.filter(r => r.page.startsWith('evidence/sample.html:plan-btn:')).length;
         const pct = (a, b) => b > 0 ? Math.round(a / b * 100) + '%' : '—';
         const funnelSteps = [
           { label: '📥 페이지 방문', count: visitCnt,    rate: '—' },
           { label: '🔢 점수 입력',   count: analyzeCnt,  rate: pct(analyzeCnt, visitCnt) },
           { label: '🏆 합격권 버튼', count: planCnt,     rate: pct(planCnt, analyzeCnt) },
-          { label: '✅ 결과 확인',   count: confirmCnt,  rate: pct(confirmCnt, planCnt) },
+          { label: '🟡 4주 플랜 버튼', count: confirmCnt, rate: pct(confirmCnt, planCnt) },
         ];
         const clr = ['#64748B','#3B82F6','#F59E0B','#10B981'];
         funnelEl.innerHTML = funnelSteps.map((s, i) => `

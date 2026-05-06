@@ -790,6 +790,7 @@
     }
 
     function openGtelpPlan() {
+      spTrack('plan-btn:' + (userScore || 0));
       document.getElementById('gtelp-plan-modal').style.display = 'block';
       document.body.style.overflow = 'hidden';
     }
