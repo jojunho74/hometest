@@ -10,55 +10,59 @@
     body{font-family:"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#F8FAFF;color:#1E293B;}
 
     /* ── 헤더 ── */
-    header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #E2E8F0;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    header{position:sticky;top:0;z-index:50;background:#0D1B2A;box-shadow:0 1px 0 rgba(255,255,255,.06),0 4px 16px rgba(0,0,0,.3);}
     .hinner{max-width:1100px;margin:0 auto;padding:0 16px;height:64px;display:flex;align-items:center;justify-content:space-between;}
-    .hlogo{font-size:1rem;font-weight:800;color:#1E4D8C;text-decoration:none;}
+    .hlogo{font-size:1rem;font-weight:800;color:#fff;text-decoration:none;white-space:nowrap;}
     .hnav{display:none;align-items:center;gap:4px;}
-    .hnav a{color:#475569;text-decoration:none;padding:8px 12px;border-radius:8px;font-size:0.85rem;font-weight:600;transition:background .18s,color .18s;}
-    .hnav a:hover,.hnav a.active{background:#1E4D8C;color:#fff;}
-    .hbtn{display:none;padding:10px 18px;border-radius:8px;font-size:0.85rem;font-weight:700;background:#1E4D8C;color:#fff;text-decoration:none;min-height:44px;display:inline-flex;align-items:center;}
-    .hbtn:hover{background:#163870;}
-    .hamburger{display:flex;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:#1E4D8C;border:none;padding:6px;border-radius:8px;}
-    .hamburger span{display:block;height:2px;background:#fff;border-radius:2px;}
-    .mobile-menu{display:none;flex-direction:column;background:#fff;border-top:1px solid #E2E8F0;padding:12px 16px 16px;}
-    .mobile-menu a{padding:14px 12px;font-size:0.95rem;font-weight:600;color:#1E293B;text-decoration:none;border-bottom:1px solid #F1F5F9;}
-    .mobile-menu .mbtn{margin-top:12px;display:block;text-align:center;padding:12px;border-radius:8px;background:#1E4D8C;color:#fff;font-weight:700;text-decoration:none;}
+    .nav-link{padding:8px 12px;border-radius:8px;color:rgba(255,255,255,.75);text-decoration:none;transition:background .18s,color .18s;font-size:0.85rem;font-weight:600;white-space:nowrap;}
+    .nav-link:hover,.nav-link.active{background:rgba(255,255,255,.12);color:#fff;}
+    .hbtn{padding:10px 18px;border-radius:8px;font-size:0.85rem;font-weight:700;color:#fff;text-decoration:none;min-height:40px;display:inline-flex;align-items:center;background:linear-gradient(135deg,#1E4D8C,#0891B2);}
+    .hbtn:hover{opacity:.9;}
+    .hbtn-gold{background:linear-gradient(135deg,#D97706,#F59E0B);}
+    .hamburger{display:flex;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:rgba(255,255,255,.12);border:none;padding:6px;border-radius:8px;}
+    .hamburger span{display:block;height:2px;background:#fff;border-radius:2px;transition:transform .25s,opacity .25s;}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+    .mobile-menu{display:none;flex-direction:column;background:#0D1B2A;border-top:1px solid rgba(255,255,255,.1);padding:12px 16px 16px;position:sticky;top:64px;z-index:49;box-shadow:0 4px 12px rgba(0,0,0,.4);}
+    .mobile-menu a{padding:14px 12px;font-size:0.95rem;font-weight:600;color:rgba(255,255,255,.85);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.08);}
+    .mobile-menu a:last-child{border-bottom:none;}
+    .mobile-menu .mbtn{margin-top:12px;display:block;text-align:center;padding:12px;border-radius:50px;background:linear-gradient(135deg,#1E4D8C,#0891B2);color:#fff;font-weight:700;text-decoration:none;}
     .mobile-menu.open{display:flex;}
-    @media(max-width:768px){.hnav{display:none;}.hbtn{display:none;}.hamburger{display:flex;}}
+    @media(min-width:769px){.hnav{display:flex;}.hbtn{display:inline-flex;}.hamburger{display:none;}}
 
-    /* ── 히어로 ── */
-    .hero{background:linear-gradient(135deg,#0B1D3A 0%,#1E3A8A 60%,#1d4ed8 100%);color:#fff;padding:48px 16px 40px;text-align:center;}
-    .hero h1{font-size:1.9rem;font-weight:900;margin-bottom:8px;}
-    .hero p{font-size:0.95rem;color:rgba(255,255,255,.8);}
+    /* ── 페이지 바 ── */
+    .page-bar{background:#fff;border-bottom:1px solid #E2E8F0;padding:20px 16px;}
+    .page-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+    .page-bar-inner h1{font-size:1.2rem;font-weight:800;color:#0B1D3A;}
 
     /* ── 본문 ── */
-    .wrap{max-width:1100px;margin:0 auto;padding:40px 16px 80px;}
-    .board-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
-    .board-top h2{font-size:1.1rem;font-weight:800;color:#0B1D3A;}
+    .wrap{max-width:1100px;margin:0 auto;padding:28px 16px 80px;}
+    .board-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+    .board-top-count{font-size:0.85rem;color:#64748B;}
     .board-top-btns{display:flex;gap:8px;}
 
     /* ── 게시판 테이블 ── */
     .board-table-wrap{border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);width:100%;}
     .board-table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;}
     .board-table thead{background:#1E3A8A;color:#fff;}
-    .board-table th{padding:14px 16px;font-size:0.85rem;font-weight:700;text-align:center;background:#1E3A8A;color:#fff;}
-    .board-table td{padding:14px 16px;font-size:0.85rem;border-bottom:1px solid #F1F5F9;text-align:center;color:#334155;}
+    .board-table th{padding:13px 16px;font-size:0.83rem;font-weight:700;text-align:center;}
+    .board-table td{padding:13px 16px;font-size:0.85rem;border-bottom:1px solid #F1F5F9;text-align:center;color:#334155;}
     .board-table tr:last-child td{border-bottom:none;}
-    .board-table tr:hover td{background:#F8FAFF;}
-    .td-title{text-align:left!important;font-weight:600;color:#1E293B;cursor:pointer;}
+    .board-table tr:hover td{background:#F8FAFF;cursor:pointer;}
+    .td-title{text-align:left!important;font-weight:600;color:#1E293B;}
+    .td-title:hover{color:#1E4D8C;}
     .td-meta{display:none;}
-    .td-title:hover{color:#1E4D8C;text-decoration:underline;}
-    .lock-icon{font-size:0.75rem;color:#94A3B8;margin-right:4px;}
-    .no-data{text-align:center;padding:60px 0;color:#94A3B8;font-size:0.9rem;}
+    .no-data{text-align:center;padding:60px 0;color:#94A3B8;font-size:0.9rem;cursor:default!important;}
     .notice-row td{background:#FFF9E6!important;}
     .notice-row:hover td{background:#FFF3CD!important;}
     .notice-badge{display:inline-block;padding:2px 7px;border-radius:4px;background:#F59E0B;color:#fff;font-size:0.7rem;font-weight:800;margin-right:6px;vertical-align:middle;}
-    .btn-notice{padding:9px 22px;border-radius:8px;background:#F59E0B;color:#fff;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;}
-    .btn-notice:hover{background:#D97706;}
-    .btn-notice.on{background:#1E4D8C;}
-    .btn-notice.on:hover{background:#163870;}
+    .admin-manage{display:inline-flex;gap:4px;margin-left:8px;vertical-align:middle;}
+    .admin-manage button{padding:2px 8px;border-radius:4px;font-size:0.7rem;font-weight:700;border:none;cursor:pointer;}
+    .btn-edit-sm{background:#0891B2;color:#fff;}
+    .btn-del-sm{background:#DC2626;color:#fff;}
 
-    /* ── 토스트 알림 ── */
+    /* ── 토스트 ── */
     .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:#1E293B;color:#fff;padding:12px 24px;border-radius:50px;font-size:0.9rem;font-weight:600;z-index:9999;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
     .toast.success{background:#059669;}
@@ -67,9 +71,8 @@
     /* ── 모달 공통 ── */
     .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:16px;}
     .modal-bg.open{display:flex;}
-    /* pw-modal은 다른 모달 위에 항상 표시 */
-    #pw-modal{z-index:400;}
     .modal{background:#fff;border-radius:16px;width:100%;max-width:780px;padding:36px 32px;box-shadow:0 8px 40px rgba(0,0,0,.18);}
+    .modal-sm{max-width:380px;}
     .modal h3{font-size:1.1rem;font-weight:800;color:#0B1D3A;margin-bottom:20px;}
     .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
     .form-group label{font-size:0.8rem;font-weight:700;color:#475569;}
@@ -77,7 +80,6 @@
     .form-group input:focus,.form-group textarea:focus{border-color:#1E4D8C;}
     .form-group textarea{resize:vertical;min-height:120px;}
     .modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap;}
-    .pw-desc{font-size:0.85rem;color:#64748B;margin-bottom:16px;line-height:1.6;}
 
     /* ── 버튼 ── */
     .btn-cancel{padding:9px 20px;border-radius:8px;border:1.5px solid #CBD5E1;background:#fff;color:#475569;font-size:0.85rem;font-weight:700;cursor:pointer;}
@@ -86,41 +88,24 @@
     .btn-submit:hover{background:#163870;}
     .btn-danger{padding:9px 22px;border-radius:8px;background:#DC2626;color:#fff;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;}
     .btn-danger:hover{background:#B91C1C;}
-    .btn-admin{padding:9px 22px;border-radius:8px;background:#7C3AED;color:#fff;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;}
+    .btn-admin{padding:9px 18px;border-radius:8px;background:#7C3AED;color:#fff;font-size:0.83rem;font-weight:700;border:none;cursor:pointer;}
     .btn-admin:hover{background:#6D28D9;}
-    .btn-write{padding:9px 22px;border-radius:8px;background:#1E4D8C;color:#fff;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;}
+    .btn-write{padding:9px 18px;border-radius:8px;background:#1E4D8C;color:#fff;font-size:0.83rem;font-weight:700;border:none;cursor:pointer;}
     .btn-write:hover{background:#163870;}
-    .btn-admin-login{padding:9px 22px;border-radius:8px;background:#7C3AED;color:#fff;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;}
-    .btn-admin-login:hover{background:#6D28D9;}
+    .btn-notice{padding:9px 22px;border-radius:8px;background:#F59E0B;color:#fff;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;}
+    .btn-notice:hover{background:#D97706;}
+    .btn-notice.on{background:#1E4D8C;}
 
     /* ── 글 상세 ── */
     .detail-meta{display:flex;gap:16px;font-size:0.78rem;color:#94A3B8;margin-bottom:16px;flex-wrap:wrap;}
     .detail-content{background:#F8FAFF;border-radius:8px;padding:20px;font-size:0.95rem;line-height:1.8;color:#334155;white-space:pre-wrap;min-height:180px;margin-bottom:20px;}
     .detail-btns{display:flex;gap:8px;flex-wrap:wrap;}
-    .admin-badge{display:inline-block;padding:2px 8px;border-radius:4px;background:#F3E8FF;color:#7C3AED;font-size:0.72rem;font-weight:700;margin-left:6px;}
-
-    /* ── 플로팅 ── */
-    .float-btns{position:fixed;right:16px;bottom:100px;z-index:99;display:flex;flex-direction:column;gap:10px;}
-    .float-btn{display:flex;align-items:center;justify-content:center;padding:13px 20px;border-radius:50px;font-size:14px;font-weight:800;color:#fff;text-decoration:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.22);transition:transform .2s,box-shadow .2s;}
-    .float-btn:hover{transform:scale(1.05);box-shadow:0 6px 28px rgba(0,0,0,.3);}
-    @media(max-width:640px){.float-btns{right:8px;bottom:80px;}.float-btn{font-size:12px;padding:10px 14px;}}
 
     /* ══ 모바일 최적화 ══ */
     @media(max-width:640px){
-
-      /* 히어로 */
-      .hero{padding:28px 16px 24px;}
-      .hero h1{font-size:1.35rem;}
-      .hero p{font-size:0.82rem;}
-
-      /* 본문 */
       .wrap{padding:20px 12px 100px;}
       .board-top{flex-wrap:wrap;gap:8px;}
-      .board-top h2{font-size:0.95rem;}
-      .board-top-btns{gap:6px;}
-      .btn-write,.btn-admin-login{padding:7px 14px;font-size:0.78rem;}
-
-      /* 테이블 → 카드형 */
+      .btn-write,.btn-admin{padding:7px 14px;font-size:0.78rem;}
       .board-table thead{display:none;}
       .board-table,.board-table tbody,.board-table tr{display:block;width:100%;}
       .board-table tr{background:#fff;border-radius:10px;margin-bottom:8px;box-shadow:0 1px 6px rgba(0,0,0,.07);overflow:hidden;border-bottom:none!important;}
@@ -128,20 +113,12 @@
       .board-table td{display:none;}
       .td-title{display:block!important;padding:14px 14px 6px;font-size:0.9rem;border-bottom:none!important;}
       .td-meta{display:flex!important;align-items:center;gap:10px;padding:6px 14px 12px;font-size:0.75rem;color:#94A3B8;border-bottom:none!important;text-align:left!important;}
-
-      /* 모달 */
       .modal-bg{padding:0;align-items:flex-end;}
       .modal{border-radius:20px 20px 0 0;max-height:92vh;overflow-y:auto;padding:24px 20px 32px;}
-      #pw-modal .modal{border-radius:20px 20px 0 0;}
       .modal h3{font-size:1rem;margin-bottom:16px;}
       .modal-btns{justify-content:stretch;}
       .modal-btns button{flex:1;}
-
-      /* 상세 버튼 */
-      .detail-btns{gap:6px;}
       .detail-btns button{flex:1;padding:9px 8px;font-size:0.78rem;}
-
-      /* 토스트 */
       .toast{font-size:0.82rem;padding:10px 18px;bottom:16px;max-width:90vw;text-align:center;white-space:normal;}
     }
   </style>
@@ -153,20 +130,23 @@
   <div class="hinner">
     <a href="index.html" class="hlogo">IBT C&amp;C</a>
     <nav class="hnav">
-      <a href="index.html#about">서비스 소개</a>
-      <a href="package.html">패키지</a>
-      <a href="schedule.html">정기시험 일정</a>
-      <a href="university-board.html">대학활동</a>
-      <a href="library-pdf.html">채용공고 자료실</a>
-      <a href="job-board.html" class="active">게시판</a>
-      <a href="index.html#faq">FAQ</a>
-      <a href="gtelp-score.html">점수대비표</a>
-    <a href="competition.html">경쟁률</a>
+      <a href="index.html#about" class="nav-link">서비스 소개</a>
+      <a href="package.html" class="nav-link">패키지</a>
+      <a href="schedule.html" class="nav-link">정기시험 일정</a>
+      <a href="university-board.html" class="nav-link">대학활동</a>
+      <a href="library-pdf.html" class="nav-link">채용공고 자료실</a>
+      <a href="job-board.html" class="nav-link active">게시판</a>
+      <a href="index.html#faq" class="nav-link">FAQ</a>
+      <a href="gtelp-score.html" class="nav-link">점수대비표</a>
+      <a href="competition.html" class="nav-link">경쟁률</a>
     </nav>
     <div style="display:flex;align-items:center;gap:8px;">
-      <a href="index.html#consultation-form" class="hbtn">대학IBT무료신청</a>
-      <a href="student.html" class="hbtn" style="background:linear-gradient(135deg,#D97706,#F59E0B);">학생IBT무료신청</a>
-      <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+      <a href="index.html#consultation-form" class="hbtn" style="font-size:0.85rem;padding:8px 16px;">대학IBT무료신청</a>
+      <a href="student.html" class="hbtn hbtn-gold" style="font-size:0.85rem;padding:8px 16px;">학생IBT무료신청</a>
+      <a href="admin-k9x3.html" title="관리자" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);text-decoration:none;transition:background .15s,color .15s;" onmouseover="this.style.background='rgba(255,255,255,.2)';this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,.1)';this.style.color='rgba(255,255,255,.6)';">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </a>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="메뉴"><span></span><span></span><span></span></button>
     </div>
   </div>
   <div class="mobile-menu" id="mobile-menu">
@@ -180,47 +160,60 @@
     <a href="gtelp-score.html">점수대비표</a>
     <a href="competition.html">경쟁률</a>
     <a href="Fvisajobs/index.html">해외취업공고</a>
-    <a href="student.html" class="mbtn" style="background:#D97706;margin-top:6px;">학생IBT무료신청</a>
+    <a href="student.html" class="mbtn" style="background:linear-gradient(135deg,#D97706,#F59E0B);margin-top:6px;">학생IBT무료신청</a>
     <a href="index.html#consultation-form" class="mbtn">대학IBT무료신청</a>
   </div>
 </header>
 
-<!-- 히어로 -->
-<section class="hero">
-  <h1>📋 게시판</h1>
-  <p>G-TELP IBT관련 채용 정보를 자유롭게 공유하고 소통하세요.<br>
-  <span style="font-size:0.82rem;opacity:.7;">🔒 게시글은 작성 시 설정한 비밀번호로 열람할 수 있습니다.</span></p>
-</section>
+<div class="page-bar">
+  <div class="page-bar-inner">
+    <h1>📋 게시판</h1>
+  </div>
+</div>
 
-<!-- 본문 -->
 <div class="wrap">
   <div class="board-top">
-    <h2>전체 글 <span id="total-count" style="color:#1E4D8C;"></span></h2>
+    <span class="board-top-count">전체 <span id="total-count">0</span>건</span>
     <div class="board-top-btns">
-      <button class="btn-admin-login" id="admin-btn" onclick="toggleAdmin()">🔐 관리자</button>
-      <button class="btn-write" onclick="openWriteModal()">✏️ 글쓰기</button>
+      <button class="btn-admin" id="admin-btn" onclick="toggleAdmin()">🔐 관리자</button>
+      <button class="btn-write" id="write-btn" onclick="openWriteModal()" style="display:none;">✏️ 글쓰기</button>
     </div>
   </div>
 
   <div class="board-table-wrap">
-  <table class="board-table">
-    <thead>
-      <tr>
-        <th style="width:56px;">번호</th>
-        <th style="text-align:left;">제목</th>
-        <th style="width:90px;">작성자</th>
-        <th style="width:100px;">작성일</th>
-        <th style="width:56px;">조회</th>
-      </tr>
-    </thead>
-    <tbody id="board-body">
-      <tr><td colspan="5" class="no-data">등록된 게시글이 없습니다.</td></tr>
-    </tbody>
-  </table>
+    <table class="board-table">
+      <thead>
+        <tr>
+          <th style="width:56px;">번호</th>
+          <th style="text-align:left;">제목</th>
+          <th style="width:90px;">작성자</th>
+          <th style="width:110px;">작성일</th>
+          <th style="width:56px;">조회</th>
+        </tr>
+      </thead>
+      <tbody id="board-body">
+        <tr><td colspan="5" class="no-data">등록된 게시글이 없습니다.</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
-<!-- ── 글쓰기 모달 ── -->
+<!-- ── 관리자 로그인 모달 ── -->
+<div class="modal-bg" id="admin-modal">
+  <div class="modal modal-sm">
+    <h3>🔐 관리자 로그인</h3>
+    <div class="form-group">
+      <label>관리자 비밀번호</label>
+      <input id="admin-pw-input" type="password" placeholder="비밀번호를 입력하세요">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeAdminModal()">취소</button>
+      <button class="btn-submit" onclick="confirmAdminLogin()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 글쓰기 모달 (관리자 전용) ── -->
 <div class="modal-bg" id="write-modal">
   <div class="modal">
     <h3>✏️ 글쓰기</h3>
@@ -229,40 +222,12 @@
       <input id="w-title" type="text" placeholder="제목을 입력하세요" maxlength="60">
     </div>
     <div class="form-group">
-      <label>닉네임 <span style="color:#DC2626;">*</span> <span style="font-weight:400;color:#94A3B8;">(열람·수정·삭제 시 사용)</span></label>
-      <input id="w-author" type="text" placeholder="닉네임을 입력하세요" maxlength="20">
-    </div>
-    <div class="form-group">
-      <label>비밀번호 <span style="color:#DC2626;">*</span> <span style="font-weight:400;color:#94A3B8;">(닉네임과 함께 열람에 사용)</span></label>
-      <input id="w-pw" type="password" placeholder="비밀번호 4자리 이상">
-    </div>
-    <div class="form-group">
       <label>내용 <span style="color:#DC2626;">*</span></label>
       <textarea id="w-content" placeholder="내용을 입력하세요"></textarea>
     </div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeWriteModal()">취소</button>
       <button class="btn-submit" onclick="submitPost()">등록</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── 비밀번호 입력 모달 (열람/수정/삭제/관리자 공용) ── -->
-<div class="modal-bg" id="pw-modal">
-  <div class="modal" style="max-width:380px;">
-    <h3 id="pw-modal-title">🔒 본인 확인</h3>
-    <p class="pw-desc" id="pw-modal-desc"></p>
-    <div class="form-group" id="pw-nick-group">
-      <label style="font-size:0.8rem;font-weight:700;color:#475569;">닉네임</label>
-      <input id="pw-nick-input" type="text" placeholder="작성 시 입력한 닉네임">
-    </div>
-    <div class="form-group">
-      <label style="font-size:0.8rem;font-weight:700;color:#475569;" id="pw-input-label">비밀번호</label>
-      <input id="pw-input" type="password" placeholder="비밀번호를 입력하세요">
-    </div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closePwModal()">취소</button>
-      <button class="btn-submit" onclick="confirmPw()">확인</button>
     </div>
   </div>
 </div>
@@ -279,10 +244,9 @@
     <div class="detail-content" id="d-content"></div>
     <div class="detail-btns">
       <button class="btn-cancel" onclick="closeDetailModal()">닫기</button>
-      <button class="btn-submit" onclick="openEditAuth()" style="background:#0891B2;">✏️ 수정</button>
-      <button class="btn-danger" onclick="openDeleteAuth()">🗑️ 삭제</button>
-      <button class="btn-notice" id="notice-toggle-btn" onclick="toggleNotice()" style="display:none;">📌 공지 설정</button>
-      <button class="btn-admin" id="admin-delete-btn" onclick="adminDeletePost()" style="display:none;">🛡️ 관리자 삭제</button>
+      <button class="btn-submit" id="d-edit-btn" onclick="openEditModal()" style="display:none;background:#0891B2;">✏️ 수정</button>
+      <button class="btn-danger" id="d-del-btn" onclick="deleteCurrentPost()" style="display:none;">🗑️ 삭제</button>
+      <button class="btn-notice" id="d-notice-btn" onclick="toggleNotice()" style="display:none;">📌 공지 설정</button>
     </div>
   </div>
 </div>
@@ -294,10 +258,6 @@
     <div class="form-group">
       <label>제목 <span style="color:#DC2626;">*</span></label>
       <input id="e-title" type="text" maxlength="60">
-    </div>
-    <div class="form-group">
-      <label>작성자</label>
-      <input id="e-author" type="text" maxlength="20">
     </div>
     <div class="form-group">
       <label>내용 <span style="color:#DC2626;">*</span></label>
@@ -313,26 +273,7 @@
 <!-- 토스트 -->
 <div class="toast" id="toast"></div>
 
-<!-- 플로팅 -->
-<div class="float-btns">
-  <button onclick="shareKakao()" class="float-btn" style="background:#FEE500;color:#3C1E1E;border:none;cursor:pointer;">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="#3C1E1E" style="vertical-align:middle;margin-right:4px;"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
-    카카오 공유
-  </button>
-  <a href="https://pf.kakao.com/_tFxiuX/chat" target="_blank" class="float-btn" style="background:#FEE500;color:#3C1E1E;">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="#3C1E1E" style="vertical-align:middle;margin-right:4px;"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
-    카카오 상담톡
-  </a>
-  <a href="http://pf.kakao.com/_NxirdX" target="_blank" class="float-btn" style="background:#3C1E1E;color:#FEE500;">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="#FEE500" style="vertical-align:middle;margin-right:4px;"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.667 1.556 5.014 3.927 6.41L4.5 21l4.683-2.34C10.083 18.885 11.03 19 12 19c5.523 0 10-3.477 10-8.5S17.523 3 12 3z"/></svg>
-    채널 구독
-  </a>
-</div>
-
 <script>
-  // ══════════════════════════════════
-  //  Supabase 설정
-  // ══════════════════════════════════
   const { createClient } = supabase;
   const db = createClient(
     'https://byzulmxcuhsrjdphmuym.supabase.co',
@@ -340,26 +281,22 @@
   );
   const ADMIN_PW = 'gtelp2024';
 
-  // ══════════════════════════════════
-  //  상태
-  // ══════════════════════════════════
-  let posts         = [];
+  let posts = [];
   let currentPostId = null;
-  let pwAction      = null;  // 'view' | 'edit' | 'delete' | 'admin-login'
-  let isAdmin       = false;
+  let isAdmin = false;
 
-  // ══════════════════════════════════
-  //  비밀번호 해시 (SHA-256)
-  // ══════════════════════════════════
   async function hashPw(pw) {
     const enc = new TextEncoder();
     const buf = await crypto.subtle.digest('SHA-256', enc.encode('gtelp_board_' + pw));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  // ══════════════════════════════════
-  //  데이터 로드 (Supabase)
-  // ══════════════════════════════════
+  function toggleMenu() {
+    document.getElementById('mobile-menu').classList.toggle('open');
+    document.getElementById('hamburger').classList.toggle('open');
+  }
+
+  // ── 데이터 로드 ──
   async function fetchPosts() {
     document.getElementById('board-body').innerHTML =
       '<tr><td colspan="5" class="no-data">불러오는 중...</td></tr>';
@@ -372,49 +309,38 @@
     renderBoard();
   }
 
-  // ══════════════════════════════════
-  //  모바일 메뉴
-  // ══════════════════════════════════
-  function toggleMenu() {
-    document.getElementById('mobile-menu').classList.toggle('open');
-    document.getElementById('hamburger').classList.toggle('open');
-  }
-
-  // ══════════════════════════════════
-  //  렌더링
-  // ══════════════════════════════════
+  // ── 렌더링 ──
   function renderBoard() {
-    const tbody   = document.getElementById('board-body');
-    const totalEl = document.getElementById('total-count');
-    totalEl.textContent = `(${posts.length}건)`;
+    const tbody = document.getElementById('board-body');
+    document.getElementById('total-count').textContent = posts.length;
 
     if (posts.length === 0) {
       tbody.innerHTML = '<tr><td colspan="5" class="no-data">등록된 게시글이 없습니다.</td></tr>';
       return;
     }
 
-    // 공지 수 파악 (번호 계산용)
     const noticeCount = posts.filter(p => p.is_notice).length;
     let regularIdx = 0;
 
     tbody.innerHTML = posts.map((p) => {
       const isNotice = p.is_notice;
-      const num  = isNotice ? '공지' : (posts.length - noticeCount - regularIdx++);
+      const num = isNotice ? '공지' : (posts.length - noticeCount - regularIdx++);
       const date = new Date(p.created_at).toLocaleDateString('ko-KR', { year:'2-digit', month:'2-digit', day:'2-digit' });
-      const adminDelBtn = isAdmin
-        ? `<button onclick="event.stopPropagation();adminDeleteById(${p.id})" style="margin-left:8px;padding:2px 10px;border-radius:4px;background:#7C3AED;color:#fff;font-size:0.72rem;font-weight:700;border:none;cursor:pointer;">삭제</button>`
+      const noticeBadge = isNotice ? `<span class="notice-badge">📌 공지</span>` : '';
+      const adminBtns = isAdmin
+        ? `<span class="admin-manage">
+            <button class="btn-edit-sm" onclick="event.stopPropagation();quickEdit(${p.id})">수정</button>
+            <button class="btn-del-sm" onclick="event.stopPropagation();quickDelete(${p.id})">삭제</button>
+           </span>`
         : '';
-      const noticeBadge = isNotice ? `<span class="notice-badge">📌 공지</span>` : `<span class="lock-icon" title="닉네임·비밀번호 필요">🔒</span>`;
-      return `<tr class="${isNotice ? 'notice-row' : ''}">
+      return `<tr class="${isNotice ? 'notice-row' : ''}" onclick="openDetail(${p.id})">
         <td style="font-weight:${isNotice ? '800' : '400'};color:${isNotice ? '#F59E0B' : ''};">${num}</td>
-        <td class="td-title" onclick="openViewAuth(${p.id})">
-          ${noticeBadge}${escHtml(p.title)}${adminDelBtn}
-        </td>
-        <td>${escHtml(maskAuthor(p.author))}</td>
+        <td class="td-title">${noticeBadge}${escHtml(p.title)}${adminBtns}</td>
+        <td>${escHtml(p.author || '관리자')}</td>
         <td>${date}</td>
         <td>${p.views}</td>
-        <td class="td-meta" onclick="openViewAuth(${p.id})">
-          <span>${escHtml(maskAuthor(p.author))}</span>
+        <td class="td-meta">
+          <span>${escHtml(p.author || '관리자')}</span>
           <span>·</span>
           <span>${date}</span>
           <span>·</span>
@@ -428,131 +354,33 @@
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  // 작성자 이름 마스킹: 첫 글자 + * + 끝 글자
-  function maskAuthor(name) {
-    if (!name || name === '익명') return '익명';
-    if (name.length === 1) return name;
-    if (name.length === 2) return name[0] + '*';
-    return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1];
-  }
-
-  // ══════════════════════════════════
-  //  글쓰기
-  // ══════════════════════════════════
-  function openWriteModal() {
-    ['w-title','w-author','w-pw','w-content'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('write-modal').classList.add('open');
-  }
-  function closeWriteModal() { document.getElementById('write-modal').classList.remove('open'); }
-
-  async function submitPost() {
-    const title   = document.getElementById('w-title').value.trim();
-    const author  = document.getElementById('w-author').value.trim();
-    const pw      = document.getElementById('w-pw').value;
-    const content = document.getElementById('w-content').value.trim();
-
-    if (!title)        { showToast('제목을 입력하세요.', 'error'); return; }
-    if (!author)       { showToast('닉네임을 입력하세요.', 'error'); return; }
-    if (pw.length < 4) { showToast('비밀번호는 4자리 이상 입력하세요.', 'error'); return; }
-    if (!content)      { showToast('내용을 입력하세요.', 'error'); return; }
-
-    const pw_hash = await hashPw(pw);
-    const { error } = await db.from('job_board').insert({
-      title, author: author || '익명', pw_hash, content
-    });
-    if (error) { showToast('등록 중 오류가 발생했습니다.', 'error'); console.error(error); return; }
-    closeWriteModal();
-    await fetchPosts();
-    showToast('등록되었습니다.', 'success');
-  }
-
-  // ══════════════════════════════════
-  //  비밀번호 모달 공용
-  // ══════════════════════════════════
-  function openPwModal(title, desc, action) {
-    pwAction = action;
-    document.getElementById('pw-modal-title').textContent = title;
-    document.getElementById('pw-modal-desc').textContent  = desc;
-    document.getElementById('pw-input').value = '';
-    document.getElementById('pw-nick-input').value = '';
-    // 관리자 로그인은 닉네임 불필요
-    const showNick = action !== 'admin-login';
-    document.getElementById('pw-nick-group').style.display = showNick ? 'flex' : 'none';
-    document.getElementById('pw-input-label').textContent  = showNick ? '비밀번호' : '관리자 비밀번호';
-    document.getElementById('pw-modal').classList.add('open');
-    setTimeout(() => {
-      if (showNick) document.getElementById('pw-nick-input').focus();
-      else document.getElementById('pw-input').focus();
-    }, 100);
-  }
-  function closePwModal() {
-    document.getElementById('pw-modal').classList.remove('open');
-    pwAction = null;
-  }
-
-  async function confirmPw() {
-    const input  = document.getElementById('pw-input').value;
-    const action = pwAction;
-
-    if (action === 'admin-login') {
-      if (input !== ADMIN_PW) { showToast('관리자 비밀번호가 틀렸습니다.', 'error'); return; }
-      isAdmin = true;
-      closePwModal();
-      document.getElementById('admin-btn').textContent = '🛡️ 관리자 모드 ON';
-      document.getElementById('admin-btn').style.background = '#059669';
-      renderBoard();
-      return;
-    }
-
-    // 닉네임 확인
-    const inputNick = document.getElementById('pw-nick-input').value.trim();
-    const post = posts.find(p => p.id === currentPostId);
-    if (!post) return;
-    if (inputNick !== post.author) { showToast('닉네임이 틀렸습니다.', 'error'); return; }
-
-    // 비밀번호 해시 비교 (DB에서 pw_hash 조회)
-    const inputHash = await hashPw(input);
-    const { data, error } = await db.from('job_board')
-      .select('pw_hash')
-      .eq('id', currentPostId)
-      .single();
-    if (error || !data) { showToast('오류가 발생했습니다.', 'error'); return; }
-    if (inputHash !== data.pw_hash) { showToast('비밀번호가 틀렸습니다.', 'error'); return; }
-
-    closePwModal();
-
-    if (action === 'view')   { showDetail(post); return; }
-    if (action === 'edit')   { openEditModal(post); return; }
-    if (action === 'delete') { doDelete(currentPostId); return; }
-  }
-
-  // ══════════════════════════════════
-  //  열람 (공지글은 바로 열람, 일반글은 비밀번호 필요)
-  // ══════════════════════════════════
-  function openViewAuth(id) {
+  // ── 글 상세 ──
+  async function openDetail(id) {
     currentPostId = id;
     const post = posts.find(p => p.id === id);
-    if (post && post.is_notice) { showDetail(post); return; }
-    openPwModal('🔒 열람 비밀번호 확인', '이 게시글은 비밀번호가 있어야 열람할 수 있습니다.', 'view');
-  }
+    if (!post) return;
 
-  async function showDetail(post) {
     post.views++;
     await db.from('job_board').update({ views: post.views }).eq('id', post.id);
-    document.getElementById('d-title').textContent   = post.title;
-    document.getElementById('d-author').textContent  = '✍️ ' + maskAuthor(post.author);
-    document.getElementById('d-date').textContent    = '📅 ' + new Date(post.created_at).toLocaleString('ko-KR');
-    document.getElementById('d-views').textContent   = '👁 ' + post.views;
+
+    document.getElementById('d-title').textContent  = post.title;
+    document.getElementById('d-author').textContent = '✍️ ' + (post.author || '관리자');
+    document.getElementById('d-date').textContent   = '📅 ' + new Date(post.created_at).toLocaleString('ko-KR');
+    document.getElementById('d-views').textContent  = '👁 ' + post.views;
     document.getElementById('d-content').textContent = post.content;
-    document.getElementById('admin-delete-btn').style.display = isAdmin ? 'inline-block' : 'none';
-    const noticeBtn = document.getElementById('notice-toggle-btn');
-    if (isAdmin) {
+
+    const showAdmin = isAdmin;
+    document.getElementById('d-edit-btn').style.display   = showAdmin ? 'inline-block' : 'none';
+    document.getElementById('d-del-btn').style.display    = showAdmin ? 'inline-block' : 'none';
+    const noticeBtn = document.getElementById('d-notice-btn');
+    if (showAdmin) {
       noticeBtn.style.display = 'inline-block';
       noticeBtn.textContent = post.is_notice ? '📌 공지 해제' : '📌 공지 설정';
       noticeBtn.className = 'btn-notice' + (post.is_notice ? ' on' : '');
     } else {
       noticeBtn.style.display = 'none';
     }
+
     document.getElementById('detail-modal').classList.add('open');
     renderBoard();
   }
@@ -562,18 +390,66 @@
     currentPostId = null;
   }
 
-  // ══════════════════════════════════
-  //  수정
-  // ══════════════════════════════════
-  function openEditAuth() {
-    openPwModal('✏️ 수정 비밀번호 확인', '수정하려면 작성 시 설정한 비밀번호를 입력하세요.', 'edit');
+  // ── 관리자 로그인 ──
+  function toggleAdmin() {
+    if (isAdmin) {
+      isAdmin = false;
+      document.getElementById('admin-btn').textContent = '🔐 관리자';
+      document.getElementById('admin-btn').style.background = '';
+      document.getElementById('write-btn').style.display = 'none';
+      renderBoard();
+    } else {
+      document.getElementById('admin-pw-input').value = '';
+      document.getElementById('admin-modal').classList.add('open');
+      setTimeout(() => document.getElementById('admin-pw-input').focus(), 100);
+    }
   }
-  function openEditModal(post) {
-    const editId = post.id;       // closeDetailModal이 currentPostId를 null로 초기화하기 전에 저장
-    closeDetailModal();
-    currentPostId = editId;       // 복원
+
+  function closeAdminModal() {
+    document.getElementById('admin-modal').classList.remove('open');
+  }
+
+  function confirmAdminLogin() {
+    const pw = document.getElementById('admin-pw-input').value;
+    if (pw !== ADMIN_PW) { showToast('비밀번호가 틀렸습니다.', 'error'); return; }
+    isAdmin = true;
+    closeAdminModal();
+    document.getElementById('admin-btn').textContent = '🛡️ 관리자 ON';
+    document.getElementById('admin-btn').style.background = '#059669';
+    document.getElementById('write-btn').style.display = 'inline-block';
+    renderBoard();
+    showToast('관리자 모드 활성화', 'success');
+  }
+
+  // ── 글쓰기 (관리자) ──
+  function openWriteModal() {
+    if (!isAdmin) return;
+    document.getElementById('w-title').value   = '';
+    document.getElementById('w-content').value = '';
+    document.getElementById('write-modal').classList.add('open');
+  }
+  function closeWriteModal() { document.getElementById('write-modal').classList.remove('open'); }
+
+  async function submitPost() {
+    const title   = document.getElementById('w-title').value.trim();
+    const content = document.getElementById('w-content').value.trim();
+    if (!title)   { showToast('제목을 입력하세요.', 'error'); return; }
+    if (!content) { showToast('내용을 입력하세요.', 'error'); return; }
+
+    const pw_hash = await hashPw(ADMIN_PW);
+    const { error } = await db.from('job_board').insert({ title, author: '관리자', content, pw_hash });
+    if (error) { showToast('오류: ' + (error.message || JSON.stringify(error)), 'error'); console.error(error); return; }
+    closeWriteModal();
+    await fetchPosts();
+    showToast('등록되었습니다.', 'success');
+  }
+
+  // ── 수정 (관리자) ──
+  function openEditModal() {
+    if (!isAdmin) return;
+    const post = posts.find(p => p.id === currentPostId);
+    if (!post) return;
     document.getElementById('e-title').value   = post.title;
-    document.getElementById('e-author').value  = post.author;
     document.getElementById('e-content').value = post.content;
     document.getElementById('edit-modal').classList.add('open');
   }
@@ -581,108 +457,79 @@
 
   async function submitEdit() {
     const title   = document.getElementById('e-title').value.trim();
-    const author  = document.getElementById('e-author').value.trim();
     const content = document.getElementById('e-content').value.trim();
     if (!title)   { showToast('제목을 입력하세요.', 'error'); return; }
     if (!content) { showToast('내용을 입력하세요.', 'error'); return; }
 
     const { error } = await db.from('job_board')
-      .update({ title, author: author || '익명', content })
+      .update({ title, content })
       .eq('id', currentPostId);
     if (error) { showToast('수정 중 오류가 발생했습니다.', 'error'); console.error(error); return; }
     closeEditModal();
-    currentPostId = null;
+    closeDetailModal();
     await fetchPosts();
     showToast('수정되었습니다.', 'success');
   }
 
-  // ══════════════════════════════════
-  //  삭제
-  // ══════════════════════════════════
-  function openDeleteAuth() {
-    openPwModal('🗑️ 삭제 비밀번호 확인', '삭제하려면 작성 시 설정한 비밀번호를 입력하세요.', 'delete');
+  // ── 삭제 (관리자) ──
+  async function deleteCurrentPost() {
+    if (!isAdmin || !currentPostId) return;
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    await doDelete(currentPostId);
+    closeDetailModal();
   }
+
+  async function quickDelete(id) {
+    if (!isAdmin) return;
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    await doDelete(id);
+  }
+
+  function quickEdit(id) {
+    if (!isAdmin) return;
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+    currentPostId = id;
+    document.getElementById('e-title').value   = post.title;
+    document.getElementById('e-content').value = post.content;
+    document.getElementById('edit-modal').classList.add('open');
+  }
+
   async function doDelete(id) {
     const { data, error } = await db.from('job_board').delete().eq('id', id).select();
-    if (error) {
-      console.error('delete error:', error);
-      showToast('삭제 중 오류가 발생했습니다.', 'error');
-      return;
-    }
-    if (!data || data.length === 0) {
-      showToast('삭제 실패 — Supabase RLS를 확인하세요.', 'error');
-      return;
-    }
-    closeDetailModal();
+    if (error) { showToast('삭제 중 오류가 발생했습니다.', 'error'); console.error(error); return; }
+    if (!data || data.length === 0) { showToast('삭제 실패 — RLS를 확인하세요.', 'error'); return; }
     await fetchPosts();
     showToast('삭제되었습니다.', 'success');
   }
 
-  // ══════════════════════════════════
-  //  관리자
-  // ══════════════════════════════════
-  function toggleAdmin() {
-    if (isAdmin) {
-      isAdmin = false;
-      document.getElementById('admin-btn').textContent = '🔐 관리자';
-      document.getElementById('admin-btn').style.background = '';
-      renderBoard();
-    } else {
-      openPwModal('🔐 관리자 로그인', '관리자 비밀번호를 입력하세요.', 'admin-login');
-    }
-  }
-
+  // ── 공지 설정 (관리자) ──
   async function toggleNotice() {
     if (!isAdmin) return;
     const post = posts.find(p => p.id === currentPostId);
     if (!post) return;
     const newVal = !post.is_notice;
     const { error } = await db.from('job_board').update({ is_notice: newVal }).eq('id', currentPostId);
-    if (error) { showToast('공지 설정 중 오류가 발생했습니다.', 'error'); console.error(error); return; }
+    if (error) { showToast('공지 설정 중 오류가 발생했습니다.', 'error'); return; }
     post.is_notice = newVal;
-    const noticeBtn = document.getElementById('notice-toggle-btn');
+    const noticeBtn = document.getElementById('d-notice-btn');
     noticeBtn.textContent = newVal ? '📌 공지 해제' : '📌 공지 설정';
     noticeBtn.className = 'btn-notice' + (newVal ? ' on' : '');
     await fetchPosts();
     showToast(newVal ? '공지로 설정되었습니다.' : '공지가 해제되었습니다.', 'success');
   }
 
-  function adminDeletePost() {
-    if (!isAdmin) return;
-    if (!confirm('정말 삭제하시겠습니까?')) return;
-    doDelete(currentPostId);
-  }
-
-  async function adminDeleteById(id) {
-    if (!isAdmin) return;
-    if (!confirm('정말 삭제하시겠습니까?')) return;
-    currentPostId = id;
-    await doDelete(id);
-  }
-
-  // ══════════════════════════════════
-  //  카카오 공유
-  // ══════════════════════════════════
-  function shareKakao() {
-    const url = window.location.href;
-    if (navigator.share) { navigator.share({ title: '게시판', url }); return; }
-    navigator.clipboard.writeText(url).then(() => showToast('링크가 복사되었습니다.', 'success'));
-  }
-
-  // ══════════════════════════════════
-  //  모달 외부 클릭 닫기 / 엔터키
-  // ══════════════════════════════════
-  ['write-modal','detail-modal','pw-modal','edit-modal'].forEach(id => {
+  // ── 모달 외부 클릭 닫기 / 엔터 ──
+  ['admin-modal','write-modal','detail-modal','edit-modal'].forEach(id => {
     document.getElementById(id).addEventListener('click', function(e) {
       if (e.target === this) this.classList.remove('open');
     });
   });
-  document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') confirmPw(); });
-  document.getElementById('pw-nick-input').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('pw-input').focus(); });
+  document.getElementById('admin-pw-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmAdminLogin();
+  });
 
-  // ══════════════════════════════════
-  //  토스트 알림
-  // ══════════════════════════════════
+  // ── 토스트 ──
   function showToast(msg, type = '') {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -691,7 +538,6 @@
     setTimeout(() => t.classList.remove('show'), 2800);
   }
 
-  // ── 초기 로드 ──
   fetchPosts();
 </script>
 
