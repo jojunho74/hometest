@@ -5473,7 +5473,7 @@
       if (funnelEl) {
         const visitCnt   = rows.length || 0;
         const analyzeCnt = actRows.filter(r => r.page.startsWith('evidence/sample.html:analyze:')).length;
-        const planCnt    = actRows.filter(r => r.page.startsWith('evidence/sample.html:plan-open:')||r.page.startsWith('evidence/sample.html:result-open:')).length;
+        const planCnt    = actRows.filter(r => r.page.startsWith('evidence/sample.html:result-open:')).length;
         const confirmCnt = actRows.filter(r => r.page.startsWith('evidence/sample.html:plan-btn:')).length;
         const pct = (a, b) => b > 0 ? Math.round(a / b * 100) + '%' : '—';
         const funnelSteps = [
@@ -8625,16 +8625,38 @@ ${d.hashtags}`;
     }
 
     let trkTotalCount = null; // 전체 방문수 (COUNT)
+    let trkPeriodCounts = {}; // 기간별 정확한 COUNT
 
     async function trkInit() {
       if (trkLoaded) return;
       trkLoaded = true;
       document.getElementById('trk-status').textContent = '불러오는 중…';
 
-      // 전체 건수 COUNT (Supabase 행수 제한 우회)
-      const { count } = await db.from('page_views')
-        .select('*', { count: 'exact', head: true });
-      trkTotalCount = count;
+      // KST 기준 날짜 계산
+      const now = new Date();
+      const kstNow = new Date(now.getTime() + 9*3600*1000);
+      const todayKST = kstNow.toISOString().slice(0, 10);
+      const todayStart  = new Date(todayKST + 'T00:00:00+09:00').toISOString();
+      const yesterStart = new Date(new Date(todayStart).getTime() - 86400*1000).toISOString();
+      const weekAgo     = new Date(now.getTime() - 7*86400*1000).toISOString();
+      const monthAgo    = new Date(now.getTime() - 30*86400*1000).toISOString();
+
+      // 전체 + 기간별 COUNT 병렬 조회
+      const [
+        { count: cAll },
+        { count: cToday },
+        { count: cYest },
+        { count: cWeek },
+        { count: cMonth },
+      ] = await Promise.all([
+        db.from('page_views').select('*', { count: 'exact', head: true }),
+        db.from('page_views').select('*', { count: 'exact', head: true }).gte('visited_at', todayStart),
+        db.from('page_views').select('*', { count: 'exact', head: true }).gte('visited_at', yesterStart).lt('visited_at', todayStart),
+        db.from('page_views').select('*', { count: 'exact', head: true }).gte('visited_at', weekAgo),
+        db.from('page_views').select('*', { count: 'exact', head: true }).gte('visited_at', monthAgo),
+      ]);
+      trkTotalCount = cAll;
+      trkPeriodCounts = { all: cAll, today: cToday, yesterday: cYest, week: cWeek, month: cMonth };
 
       // 분석용 최신 1,000개 로드
       const { data, error } = await db.from('page_views')
@@ -8693,15 +8715,15 @@ ${d.hashtags}`;
     function trkRenderKPI(rows) {
       const total = rows.length;
       const pages = new Set(rows.map(r => r.page)).size;
-      // 총 방문수는 전체 COUNT 사용 (기간 필터 무관)
-      if (trkTotalCount !== null) document.getElementById('trk-k-total').textContent = trkTotalCount.toLocaleString();
       const cl = rows.map(r => trkClassifyRef(r.referrer));
       const direct = cl.filter(c => c.type==='직접접속').length;
       const internal = cl.filter(c => c.type==='내부링크').length;
       const ext = total - direct - internal;
       const dwellRows = rows.filter(r => r.dwell_seconds > 0);
       const avgDwell = dwellRows.length ? Math.round(dwellRows.reduce((s,r)=>s+r.dwell_seconds,0)/dwellRows.length) : null;
-      document.getElementById('trk-k-total').textContent    = total.toLocaleString();
+      // 총 방문수는 기간별 Supabase COUNT 사용
+      const periodCount = trkPeriodCounts[trkPeriod] ?? trkTotalCount ?? total;
+      document.getElementById('trk-k-total').textContent    = periodCount.toLocaleString();
       document.getElementById('trk-k-pages').textContent    = pages;
       document.getElementById('trk-k-direct').textContent   = total ? Math.round(direct/total*100)+'%' : '—';
       document.getElementById('trk-k-ext').textContent      = total ? Math.round(ext/total*100)+'%' : '—';
