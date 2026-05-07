@@ -211,6 +211,7 @@
       <button onclick="switchTab('calendar')" id="tab-calendar" class="sb-item"><span class="sb-icon">📅</span><span class="sb-label">채용달력</span></button>
       <button onclick="switchTab('passdata')" id="tab-passdata" class="sb-item"><span class="sb-icon">🏆</span><span class="sb-label">합격데이터</span></button>
       <button onclick="switchTab('passconvert')" id="tab-passconvert" class="sb-item"><span class="sb-icon">🔄</span><span class="sb-label">합격데이터 변환</span></button>
+      <button onclick="switchTab('scorereports')" id="tab-scorereports" class="sb-item"><span class="sb-icon">📊</span><span class="sb-label">합격 제보</span></button>
 
       <div class="sb-section-label">자동화</div>
       <button onclick="switchTab('cardnews')" id="tab-cardnews" class="sb-item"><span class="sb-icon">📰</span><span class="sb-label">카드뉴스제작</span></button>
@@ -2925,6 +2926,49 @@
         </div>
       </div>
 
+      <!-- ── 합격 제보 관리 탭 ── -->
+      <div id="section-scorereports" class="hidden">
+        <div class="bg-white rounded-xl shadow-sm p-5 mb-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 class="font-bold text-slate-700 text-base">📊 합격 점수 제보 목록</h3>
+              <p class="text-xs text-slate-400 mt-0.5">sample.html에서 유저가 직접 제보한 합격 점수 데이터입니다.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <input id="sr-filter-input" type="text" placeholder="기관명 검색…" oninput="srFilterRender()"
+                class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 w-44">
+              <span id="sr-count-badge" class="text-xs font-semibold px-2 py-1 rounded-full bg-blue-50 text-blue-600"></span>
+              <button onclick="loadScoreReports()" class="btn btn-secondary text-xs px-3 py-1.5">새로고침</button>
+            </div>
+          </div>
+
+          <!-- 기관별 집계 요약 -->
+          <div id="sr-summary-wrap" class="mb-5 hidden">
+            <h4 class="text-xs font-bold text-slate-500 mb-2">기관별 제보 요약 (3건 이상)</h4>
+            <div id="sr-summary-cards" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <!-- 제보 목록 테이블 -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-slate-400 text-xs border-b border-slate-100">
+                  <th class="px-4 py-3 font-semibold">기관명</th>
+                  <th class="px-4 py-3 font-semibold">제보 점수</th>
+                  <th class="px-4 py-3 font-semibold">합격 연도</th>
+                  <th class="px-4 py-3 font-semibold">메모</th>
+                  <th class="px-4 py-3 font-semibold">제보일시</th>
+                  <th class="px-4 py-3 font-semibold">삭제</th>
+                </tr>
+              </thead>
+              <tbody id="sr-tbody">
+                <tr><td colspan="6" class="px-4 py-8 text-center text-slate-400 text-xs">불러오는 중…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- ══════ 카드뉴스제작 ══════ -->
       <div id="section-cardnews" class="hidden" style="flex:1;overflow:hidden;">
         <style>
@@ -3330,11 +3374,11 @@
       consult:'신청 관리', student:'학생접수', ibt:'IBT신청접수', news:'대학소식', programs:'대학활동',
       jobs:'채용공고', foreignjobs:'외국인채용공고', staffjobs:'직원채용공고', cnews:'기업소식', shorts:'유튜브쇼츠', stats:'통계',
       tracking:'추적', analysis1:'분석 1', analysis2:'분석 2', blog:'블로그 원고', calendar:'채용달력', popupads:'팝업광고', crawler:'대학활동 수집', alio:'채용AI DATA',
-      comments:'댓글 관리', cardnews:'카드뉴스 제작', passdata:'합격데이터', passconvert:'합격데이터 변환'
+      comments:'댓글 관리', cardnews:'카드뉴스 제작', passdata:'합격데이터', passconvert:'합격데이터 변환', scorereports:'합격 제보 관리'
     };
 
     function switchTab(tab) {
-      ['consult', 'student', 'ibt', 'news', 'programs', 'jobs', 'foreignjobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'tracking', 'analysis1', 'analysis2', 'blog', 'calendar', 'popupads', 'crawler', 'alio', 'comments', 'cardnews', 'passdata', 'passconvert'].forEach(t => {
+      ['consult', 'student', 'ibt', 'news', 'programs', 'jobs', 'foreignjobs', 'staffjobs', 'cnews', 'shorts', 'stats', 'tracking', 'analysis1', 'analysis2', 'blog', 'calendar', 'popupads', 'crawler', 'alio', 'comments', 'cardnews', 'passdata', 'passconvert', 'scorereports'].forEach(t => {
         document.getElementById('section-' + t).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById('tab-' + t);
         if (btn) { if (t === tab) btn.classList.add('active'); else btn.classList.remove('active'); }
@@ -3362,6 +3406,7 @@
       if (tab === 'blog')     loadBlogDrafts();
       if (tab === 'calendar') loadCalendarAdmin();
       if (tab === 'passdata') loadPassData();
+      if (tab === 'scorereports') loadScoreReports();
       if (tab === 'popupads') loadPopupAds();
       if (tab === 'crawler') { loadUnivSites(); restoreDetectResults(); }
       if (tab === 'cardnews') cnInit();
@@ -10077,6 +10122,89 @@ ${d.hashtags}`;
     if (error) { alert('수정 실패: ' + error.message); return; }
     closePsModal();
     loadPassData();
+  }
+  </script>
+
+  <!-- ── 합격 제보 관리 JS ── -->
+  <script>
+  let _srAllRows = [];
+
+  async function loadScoreReports() {
+    const tbody = document.getElementById('sr-tbody');
+    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400 text-xs">불러오는 중…</td></tr>';
+
+    const { data, error } = await db.from('score_reports')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(2000);
+
+    if (error) {
+      tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-red-400 text-xs">오류: ${error.message}</td></tr>`;
+      return;
+    }
+    _srAllRows = data || [];
+    document.getElementById('sr-count-badge').textContent = `총 ${_srAllRows.length}건`;
+    srFilterRender();
+    srRenderSummary();
+  }
+
+  function srFilterRender() {
+    const q = (document.getElementById('sr-filter-input').value || '').trim().toLowerCase();
+    const filtered = q ? _srAllRows.filter(r => r.institution_name.toLowerCase().includes(q)) : _srAllRows;
+    const tbody = document.getElementById('sr-tbody');
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400 text-xs">제보 데이터가 없습니다.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = filtered.map(r => {
+      const dt = r.created_at ? new Date(new Date(r.created_at).getTime() + 9*3600*1000).toISOString().replace('T',' ').slice(0,16) : '-';
+      return `<tr class="border-b border-slate-50 hover:bg-slate-50">
+        <td class="px-4 py-3 font-medium text-slate-700">${r.institution_name || '-'}</td>
+        <td class="px-4 py-3 font-bold text-blue-600">${r.reported_score}점</td>
+        <td class="px-4 py-3 text-slate-500">${r.pass_year || '-'}년</td>
+        <td class="px-4 py-3 text-slate-400 text-xs">${r.note || '-'}</td>
+        <td class="px-4 py-3 text-slate-400 text-xs">${dt}</td>
+        <td class="px-4 py-3">
+          <button onclick="srDelete('${r.id}')" class="text-xs text-red-400 hover:text-red-600 font-semibold">삭제</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function srRenderSummary() {
+    const countMap = {};
+    const scoreMap = {};
+    _srAllRows.forEach(r => {
+      const k = r.institution_name;
+      countMap[k] = (countMap[k] || 0) + 1;
+      if (!scoreMap[k]) scoreMap[k] = [];
+      scoreMap[k].push(r.reported_score);
+    });
+    const qualified = Object.keys(countMap).filter(k => countMap[k] >= 3).sort((a,b) => countMap[b]-countMap[a]);
+    const wrap = document.getElementById('sr-summary-wrap');
+    const cards = document.getElementById('sr-summary-cards');
+    if (!qualified.length) { wrap.classList.add('hidden'); return; }
+    wrap.classList.remove('hidden');
+    cards.innerHTML = qualified.map(k => {
+      const scores = scoreMap[k].sort((a,b)=>a-b);
+      const avg = Math.round(scores.reduce((s,v)=>s+v,0)/scores.length);
+      const min = scores[0], max = scores[scores.length-1];
+      return `<div class="border border-blue-100 bg-blue-50 rounded-lg px-3 py-2 text-xs">
+        <div class="font-bold text-slate-700">${k}</div>
+        <div class="text-blue-600 font-semibold mt-0.5">평균 ${avg}점 <span class="text-slate-400 font-normal">(${min}~${max})</span></div>
+        <div class="text-slate-400">제보 ${countMap[k]}건</div>
+      </div>`;
+    }).join('');
+  }
+
+  async function srDelete(id) {
+    if (!confirm('이 제보를 삭제하시겠습니까?')) return;
+    const { error } = await db.from('score_reports').delete().eq('id', id);
+    if (error) { alert('삭제 실패: ' + error.message); return; }
+    _srAllRows = _srAllRows.filter(r => r.id !== id);
+    document.getElementById('sr-count-badge').textContent = `총 ${_srAllRows.length}건`;
+    srFilterRender();
+    srRenderSummary();
   }
   </script>
 

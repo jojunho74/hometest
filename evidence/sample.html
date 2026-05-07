@@ -724,8 +724,12 @@
         } else if (passAvg != null) {
           passCell = `<span style="color:#FCD34D;font-weight:600;">${passAvg}</span><span style="color:#64748B;font-size:10px;"> ${passYear}</span>`;
         }
+        const safeInst = JSON.stringify(r.institution_name);
         return `<tr>
-          <td style="color:#E2E8F0;font-weight:500;">${esc(r.institution_name)}</td>
+          <td style="color:#E2E8F0;font-weight:500;">
+            <div>${esc(r.institution_name)}</div>
+            <button onclick="openReportModal(${safeInst})" style="margin-top:4px;font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid rgba(56,189,248,0.3);background:rgba(56,189,248,0.08);color:#38BDF8;cursor:pointer;font-weight:600;">📊 제보</button>
+          </td>
           <td style="color:#94A3B8;">${r.toeic_score != null ? r.toeic_score + '점' : '-'}</td>
           <td style="color:${diffColor};font-weight:700;">${diffStr}</td>
           <td style="font-size:12px;white-space:nowrap;">${passCell}</td>
@@ -889,10 +893,115 @@
       document.getElementById('mobile-menu').classList.toggle('open');
     }
 
+    // ── 합격 점수 제보 ──
+    function openReportModal(institutionName) {
+      document.getElementById('report-inst-label').textContent = institutionName;
+      document.getElementById('report-inst-hidden').value = institutionName;
+      document.getElementById('report-score-input').value = userScore || '';
+      document.getElementById('report-note-input').value = '';
+      document.getElementById('report-result').textContent = '';
+      const btn = document.getElementById('report-submit-btn');
+      btn.disabled = false;
+      btn.textContent = '제보하기';
+      document.getElementById('report-modal').style.display = 'flex';
+    }
+
+    function closeReportModal() {
+      document.getElementById('report-modal').style.display = 'none';
+    }
+
+    async function submitReport() {
+      const institutionName = document.getElementById('report-inst-hidden').value;
+      const score = parseInt(document.getElementById('report-score-input').value);
+      const year  = parseInt(document.getElementById('report-year-select').value);
+      const note  = document.getElementById('report-note-input').value.trim();
+      const resultEl = document.getElementById('report-result');
+
+      if (!institutionName || isNaN(score) || score < 0 || score > 990) {
+        resultEl.style.color = '#F87171';
+        resultEl.textContent = '올바른 점수를 입력해주세요. (0~990)';
+        return;
+      }
+
+      const btn = document.getElementById('report-submit-btn');
+      btn.disabled = true;
+      btn.textContent = '제보 중...';
+
+      const { error } = await db.from('score_reports').insert([{
+        institution_name: institutionName,
+        reported_score: score,
+        pass_year: year,
+        note: note || null
+      }]);
+
+      if (error) {
+        resultEl.style.color = '#F87171';
+        resultEl.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
+        btn.disabled = false;
+        btn.textContent = '제보하기';
+      } else {
+        resultEl.style.color = '#4ADE80';
+        resultEl.textContent = '✅ 제보해주셔서 감사합니다! 검토 후 데이터에 반영됩니다.';
+        btn.textContent = '제보 완료';
+        spTrack('score-report:' + institutionName + ':' + score);
+        setTimeout(() => closeReportModal(), 2200);
+      }
+    }
+
     // ── 내 방문 제외: 항상 ON 고정 ──
     const _NT_KEY = 'gtelp_notrack';
     localStorage.setItem(_NT_KEY, '1');
   </script>
+
+  <!-- ── 합격 점수 제보 모달 ── -->
+  <div id="report-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.72);align-items:center;justify-content:center;padding:16px;">
+    <div style="background:#152440;border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:24px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <h3 style="font-size:15px;font-weight:700;color:#E2E8F0;margin:0;">📊 합격 점수 제보</h3>
+        <button onclick="closeReportModal()" style="background:none;border:none;color:#64748B;font-size:18px;cursor:pointer;line-height:1;">✕</button>
+      </div>
+      <p style="font-size:12px;color:#64748B;margin:0 0 16px;line-height:1.6;">실제 합격 경험이 있으신 분만 제보해주세요.<br>여러분의 제보가 데이터 정확도를 높입니다.</p>
+
+      <div style="margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:600;color:#64748B;margin-bottom:4px;">기관명</div>
+        <div id="report-inst-label" style="font-size:14px;font-weight:600;color:#60A5FA;padding:9px 12px;background:#0D1F3C;border-radius:8px;border:1px solid rgba(255,255,255,0.08);"></div>
+        <input type="hidden" id="report-inst-hidden">
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label for="report-score-input" style="font-size:11px;font-weight:600;color:#64748B;display:block;margin-bottom:4px;">실제 보유 점수 (토익)</label>
+        <input id="report-score-input" type="number" min="0" max="990" placeholder="예: 850"
+          style="width:100%;box-sizing:border-box;background:#0D1F3C;border:1px solid rgba(255,255,255,0.12);color:#E2E8F0;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;">
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label for="report-year-select" style="font-size:11px;font-weight:600;color:#64748B;display:block;margin-bottom:4px;">합격 연도</label>
+        <select id="report-year-select"
+          style="width:100%;box-sizing:border-box;background:#0D1F3C;border:1px solid rgba(255,255,255,0.12);color:#E2E8F0;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;">
+          <option value="2026">2026년</option>
+          <option value="2025">2025년</option>
+          <option value="2024">2024년</option>
+          <option value="2023">2023년</option>
+          <option value="2022">2022년</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom:18px;">
+        <label for="report-note-input" style="font-size:11px;font-weight:600;color:#64748B;display:block;margin-bottom:4px;">메모 (선택)</label>
+        <input id="report-note-input" type="text" placeholder="직렬, 직급 등 (선택 사항)"
+          style="width:100%;box-sizing:border-box;background:#0D1F3C;border:1px solid rgba(255,255,255,0.12);color:#E2E8F0;border-radius:8px;padding:9px 12px;font-size:13px;outline:none;">
+      </div>
+
+      <div id="report-result" style="font-size:12px;min-height:18px;margin-bottom:12px;"></div>
+
+      <div style="display:flex;gap:8px;">
+        <button id="report-submit-btn" onclick="submitReport()"
+          style="flex:1;padding:10px;background:linear-gradient(135deg,#1D4ED8,#2563EB);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;">제보하기</button>
+        <button onclick="closeReportModal()"
+          style="flex:1;padding:10px;background:#1A2E50;color:#94A3B8;border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">취소</button>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
