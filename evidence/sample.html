@@ -724,11 +724,10 @@
         } else if (passAvg != null) {
           passCell = `<span style="color:#FCD34D;font-weight:600;">${passAvg}</span><span style="color:#64748B;font-size:10px;"> ${passYear}</span>`;
         }
-        const safeInst = JSON.stringify(r.institution_name);
         return `<tr>
           <td style="color:#E2E8F0;font-weight:500;">
             <div>${esc(r.institution_name)}</div>
-            <button onclick="openReportModal(${safeInst})" style="margin-top:4px;font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid rgba(56,189,248,0.3);background:rgba(56,189,248,0.08);color:#38BDF8;cursor:pointer;font-weight:600;">📊 제보</button>
+            <button onclick="openReportModal(this.dataset.name)" data-name="${esc(r.institution_name)}" style="margin-top:4px;font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid rgba(56,189,248,0.3);background:rgba(56,189,248,0.08);color:#38BDF8;cursor:pointer;font-weight:600;">📊 제보</button>
           </td>
           <td style="color:#94A3B8;">${r.toeic_score != null ? r.toeic_score + '점' : '-'}</td>
           <td style="color:${diffColor};font-weight:700;">${diffStr}</td>
